@@ -37,6 +37,9 @@ fail() {
 trap 'fail $LINENO' ERR
 cd "$ROOT"
 
+step "hf CLI (colab/sync.sh uses it)"
+pip install -q "huggingface_hub>=0.34"
+
 step "venv with the repo's pinned versions (uses Colab's CUDA torch)"
 # --without-pip: Colab's Python lacks ensurepip; the system pip installs into the venv.
 if [ ! -x "$VENV/bin/python" ]; then python -m venv --without-pip --system-site-packages "$VENV"; fi
