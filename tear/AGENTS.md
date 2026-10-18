@@ -12,6 +12,13 @@ Reproduces TEAR (table extraction TEW + attribute recommendation ARW) from the s
 - First 20 Conversation test texts run on a CPU laptop (Llama-3-8B Q4): Table 2 structured-F1 EM RAG 68.2 (paper 76.9), TEAR 71.5 (paper 82.4). Details: `results/report.md`.
 - Next: larger runs on Colab GPU (N=100, then 700).
 
+## Long runs (workflow)
+1. Test locally first (unit tests, `bash -n colab/*.sh`), then push the code to GitHub. Data, models and tokens never go in git.
+2. Data and models live on Hugging Face (`database-lab`, private): dataset `attribute-extraction-data` (folder `tear/`) and model `tear-surrogate`; one TEAR run at a time (`results/RUN_OWNER`).
+3. Run on Colab with `colab/TEAR_colab.ipynb` (see `colab/README.md`); start with a small benchmark and give a time estimate before the full run.
+4. Results are committed back to `tear/results/` by `colab/sync.sh` (every 30 min and at the end); `git pull` to get them.
+5. Tokens only in Colab Secrets (`HF_TOKEN`, `GH_TOKEN` = classic token with `public_repo`).
+
 ## Rules
 - Don't change method code or prompts without asking. Never force-push or rewrite `results/`.
 - Data and models never go in git; tokens never go in files or notebooks (Colab Secrets only).
