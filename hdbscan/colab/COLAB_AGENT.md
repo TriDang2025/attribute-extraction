@@ -6,6 +6,8 @@ Project: `/content/attribute-extraction/hdbscan`, a clone of the shared GitHub r
 - Background: `AGENTS.md`, and `hbe/config.py` for the paper settings and targets.
 - Notebook cell 1 set up the HF and GitHub logins. If `hf auth whoami` or `git push` fails, ask the user to run it again.
 
+- GitHub pushes use the `GH_TOKEN` environment variable that notebook cell 1 sets. Jobs started from notebook cells inherit it; the Colab Terminal does not. So start runs from the notebook cells (`run.sh` / `run_colab.sh`), and if a push from the Terminal fails with `could not read Username`, ask the user to run the push from a notebook cell instead.
+
 ## Rules
 - Do not change the paper settings in `hbe/config.py` or the metric code without asking the user.
 - Never delete files in `data/` or `results/`, or on HF; the run resumes from them. Never force-push.

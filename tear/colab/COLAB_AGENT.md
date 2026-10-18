@@ -4,9 +4,11 @@ You are on a Google Colab GPU VM, in `/content/attribute-extraction/tear`. This 
 - Data and the surrogate come from Hugging Face.
 - Results are committed back to GitHub.
 - Background: `AGENTS.md` and `README.md` in this folder.
-- Notebook cell 1 has already set up the logins: HF through `huggingface_hub.login`, and GitHub through git's credential cache. If `hf auth whoami` or `git push` fails, ask the user to run cell 1 again.
+- Notebook cell 1 has already set up the logins: HF through `huggingface_hub.login`, and GitHub through the GH_TOKEN env var. If `hf auth whoami` or `git push` fails, ask the user to run cell 1 again.
 
 Goal: rerun the TEAR reproduction on more Conversation test texts than the 20 done on the laptop. Use the same models and settings: Llama-3-8B Q4_K_M, SFR-Embedding-Mistral Q4_K_M, and an 8K context, now on the GPU.
+
+- GitHub pushes use the `GH_TOKEN` environment variable that notebook cell 1 sets. Jobs started from notebook cells inherit it; the Colab Terminal does not. So start runs from the notebook cells (`run.sh` / `run_colab.sh`), and if a push from the Terminal fails with `could not read Username`, ask the user to run the push from a notebook cell instead.
 
 ## Rules
 - Do not change the method code (`tear_reproduction/`, `eval/`, `surrogate/`) or the prompts without asking the user.

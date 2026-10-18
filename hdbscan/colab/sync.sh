@@ -3,7 +3,7 @@
 #   bash colab/sync.sh pull-data          HF dataset hdbscan/ -> data/ (keeps local files) + public Hansard sources
 #   bash colab/sync.sh push-data          bge-m3 embeddings (also partial ones, so embedding resumes) -> HF
 #   bash colab/sync.sh push-results MSG   commit hdbscan/results/ and push to GitHub (rebases on others' commits)
-# Auth: HF from `huggingface_hub.login` (notebook cell 1); GitHub from git's credential cache.
+# Auth: HF from `huggingface_hub.login` (notebook cell 1); GitHub from the GH_TOKEN env var + credential helper set by notebook cell 1.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export HF_DATA_REPO="${HF_DATA_REPO:-database-lab/attribute-extraction-data}"   # dataset: hdbscan/ <-> hdbscan/data/

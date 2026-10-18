@@ -3,7 +3,7 @@
 #   bash colab/sync.sh pull-data          HF dataset tear/ -> tear/data/ (keeps local files), surrogate -> $TEAR_MODELS
 #   bash colab/sync.sh push-data          tear/data/conversation caches that runs grow -> HF (only if changed)
 #   bash colab/sync.sh push-results MSG   commit tear/results/ and push to GitHub (rebases on others' commits)
-# Auth: HF from `huggingface_hub.login` / HF_TOKEN; GitHub from git's credential cache (set by the notebook).
+# Auth: HF from `huggingface_hub.login` / HF_TOKEN; GitHub from the GH_TOKEN env var + credential helper set by notebook cell 1.
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 cd "$TEAR_PROJECT"
