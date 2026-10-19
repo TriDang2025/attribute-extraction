@@ -46,9 +46,9 @@
 
 | Dataset | Level | Hidden | Z | P* | Judge calls | Z' | elbow k | Accepted | TEAR chrf | TEAR BS | CFR chrf | CFR BS |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Conversation | 1 (seed 0) | 7 | 29 | 1 | 1 | 29 | 3 | 0 | 44.0 | 62.8 | 38.5 | 43.7 |
+| Conversation | 1 (seed 0) | 7 | 132 | 8 | 8 | 132 | 11 | 1 | 64.4 | 76.2 | 64.9 | 72.2 |
 | Conversation | 2 (seed 0) | 12 | 137 | 4 | 4 | 137 | 20 | 2 | 66.5 | 73.6 | 63.5 | 73.6 |
-| Conversation | 3 (seed 0) | 17 | 47 | 1 | 1 | 47 | 8 | 2 | 48.4 | 65.3 | 38.8 | 54.2 |
+| Conversation | 3 (seed 0) | 17 | 207 | 6 | 6 | 207 | 19 | 6 | 74.6 | 79.9 | 65.2 | 75.2 |
 
 The paper reports Figure 4 as bars only (roughly 40-80% for Llama-3-8B).
 
@@ -56,9 +56,9 @@ The paper reports Figure 4 as bars only (roughly 40-80% for Llama-3-8B).
 
 | Dataset | Level | Method | header-F1 EM | header-F1 chrf | structured-F1 EM | structured-F1 chrf |
 |---|---|---|---|---|---|---|
-| Conversation | 1 | TEAR | 80.7±0.0 | 89.5±0.0 | 71.8±0.0 | 79.3±0.0 |
-| Conversation | 1 | TEAR* | 80.7±0.0 | 89.5±0.0 | 71.8±0.0 | 79.3±0.0 |
+| Conversation | 1 | TEAR | 76.4±0.0 | 86.2±0.0 | 65.8±0.0 | 75.4±0.0 |
+| Conversation | 1 | TEAR* | 77.5±0.0 | 86.5±0.0 | 65.3±0.0 | 75.0±0.0 |
 | Conversation | 2 | TEAR | 70.3±0.0 | 82.3±0.0 | 59.1±0.0 | 71.2±0.0 |
 | Conversation | 2 | TEAR* | 71.4±0.0 | 82.6±0.0 | 60.4±0.0 | 71.7±0.0 |
-| Conversation | 3 | TEAR | 69.9±0.0 | 81.7±0.0 | 56.9±0.0 | 67.5±0.0 |
-| Conversation | 3 | TEAR* | 70.6±0.0 | 80.9±0.0 | 56.4±0.0 | 67.1±0.0 |
+| Conversation | 3 | TEAR | 58.3±0.0 | 70.6±0.0 | 47.8±0.0 | 58.5±0.0 |
+| Conversation | 3 | TEAR* | 69.6±0.0 | 81.0±0.0 | 56.8±0.0 | 67.6±0.0 |
