@@ -280,7 +280,7 @@ def _fmt(values: List[float]) -> str:
 
 def cmd_report(args):
     sims = [s for s in ("EM", "chrf", "BS") if s != "BS" or not args.no_bs]
-    lines, data = ["# Reproduction results (Llama-3-8B-Instruct, CPU)", ""], {"table2": [], "ar": [], "tearstar": []}
+    lines, data = ["# Reproduction results (Llama-3-8B-Instruct Q4_K_M)", ""], {"table2": [], "ar": [], "tearstar": []}
     lines += ["## Table 2: table extraction, full schema", "",
               "| Dataset | Metric | sim. | Paper RAG | Ours RAG | Paper TEAR | Ours TEAR |", "|---|---|---|---|---|---|---|"]
     notes = []

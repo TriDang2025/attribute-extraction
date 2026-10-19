@@ -1,4 +1,4 @@
-# Reproduction results (Llama-3-8B-Instruct, CPU)
+# Reproduction results (Llama-3-8B-Instruct Q4_K_M)
 
 ## Table 2: table extraction, full schema
 
