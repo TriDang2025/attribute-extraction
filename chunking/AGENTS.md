@@ -20,5 +20,13 @@ Baselines: `fixed` (400 cl100k tokens) and `texttiling` (NLTK).
 - The full run is on Colab: `colab/README.md`, notebook `colab/CHK_colab.ipynb`, agent steps in `colab/COLAB_AGENT.md`. The data is on the HF dataset `database-lab/attribute-extraction-data`, folder `chunking/`.
 - Smoke runs on the laptop (2026-10-19): `results/S_n50`, `results/T_seed42_n40`.
 
+## Status (2026-10-20)
+- The scope is a 5% sample (the first 50 dialogues), run on the laptop: `results/S_n50` and `results/T_seed{42,0,1}_n50` (3 stitched documents per seed). The Colab full run is ready but not used.
+- `scripts/make_viewer.py <run>` gives a per-run browser view (`results/<run>/viewer.html`). `scripts/make_showcase.py --out X.html` builds 4 real examples side by side, the score tables, and the differences from each source. A copy of that page is `results/examples_5pct.html`.
+- Main patterns, from this sample only:
+  - Chonkie (both models) over-cuts: about 8 chunks per dialogue, and half its cuts fall inside turns.
+  - RSC cuts rarely, and about half its cuts also fall inside turns (LangChain's sentence regex).
+  - Chroma almost never cuts inside a turn, and it has the best coherence gap and boundary F1 on the stitched documents.
+
 ## Rules
 - Don't change published settings or metric code without asking. Data and models never go in git.
