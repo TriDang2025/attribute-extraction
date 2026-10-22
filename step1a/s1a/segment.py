@@ -39,9 +39,10 @@ def chroma_pieces(text, enc, min_size, max_size):
                   dict(max_chunk_size=max_size, min_chunk_size=min_size))
 
 
-def merge_adjacent(text, spans, enc, tau):
+def merge_adjacent(text, spans, enc, tau, use_keywords=True):
     """Merge span i+1 into the current piece when cos >= tau and span i+1 adds no entity type
-    the current piece lacks. Works on char spans so pieces stay slices of text."""
+    the current piece lacks (use_keywords=False: cosine only). Works on char spans so pieces
+    stay slices of text."""
     if tau is None or len(spans) < 2:
         return list(spans)
     vec = enc.encode([text[s:e] for s, e in spans])
@@ -49,7 +50,7 @@ def merge_adjacent(text, spans, enc, tau):
     cur_v, cur_ents = vec[0], entity_words(text[spans[0][0]:spans[0][1]])
     for (s, e), v in zip(spans[1:], vec[1:]):
         ents = entity_words(text[s:e])
-        if float(cur_v @ v) >= tau and ents <= cur_ents:
+        if float(cur_v @ v) >= tau and (not use_keywords or ents <= cur_ents):
             out[-1] = (out[-1][0], e)
             cur_v = enc.encode([text[out[-1][0]:e]])[0]
         else:
@@ -64,6 +65,27 @@ def piece_spans(doc, chunks):
     starts = [s for s, _ in align(doc.text, chunks)[0]]
     ends = starts[1:] + [len(doc.text)]
     return [(s, e) for s, e in zip(starts, ends) if doc.text[s:e].strip()]
+
+
+def snap_to_turns(doc, spans):
+    """Move every internal cut of contiguous char spans to the nearest turn start (ties: earlier),
+    then rebuild contiguous spans without empty or whitespace-only pieces."""
+    starts = [s for s, _ in doc.spans]
+    first, end = spans[0][0], len(doc.text)
+    cuts = sorted({min(starts, key=lambda t: (abs(t - c), t)) for c, _ in spans[1:]})
+    out, cur = [], first
+    for c in cuts + [end]:
+        if c <= cur or c > end:
+            continue
+        if not doc.text[cur:c].strip():
+            if c == end and out:  # trailing blank piece joins the previous one
+                out[-1] = (out[-1][0], end)
+            continue
+        out.append((cur, c))
+        cur = c
+    if cur < end and out:
+        out[-1] = (out[-1][0], end)
+    return out or [(first, end)]
 
 
 def as_chunks(doc, spans):

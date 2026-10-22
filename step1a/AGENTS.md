@@ -8,11 +8,40 @@ Tests Step 1a of the schema-expansion pipeline (OneDrive `TEAR/source_paper/pipe
 - `scripts/run.py --limit 50`: main grid -> `results/n50/{metrics.csv, summary.md, examples.md, attribute_purity.csv}`.
 - `scripts/relabel.py --limit 50`: scores value clusters vs attribute / entity / slot, plus the two-stage test -> `results/n50/relabel.md`.
 - `s1a/segment.py`, `s1a/spans.py`, `scripts/entity_seg.py --limit 50`: entity segmentation (Chroma + bge-m3 at smaller sizes, merge if cosine >= tau and no new entity keyword) and GLiNER generic-label spans, in the two-stage test -> `results/n50/entity_seg.{md,csv}`, `entity_seg_examples.md`, caches in `entity_seg/`. GLiNER medium v2.1 in `CHK_MODELS/gliner_medium-v2.1` (its config points to the local `deberta-v3-base`).
+  - Flags: `--sizes`, `--taus`, `--snap`, `--keywords`, `--out`, `--chunk-cache`.
+  - With no flags it reproduces the original grid exactly.
+- `s1a/split.py`: dev = ids[:300] (TEAR pool), test = ids[300:]; `--split dev|test` on the scripts. The n50 runs use dev 0–49.
+- `s1a/gold.py`, `s1a/metrics.py`: v2 protocol.
+  - Units: every verbatim mention; yes/no and unfound values are non-verbatim.
+  - Classes: name and confirmed name merged (33 classes); lenient multi-label B-cubed.
+  - `match_all`: a span takes every label at its position.
+  - `span_recall`: mention, value and tight recall.
+  - Report block: visible/hidden for TEAR levels 1–3, plus bootstrap CI.
+  - `scripts/rescore.py`: old vs new protocol.
+- `s1a/step2.py`, `scripts/step2.py`: Step 2 with gold entities (normalize, masked context with target mark, type partition, cannot-link constrained agglomerative, ceilings).
+  - Adopted setting: `results/v2_n50/chosen_step2_joint.json` (α 0.5, average, t 0.45, type partition, cannot-link).
+  - `merge_split_clusters` (C6) was rejected; it stays only as a reported ladder row.
+- `scripts/plug_in.py`: Step 2 on predicted entities. Default segments are 25/100 snap + merge 0.45 (adopted).
+- `s1a/spacy_spans.py`, `scripts/spacy_extract.py` (spaCy venv `C:\Users\nguye\venvs\spacy`), `scripts/spans_compare.py`: GLiNER vs spaCy comparison. spaCy as main extractor was not adopted.
 - `data/cache/` (not in git): bge-m3 cache, seeded from the chunking cache.
 
 ## Run
-venv `C:\Users\nguye\venvs\chunking`; `python -m pytest -q tests`, then the scripts above (n50: about 7 min on the laptop CPU).
+venv `C:\Users\nguye\venvs\chunking`; `python -m pytest -q tests` (79 tests), then the scripts above.
+Timings on the laptop CPU for n50:
+- `run.py`: about 7 min
+- `rescore.py`: 2 min
+- `step2.py`: 5 min
+- `spans_compare.py`: 2 min
+- `plug_in.py`: 5–8 min
+- segmentation grid: 41 min
 
-## Status (2026-10-21)
+## Status (2026-10-23)
+- 2026-10-22/23, v2: new protocol, snapped segments and joint Step 2 adopted; the code was built in worktree `../attribute-extraction-v2` and ported here.
+  - Results:
+    - GLiNER spans F1 0.583 → 0.630
+    - end to end 0.344 → 0.456
+    - gold mentions on predicted entities 0.549 → 0.672 (K 48)
+  - Results in `results/v2_n50/`; reports in OneDrive `TEAR/report/step1a_v2/`.
+  - Tuned on the scored 50 dialogues; not yet checked on test.
 - 2026-10-20, 5% sample: values alone cluster by slot, values with context by entity; two stages (entity, then value) reach B-cubed F1 0.66 with gold entities, 0.47 with Chroma-based entities. Report: OneDrive `TEAR/report/step1a_results.md`.
 - 2026-10-21, entity segmentation: 0.470 -> 0.549 (Chroma 25/100 + merge 0.45). GLiNER spans find 59–64% of gold values; on matched spans F1 0.530 -> 0.583. bge-m3 cosines of adjacent pieces are about 0.35–0.85, so merge cutoffs are 0.45–0.60. `entity_seg.py` takes 25 min on CPU (gliner 0.2.29 pins transformers 5.16.1 in the venv). Report: OneDrive `TEAR/report/step1a_entity_segmentation.md`.

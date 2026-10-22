@@ -15,6 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from s1a import paths  # noqa: E402
+from s1a import split as S  # noqa: E402
 from s1a import units as U  # noqa: E402
 from s1a.cluster import n_clusters, runs, spaces  # noqa: E402
 
@@ -38,8 +39,8 @@ def encoder():
     return Encoder()
 
 
-def build_units(limit):
-    dialogues = load_dialogues(limit)
+def build_units(limit, split="dev"):
+    dialogues = S.dialogues(split, limit)
     docs = {d.doc_id: d for d in single_docs(dialogues)}
     tables = U.load_tables(paths.TEAR_DATA, list(docs))
     chunks = {}

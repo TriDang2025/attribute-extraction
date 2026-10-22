@@ -1,0 +1,42 @@
+591 verbatim mentions, 31 classes, adapter: s1a.gold.mentions_for
+Loading weights:   0%|          | 0/391 [00:00<?, ?it/s]Loading weights: 100%|##########| 391/391 [00:00<00:00, 7979.82it/s]
+encoded in 262s
+# Step 2 with gold entities fixed (dev, 50 dialogues)
+
+591 verbatim gold mentions, 31 classes, 50 dialogues; units from s1a.gold.mentions_for. Groups = gold entity of the mention; booking = (dialogue, gold entity). Run time 4.5 min.
+
+**Tuning uses the same dialogues it reports on** (t, linkage, alpha, theta are picked by F1 on these mentions), so rows after C2 are optimistic.
+
+Lenient multi-label B-cubed (s1a.metrics.report_block); single F1 = old single-label score on the joined label. vL/hL = F1 on mentions of visible / hidden attributes at TEAR level L. Delta = F1 change vs the previous carried row (ceilings vs C0).
+
+| Stage | Config | P | R | F1 | K | Delta F1 | single F1 | vL1 | hL1 | vL2 | hL2 | vL3 | hL3 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| C0 | raw strings, average, t=0.4 | 0.822 | 0.597 | 0.692 | 120 |  | 0.684 | 0.683 | 0.777 | 0.667 | 0.773 | 0.668 | 0.732 |
+| C1 | string ceiling (normalized string -> majority gold class) | 0.890 | 0.884 | 0.887 | 31 | +0.195 | 0.877 | 0.884 | 0.929 | 0.879 | 0.915 | 0.862 | 0.937 |
+| C1 | oracle k per entity (normalized string vectors, average) | 0.392 | 0.839 | 0.534 | 32 | -0.158 | 0.522 | 0.532 | 0.562 | 0.533 | 0.535 | 0.535 | 0.530 |
+| C2 | normalized, complete, t=0.4 | 0.853 | 0.601 | 0.705 | 108 | +0.014 | 0.698 | 0.698 | 0.777 | 0.683 | 0.775 | 0.666 | 0.776 |
+| C3 | alpha=0.5, complete, t=0.4 | 0.609 | 0.729 | 0.664 | 35 | -0.042 | 0.650 | 0.669 | 0.509 | 0.629 | 0.785 | 0.641 | 0.711 |
+| C3 retuned | alpha=0.5, complete, t=0.4 | 0.609 | 0.729 | 0.664 | 35 | +0.000 | 0.650 | 0.669 | 0.509 | 0.629 | 0.785 | 0.641 | 0.711 |
+| C4 | + partition by type (alpha=0.5, complete, t=0.4) | 0.728 | 0.737 | 0.732 | 39 | +0.069 | 0.721 | 0.730 | 0.756 | 0.701 | 0.839 | 0.722 | 0.750 |
+| C5 | + cannot-link (1965 pairs) | 0.799 | 0.663 | 0.725 | 46 | -0.008 | 0.721 | 0.716 | 0.803 | 0.697 | 0.819 | 0.704 | 0.762 |
+| C6 | theta=0.6 (13 merges) | 0.739 | 0.711 | 0.725 | 33 | -0.000 | 0.718 | 0.717 | 0.807 | 0.687 | 0.857 | 0.694 | 0.784 |
+
+Chosen: C4 + partition by type (alpha=0.5, complete, t=0.4) (F1 0.732) -> chosen_step2.json (`s1a.step2.run_best`).
+
+## C2 grid (normalized strings): F1 (K)
+
+| linkage | t=0.2 | t=0.25 | t=0.3 | t=0.35 | t=0.4 | t=0.45 | t=0.5 | t=0.55 | t=0.6 |
+|---|---|---|---|---|---|---|---|---|---|
+| average | 0.538 (170) | 0.632 (157) | 0.669 (140) | 0.685 (122) | 0.704 (102) | 0.685 (83) | 0.612 (53) | 0.526 (29) | 0.337 (14) |
+| complete | 0.498 (177) | 0.589 (162) | 0.638 (145) | 0.676 (126) | 0.705 (108) | 0.704 (94) | 0.696 (74) | 0.624 (49) | 0.592 (35) |
+| single | 0.575 (167) | 0.657 (152) | 0.685 (129) | 0.680 (106) | 0.593 (73) | 0.432 (42) | 0.324 (16) | 0.287 (6) | 0.285 (5) |
+
+## C3 context weight alpha
+
+| Config | P | R | F1 | K |
+|---|---|---|---|---|
+| alpha=0.4, complete, t=0.4 | 0.626 | 0.685 | 0.654 | 47 |
+| alpha=0.5, complete, t=0.4 | 0.609 | 0.729 | 0.664 | 35 |
+| alpha=0.6, complete, t=0.4 | 0.447 | 0.580 | 0.505 | 30 |
+| alpha=0.7, compl
+done in 4.5 min -> C:\Users\nguye\repos\attribute-extraction-v2\step1a\results\v2_n50
