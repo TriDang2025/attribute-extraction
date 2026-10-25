@@ -30,7 +30,10 @@ Timings on the laptop CPU for n50:
 - `s1a/step2.py`, `scripts/step2.py`: Step 2 with gold entities (normalize, masked context with target mark, type partition, cannot-link constrained agglomerative, ceilings).
   - Adopted setting: `results/v2_n50/chosen_step2_joint.json` (α 0.5, average, t 0.45, type partition, cannot-link).
   - `merge_split_clusters` (C6) was rejected; it stays only as a reported ladder row.
-- `scripts/plug_in.py`: Step 2 on predicted entities. Default segments are 25/100 snap + merge 0.45 (adopted).
+- `scripts/plug_in.py`: Step 2 on predicted entities, original vs chosen stage 2. Defaults (v3): segments 5/25 snap + merge 0.40; spans from the per-turn GLiNER cache; `--step2` (spans) joint, `--step2-gold` window.
+  - Best per input (v3): spans → original stage 2 (raw strings, t 0.4); gold mentions → window Step 2.
+- `scripts/gliner_labels.py`: GLiNER once per turn without the speaker prefix (`spans.turn_windows`), label sets generic / hand / gold -> `results/v3_n50/gliner_labels/gliner_turn_<set>.jsonl` (threshold 0.3 stored).
+- `scripts/step2_window.py`: window Step 2 grid on gold entities -> `results/v3_n50/chosen_step2_window.json`.
 - `s1a/spacy_spans.py`, `scripts/spacy_extract.py`, `scripts/spans_compare.py`: GLiNER vs spaCy comparison. spaCy as main extractor was not adopted.
 - `data/cache/` (not in git): bge-m3 cache, seeded from the chunking cache.
 
@@ -44,7 +47,11 @@ Timings on the laptop CPU for n50:
 - `scripts/step2.py` -> `results/v2_n50/{chosen_step2.json, step2.csv, step2.md, step2_examples.md}`; the adopted `chosen_step2_joint.json` -> `scripts/plug_in.py` (`--step2`) -> `results/v2_n50/plug_in.md`
 - `scripts/rescore.py` -> `results/v2_n50/{rescore.md, rescore.csv, rescore_examples.md}`; also checks against `results/n50/entity_seg.md`
 
-## Status (2026-10-23)
+## Status (2026-10-25)
+- 2026-10-25, v3 ported from worktree `../attribute-extraction-v3` (n50 dev):
+  - gold mentions on predicted entities 0.744 (K 36), window Step 2;
+  - GLiNER spans F1 0.614, value recall 0.887, end to end 0.545 (original stage 2);
+  - check run: `results/v3_n50/plug_in_main_check.md`. Not yet checked on test.
 - 2026-10-22/23, v2: new protocol, snapped segments and joint Step 2 adopted; the code was built in worktree `../attribute-extraction-v2` and ported here.
   - Results:
     - GLiNER spans F1 0.583 → 0.630
