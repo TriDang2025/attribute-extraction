@@ -4,9 +4,12 @@ value spans, put back into Step 1a's two-stage clustering and compared with the 
 
 python scripts/entity_seg.py --limit 50
   -> results/n50/entity_seg.{md,csv}, entity_seg_examples.md, chosen_seg.json, entity_seg/ (caches)
-Options: --sizes 25/100,15/75  --taus none,0.40,0.45  --snap {off,on,both}  --keywords {on,off,both}
+Options: --sizes 25/100,15/75,10/50,5/25,turn  --taus none,0.40,0.45  --snap {off,on,both}  --keywords {on,off,both}
   --out DIR (results dir)  --chunk-cache DIR (chunk and GLiNER caches, default <out>/entity_seg)
 snap = move cuts to the nearest turn start; keywords off = merge on cosine only.
+turn = one piece per turn (no Chroma, snap is a no-op). --candidates-only: per size, pieces per dialogue,
+share of turn gaps that are cuts and gold-cut recall before any merge -> candidate_cuts.md.
+Entity F1 v2 (ent2_*): verbatim gold mentions, lenient B-cubed on entity labels; configs are ranked by it.
 """
 
 import argparse
@@ -28,6 +31,9 @@ from s1a import paths  # noqa: E402
 from s1a import segment as S  # noqa: E402
 from s1a import spans as SP  # noqa: E402
 from s1a import units as U  # noqa: E402
+from s1a import gold  # noqa: E402
+from s1a import metrics as M  # noqa: E402
+from types import SimpleNamespace  # noqa: E402
 from chk.metrics import boundary_counts, cuts_to_gaps, prf  # noqa: E402
 from hbe.metrics import external  # noqa: E402
 
@@ -35,18 +41,25 @@ BASE = ((50, 400), None, False, True)  # (size, tau, snap, keywords)
 SPAN_THRESHOLDS = (0.3, 0.5)
 
 
+TURN = "turn"
+
+
+def size_str(size):
+    return TURN if size == TURN else f"{size[0]}/{size[1]}"
+
+
 def cfg_name(size, tau, snap=False, kw=True):
-    return (f"{size[0]}/{size[1]}" + (" snap" if snap else "") + (f" +merge {tau:.2f}" if tau else "")
+    return (size_str(size) + (" snap" if snap else "") + (f" +merge {tau:.2f}" if tau else "")
             + (" sim-only" if tau and not kw else ""))
 
 
 def cfg_key(size, tau, snap=False, kw=True):
-    return (f"{size[0]}_{size[1]}" + ("_s" if snap else "") + (f"_m{round(tau * 100)}" if tau else "")
+    return (size_str(size).replace("/", "_") + ("_s" if snap else "") + (f"_m{round(tau * 100)}" if tau else "")
             + ("_nk" if tau and not kw else ""))
 
 
 def parse_sizes(s):
-    return tuple(tuple(int(x) for x in p.split("/")) for p in s.split(","))
+    return tuple(TURN if p.strip() == TURN else tuple(int(x) for x in p.split("/")) for p in s.split(","))
 
 
 def parse_taus(s):
@@ -59,12 +72,20 @@ def configs(sizes, taus, snap, keywords):
     kws = {"on": (True,), "off": (False,), "both": (True, False)}[keywords]
     out = [BASE]
     for size in sizes:
-        for sn in snaps:
+        for sn in ((False,) if size == TURN else snaps):  # snapping turn pieces changes nothing
             for tau in taus:
                 for kw in (kws if tau else (True,)):
                     if (size, tau, sn, kw) not in out:
                         out.append((size, tau, sn, kw))
     return out
+
+
+def base_pieces(docs, cache, enc, size):
+    """Char spans per dialogue before snapping/merging."""
+    if size == TURN:
+        return {d: S.turn_pieces(docs[d]) for d in docs}
+    chunks = load_chunks(cache, docs, enc, size)
+    return {d: S.piece_spans(docs[d], chunks[d]) for d in docs}
 
 
 def load_chunks(cache, docs, enc, size):
@@ -109,6 +130,33 @@ def segment_stats(docs, spans_by_doc):
     p1, r1, f1 = prf(tp1, n_hyp, n_ref)
     return dict(seg_per_dlg=n_seg / len(docs), cut_inside_pct=100 * inside / max(1, n_seg - len(docs)),
                 p0=p0, r0=r0, f0=f0, p1=p1, r1=r1, f1=f1, purity=pure / n_turns)
+
+
+def candidate_rows(docs, sp_by_doc):
+    """Pieces per dialogue, share of turn gaps that are cuts, gold-cut recall (before any merge)."""
+    n_cut = sum(len(cuts_to_gaps(d, sp_by_doc[i])[0]) for i, d in docs.items())
+    n_gap = sum(d.n_turns - 1 for d in docs.values())
+    return dict(pieces=sum(len(s) for s in sp_by_doc.values()) / len(docs), cut_share=n_cut / max(1, n_gap),
+                r0=segment_stats(docs, sp_by_doc)["r0"])
+
+
+def write_candidates(out, rows, n_docs):
+    L = [f"# Cut candidates before merging ({n_docs} dialogues)", "",
+         "Pieces after snapping (if on), before the merge. Share = turn gaps that are a cut; "
+         "recall = gold domain-change cuts hit exactly (r0).", "",
+         "| Size | Snap | Pieces/dialogue | Share of turn gaps cut | Gold-cut recall r0 |", "|---|---|---|---|---|"]
+    L += [f"| {r['size']} | {r['snap']} | {r['pieces']:.1f} | {r['cut_share']:.2f} | {r['r0']:.2f} |" for r in rows]
+    text = "\n".join(L) + "\n"
+    (out / "candidate_cuts.md").write_text(text, encoding="utf-8", newline="\n")
+    print(text)
+
+
+def entity_units(docs, mentions):
+    """Verbatim gold mentions as units with entity-label sets (rule of s1a.step2.gold_entity)."""
+    from s1a.step2 import gold_entity
+    return [SimpleNamespace(doc_id=m.doc_id, start=m.start,
+                            labels=frozenset({gold_entity(m, docs[m.doc_id]).lower()}))
+            for m in mentions if m.verbatim]
 
 
 def two_stage_scores(us, xv, groups_by_seed, golds, scored=None):
@@ -176,6 +224,7 @@ def main():
     ap.add_argument("--snap", choices=("off", "on", "both"), default="off")
     ap.add_argument("--keywords", choices=("on", "off", "both"), default="on")
     ap.add_argument("--out", help="results dir (default results/n<limit>)")
+    ap.add_argument("--candidates-only", action="store_true", help="only the cut-candidate pre-check")
     ap.add_argument("--chunk-cache", help="dir for chunk and GLiNER caches (default <out>/entity_seg)")
     args = ap.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -191,6 +240,18 @@ def main():
 
     docs, sets, stats = build_units(args.limit, args.split)
     enc = encoder()
+    if args.candidates_only:
+        rows = []
+        for size in sizes:
+            base = base_pieces(docs, cache, enc, size)
+            for sn in sorted({c[2] for c in grid if c[0] == size}):
+                sp = {d: S.snap_to_turns(docs[d], base[d]) if sn else base[d] for d in docs}
+                rows.append(dict(size=size_str(size), snap="on" if sn else "off") | candidate_rows(docs, sp))
+        enc.save()
+        write_candidates(out, rows, len(docs))
+        return
+    tables = U.load_tables(paths.TEAR_DATA, list(docs))
+    eus = entity_units(docs, gold.mentions_for(docs, tables))
     vals = sets["value"]
     vgold = golds_of([u.label for u in vals])
     xv = enc.encode([u.text for u in vals])
@@ -198,13 +259,12 @@ def main():
     # ---------------------------------------------------------------- segmentation grid
     rows, segs_of, adj = [], {}, {}
     for size in sizes:
-        chunks = load_chunks(cache, docs, enc, size)
-        base_spans = {d: S.piece_spans(docs[d], chunks[d]) for d in docs}
+        base_spans = base_pieces(docs, cache, enc, size)
         sims = []
         for d, sp in base_spans.items():
             v = enc.encode([docs[d].text[s:e] for s, e in sp])
             sims += [float(v[i] @ v[i + 1]) for i in range(len(sp) - 1)]
-        adj[f"{size[0]}/{size[1]}"] = np.percentile(sims, [10, 50, 75, 90, 100])
+        adj[size_str(size)] = np.percentile(sims, [10, 50, 75, 90, 100])
         print(f"chunks {size}: {time.time() - t0:.0f}s", flush=True)
         for c in (c for c in grid if c[0] == size):
             _, tau, snap, kw = c
@@ -212,11 +272,15 @@ def main():
             sp = {d: S.merge_adjacent(docs[d].text, sp[d], enc, tau, use_keywords=kw) for d in docs}
             segs = [u for d in docs for u in U.chroma_units(docs[d], S.as_chunks(docs[d], sp[d]))]
             segs_of[c] = (sp, segs)
-            row = dict(config=cfg_name(*c), key=cfg_key(*c), size=f"{size[0]}/{size[1]}",
+            row = dict(config=cfg_name(*c), key=cfg_key(*c), size=size_str(size),
                        tau=tau if tau else "none", snap="on" if snap else "off",
                        keywords="off" if tau and not kw else "on", n_seg=len(segs))
             row |= segment_stats(docs, sp)
             row |= two_stage_scores(vals, xv, entity_groups(vals, segs, enc), vgold)
+            row["f0_lo"], row["f0_hi"] = M.boundary_ci(docs, sp)
+            eg = entity_groups(eus, segs, enc)
+            row["ent2_p"], row["ent2_r"], row["ent2_f1"] = M.ent2_scores(eus, eg)
+            row["ent2_lo"], row["ent2_hi"] = M.ent2_ci(eus, eg)
             # PART1: metrics.report_block (new protocol scoring plugs in here: report_block(units, pred, levels))
             rows.append(row)
             print(f"  {row['config']}: {len(segs)} segs, A F1@0.4 {row['t0.4_attribute_f1']:.3f}", flush=True)
@@ -274,11 +338,23 @@ def ranking(rows, metric, n=10):
     return sorted(rows, key=lambda r: -r[metric])[:n]
 
 
+def ent2_top(rows):
+    """Top config by entity F1 v2 and the other configs whose range overlaps the top one's."""
+    ranked = sorted(rows, key=lambda r: -r["ent2_f1"])
+    top = ranked[0]
+    return top, [r for r in ranked[1:] if r["ent2_hi"] >= top["ent2_lo"] and r["ent2_lo"] <= top["ent2_hi"]]
+
+
 def write_chosen(out, rows):
     """chosen_seg.json: best config by each criterion."""
     keys = ("config", "key", "size", "tau", "snap", "keywords", "stage1_entity_f1", "t0.4_attribute_f1")
     res = {m: {k: (float(r[k]) if isinstance(r[k], (float, np.floating)) else r[k]) for k in keys}
            for _, m in RANKINGS for r in ranking(rows, m, 1)}
+    top, tied = ent2_top(rows)
+    ek = keys + ("ent2_f1", "ent2_lo", "ent2_hi")
+    res["ent2_f1"] = {k: (float(top[k]) if isinstance(top[k], (float, np.floating)) else top[k]) for k in ek}
+    res["ent2_tied"] = [{k: (float(r[k]) if isinstance(r[k], (float, np.floating)) else r[k]) for k in ek}
+                        for r in tied]
     (out / "chosen_seg.json").write_text(json.dumps(res, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
@@ -289,12 +365,12 @@ def write_md(out, rows, gold_row, span_rows, adj, limit, n_vals, secs):
          "## Segments", "",
          "Boundaries vs gold domain changes, pooled over dialogues; ±1 = within one turn. "
          "Purity = turns in their segment's majority gold domain.", "",
-         "| Config | Snap | Keywords | Seg/dialogue | Cuts inside turn % | P ±0 | R ±0 | F1 ±0 | P ±1 | R ±1 | F1 ±1 | Purity |",
-         "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+         "| Config | Snap | Keywords | Seg/dialogue | Cuts inside turn % | P ±0 | R ±0 | F1 ±0 | P ±1 | R ±1 | F1 ±1 | Purity | F1 ±0 range |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
         L.append(f"| {r['config']} | {r['snap']} | {r['keywords']} | {r['seg_per_dlg']:.1f} | {r['cut_inside_pct']:.0f} | {_f(r['p0'], 2)} | "
                  f"{_f(r['r0'], 2)} | {_f(r['f0'], 2)} | {_f(r['p1'], 2)} | {_f(r['r1'], 2)} | "
-                 f"{_f(r['f1'], 2)} | {_f(r['purity'], 2)} |")
+                 f"{_f(r['f1'], 2)} | {_f(r['purity'], 2)} | {_f(r['f0_lo'], 2)}-{_f(r['f0_hi'], 2)} |")
     L += ["", "Cosine of adjacent pieces before the merge (bge-m3), percentiles 10/50/75/90/max: "
           + "; ".join(f"{k}: " + "/".join(f"{x:.2f}" for x in v) for k, v in adj.items()) + ". "
           "Merge = cosine >= tau and no new entity word (keywords off: cosine only). Snap = cuts moved to turn starts."]
@@ -326,6 +402,20 @@ def write_md(out, rows, gold_row, span_rows, adj, limit, n_vals, secs):
                      f"{_f(sp_p, 2)} / {_f(sp_r, 2)} / {_f(sp_f, 2)} | {prf3(r, 'stage1_entity')} | "
                      f"{prf3(r, 't0.3_attribute')} | {prf3(r, 't0.4_attribute')} ({r['t0.4_K']:.0f}) | "
                      f"{prf3(r, 't0.5_attribute')} |")
+    top, tied = ent2_top(rows)
+    tie = {r["key"] for r in tied}
+    L += ["", "## Side by side (ranked by entity F1 v2)", "",
+          "Entity F1 v2: stage-1 entity B-cubed on verbatim gold mentions (lenient, mean of 3 k-means seeds), "
+          "range = 95% bootstrap over dialogues (seed 42). Boundary range = bootstrap over dialogues. "
+          "Tie = range overlaps the top config's range.", "",
+          "| # | Config | Pieces/dlg | Boundary P / R / F1 [range] | Entity F1 old | Entity P / R / F1 v2 [range] | "
+          "Attribute F1 t=0.4 | |", "|---|---|---|---|---|---|---|---|"]
+    for i, r in enumerate(sorted(rows, key=lambda r: -r["ent2_f1"]), 1):
+        mark = "top" if r is top else ("tie" if r["key"] in tie else "")
+        L.append(f"| {i} | {r['config']} | {r['seg_per_dlg']:.1f} | {_f(r['p0'], 2)} / {_f(r['r0'], 2)} / {_f(r['f0'], 2)} "
+                 f"[{_f(r['f0_lo'], 2)}-{_f(r['f0_hi'], 2)}] | {_f(r['stage1_entity_f1'])} | "
+                 f"{_f(r['ent2_p'])} / {_f(r['ent2_r'])} / {_f(r['ent2_f1'])} [{_f(r['ent2_lo'])}-{_f(r['ent2_hi'])}] | "
+                 f"{_f(r['t0.4_attribute_f1'])} | {mark} |")
     L += ["", "## Rankings (top 10, segmentation only)", ""]
     for title, m in RANKINGS:
         L += [f"By {title}:", "", "| # | Config | Stage-1 entity F1 | Attribute F1 t=0.4 |", "|---|---|---|---|"]

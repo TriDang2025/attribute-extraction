@@ -199,6 +199,42 @@ def bootstrap_ci(units, pred, n_boot=1000, seed=0):
     return float(np.percentile(f, 2.5)), float(np.percentile(f, 97.5))
 
 
+def ent2_scores(units, groups_by_seed):
+    """Mean over seeds of lenient B-cubed (P, R, F1) of units (.labels = entity-label sets) vs groups."""
+    res = [bcubed_multi([u.labels for u in units], g) for g in groups_by_seed.values()]
+    return tuple(float(np.mean([r[i] for r in res])) for i in range(3))
+
+
+def ent2_ci(units, groups_by_seed, n_boot=1000, seed=0):
+    """95% range of lenient F1 over all seeds: per-item P/R are averaged over the seeds, then
+    dialogues are resampled, so the range matches the mean-over-seeds point."""
+    sets = [u.labels for u in units]
+    pr = [bcubed_items(sets, [str(x) for x in g]) for g in groups_by_seed.values()]
+    p, r = np.mean([x[0] for x in pr], 0), np.mean([x[1] for x in pr], 0)
+    by_doc = defaultdict(list)
+    for i, u in enumerate(units):
+        by_doc[u.doc_id].append(i)
+    docs, rng, f = sorted(by_doc), np.random.RandomState(seed), []
+    for _ in range(n_boot):
+        sel = [i for d in rng.choice(docs, len(docs)) for i in by_doc[d]]
+        f.append(_prf(p[sel], r[sel])[2])
+    return float(np.percentile(f, 2.5)), float(np.percentile(f, 97.5))
+
+
+def boundary_ci(docs, spans_by_doc, n_boot=1000, seed=0):
+    """95% range of pooled exact (+-0) boundary F1: bootstrap over dialogues, re-pooling the
+    per-dialogue tp / hyp / ref counts."""
+    from chk.metrics import boundary_counts, cuts_to_gaps, prf
+    c = np.array([boundary_counts(d.gold_gaps, cuts_to_gaps(d, spans_by_doc[i])[0], 0)
+                  for i, d in docs.items()], float)
+    rng = np.random.RandomState(seed)
+    f = []
+    for _ in range(n_boot):
+        tp, hyp, ref = c[rng.randint(0, len(c), len(c))].sum(0)
+        f.append(prf(tp, hyp, ref)[2])
+    return float(np.percentile(f, 2.5)), float(np.percentile(f, 97.5))
+
+
 def _f(x):
     return f"{x:.3f}"
 

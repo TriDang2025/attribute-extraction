@@ -88,5 +88,11 @@ def snap_to_turns(doc, spans):
     return out or [(first, end)]
 
 
+def turn_pieces(doc):
+    """One contiguous char piece per turn: starts at each turn start (first at 0), last ends at len(text)."""
+    starts = [0] + [s for s, _ in doc.spans[1:]]
+    return list(zip(starts, starts[1:] + [len(doc.text)]))
+
+
 def as_chunks(doc, spans):
     return [doc.text[s:e] for s, e in spans]

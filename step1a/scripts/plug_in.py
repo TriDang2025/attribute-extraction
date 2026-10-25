@@ -1,7 +1,8 @@
 """C7: the chosen Step 2 on predicted entities (Chroma segments + k-means stage 1), for gold
 mentions (A) and GLiNER spans (B), against the original stage 2 (raw strings, average, t=0.4).
 
-python scripts/plug_in.py --limit 50 [--seg 25/100,0.45,on,on] [--step2 results/v2_n50/chosen_step2_joint.json]
+python scripts/plug_in.py --limit 50 [--seg 5/25,0.40,on,on] [--step2 results/v2_n50/chosen_step2_joint.json]
+    [--step2-gold results/v3_n50/chosen_step2_window.json] [--spans <GLiNER cache .jsonl>]
   -> results/v2_n50/plug_in.md
 """
 
@@ -26,30 +27,34 @@ from s1a import units as U  # noqa: E402
 import spans_compare as SC  # noqa: E402
 
 CHUNKS = paths.RESULTS / "n50" / "entity_seg"
-DEFAULT_SEG = "25/100,0.45,on,on"  # adopted 2026-10-23: snap + merge 0.45 with the keyword check
+DEFAULT_SEG = "5/25,0.40,on,on"  # adopted 2026-10-25 (v3): snap + merge 0.40 with the keyword check
+DEFAULT_SPANS = "results/v3_n50/gliner_labels/gliner_turn_generic.jsonl"  # GLiNER once per turn, no prefix
 
 
 def parse_seg(s):
     size, tau, snap, kw = s.split(",")
-    a, b = size.split("/")
-    return (int(a), int(b)), (None if tau == "none" else float(tau)), snap == "on", kw == "on"
+    if size != "turn":
+        a, b = size.split("/")
+        size = (int(a), int(b))
+    return size, (None if tau == "none" else float(tau)), snap == "on", kw == "on"
 
 
 def seg_key(size, tau, snap, kw):
-    k = f"{size[0]}_{size[1]}" + ("_s" if snap else "") + (f"_m{round(tau * 100)}" if tau else "")
+    k = ("turn" if size == "turn" else f"{size[0]}_{size[1]}") + ("_s" if snap and size != "turn" else "") + (f"_m{round(tau * 100)}" if tau else "")
     return k + ("" if kw or not tau else "_nk")
 
 
-def segments(docs, enc, size, tau, snap, kw):
-    src = paths.CHROMA_CHUNKS if size == (50, 400) else CHUNKS / f"chunks_{size[0]}_{size[1]}.jsonl"
+def segments(docs, enc, size, tau, snap, kw, cache=CHUNKS):
     have = {}
-    for line in open(src, encoding="utf-8"):
-        r = json.loads(line)
-        have[r["doc_id"]] = r["chunks"]
+    if size != "turn":
+        src = paths.CHROMA_CHUNKS if size == (50, 400) else cache / f"chunks_{size[0]}_{size[1]}.jsonl"
+        for line in open(src, encoding="utf-8"):
+            r = json.loads(line)
+            have[r["doc_id"]] = r["chunks"]
     segs = []
     for did, doc in docs.items():
-        sp = S.piece_spans(doc, have[did])
-        if snap:
+        sp = S.turn_pieces(doc) if size == "turn" else S.piece_spans(doc, have[did])
+        if snap and size != "turn":
             sp = S.snap_to_turns(doc, sp)
         sp = S.merge_adjacent(doc.text, sp, enc, tau, use_keywords=kw)
         segs += U.chroma_units(doc, S.as_chunks(doc, sp))
@@ -87,8 +92,12 @@ def run(units, docs, segs, enc, cfg, ts=()):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=50)
-    ap.add_argument("--seg", action="append", help="size,tau,snap,keywords e.g. 25/100,0.45,off,on")
-    ap.add_argument("--step2", default="results/v2_n50/chosen_step2_joint.json")
+    ap.add_argument("--seg", action="append", help="size,tau,snap,keywords e.g. 25/100,0.45,off,on or turn,0.40,on,on")
+    ap.add_argument("--step2", default="results/v2_n50/chosen_step2_joint.json", help="Step 2 for spans (B)")
+    ap.add_argument("--step2-gold", default="results/v3_n50/chosen_step2_window.json",
+                    help="Step 2 for gold mentions (A)")
+    ap.add_argument("--spans", default=DEFAULT_SPANS, help="GLiNER span cache (threshold 0.5 applied)")
+    ap.add_argument("--chunk-cache", default=str(CHUNKS), help="dir with chunks_<a>_<b>.jsonl")
     ap.add_argument("--out", default="results/v2_n50")
     ap.add_argument("--t", default="", help="extra thresholds for the chosen Step 2, e.g. 0.25,0.3,0.35")
     ap.add_argument("--name", default="plug_in", help="output file stem")
@@ -96,21 +105,22 @@ def main():
     out = paths.ROOT / args.out
     t0 = time.time()
     cfg = json.load(open(paths.ROOT / args.step2, encoding="utf-8"))
+    cfg_gold = json.load(open(paths.ROOT / args.step2_gold, encoding="utf-8"))
     docs, _, _ = build_units(args.limit)
     tables = U.load_tables(paths.TEAR_DATA, list(docs))
     docs = {d: v for d, v in docs.items() if d in tables}
     mentions = gold.mentions_for(docs, tables)
     verb = [m for m in mentions if m.verbatim]
     enc = encoder()
-    spans = SC.gliner_units(CHUNKS / "gliner_25_100_m45.jsonl", docs, 0.5)
+    spans = SC.gliner_units(paths.ROOT / args.spans, docs, 0.5)
     M.match_all(spans, mentions)
     vrec = M.span_recall(spans, mentions)["value"]
     rows = []
     for seg in args.seg or [DEFAULT_SEG]:
         size, tau, snap, kw = parse_seg(seg)
-        segs = segments(docs, enc, size, tau, snap, kw)
-        for unit_name, us in (("A gold mentions", verb), ("B GLiNER 0.5 spans", spans)):
-            res = run(us, docs, segs, enc, cfg, [float(x) for x in args.t.split(",") if x])
+        segs = segments(docs, enc, size, tau, snap, kw, Path(args.chunk_cache))
+        for unit_name, us, c in (("A gold mentions", verb, cfg_gold), ("B GLiNER 0.5 spans", spans, cfg)):
+            res = run(us, docs, segs, enc, c, [float(x) for x in args.t.split(",") if x])
             for st, r in res.items():
                 rows.append(dict(seg=seg_key(size, tau, snap, kw), units=unit_name, stage2=st, **r,
                                  e2e=(vrec * r["F1"]) if unit_name.startswith("B") else None))
@@ -118,7 +128,7 @@ def main():
                   flush=True)
     enc.save()
     L = [f"# C7: chosen Step 2 on predicted entities ({args.limit} dialogues)", "",
-         f"Step 2 config: `{json.dumps(cfg)}`. Stage 1 = k-means k=5 on segments (3 seeds, mean). "
+         f"Step 2 config (spans): `{json.dumps(cfg)}`; (gold mentions): `{json.dumps(cfg_gold)}`. Stage 1 = k-means k=5 on segments (3 seeds, mean). "
          f"Booking = (dialogue, segment). B value recall = {vrec:.3f}. Run {(time.time() - t0) / 60:.1f} min.", "",
          "| Segments | Units | Stage 2 | P | R | F1 | K | vis/hid L1 | vis/hid L2 | vis/hid L3 | End to end |",
          "|---|---|---|---|---|---|---|---|---|---|---|"]

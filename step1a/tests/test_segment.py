@@ -82,3 +82,43 @@ def test_merge_keywords_vs_similarity_only():
     assert S.merge_adjacent(t3, sp3, Same(), 0.5) == sp3
     assert S.merge_adjacent(t3, sp3, Same(), 0.5, use_keywords=False) == [(0, len(t3))]
     assert S.merge_adjacent(t2, sp2, Same(), None) == sp2
+
+
+def test_turn_pieces_one_per_turn_contiguous():
+    doc = _doc()
+    sp = S.turn_pieces(doc)
+    _check(doc, sp)
+    assert len(sp) == doc.n_turns
+    assert [s for s, _ in sp[1:]] == [s for s, _ in doc.spans[1:]]
+
+
+def test_boundary_ci_contains_point():
+    from chk.metrics import boundary_counts, cuts_to_gaps, prf
+    from s1a import metrics as M
+    docs = {"D1": _doc()}
+    starts = [s for s, _ in docs["D1"].spans]
+    n = len(docs["D1"].text)
+    sp = {"D1": [(0, starts[2]), (starts[2], n)]}
+    lo, hi = M.boundary_ci(docs, sp, n_boot=50)
+    tp, h, r = boundary_counts(docs["D1"].gold_gaps, cuts_to_gaps(docs["D1"], sp["D1"])[0], 0)
+    assert lo <= prf(tp, h, r)[2] <= hi
+
+
+def test_ent2_scores_equal_single_label_bcubed():
+    from types import SimpleNamespace
+    from hbe.metrics import external
+    from s1a import metrics as M
+    gold_l = ["hotel", "hotel", "train", "taxi", "train", "hotel"]
+    pred = [0, 0, 1, 1, 1, 0]
+    us = [SimpleNamespace(labels=frozenset({g})) for g in gold_l]
+    p, r, f = M.ent2_scores(us, {42: pred})
+    e = external(gold_l, pred)
+    assert np.allclose([p, r, f], [e["bcubed_precision"], e["bcubed_recall"], e["bcubed_f1"]])
+
+
+def test_plug_in_parse_seg_turn():
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    import plug_in
+    assert plug_in.parse_seg("turn,0.4,on,on") == ("turn", 0.4, True, True)
+    assert plug_in.seg_key(*plug_in.parse_seg("turn,0.40,on,on")) == "turn_m40"
+    assert plug_in.parse_seg("10/50,none,off,on")[0] == (10, 50)

@@ -110,13 +110,9 @@ def turn_index(doc, m):
     return len(doc.spans) - 1
 
 
-def masked_context(doc, mention, mentions_in_doc, prev_turns=1, mask_strings=True, mark_target=True):
-    """Text of the mention's turn and `prev_turns` previous turns, with every mention span in
-    that window replaced by its type tag. mask_strings also tags other occurrences of the
-    mention strings (a value said twice but located once), so no value string leaks. mark_target
-    writes the mention's own tag as <<[TAG]>>, so mentions in the same turns get different contexts."""
-    t = turn_index(doc, mention)
-    lo, hi = doc.spans[max(0, t - prev_turns)][0], doc.spans[t][1]
+def _value_spans(doc, lo, hi, mentions_in_doc, mask_strings=True):
+    """(start, end, text) of mention spans inside [lo, hi], plus (mask_strings) every other
+    occurrence of a mention string there; sorted by start, longer first."""
     spans = [(m.start, m.end, m.text) for m in mentions_in_doc
              if m.start is not None and m.start >= 0 and m.start >= lo and m.end <= hi]
     if mask_strings:
@@ -125,6 +121,17 @@ def masked_context(doc, mention, mentions_in_doc, prev_turns=1, mask_strings=Tru
             pat = re.compile(r"(?<!\w)" + re.escape(v.strip()) + r"(?!\w)", re.I)
             spans += [(lo + a.start(), lo + a.end(), v) for a in pat.finditer(win)]
     spans.sort(key=lambda x: (x[0], -(x[1] - x[0])))
+    return spans
+
+
+def masked_context(doc, mention, mentions_in_doc, prev_turns=1, mask_strings=True, mark_target=True):
+    """Text of the mention's turn and `prev_turns` previous turns, with every mention span in
+    that window replaced by its type tag. mask_strings also tags other occurrences of the
+    mention strings (a value said twice but located once), so no value string leaks. mark_target
+    writes the mention's own tag as <<[TAG]>>, so mentions in the same turns get different contexts."""
+    t = turn_index(doc, mention)
+    lo, hi = doc.spans[max(0, t - prev_turns)][0], doc.spans[t][1]
+    spans = _value_spans(doc, lo, hi, mentions_in_doc, mask_strings)
     out, pos = [], lo
     for s, e, v in spans:
         if s < pos:
@@ -138,6 +145,42 @@ def masked_context(doc, mention, mentions_in_doc, prev_turns=1, mask_strings=Tru
     return "".join(out)
 
 
+_SPEAKER = re.compile(r"\s*(User|System)\s*:\s*")
+
+
+def _masked(doc, a, b, spans):
+    """doc.text[a:b] with the spans inside it (already non-overlapping) replaced by type tags."""
+    out, pos = [], a
+    for s, e, v in spans:
+        if s < pos or s < a or e > b:
+            continue
+        pad_l = " " if s > 0 and doc.text[s - 1].isalnum() else ""
+        pad_r = " " if e < len(doc.text) and doc.text[e].isalnum() else ""
+        out += [doc.text[pos:s], pad_l + TAGS[value_type(v)] + pad_r]
+        pos = e
+    out.append(doc.text[pos:b])
+    return "".join(out)
+
+
+def window_texts(doc, mention, mentions_in_doc, k, side="lr", mask_strings=True):
+    """k words before and after the mention inside its own turn (speaker prefix stripped), other
+    values masked by type tag, target written as <<[TAG]>>. side "lr" -> (left, right) with left
+    ending and right starting at the mark; side "sym" -> one string left + mark + right."""
+    lo, hi = doc.spans[turn_index(doc, mention)]
+    m = _SPEAKER.match(doc.text, lo, hi)
+    if m:
+        lo = m.end()
+    ts, te = mention.start, mention.end
+    spans = [x for x in _value_spans(doc, lo, hi, mentions_in_doc, mask_strings)
+             if x[1] <= ts or x[0] >= te]  # the target wins over anything overlapping it
+    left = _masked(doc, lo, ts, spans).split()[-k:] if k > 0 else []
+    right = _masked(doc, te, hi, spans).split()[:k] if k > 0 else []
+    mark = f"<<{TAGS[value_type(mention.text)]}>>"
+    if side == "sym":
+        return " ".join(left + [mark] + right)
+    return " ".join(left + [mark]), " ".join([mark] + right)
+
+
 def _unit(x):
     n = np.linalg.norm(x, axis=1, keepdims=True)
     return x / np.where(n == 0, 1, n)
@@ -146,6 +189,21 @@ def _unit(x):
 def combine(ctx_vecs, str_vecs, alpha):
     """alpha * context + (1 - alpha) * string, re-normalized rows."""
     return _unit(alpha * np.asarray(ctx_vecs, float) + (1 - alpha) * np.asarray(str_vecs, float)).astype(np.float32)
+
+
+
+def combine_window(ctx_vecs, left_vecs, right_vecs, str_vecs, alpha, beta):
+    """alpha * context + beta * window + (1 - alpha - beta) * string, re-normalized rows. Window =
+    (left + right) / 2, or left_vecs alone when right_vecs is None (the "sym" window).
+    beta = 0 gives exactly combine(ctx, string, alpha)."""
+    if not beta:
+        return combine(ctx_vecs, str_vecs, alpha)
+    w = np.asarray(left_vecs, float)
+    if right_vecs is not None:
+        w = (w + np.asarray(right_vecs, float)) / 2
+    s = np.asarray(str_vecs, float)
+    c = np.asarray(ctx_vecs, float) if alpha else np.zeros_like(s)
+    return _unit(alpha * c + beta * w + (1 - alpha - beta) * s).astype(np.float32)
 
 
 def labels_of(u):
@@ -341,8 +399,23 @@ def merge_split_clusters(labels, ctx_vecs, booking_ids, theta, groups=None):
     return out, log
 
 
+def _with_window(units, docs, enc, cfg, ctx, x):
+    """String vectors x mixed with context (alpha) and the k-word window (beta, side)."""
+    by_doc = defaultdict(list)
+    for u in units:
+        by_doc[u.doc_id].append(u)
+    side = cfg.get("side", "lr")
+    w = [window_texts(docs[u.doc_id], u, by_doc[u.doc_id], cfg["window"], side) for u in units]
+    if side == "sym":
+        lv, rv = enc.encode(w), None
+    else:
+        lv, rv = enc.encode([a for a, _ in w]), enc.encode([b for _, b in w])
+    return combine_window(ctx, lv, rv, x, cfg.get("alpha") or 0.0, cfg["beta"])
+
+
 def run_best(units, docs, groups, booking_ids, enc, cfg):
-    """Apply a chosen Step-2 config (chosen_step2.json) to any units: returns labels."""
+    """Apply a chosen Step-2 config (chosen_step2.json) to any units: returns labels.
+    Optional window keys: window (k words), beta (window weight), side ("lr" | "sym")."""
     texts = [normalize(u.text) if cfg.get("normalize") else u.text for u in units]
     x = enc.encode(texts)
     ctx = None
@@ -352,7 +425,9 @@ def run_best(units, docs, groups, booking_ids, enc, cfg):
             by_doc[u.doc_id].append(u)
         ctx = enc.encode([masked_context(docs[u.doc_id], u, by_doc[u.doc_id],
                                          cfg.get("prev_turns", 1)) for u in units])
-    if cfg.get("alpha") is not None:
+    if cfg.get("window") and cfg.get("beta"):
+        x = _with_window(units, docs, enc, cfg, ctx, x)
+    elif cfg.get("alpha") is not None:
         x = combine(ctx, x, cfg["alpha"])
     parts = [(g, value_type(u.text)) for g, u in zip(groups, units)] if cfg.get("by_type") else list(groups)
     t, link = cfg["t"], cfg.get("linkage", "average")

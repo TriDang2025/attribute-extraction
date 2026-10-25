@@ -4,9 +4,13 @@ Pieces longer than the model's window are cut at line (turn) breaks; span offset
 back to the dialogue text. A span matches a gold value when their char spans overlap.
 """
 
+import json
 import os
+import re
+from collections.abc import Mapping
 from pathlib import Path
 
+from . import paths
 from .units import Unit, turn_of
 
 MODEL = Path(os.environ.get("CHK_MODELS", Path.home() / "models")) / "gliner_medium-v2.1"
@@ -14,6 +18,43 @@ LABELS = ["place", "time", "date", "day", "number", "price", "name", "duration"]
 THRESHOLD = 0.3          # low, for recall; higher thresholds are filtered from the scores
 MAX_WORDS = 200          # below the model's 384-token window
 SPEAKERS = {"User", "System"}  # turn prefixes, tagged as names otherwise
+HAND_EXTRA = ["cuisine", "area", "hotel type", "price range", "star rating", "departure station",
+              "destination station", "departure time", "arrival time", "number of guests",
+              "length of stay"]
+PROMPT_LIMIT = 512       # subtokens of "labels + text" the encoder is trusted with
+
+
+def gold_slot_labels():
+    """Slot names of the gold schema ("Train leave at" -> "leave at"), deduplicated, in order."""
+    schema = json.loads((paths.TEAR_DATA / "levels.json").read_text(encoding="utf-8"))["full_schema"]
+    out = []
+    for attr in schema:
+        slot = attr.split(" ", 1)[1].lower()
+        if slot not in out:
+            out.append(slot)
+    return out
+
+
+class _LabelSets(Mapping):
+    """Label sets by name; the gold one is built on first access only."""
+
+    def __getitem__(self, name):
+        if name == "generic":
+            return list(LABELS)
+        if name == "hand":
+            return LABELS + HAND_EXTRA
+        if name == "gold":
+            return LABELS + [s for s in gold_slot_labels() if s not in LABELS]
+        raise KeyError(name)
+
+    def __iter__(self):
+        return iter(("generic", "hand", "gold"))
+
+    def __len__(self):
+        return 3
+
+
+LABEL_SETS = _LabelSets()
 
 
 def load():
@@ -35,10 +76,8 @@ def windows(text, start, end, max_words=MAX_WORDS):
     return [(a, b) for a, b in out if text[a:b].strip()]
 
 
-def extract(model, doc, spans, threshold=THRESHOLD):
-    """GLiNER spans of every piece of one document, as Units (label filled later)."""
-    wins = [w for s, e in spans for w in windows(doc.text, s, e)]
-    preds = model.inference([doc.text[a:b] for a, b in wins], LABELS, threshold=threshold,
+def _run(model, doc, wins, labels, threshold):
+    preds = model.inference([doc.text[a:b] for a, b in wins], labels, threshold=threshold,
                             batch_size=8)
     out = []
     for (a, _), ents in zip(wins, preds):
@@ -50,6 +89,52 @@ def extract(model, doc, spans, threshold=THRESHOLD):
             u.tag, u.score = ent["label"], float(ent["score"])
             out.append(u)
     return out
+
+
+def extract(model, doc, spans, threshold=THRESHOLD, labels=LABELS):
+    """GLiNER spans of every piece of one document, as Units (label filled later)."""
+    wins = [w for s, e in spans for w in windows(doc.text, s, e)]
+    return _run(model, doc, wins, labels, threshold)
+
+
+def turn_windows(doc, max_words=MAX_WORDS):
+    """One (abs_start, abs_end) window per turn, without the speaker prefix; turns longer than
+    max_words words are cut at word boundaries."""
+    out = []
+    for s, e in doc.spans:
+        m = re.match(r"(User|System): ", doc.text[s:e])
+        a = s + (m.end() if m else 0)
+        words = [w.span() for w in re.finditer(r"\S+", doc.text[a:e])]
+        for i in range(0, len(words), max_words):
+            part = words[i:i + max_words]
+            out.append((a + part[0][0], a + part[-1][1]))
+    return out
+
+
+def extract_windows(model, doc, windows, labels=LABELS, threshold=THRESHOLD):
+    """GLiNER spans of explicit (start, end) windows, tag = GLiNER label."""
+    return _run(model, doc, windows, labels, threshold)
+
+
+def prompt_tokens(model, text, labels):
+    """Subtokens GLiNER feeds the encoder: one entity token + label tokens per label, then the text."""
+    tk = model.data_processor.transformer_tokenizer
+    n = len(tk(text, add_special_tokens=False)["input_ids"])
+    return n + sum(len(tk(lab, add_special_tokens=False)["input_ids"]) + 1 for lab in labels) + 3
+
+
+def fit_max_words(model, docs, labels, start=MAX_WORDS, floor=25):
+    """Largest window size (words, from start, shrinking by a quarter) at which no turn window
+    of docs exceeds PROMPT_LIMIT subtokens with labels. Returns (max_words, n_overflowing at
+    start, n_windows)."""
+    first, mw = None, start
+    while True:
+        wins = [doc.text[a:b] for doc in docs for a, b in turn_windows(doc, mw)]
+        bad = sum(prompt_tokens(model, w, labels) > PROMPT_LIMIT for w in wins)
+        first = bad if first is None else first
+        if bad == 0 or mw <= floor:
+            return mw, first, len(wins)
+        mw = max(floor, mw * 3 // 4)
 
 
 def match(spans, values):

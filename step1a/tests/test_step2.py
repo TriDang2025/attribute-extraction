@@ -148,3 +148,69 @@ def test_gold_entity_prefers_turn_domain():
     u = M("D1", "cambridge", 0, 1, 0, frozenset({"Taxi destination", "Train destination"}))
     assert S.gold_entity(u, doc) == "Train"
     assert S.gold_entity(u) == "Taxi"
+
+
+def test_window_texts_k_words_within_turn():
+    doc = _doc()
+    ms = _mentions(doc)
+    lo, hi = doc.spans[1]
+    lon = M("D1", "london", doc.text.index("london", lo), doc.text.index("london", lo) + 6)
+    ms = [m for m in ms if m.text != "london"] + [lon]
+    left, right = S.window_texts(doc, lon, ms, 2)
+    assert left == "[ID] leaves <<[TEXT]>>" and right == "<<[TEXT]>> at [TIME],"
+    l1, r1 = S.window_texts(doc, ms[0], ms, 5)  # "cambridge" in turn 0
+    assert l1 == "I need a train to <<[TEXT]>>"  # "User:" stripped
+    assert r1 == "<<[TEXT]>> on [DAY] at [TIME]."  # turn 0 ends here: nothing from turn 1
+    for m in ms:
+        for w in (left, right, l1, r1):
+            assert m.text not in w.replace("<<", "").replace(">>", "")
+    sym = S.window_texts(doc, lon, ms, 2, side="sym")
+    assert sym == "[ID] leaves <<[TEXT]>> at [TIME]," and sym.count("<<") == 1
+    assert left.count("<<") == 1 and right.count("<<") == 1
+
+
+def test_window_texts_strips_speaker_and_short_turn():
+    doc = _doc()
+    ms = _mentions(doc)
+    left, right = S.window_texts(doc, ms[3], ms, 5)  # TR1234 opens turn 1
+    assert left == "<<[ID]>>" and right.startswith("<<[ID]>> leaves [TEXT] at [TIME],")
+
+
+def test_combine_window_beta0_equals_combine():
+    rng = np.random.RandomState(1)
+    c, l, r, s = (S._unit(rng.randn(6, 8)) for _ in range(4))
+    for a in (0.0, 0.35, 0.5):
+        assert np.array_equal(S.combine_window(c, l, r, s, a, 0.0), S.combine(c, s, a))
+    v = S.combine_window(c, l, r, s, 0.2, 0.5)
+    want = S._unit(0.2 * c + 0.5 * (l + r) / 2 + 0.3 * s)
+    assert np.allclose(v, want, atol=1e-6)
+    assert np.allclose(S.combine_window(c, l, None, s, 0.2, 0.5), S._unit(0.2 * c + 0.5 * l + 0.3 * s), atol=1e-6)
+
+
+class _Enc:
+    """Deterministic toy encoder: hashed character trigrams, L2-normalized."""
+
+    def encode(self, texts):
+        out = np.zeros((len(texts), 64))
+        for i, t in enumerate(texts):
+            t = f"  {t.lower()}  "
+            for j in range(len(t) - 2):
+                out[i, sum(map(ord, t[j:j + 3])) % 64] += 1
+        return S._unit(out).astype(np.float32)
+
+
+def test_run_best_without_window_keys_unchanged():
+    doc = _doc()
+    ms = _mentions(doc)
+    docs, groups = {"D1": doc}, ["Train"] * len(ms)
+    books = [("D1", "Train")] * len(ms)
+    cfg = {"normalize": True, "alpha": 0.5, "by_type": True, "linkage": "average", "t": 0.45,
+           "cannot_link": True}
+    enc = _Enc()
+    x = S.combine(enc.encode([S.masked_context(doc, u, ms, 1) for u in ms]),
+                  enc.encode([S.normalize(u.text) for u in ms]), 0.5)
+    parts = [(g, S.value_type(u.text)) for g, u in zip(groups, ms)]
+    want = S.cluster_constrained(x, parts, S.cannot_links(ms, books), 0.45, "average")
+    assert S.run_best(ms, docs, groups, books, enc, cfg) == want
+    assert S.run_best(ms, docs, groups, books, enc, dict(cfg, window=3, beta=0.0, side="lr")) == want
+    assert len(S.run_best(ms, docs, groups, books, enc, dict(cfg, window=3, beta=0.3, side="sym"))) == len(ms)
