@@ -35,7 +35,7 @@ def load_tables(tear_data, ids):
             continue
         for line in open(p, encoding="utf-8"):
             r = json.loads(line)
-            if r["id"] in want and r["id"] not in out:
+            if r["id"] in want and r["id"] not in out and "table" in r:  # input.jsonl rows hold no table
                 out[r["id"]] = r["table"]
     return out
 

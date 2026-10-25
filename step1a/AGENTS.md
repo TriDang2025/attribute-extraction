@@ -36,8 +36,19 @@ Timings on the laptop CPU for n50:
 - `scripts/step2_window.py`: window Step 2 grid on gold entities -> `results/v3_n50/chosen_step2_window.json`.
 - `s1a/spacy_spans.py`, `scripts/spacy_extract.py`, `scripts/spans_compare.py`: GLiNER vs spaCy comparison. spaCy as main extractor was not adopted.
 - `data/cache/` (not in git): bge-m3 cache, seeded from the chunking cache.
+- Graph tasks 0–9 (pipeline v2 Step 1a without LLM; contract in `GRAPH_CONTRACT.md`):
+  - `s1a/mentions.py` (T0 export)
+  - `s1a/coverage.py` (T1)
+  - `s1a/graph.py` (T2)
+  - `s1a/signals.py`, `s1a/stability.py` (T3)
+  - `s1a/labels.py` (T4)
+  - `s1a/node_filter.py` (T5–T6)
+  - `s1a/draft_schema.py`, `s1a/schema_eval.py` (T7–T8)
+  - Run: `scripts/export_mentions.py --split dev|test --out results/graph_<split>50`, then `scripts/graph_run.py --run ... --stage coverage|graph|stability|signals|labels|select|schema` (`--chosen <dev chosen.json>` on test). `scripts/label_sheet.py --merge` folds filled label sheets in.
+  - Spans use the original Step 2 (raw strings, t 0.4); gold values use the window Step 2.
 
 ## Data links
+- `scripts/export_mentions.py` -> `results/graph_<split>50/{docs.jsonl, gold_values.csv, gold_attrs.txt, cache/}`, `<input>/{mentions,clusters,instances}.csv, vectors.npz` -> `scripts/graph_run.py` stages -> `<input>/{coverage.csv, graphs.pkl, stability.csv, nodes.csv, labels.csv, select/, schema/}`
 - `../chunking/results/S_n50/chunks/chroma_bge-m3.jsonl` -> `s1a/paths.py` `CHROMA_CHUNKS` -> `scripts/run.py`, `scripts/plug_in.py` (size 50/400)
 - `../tear/data/conversation/{pool,test}.jsonl`, `levels.json` -> `s1a/paths.py` `TEAR_DATA` -> `s1a/gold.py`, `s1a/units.py`, `scripts/run.py`
 - `scripts/run.py` -> `results/n50/{metrics.csv, summary.md, examples.md, attribute_purity.csv}`

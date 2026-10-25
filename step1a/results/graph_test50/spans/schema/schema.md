@@ -1,0 +1,503 @@
+## E0
+- identifier: E0#19 (reference number, booking number)
+- #E0#0 [table]: london king cross, king lynn, king cross
+- #E0#1 [table]: 08:00, 15:30, 21:50
+- #E0#11 [column]: 163 minute, 51 minute, 79 minute
+- #E0#12 [column]: bishop stortford
+- #E0#13 [column]: okay
+- #E0#14 [column]: n5aqlngk
+- #E0#15 [column]: norwich
+- #E0#17 [table]: 14.08 gbp, 180.24 gbp, 4.4 gbp
+- #E0#18 [column]: birmingham
+- #E0#2 [table]: arrival time, destination, travel time
+- #E0#20 [column]: bqfehigk
+- #E0#21 [column]: 06:10, 600.79
+- #E0#22 [column]: help desk
+- #E0#23 [column]: stevenage
+- #E0#24 [column]: 44fv40zc
+- #E0#25 [column]: broxbourne
+- #E0#26 [column]: how many ticket
+- #E0#27 [column]: agmkny6z
+- #E0#28 [column]: 96
+- #E0#29 [column]: 5txw2b1k
+- #E0#3 [column]: station, site
+- #E0#30 [column]: 0lyl0j3v
+- #E0#31 [column]: standsted airport
+- #E0#32 [column]: a4v9r126
+- #E0#33 [column]: 875dq3rf
+- #E0#34 [column]: 2i340ejn
+- #E0#35 [column]: 1ejqjws2
+- #E0#36 [column]: tr6725
+- #E0#37 [column]: m27vmt7n
+- #E0#38 [column]: ely
+- #E0#39 [column]: t5gd6fit
+- #E0#4 [column]: cambridge, cambridge towninfo centre
+- #E0#5 [table]: monday, sunday, today
+- #E0#6 [column]: 4 people, 3 people, 3 train
+- #E0#7 [column]: tr6203, tr7803
+- #E0#8 [column]: birmingham new street, new street
+- #E0#9 [column]: i, you, 1
+- merge: E0#0 + E0#18 (cos 0.59)
+- merge: E0#11 + E0#6 (cos 0.61)
+- merge: E0#17 + E0#21 (cos 0.75)
+- merge: E0#2 + E0#26 (cos 0.60)
+- merge: E0#36 + E0#7 (cos 0.64)
+- keep apart: E0#0 / E0#4 (cos 0.61, co 6)
+- keep apart: E0#1 / E0#11 (cos 0.59, co 3)
+- keep apart: E0#1 / E0#17 (cos 0.66, co 5)
+- keep apart: E0#1 / E0#2 (cos 0.67, co 6)
+- keep apart: E0#1 / E0#21 (cos 0.65, co 2)
+- keep apart: E0#1 / E0#3 (cos 0.65, co 6)
+- keep apart: E0#1 / E0#5 (cos 0.72, co 20)
+- keep apart: E0#1 / E0#6 (cos 0.65, co 8)
+- keep apart: E0#1 / E0#9 (cos 0.65, co 12)
+- keep apart: E0#11 / E0#17 (cos 0.62, co 1)
+- keep apart: E0#11 / E0#2 (cos 0.61, co 3)
+- keep apart: E0#11 / E0#5 (cos 0.59, co 3)
+- keep apart: E0#17 / E0#2 (cos 0.62, co 1)
+- keep apart: E0#17 / E0#3 (cos 0.59, co 3)
+- keep apart: E0#17 / E0#5 (cos 0.61, co 5)
+- keep apart: E0#17 / E0#6 (cos 0.61, co 3)
+- keep apart: E0#17 / E0#9 (cos 0.60, co 4)
+- keep apart: E0#18 / E0#3 (cos 0.59, co 1)
+- keep apart: E0#18 / E0#4 (cos 0.61, co 2)
+- keep apart: E0#18 / E0#5 (cos 0.58, co 2)
+- keep apart: E0#18 / E0#8 (cos 0.59, co 2)
+- keep apart: E0#2 / E0#3 (cos 0.69, co 1)
+- keep apart: E0#2 / E0#5 (cos 0.72, co 6)
+- keep apart: E0#2 / E0#6 (cos 0.69, co 1)
+- keep apart: E0#2 / E0#9 (cos 0.59, co 1)
+- keep apart: E0#21 / E0#3 (cos 0.59, co 1)
+- keep apart: E0#21 / E0#5 (cos 0.58, co 2)
+- keep apart: E0#26 / E0#6 (cos 0.64, co 2)
+- keep apart: E0#3 / E0#5 (cos 0.70, co 6)
+- keep apart: E0#3 / E0#6 (cos 0.65, co 4)
+- keep apart: E0#3 / E0#9 (cos 0.65, co 5)
+- keep apart: E0#5 / E0#6 (cos 0.72, co 8)
+- keep apart: E0#5 / E0#9 (cos 0.69, co 12)
+- keep apart: E0#6 / E0#9 (cos 0.62, co 5)
+- sub-entity: E0#0, E0#11, E0#15, E0#2, E0#32, E0#7
+- sub-entity: E0#1, E0#4, E0#5
+- sub-entity: E0#12, E0#13, E0#14, E0#35, E0#6
+- sub-entity: E0#17, E0#3, E0#36, E0#37, E0#38, E0#39
+- sub-entity: E0#23, E0#24, E0#28, E0#29
+- sub-entity: E0#25, E0#26, E0#27, E0#33, E0#34, E0#9
+
+## E1
+- identifier: E1#31 (i, it, there)
+- #E1#0 [table]: moderately priced, cheap, moderate price range
+- #E1#1 [table]: restaurant, polish restaurant, anatolia restaurant
+- #E1#10 [table]: monday, today, tuesday
+- #E1#11 [column]: 12:00, 19:30, 14:00
+- #E1#12 [column]: 15 minute, 15
+- #E1#13 [column]: 42z6ay64
+- #E1#14 [column]: byard art
+- #E1#15 [column]: charlie chan
+- #E1#16 [column]: the missing sock
+- #E1#17 [column]: east, east restaurant, in the north
+- #E1#18 [column]: table, booked time
+- #E1#19 [column]: ycxb5jqe
+- #E1#2 [column]: efe restaurant
+- #E1#20 [column]: portuguese
+- #E1#21 [table]: nando, nando city centre
+- #E1#22 [column]: south
+- #E1#23 [table]: address, phone number, reference number
+- #E1#24 [column]: bedouin
+- #E1#25 [column]: 100 mill road
+- #E1#26 [column]: 1crco6ht
+- #E1#27 [column]: cambridge, cambridge towninfo centre
+- #E1#28 [table]: african, asian
+- #E1#29 [column]: british, british food
+- #E1#3 [column]: anatolia
+- #E1#30 [column]: italian, italian food
+- #E1#32 [column]: clown cafe
+- #E1#33 [column]: 3hzr0o30, cob3zu7o
+- #E1#34 [column]: xxnq81ie
+- #E1#35 [column]: da vinci pizzeria
+- #E1#36 [column]: n5b6arjp
+- #E1#37 [column]: royal standard
+- #E1#38 [column]: thanh binh
+- #E1#39 [column]: thanh binh
+- #E1#4 [column]: 14 -16 bridge street, 30 bridge street
+- #E1#40 [column]: xx1tf9gv
+- #E1#41 [column]: the nirala
+- #E1#42 [column]: 7 milton road
+- #E1#43 [column]: 01223 248882, 01223307581, 01223360966
+- #E1#44 [column]: pizza express, pizza hut city centre
+- #E1#45 [column]: cb11ln, cb21db
+- #E1#46 [column]: 86 regent street, regent street city centre
+- #E1#47 [column]: college
+- #E1#48 [column]: 5f3kbh78
+- #E1#49 [column]: pizza hut cherry hinton
+- #E1#5 [table]: centre, city centre, center
+- #E1#50 [column]: zizzi cambridge
+- #E1#51 [column]: the oak bistro
+- #E1#52 [column]: de luca cucina and bar
+- #E1#53 [column]: 0xfpi4ib
+- #E1#54 [table]: maharajah tandoori, maharajah tandoori restaurant, tandoori palace
+- #E1#55 [column]: 41518 castle street
+- #E1#56 [column]: 4eny97qo
+- #E1#57 [column]: yu garden
+- #E1#58 [column]: vn4qz2m1
+- #E1#59 [column]: hakka
+- #E1#6 [column]: east part of town, town, west side of town
+- #E1#60 [column]: 529 newmarket road
+- #E1#61 [column]: fen ditton
+- #E1#62 [column]: 40270 king street
+- #E1#63 [column]: rajmahal
+- #E1#64 [column]: park
+- #E1#65 [column]: saint john chop house
+- #E1#66 [column]: okat9rpq
+- #E1#67 [column]: 68 histon road
+- #E1#68 [column]: chesterton
+- #E1#69 [column]: cb43le
+- #E1#7 [column]: la tasca
+- #E1#8 [column]: la margherita, la raza
+- #E1#9 [column]: 2 people, 5, 2
+- merge: E1#0 + E1#28 (cos 0.58)
+- merge: E1#1 + E1#44 (cos 0.67)
+- merge: E1#1 + E1#51 (cos 0.61)
+- merge: E1#1 + E1#52 (cos 0.63)
+- merge: E1#1 + E1#54 (cos 0.64)
+- merge: E1#12 + E1#23 (cos 0.58)
+- merge: E1#17 + E1#22 (cos 0.62)
+- merge: E1#17 + E1#28 (cos 0.66)
+- merge: E1#17 + E1#8 (cos 0.63)
+- merge: E1#19 + E1#36 (cos 0.59)
+- merge: E1#23 + E1#28 (cos 0.62)
+- merge: E1#25 + E1#42 (cos 0.59)
+- merge: E1#29 + E1#37 (cos 0.64)
+- merge: E1#30 + E1#35 (cos 0.61)
+- merge: E1#35 + E1#44 (cos 0.60)
+- merge: E1#4 + E1#46 (cos 0.59)
+- merge: E1#41 + E1#8 (cos 0.58)
+- merge: E1#44 + E1#49 (cos 0.67)
+- merge: E1#45 + E1#69 (cos 0.64)
+- merge: E1#5 + E1#64 (cos 0.59)
+- keep apart: E1#0 / E1#1 (cos 0.61, co 7)
+- keep apart: E1#0 / E1#10 (cos 0.64, co 11)
+- keep apart: E1#0 / E1#17 (cos 0.61, co 4)
+- keep apart: E1#0 / E1#18 (cos 0.60, co 6)
+- keep apart: E1#0 / E1#23 (cos 0.63, co 7)
+- keep apart: E1#0 / E1#31 (cos 0.60, co 4)
+- keep apart: E1#0 / E1#5 (cos 0.59, co 8)
+- keep apart: E1#0 / E1#6 (cos 0.61, co 7)
+- keep apart: E1#0 / E1#9 (cos 0.63, co 9)
+- keep apart: E1#1 / E1#10 (cos 0.63, co 10)
+- keep apart: E1#1 / E1#17 (cos 0.65, co 5)
+- keep apart: E1#1 / E1#18 (cos 0.65, co 5)
+- keep apart: E1#1 / E1#2 (cos 0.69, co 1)
+- keep apart: E1#1 / E1#23 (cos 0.66, co 7)
+- keep apart: E1#1 / E1#28 (cos 0.60, co 1)
+- keep apart: E1#1 / E1#29 (cos 0.70, co 2)
+- keep apart: E1#1 / E1#30 (cos 0.67, co 1)
+- keep apart: E1#1 / E1#31 (cos 0.60, co 3)
+- keep apart: E1#1 / E1#32 (cos 0.63, co 1)
+- keep apart: E1#1 / E1#5 (cos 0.60, co 6)
+- keep apart: E1#1 / E1#6 (cos 0.64, co 6)
+- keep apart: E1#1 / E1#9 (cos 0.64, co 7)
+- keep apart: E1#10 / E1#11 (cos 0.72, co 16)
+- keep apart: E1#10 / E1#12 (cos 0.64, co 6)
+- keep apart: E1#10 / E1#17 (cos 0.70, co 5)
+- keep apart: E1#10 / E1#18 (cos 0.67, co 9)
+- keep apart: E1#10 / E1#23 (cos 0.70, co 6)
+- keep apart: E1#10 / E1#28 (cos 0.65, co 1)
+- keep apart: E1#10 / E1#29 (cos 0.59, co 2)
+- keep apart: E1#10 / E1#31 (cos 0.70, co 7)
+- keep apart: E1#10 / E1#47 (cos 0.59, co 1)
+- keep apart: E1#10 / E1#5 (cos 0.62, co 10)
+- keep apart: E1#10 / E1#6 (cos 0.68, co 7)
+- keep apart: E1#10 / E1#8 (cos 0.60, co 2)
+- keep apart: E1#10 / E1#9 (cos 0.73, co 13)
+- keep apart: E1#11 / E1#12 (cos 0.65, co 5)
+- keep apart: E1#11 / E1#17 (cos 0.60, co 5)
+- keep apart: E1#11 / E1#18 (cos 0.62, co 9)
+- keep apart: E1#11 / E1#23 (cos 0.63, co 5)
+- keep apart: E1#11 / E1#31 (cos 0.62, co 6)
+- keep apart: E1#11 / E1#9 (cos 0.68, co 12)
+- keep apart: E1#12 / E1#31 (cos 0.59, co 1)
+- keep apart: E1#12 / E1#9 (cos 0.71, co 5)
+- keep apart: E1#17 / E1#18 (cos 0.62, co 3)
+- keep apart: E1#17 / E1#23 (cos 0.65, co 4)
+- keep apart: E1#17 / E1#29 (cos 0.63, co 1)
+- keep apart: E1#17 / E1#31 (cos 0.66, co 1)
+- keep apart: E1#17 / E1#5 (cos 0.65, co 1)
+- keep apart: E1#17 / E1#6 (cos 0.79, co 3)
+- keep apart: E1#17 / E1#9 (cos 0.69, co 4)
+- keep apart: E1#18 / E1#23 (cos 0.69, co 2)
+- keep apart: E1#18 / E1#28 (cos 0.63, co 1)
+- keep apart: E1#18 / E1#29 (cos 0.59, co 2)
+- keep apart: E1#18 / E1#31 (cos 0.62, co 4)
+- keep apart: E1#18 / E1#5 (cos 0.62, co 5)
+- keep apart: E1#18 / E1#6 (cos 0.61, co 2)
+- keep apart: E1#18 / E1#8 (cos 0.60, co 1)
+- keep apart: E1#18 / E1#9 (cos 0.64, co 8)
+- keep apart: E1#23 / E1#31 (cos 0.66, co 3)
+- keep apart: E1#23 / E1#43 (cos 0.72, co 5)
+- keep apart: E1#23 / E1#44 (cos 0.59, co 1)
+- keep apart: E1#23 / E1#5 (cos 0.62, co 4)
+- keep apart: E1#23 / E1#6 (cos 0.63, co 9)
+- keep apart: E1#23 / E1#9 (cos 0.67, co 4)
+- keep apart: E1#27 / E1#29 (cos 0.58, co 1)
+- keep apart: E1#28 / E1#29 (cos 0.61, co 1)
+- keep apart: E1#28 / E1#31 (cos 0.64, co 1)
+- keep apart: E1#28 / E1#9 (cos 0.67, co 1)
+- keep apart: E1#29 / E1#30 (cos 0.63, co 1)
+- keep apart: E1#29 / E1#31 (cos 0.59, co 1)
+- keep apart: E1#29 / E1#9 (cos 0.59, co 1)
+- keep apart: E1#31 / E1#6 (cos 0.60, co 4)
+- keep apart: E1#31 / E1#7 (cos 0.59, co 1)
+- keep apart: E1#31 / E1#8 (cos 0.64, co 1)
+- keep apart: E1#31 / E1#9 (cos 0.67, co 6)
+- keep apart: E1#38 / E1#39 (cos 0.58, co 1)
+- keep apart: E1#44 / E1#5 (cos 0.62, co 2)
+- keep apart: E1#46 / E1#5 (cos 0.63, co 2)
+- keep apart: E1#5 / E1#6 (cos 0.72, co 3)
+- keep apart: E1#5 / E1#9 (cos 0.62, co 6)
+- keep apart: E1#6 / E1#7 (cos 0.61, co 2)
+- keep apart: E1#6 / E1#9 (cos 0.68, co 5)
+- keep apart: E1#7 / E1#8 (cos 0.62, co 1)
+- keep apart: E1#8 / E1#9 (cos 0.59, co 2)
+- sub-entity: E1#0, E1#44, E1#45, E1#46, E1#47, E1#48, E1#5, E1#50, E1#62
+- sub-entity: E1#1, E1#2, E1#20, E1#21, E1#22, E1#23, E1#3, E1#34, E1#4, E1#49
+- sub-entity: E1#12, E1#15, E1#24, E1#25, E1#26, E1#35, E1#36
+- sub-entity: E1#13, E1#14, E1#38, E1#39, E1#40, E1#6, E1#7, E1#8
+- sub-entity: E1#16, E1#17, E1#19, E1#37, E1#57, E1#58, E1#60, E1#61
+- sub-entity: E1#41, E1#42, E1#43, E1#54, E1#55, E1#56, E1#67, E1#68, E1#69
+- sub-entity: E1#63, E1#64
+
+## E2
+- identifier: E2#2 (07288413004, 07678148281, 07863299997)
+- #E2#0 [column]: byard
+- #E2#10 [column]: golden hous
+- #E2#11 [column]: i
+- #E2#12 [column]: holy trinity church
+- #E2#13 [column]: contact number, reference number
+- #E2#14 [column]: blue tesla
+- #E2#15 [column]: avalon
+- #E2#16 [column]: rosa
+- #E2#17 [column]: ashley hotel
+- #E2#18 [column]: cherry hinton village centre
+- #E2#19 [column]: the park
+- #E2#4 [column]: how many ticket
+- #E2#5 [column]: 47 minute
+- #E2#6 [table]: restaurant, theatre, hotel
+- #E2#7 [column]: tr7075
+- #E2#8 [column]: monday
+- #E2#9 [column]: ytanicp1
+- merge: E2#11 + E2#6 (cos 0.61)
+- merge: E2#12 + E2#6 (cos 0.59)
+- merge: E2#17 + E2#6 (cos 0.65)
+- merge: E2#6 + E2#8 (cos 0.58)
+- keep apart: E2#13 / E2#2 (cos 0.71, co 2)
+- keep apart: E2#13 / E2#6 (cos 0.64, co 1)
+- keep apart: E2#19 / E2#6 (cos 0.67, co 1)
+- sub-entity: E2#11, E2#12, E2#13, E2#14
+- sub-entity: E2#16, E2#19, E2#6
+- sub-entity: E2#4, E2#5
+- sub-entity: E2#8, E2#9
+
+## E3
+- identifier: E3#21 (the holy trinity church, trinity street)
+- #E3#0 [column]: cambridge, cambridge leisure park, cambridge university botanic garden
+- #E3#1 [table]: college, christ's college, churchill college
+- #E3#10 [column]: attraction, college type of attraction
+- #E3#11 [table]: saint andrew, saint andrew's street
+- #E3#12 [column]: cb23bu
+- #E3#13 [column]: cambridge leisure park clifton way, clifton way
+- #E3#14 [column]: today, day
+- #E3#15 [table]: cherry hinton, cherry hinton hall and ground, cherry hinton road
+- #E3#16 [column]: cb30ag
+- #E3#17 [column]: magdalene street
+- #E3#18 [table]: mumford theatre, theatre
+- #E3#19 [table]: gonville and caius college, the gonville caius college
+- #E3#2 [column]: entrance fee, free, free entrance fee
+- #E3#20 [column]: admission
+- #E3#22 [column]: broughton house gallery
+- #E3#23 [table]: great saint mary, little saint mary
+- #E3#24 [table]: market square, market street
+- #E3#25 [column]: the ballare
+- #E3#26 [column]: acorn guest house
+- #E3#27 [table]: milton country park, milton
+- #E3#28 [column]: cb43ax, cb46az
+- #E3#29 [column]: riverboat georgina
+- #E3#3 [table]: town, centre area, center of town
+- #E3#30 [table]: park, playground
+- #E3#31 [column]: camboat
+- #E3#32 [column]: the plough
+- #E3#33 [column]: green end
+- #E3#34 [column]: fen ditton
+- #E3#35 [column]: cb58sx
+- #E3#4 [column]: 2 pound, 2.50 pound, 5 pound
+- #E3#5 [column]: west area, west side
+- #E3#6 [column]: storey
+- #E3#7 [column]: it
+- #E3#9 [column]: 01223 323737, 01223327908, 01223420060
+- merge: E3#0 + E3#31 (cos 0.61)
+- merge: E3#1 + E3#18 (cos 0.60)
+- merge: E3#1 + E3#30 (cos 0.60)
+- merge: E3#10 + E3#30 (cos 0.64)
+- merge: E3#11 + E3#23 (cos 0.63)
+- merge: E3#12 + E3#28 (cos 0.65)
+- merge: E3#14 + E3#30 (cos 0.62)
+- merge: E3#14 + E3#4 (cos 0.59)
+- merge: E3#18 + E3#2 (cos 0.61)
+- merge: E3#18 + E3#21 (cos 0.59)
+- merge: E3#18 + E3#30 (cos 0.64)
+- merge: E3#21 + E3#30 (cos 0.59)
+- merge: E3#21 + E3#32 (cos 0.62)
+- merge: E3#23 + E3#3 (cos 0.59)
+- merge: E3#24 + E3#3 (cos 0.67)
+- merge: E3#24 + E3#30 (cos 0.60)
+- merge: E3#28 + E3#35 (cos 0.64)
+- merge: E3#3 + E3#32 (cos 0.61)
+- merge: E3#3 + E3#5 (cos 0.69)
+- merge: E3#3 + E3#6 (cos 0.61)
+- merge: E3#30 + E3#32 (cos 0.62)
+- merge: E3#30 + E3#6 (cos 0.60)
+- keep apart: E3#0 / E3#1 (cos 0.60, co 1)
+- keep apart: E3#0 / E3#13 (cos 0.58, co 1)
+- keep apart: E3#1 / E3#10 (cos 0.63, co 2)
+- keep apart: E3#1 / E3#19 (cos 0.66, co 1)
+- keep apart: E3#1 / E3#2 (cos 0.59, co 4)
+- keep apart: E3#1 / E3#20 (cos 0.64, co 1)
+- keep apart: E3#1 / E3#3 (cos 0.64, co 3)
+- keep apart: E3#10 / E3#2 (cos 0.67, co 1)
+- keep apart: E3#10 / E3#20 (cos 0.61, co 1)
+- keep apart: E3#10 / E3#3 (cos 0.62, co 2)
+- keep apart: E3#14 / E3#2 (cos 0.63, co 3)
+- keep apart: E3#14 / E3#3 (cos 0.65, co 2)
+- keep apart: E3#18 / E3#3 (cos 0.67, co 1)
+- keep apart: E3#2 / E3#20 (cos 0.66, co 1)
+- keep apart: E3#2 / E3#3 (cos 0.67, co 4)
+- keep apart: E3#2 / E3#30 (cos 0.65, co 1)
+- keep apart: E3#21 / E3#23 (cos 0.60, co 1)
+- keep apart: E3#21 / E3#3 (cos 0.63, co 1)
+- keep apart: E3#3 / E3#30 (cos 0.73, co 1)
+- keep apart: E3#3 / E3#4 (cos 0.60, co 2)
+- sub-entity: E3#1, E3#10, E3#11, E3#12, E3#19, E3#2, E3#20, E3#3, E3#6
+- sub-entity: E3#13, E3#15, E3#18, E3#26, E3#27, E3#28, E3#29, E3#30, E3#7, E3#9
+- sub-entity: E3#14, E3#31, E3#32, E3#33, E3#34, E3#35
+- sub-entity: E3#16, E3#17, E3#5
+
+## E4
+- identifier: E4#5 (4 people, 2 people, 3 people)
+- #E4#0 [column]: cambridge, cambridge belfry
+- #E4#11 [table]: moderately priced, cheap, cheap price range
+- #E4#12 [column]: alexander bed and breakfast
+- #E4#13 [column]: 56 saint barnaba road
+- #E4#14 [column]: jgte0kgb
+- #E4#15 [table]: i, it, they
+- #E4#16 [table]: centre, centre of town, city
+- #E4#17 [column]: arrival date
+- #E4#18 [column]: allenbell
+- #E4#19 [column]: autumn house
+- #E4#2 [table]: acorn guest house, acorn, acorn guesthouse
+- #E4#20 [column]: uft1h00c
+- #E4#21 [column]: aylesbray lodge guest house
+- #E4#22 [column]: 84esp6f5
+- #E4#23 [table]: west, west side
+- #E4#24 [column]: finch bed and breakfast
+- #E4#25 [column]: 144 thornton road, 154 chesterton rd, 154 chesterton road
+- #E4#26 [column]: reference number, phone number, postcode
+- #E4#27 [column]: cb30nd
+- #E4#28 [column]: lovell lodge
+- #E4#29 [table]: 1, 10, 3
+- #E4#3 [table]: today, tuesday, thursday
+- #E4#30 [column]: dk6k73qs
+- #E4#31 [column]: 1cd4lz9r
+- #E4#32 [table]: the warkworth, the warkworth house, warkworth house
+- #E4#33 [column]: vtgt4pfz
+- #E4#34 [column]: alpha-milton guest house
+- #E4#35 [column]: 63 milton road
+- #E4#36 [column]: 4r3bmwnk
+- #E4#37 [column]: home from home
+- #E4#38 [column]: vo8ym3x4
+- #E4#39 [column]: cb41da
+- #E4#4 [table]: 4 night, 2 night, 4 star
+- #E4#40 [column]: 0pp63274
+- #E4#41 [column]: cuza1tzh
+- #E4#42 [column]: na5ikohz
+- #E4#43 [column]: fti92d9b
+- #E4#44 [column]: the avalon
+- #E4#45 [column]: hng3aw8r
+- #E4#46 [column]: rosa
+- #E4#47 [column]: ovup7d9i
+- #E4#48 [column]: dpeistwk
+- #E4#49 [column]: j5zlg2wn
+- #E4#6 [column]: k8eettjf
+- #E4#7 [table]: leverton, leverton house, the leverton house
+- #E4#8 [column]: 01223363682, 01223292094, 01223353888
+- #E4#9 [table]: north, east, south
+- merge: E4#12 + E4#24 (cos 0.61)
+- merge: E4#14 + E4#6 (cos 0.59)
+- merge: E4#16 + E4#29 (cos 0.64)
+- merge: E4#17 + E4#26 (cos 0.61)
+- merge: E4#17 + E4#3 (cos 0.66)
+- merge: E4#19 + E4#2 (cos 0.63)
+- merge: E4#2 + E4#21 (cos 0.59)
+- merge: E4#2 + E4#34 (cos 0.60)
+- merge: E4#21 + E4#34 (cos 0.59)
+- merge: E4#23 + E4#9 (cos 0.76)
+- merge: E4#3 + E4#37 (cos 0.61)
+- merge: E4#37 + E4#5 (cos 0.59)
+- merge: E4#37 + E4#9 (cos 0.59)
+- keep apart: E4#0 / E4#16 (cos 0.60, co 2)
+- keep apart: E4#11 / E4#15 (cos 0.62, co 6)
+- keep apart: E4#11 / E4#16 (cos 0.61, co 2)
+- keep apart: E4#11 / E4#26 (cos 0.63, co 5)
+- keep apart: E4#11 / E4#3 (cos 0.64, co 8)
+- keep apart: E4#11 / E4#4 (cos 0.63, co 10)
+- keep apart: E4#11 / E4#5 (cos 0.61, co 7)
+- keep apart: E4#11 / E4#9 (cos 0.63, co 10)
+- keep apart: E4#12 / E4#4 (cos 0.60, co 2)
+- keep apart: E4#15 / E4#16 (cos 0.67, co 2)
+- keep apart: E4#15 / E4#23 (cos 0.59, co 1)
+- keep apart: E4#15 / E4#26 (cos 0.67, co 4)
+- keep apart: E4#15 / E4#29 (cos 0.75, co 2)
+- keep apart: E4#15 / E4#3 (cos 0.73, co 8)
+- keep apart: E4#15 / E4#37 (cos 0.59, co 1)
+- keep apart: E4#15 / E4#4 (cos 0.62, co 9)
+- keep apart: E4#15 / E4#44 (cos 0.63, co 1)
+- keep apart: E4#15 / E4#5 (cos 0.65, co 7)
+- keep apart: E4#15 / E4#9 (cos 0.70, co 7)
+- keep apart: E4#16 / E4#23 (cos 0.61, co 1)
+- keep apart: E4#16 / E4#26 (cos 0.64, co 1)
+- keep apart: E4#16 / E4#3 (cos 0.67, co 1)
+- keep apart: E4#16 / E4#4 (cos 0.60, co 3)
+- keep apart: E4#16 / E4#5 (cos 0.60, co 2)
+- keep apart: E4#16 / E4#9 (cos 0.72, co 1)
+- keep apart: E4#23 / E4#3 (cos 0.61, co 2)
+- keep apart: E4#26 / E4#29 (cos 0.65, co 2)
+- keep apart: E4#26 / E4#3 (cos 0.67, co 5)
+- keep apart: E4#26 / E4#5 (cos 0.59, co 3)
+- keep apart: E4#26 / E4#8 (cos 0.66, co 2)
+- keep apart: E4#26 / E4#9 (cos 0.61, co 4)
+- keep apart: E4#29 / E4#3 (cos 0.69, co 3)
+- keep apart: E4#29 / E4#4 (cos 0.66, co 3)
+- keep apart: E4#29 / E4#5 (cos 0.72, co 2)
+- keep apart: E4#29 / E4#9 (cos 0.64, co 2)
+- keep apart: E4#3 / E4#4 (cos 0.68, co 17)
+- keep apart: E4#3 / E4#44 (cos 0.60, co 1)
+- keep apart: E4#3 / E4#5 (cos 0.70, co 14)
+- keep apart: E4#3 / E4#9 (cos 0.73, co 10)
+- keep apart: E4#4 / E4#5 (cos 0.73, co 15)
+- keep apart: E4#4 / E4#9 (cos 0.65, co 11)
+- keep apart: E4#40 / E4#8 (cos 0.60, co 1)
+- keep apart: E4#44 / E4#5 (cos 0.61, co 1)
+- keep apart: E4#44 / E4#9 (cos 0.63, co 1)
+- keep apart: E4#5 / E4#9 (cos 0.68, co 8)
+- sub-entity: E4#0, E4#12, E4#13, E4#14, E4#16, E4#17, E4#28
+- sub-entity: E4#11, E4#18, E4#19, E4#20, E4#37, E4#46, E4#47, E4#48, E4#7, E4#9
+- sub-entity: E4#15, E4#2, E4#25, E4#31, E4#32, E4#33, E4#38, E4#39, E4#40, E4#8
+- sub-entity: E4#23, E4#24, E4#26, E4#27, E4#41, E4#42
+- sub-entity: E4#29, E4#30, E4#43, E4#49
+
+## relationships
+| entities | node pairs | max npmi |
+|---|---|---|
+| E0 - E4 | 23 | 0.43 |
+| E1 - E3 | 7 | 0.65 |
+| E1 - E2 | 2 | 0.41 |
+| E1 - E4 | 2 | 0.23 |
+| E2 - E3 | 2 | 0.51 |

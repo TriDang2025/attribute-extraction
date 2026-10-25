@@ -413,9 +413,9 @@ def _with_window(units, docs, enc, cfg, ctx, x):
     return combine_window(ctx, lv, rv, x, cfg.get("alpha") or 0.0, cfg["beta"])
 
 
-def run_best(units, docs, groups, booking_ids, enc, cfg):
-    """Apply a chosen Step-2 config (chosen_step2.json) to any units: returns labels.
-    Optional window keys: window (k words), beta (window weight), side ("lr" | "sym")."""
+def step2_vectors(units, docs, enc, cfg):
+    """Vectors a Step-2 config clusters on: (x, ctx) with x the string / context / window mix and
+    ctx the masked-context vectors (None when the config has no alpha or theta)."""
     texts = [normalize(u.text) if cfg.get("normalize") else u.text for u in units]
     x = enc.encode(texts)
     ctx = None
@@ -429,6 +429,11 @@ def run_best(units, docs, groups, booking_ids, enc, cfg):
         x = _with_window(units, docs, enc, cfg, ctx, x)
     elif cfg.get("alpha") is not None:
         x = combine(ctx, x, cfg["alpha"])
+    return x, ctx
+
+
+def step2_cluster(units, groups, booking_ids, x, ctx, cfg):
+    """Cluster the vectors of step2_vectors inside each group: returns labels."""
     parts = [(g, value_type(u.text)) for g, u in zip(groups, units)] if cfg.get("by_type") else list(groups)
     t, link = cfg["t"], cfg.get("linkage", "average")
     if cfg.get("cannot_link"):
@@ -438,3 +443,10 @@ def run_best(units, docs, groups, booking_ids, enc, cfg):
     if cfg.get("theta") is not None:
         lab, _ = merge_split_clusters(lab, ctx, booking_ids, cfg["theta"], groups)
     return lab
+
+
+def run_best(units, docs, groups, booking_ids, enc, cfg):
+    """Apply a chosen Step-2 config (chosen_step2.json) to any units: returns labels.
+    Optional window keys: window (k words), beta (window weight), side ("lr" | "sym")."""
+    x, ctx = step2_vectors(units, docs, enc, cfg)
+    return step2_cluster(units, groups, booking_ids, x, ctx, cfg)

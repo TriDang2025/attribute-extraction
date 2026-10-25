@@ -61,13 +61,17 @@ def main():
 THRESHOLDS = (0.3, 0.4, 0.5)
 
 
-def entity_groups(us, segs, enc, k=5):
+def segment_clusters(segs, enc, k=5, seeds=SEEDS):
+    """Stage 1 per seed: k-means (k clusters) on the segment vectors; {seed: label per segment}."""
+    xc = enc.encode([c.text for c in segs])
+    return {s: KMeans(k, n_init=10, random_state=s).fit_predict(xc) for s in seeds}
+
+
+def entity_groups(us, segs, enc, k=5, seeds=SEEDS):
     """Stage 1 per seed: k-means on segment vectors; each unit takes its segment's cluster
     (-1 when no segment holds it)."""
-    xc = enc.encode([c.text for c in segs])
     out = {}
-    for s in SEEDS:
-        clab = KMeans(k, n_init=10, random_state=s).fit_predict(xc)
+    for s, clab in segment_clusters(segs, enc, k, seeds).items():
         g = []
         for u in us:
             ci = next((i for i, c in enumerate(segs)
