@@ -46,6 +46,11 @@ Timings on the laptop CPU for n50:
   - `s1a/draft_schema.py`, `s1a/schema_eval.py` (T7–T8)
   - Run: `scripts/export_mentions.py --split dev|test --out results/graph_<split>50`, then `scripts/graph_run.py --run ... --stage coverage|graph|stability|signals|labels|select|schema` (`--chosen <dev chosen.json>` on test). `scripts/label_sheet.py --merge` folds filled label sheets in.
   - Spans use the original Step 2 (raw strings, t 0.4); gold values use the window Step 2.
+- wf_v2.1 spans Step 3 variants:
+  - `s1a/variants.py` (Variant = span filter + `cluster_fn`, hooked in through `mentions.Inputs.cluster_fn`)
+  - `span_filter.py` (A), `shapes.py` (B), `cue.py` (C), `spans_step2.py` (D), `combos.py` (E)
+  - Score: `scripts/v21_run.py --part A..E [--split test]` -> `results/v21_<part>[_test]/scores.{csv,md}`
+  - Adopted: `E_AB_type` (stop list + code shapes + value-type split, t 0.4). Export with `export_mentions.py --variant E_AB_type --from-run results/graph_<split>50` -> `results/graph_v21_<split>50/`
 
 ## Data links
 - `scripts/export_mentions.py` -> `results/graph_<split>50/{docs.jsonl, gold_values.csv, gold_attrs.txt, cache/}`, `<input>/{mentions,clusters,instances}.csv, vectors.npz` -> `scripts/graph_run.py` stages -> `<input>/{coverage.csv, graphs.pkl, stability.csv, nodes.csv, labels.csv, select/, schema/}`
