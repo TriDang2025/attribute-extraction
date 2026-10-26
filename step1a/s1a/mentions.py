@@ -46,6 +46,7 @@ class Inputs:
     spans: list = None    # span Units with .score (GLiNER, threshold applied); spans input
     segs: list = None     # segment Units (merged segments); spans input
     cfg_spans: dict = None  # None = original Step 2 (raw strings, t 0.4)
+    cluster_fn: object = None  # spans: f(spans, docs, enc, groups, books) -> (x, labels); overrides cfg_spans
     cfg_gold: dict = None
 
 
@@ -140,7 +141,9 @@ def _spans(docs, enc, seed, inp):
     piece = PI.piece_of(spans, segs)
     groups = [int(clab[p]) if p >= 0 else -1 for p in piece]
     books = [(u.doc_id, p) for u, p in zip(spans, piece)]
-    if inp.cfg_spans:
+    if inp.cluster_fn:
+        x, lab = inp.cluster_fn(spans, docs, enc, groups, books)
+    elif inp.cfg_spans:
         x, ctx = S2.step2_vectors(spans, docs, enc, inp.cfg_spans)
         lab = S2.step2_cluster(spans, groups, books, x, ctx, inp.cfg_spans)
     else:
