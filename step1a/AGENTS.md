@@ -51,6 +51,10 @@ Timings on the laptop CPU for n50:
   - `span_filter.py` (A), `shapes.py` (B), `cue.py` (C), `spans_step2.py` (D), `combos.py` (E)
   - Score: `scripts/v21_run.py --part A..E [--split test]` -> `results/v21_<part>[_test]/scores.{csv,md}`
   - Adopted: `E_AB_type` (stop list + code shapes + value-type split, t 0.4). Export with `export_mentions.py --variant E_AB_type --from-run results/graph_<split>50` -> `results/graph_v21_<split>50/`
+- wf_v2.2 spans Step 3 variants (on top of wf_v2.1 via `combos.V21`, `V21_FILTER`, `V21_TEXT`):
+  - `fold.py` (F), `staged.py` (G), `roleword.py` (H), `multiview.py` (I), `combos22.py` (J)
+  - Score: `scripts/v21_run.py --part F..J [--split test]` -> `results/v22_<part>[_test]/`. Adds a one-to-one F1 (Hungarian matching of clusters to classes).
+  - Adopted: `fold.CONFIGS["F_m2_t06_bk"]` (fold clusters < 2 members into the nearest kept centroid if cos ≥ 0.6, booking check).
 
 ## Data links
 - `scripts/export_mentions.py` -> `results/graph_<split>50/{docs.jsonl, gold_values.csv, gold_attrs.txt, cache/}`, `<input>/{mentions,clusters,instances}.csv, vectors.npz` -> `scripts/graph_run.py` stages -> `<input>/{coverage.csv, graphs.pkl, stability.csv, nodes.csv, labels.csv, select/, schema/}`

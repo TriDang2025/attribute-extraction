@@ -33,3 +33,8 @@ CONFIGS = {
     "E_AB_type_cl_t05": _v("A + B + type + cannot-link, t 0.5", t=0.5, cannot_link=True),
     "E_AB_type_cue02_cl": _v("A + B + type + cue 0.2 + cannot-link", beta=0.2, cannot_link=True),
 }
+
+# public handles for building on wf_v2.1 (used by the v2.2 parts)
+V21_FILTER = _A  # span filter: stop words + slot names
+V21_TEXT = _B    # text_fn: code shapes
+V21 = CONFIGS["E_AB_type"]  # the adopted wf_v2.1 variant (type split, t 0.4)
