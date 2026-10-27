@@ -72,6 +72,15 @@ def prepare(split, limit, out, with_spans=True):
     return docs, inp, enc
 
 
+def apply_variant(inp, name):
+    """Set the spans filter and cluster_fn of a variant from s1a/combos.py (v2.1) or s1a/fold.py (v2.2)."""
+    from s1a import combos, fold
+    v = (combos.CONFIGS | fold.CONFIGS)[name]
+    inp.spans = v.span_filter(inp.spans) if v.span_filter else inp.spans
+    inp.cluster_fn = v.cluster_fn
+    print(f"variant {name}: {v.note}; {len(inp.spans)} spans", flush=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--split", choices=("dev", "test"), default="dev")
@@ -79,7 +88,7 @@ def main():
     ap.add_argument("--input", choices=("spans", "gold", "both"), default="both")
     ap.add_argument("--out", required=True)
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--variant", help="v2.1 spans variant from s1a/combos.py (span filter + cluster_fn)")
+    ap.add_argument("--variant", help="spans variant from s1a/combos.py or s1a/fold.py (span filter + cluster_fn)")
     ap.add_argument("--from-run", help="run dir whose cache/ seeds this one (e.g. results/graph_dev50)")
     args = ap.parse_args()
     out = Path(args.out)
@@ -90,11 +99,7 @@ def main():
         shutil.copytree(paths.ROOT / args.from_run / "cache", out / "cache")
     docs, inp, enc = prepare(args.split, args.limit, out, "spans" in inputs)
     if args.variant:
-        from s1a.combos import CONFIGS
-        v = CONFIGS[args.variant]
-        inp.spans = v.span_filter(inp.spans) if v.span_filter else inp.spans
-        inp.cluster_fn = v.cluster_fn
-        print(f"variant {args.variant}: {v.note}; {len(inp.spans)} spans", flush=True)
+        apply_variant(inp, args.variant)
     for name in inputs:
         t1 = time.time()
         e = MN.build(name, docs, enc, args.seed, inp=inp)

@@ -1,0 +1,734 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). For EVERY cluster:
+1. Give it a short database attribute name (snake_case, e.g. "graduation_year") and a one-sentence description,
+   or mark it as not an attribute.
+2. Choose one action: keep (a real attribute as it is), merge (same attribute as other listed clusters; list
+   them in merge_with), split (the cluster mixes several attributes; list the parts in split, each with
+   a name and the example ids that belong to it), not_attribute (noise or not a database attribute),
+   unsure.
+3. Choose where the attribute belongs: pick ONE placement from the listed options and copy its text exactly.
+4. Quote one example span from the cluster as evidence.
+Examples are marked with [[...]] inside the turn they come from. Lines labelled "suggestion, no decision"
+are weak automatic hints; they can be wrong, so decide from the examples.
+Return ONLY one JSON array, one object per cluster, nothing before or after it. Each object:
+{"cluster_id": "E1#3", "name": "str", "description": "str",
+ "value_type": "time|day|number|name|code|other",
+ "action": "keep|merge|split|not_attribute|unsure",
+ "merge_with": ["E1#5"], "split": [{"name": "str", "examples": ["E1#3:0"]}],
+ "placement": "<option text exactly as listed>", "evidence": "<one quoted example>"}
+Use [] for merge_with and split when they do not apply.
+
+Entity E1: 29 clusters.
+
+Placement options (copy one exactly into "placement"):
+- current entity E1: the attribute belongs to E1
+- sub-entity of E1: a part of E1 that has attributes of its own
+- other entity E0: the attribute belongs to E0
+- other entity E2: the attribute belongs to E2
+- other entity E3: the attribute belongs to E3
+- other entity E4: the attribute belongs to E4
+- relationship(E1, E0): links E1 and E0
+- relationship(E1, E2): links E1 and E2
+- relationship(E1, E3): links E1 and E3
+- relationship(E1, E4): links E1 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E1#0  (mentions 11, distinct values 2)
+Examples:
+- E1#0:0: [[stansted airport]]
+- E1#0:1: [[stansted]]
+- E1#0:2: [[Stansted airport]]
+- E1#0:3: [[Stansted Airport]]
+- E1#0:4: [[Stansted Airport]]
+- E1#0:5: [[Stansted Airport]]
+- E1#0:6: [[stansted airport]]
+- E1#0:7: [[Stansted airport]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#15: cosine percentile 89; never in the same instance: no; same value type: yes
+- E1#26: cosine percentile 72; never in the same instance: no; same value type: yes
+- E1#6: cosine percentile 70; never in the same instance: yes; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.65 (entity share 1.00, co-occurrence 0.05, similarity 0.89)
+2. separate table: 0.36 (cardinality 0.36 (mean distinct values per instance 1.14; above 1.2 favours a separate table))
+3. other entity E0: 0.34 (entity share 0.18, co-occurrence 0.04, similarity 0.79)
+4. other entity E2: 0.29 (entity share 0.09, co-occurrence 0.05, similarity 0.71)
+5. relationship(E1, E0): 0.28 (co-occurrence 0.04, similarity 0.79, shared values 0.00)
+6. relationship(E1, E2): 0.26 (co-occurrence 0.05, similarity 0.71, shared values 0.00)
+7. other entity E3: 0.26 (entity share 0.00, co-occurrence 0.08, similarity 0.69)
+8. relationship(E1, E3): 0.26 (co-occurrence 0.08, similarity 0.69, shared values 0.00)
+9. other entity E4: 0.12 (entity share 0.00, co-occurrence 0.13, similarity 0.24)
+10. relationship(E1, E4): 0.12 (co-occurrence 0.13, similarity 0.24, shared values 0.00)
+11. sub-entity of E1: no signal
+
+### E1#1  (mentions 89, distinct values 62)
+Examples:
+- E1#1:0: [[19:30]]
+- E1#1:1: [[noon]]
+- E1#1:2: [[13:15]]
+- E1#1:3: [[15:45]]
+- E1#1:4: [[18:15]]
+- E1#1:5: [[18:24]]
+- E1#1:6: [[5:54]]
+- E1#1:7: [[06:08]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#13: cosine percentile 98; never in the same instance: no; same value type: no
+- E1#14: cosine percentile 96; never in the same instance: no; same value type: no
+- E1#15: cosine percentile 94; never in the same instance: no; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. separate table: 1.00 (cardinality 1.00 (mean distinct values per instance 2.78; above 1.2 favours a separate table))
+2. current entity E1: 0.68 (entity share 1.00, co-occurrence 0.05, similarity 0.98)
+3. other entity E2: 0.35 (entity share 0.02, co-occurrence 0.03, similarity 1.00)
+4. other entity E0: 0.34 (entity share 0.06, co-occurrence 0.04, similarity 0.94)
+5. other entity E3: 0.34 (entity share 0.01, co-occurrence 0.09, similarity 0.93)
+6. relationship(E1, E2): 0.34 (co-occurrence 0.03, similarity 1.00, shared values 0.00)
+7. relationship(E1, E3): 0.34 (co-occurrence 0.09, similarity 0.93, shared values 0.00)
+8. relationship(E1, E0): 0.33 (co-occurrence 0.04, similarity 0.94, shared values 0.00)
+9. other entity E4: 0.24 (entity share 0.00, co-occurrence 0.04, similarity 0.68)
+10. relationship(E1, E4): 0.24 (co-occurrence 0.04, similarity 0.68, shared values 0.00)
+11. sub-entity of E1: no signal
+
+### E1#2  (mentions 31, distinct values 22, low confidence)
+Examples:
+- E1#2:0: [[TR9016]]
+- E1#2:1: [[TR5713]]
+- E1#2:2: [[TR5921]]
+- E1#2:3: [[TR6387]]
+- E1#2:4: [[TR7610]]
+- E1#2:5: [[TR9448]]
+- E1#2:6: [[TR0032]]
+- E1#2:7: [[tr1393]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#26: cosine percentile 85; never in the same instance: no; same value type: no
+- E1#15: cosine percentile 85; never in the same instance: no; same value type: no
+- E1#10: cosine percentile 83; never in the same instance: no; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.64 (entity share 1.00, co-occurrence 0.06, similarity 0.85)
+2. separate table: 0.56 (cardinality 0.56 (mean distinct values per instance 1.22; above 1.2 favours a separate table))
+3. other entity E0: 0.42 (entity share 0.19, co-occurrence 0.07, similarity 1.00)
+4. relationship(E1, E0): 0.37 (co-occurrence 0.07, similarity 1.00, shared values 0.05)
+5. other entity E3: 0.33 (entity share 0.00, co-occurrence 0.12, similarity 0.87)
+6. relationship(E1, E3): 0.33 (co-occurrence 0.12, similarity 0.87, shared values 0.00)
+7. other entity E2: 0.33 (entity share 0.03, co-occurrence 0.04, similarity 0.92)
+8. relationship(E1, E2): 0.32 (co-occurrence 0.04, similarity 0.92, shared values 0.00)
+9. other entity E4: 0.30 (entity share 0.00, co-occurrence 0.07, similarity 0.83)
+10. relationship(E1, E4): 0.30 (co-occurrence 0.07, similarity 0.83, shared values 0.00)
+11. sub-entity of E1: no signal
+
+### E1#3  (mentions 45, distinct values 3)
+Examples:
+- E1#3:0: [[Cambridge]]
+- E1#3:1: [[cambidge]]
+- E1#3:2: [[Cambridge TownInfo centre]]
+- E1#3:3: [[cambridge]]
+- E1#3:4: [[cambridge]]
+- E1#3:5: [[Cambridge]]
+- E1#3:6: [[Cambridge]]
+- E1#3:7: [[Cambridge]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#11: cosine percentile 80; never in the same instance: no; same value type: yes
+- E1#15: cosine percentile 79; never in the same instance: no; same value type: yes
+- E1#4: cosine percentile 76; never in the same instance: no; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.61 (entity share 1.00, co-occurrence 0.01, similarity 0.80)
+2. relationship(E1, E3): 0.47 (co-occurrence 0.09, similarity 1.00, shared values 0.33)
+3. relationship(E1, E2): 0.46 (co-occurrence 0.04, similarity 1.00, shared values 0.33)
+4. other entity E3: 0.38 (entity share 0.07, co-occurrence 0.09, similarity 1.00)
+5. other entity E0: 0.37 (entity share 0.07, co-occurrence 0.03, similarity 1.00)
+6. other entity E2: 0.36 (entity share 0.04, co-occurrence 0.04, similarity 1.00)
+7. relationship(E1, E0): 0.34 (co-occurrence 0.03, similarity 1.00, shared values 0.00)
+8. other entity E4: 0.34 (entity share 0.00, co-occurrence 0.04, similarity 0.99)
+9. relationship(E1, E4): 0.34 (co-occurrence 0.04, similarity 0.99, shared values 0.00)
+10. separate table: 0.18 (cardinality 0.18 (mean distinct values per instance 1.07; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#4  (mentions 41, distinct values 8)
+Examples:
+- E1#4:0: [[Saturday]]
+- E1#4:1: [[Friday]]
+- E1#4:2: [[Wednesday]]
+- E1#4:3: [[Tuesday]]
+- E1#4:4: [[Sunday]]
+- E1#4:5: [[Thursday]]
+- E1#4:6: [[Monday]]
+- E1#4:7: [[next tuesday]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#7: cosine percentile 99; never in the same instance: no; same value type: no
+- E1#14: cosine percentile 98; never in the same instance: no; same value type: no
+- E1#15: cosine percentile 96; never in the same instance: no; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.67 (entity share 1.00, co-occurrence 0.04, similarity 0.99)
+2. relationship(E1, E0): 0.47 (co-occurrence 0.03, similarity 1.00, shared values 0.38)
+3. other entity E2: 0.37 (entity share 0.07, co-occurrence 0.03, similarity 1.00)
+4. other entity E3: 0.36 (entity share 0.02, co-occurrence 0.08, similarity 0.97)
+5. other entity E0: 0.35 (entity share 0.02, co-occurrence 0.03, similarity 1.00)
+6. relationship(E1, E3): 0.35 (co-occurrence 0.08, similarity 0.97, shared values 0.00)
+7. relationship(E1, E2): 0.34 (co-occurrence 0.03, similarity 1.00, shared values 0.00)
+8. other entity E4: 0.28 (entity share 0.02, co-occurrence 0.04, similarity 0.78)
+9. relationship(E1, E4): 0.27 (co-occurrence 0.04, similarity 0.78, shared values 0.00)
+10. separate table: 0.18 (cardinality 0.18 (mean distinct values per instance 1.07; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#5  (mentions 13, distinct values 10)
+Examples:
+- E1#5:0: [[10.10 pounds]]
+- E1#5:1: [[66 GBP]]
+- E1#5:2: [[10.56 GBP]]
+- E1#5:3: [[12.80 pounds]]
+- E1#5:4: [[14.08 pounds]]
+- E1#5:5: [[40.4 GBP]]
+- E1#5:6: [[450.6 GBP]]
+- E1#5:7: [[49.5 GBP]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#18: cosine percentile 100; never in the same instance: yes; same value type: no
+- E1#16: cosine percentile 98; never in the same instance: no; same value type: no
+- E1#13: cosine percentile 98; never in the same instance: no; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.70 (entity share 1.00, co-occurrence 0.10, similarity 1.00)
+2. other entity E0: 0.45 (entity share 0.31, co-occurrence 0.06, similarity 0.97)
+3. other entity E2: 0.44 (entity share 0.31, co-occurrence 0.03, similarity 0.97)
+4. other entity E3: 0.43 (entity share 0.15, co-occurrence 0.14, similarity 1.00)
+5. relationship(E1, E3): 0.38 (co-occurrence 0.14, similarity 1.00, shared values 0.00)
+6. relationship(E1, E0): 0.34 (co-occurrence 0.06, similarity 0.97, shared values 0.00)
+7. relationship(E1, E2): 0.34 (co-occurrence 0.03, similarity 0.97, shared values 0.00)
+8. other entity E4: 0.23 (entity share 0.00, co-occurrence 0.09, similarity 0.59)
+9. relationship(E1, E4): 0.23 (co-occurrence 0.09, similarity 0.59, shared values 0.00)
+10. separate table: 0.21 (cardinality 0.21 (mean distinct values per instance 1.08; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#6  (mentions 2, distinct values 1)
+Examples:
+- E1#6:0: [[stevenage]]
+- E1#6:1: [[Stevenage]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#15: cosine percentile 74; never in the same instance: yes; same value type: yes
+- E1#4: cosine percentile 71; never in the same instance: no; same value type: no
+- E1#0: cosine percentile 70; never in the same instance: yes; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.61 (entity share 1.00, co-occurrence 0.09, similarity 0.74)
+2. other entity E3: 0.45 (entity share 0.50, co-occurrence 0.14, similarity 0.70)
+3. relationship(E1, E3): 0.28 (co-occurrence 0.14, similarity 0.70, shared values 0.00)
+4. other entity E2: 0.24 (entity share 0.00, co-occurrence 0.00, similarity 0.72)
+5. relationship(E1, E2): 0.24 (co-occurrence 0.00, similarity 0.72, shared values 0.00)
+6. other entity E0: 0.23 (entity share 0.00, co-occurrence 0.00, similarity 0.70)
+7. relationship(E1, E0): 0.23 (co-occurrence 0.00, similarity 0.70, shared values 0.00)
+8. other entity E4: 0.07 (entity share 0.00, co-occurrence 0.00, similarity 0.20)
+9. relationship(E1, E4): 0.07 (co-occurrence 0.00, similarity 0.20, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#7  (mentions 9, distinct values 2, low confidence)
+Examples:
+- E1#7:0: [[What day]]
+- E1#7:1: [[What time]]
+- E1#7:2: [[what day]]
+- E1#7:3: [[what time]]
+- E1#7:4: [[what day]]
+- E1#7:5: [[what time]]
+- E1#7:6: [[what day]]
+- E1#7:7: [[What day]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#4: cosine percentile 99; never in the same instance: no; same value type: no
+- E1#20: cosine percentile 95; never in the same instance: yes; same value type: yes
+- E1#1: cosine percentile 93; never in the same instance: no; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.69 (entity share 1.00, co-occurrence 0.09, similarity 0.99)
+2. other entity E3: 0.35 (entity share 0.00, co-occurrence 0.13, similarity 0.91)
+3. relationship(E1, E3): 0.35 (co-occurrence 0.13, similarity 0.91, shared values 0.00)
+4. other entity E2: 0.35 (entity share 0.00, co-occurrence 0.04, similarity 1.00)
+5. relationship(E1, E2): 0.35 (co-occurrence 0.04, similarity 1.00, shared values 0.00)
+6. other entity E0: 0.34 (entity share 0.00, co-occurrence 0.01, similarity 1.00)
+7. relationship(E1, E0): 0.34 (co-occurrence 0.01, similarity 1.00, shared values 0.00)
+8. other entity E4: 0.25 (entity share 0.00, co-occurrence 0.00, similarity 0.74)
+9. relationship(E1, E4): 0.25 (co-occurrence 0.00, similarity 0.74, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#8  (mentions 8, distinct values 4)
+Examples:
+- E1#8:0: [[105 minutes]]
+- E1#8:1: [[49 minutes]]
+- E1#8:2: [[2 days]]
+- E1#8:3: [[38 minute]]
+- E1#8:4: [[105 minute]]
+- E1#8:5: [[49 minutes]]
+- E1#8:6: [[105 minutes]]
+- E1#8:7: [[105 minutes]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#17: cosine percentile 100; never in the same instance: yes; same value type: no
+- E1#14: cosine percentile 97; never in the same instance: no; same value type: yes
+- E1#13: cosine percentile 94; never in the same instance: yes; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.70 (entity share 1.00, co-occurrence 0.09, similarity 1.00)
+2. other entity E0: 0.40 (entity share 0.12, co-occurrence 0.09, similarity 0.98)
+3. relationship(E1, E0): 0.36 (co-occurrence 0.09, similarity 0.98, shared values 0.00)
+4. other entity E2: 0.34 (entity share 0.00, co-occurrence 0.03, similarity 1.00)
+5. relationship(E1, E2): 0.34 (co-occurrence 0.03, similarity 1.00, shared values 0.00)
+6. other entity E3: 0.34 (entity share 0.00, co-occurrence 0.10, similarity 0.92)
+7. relationship(E1, E3): 0.34 (co-occurrence 0.10, similarity 0.92, shared values 0.00)
+8. other entity E4: 0.24 (entity share 0.12, co-occurrence 0.00, similarity 0.59)
+9. relationship(E1, E4): 0.20 (co-occurrence 0.00, similarity 0.59, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#9  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#9:0: [[2312]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#13: cosine percentile 83; never in the same instance: yes; same value type: no
+- E1#1: cosine percentile 76; never in the same instance: no; same value type: yes
+- E1#14: cosine percentile 71; never in the same instance: yes; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.64 (entity share 1.00, co-occurrence 0.09, similarity 0.83)
+2. other entity E0: 0.33 (entity share 0.00, co-occurrence 0.00, similarity 0.99)
+3. relationship(E1, E0): 0.33 (co-occurrence 0.00, similarity 0.99, shared values 0.00)
+4. other entity E3: 0.30 (entity share 0.00, co-occurrence 0.14, similarity 0.76)
+5. relationship(E1, E3): 0.30 (co-occurrence 0.14, similarity 0.76, shared values 0.00)
+6. other entity E2: 0.25 (entity share 0.00, co-occurrence 0.00, similarity 0.76)
+7. relationship(E1, E2): 0.25 (co-occurrence 0.00, similarity 0.76, shared values 0.00)
+8. other entity E4: 0.14 (entity share 0.00, co-occurrence 0.00, similarity 0.43)
+9. relationship(E1, E4): 0.14 (co-occurrence 0.00, similarity 0.43, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#10  (mentions 19, distinct values 19)
+Examples:
+- E1#10:0: [[1R61PO9r]]
+- E1#10:1: [[64UQ7M3G]]
+- E1#10:2: [[698RE4W1]]
+- E1#10:3: [[69luuzq7]]
+- E1#10:4: [[G7THDK3O]]
+- E1#10:5: [[GGE66KI2]]
+- E1#10:6: [[GJ3062PE]]
+- E1#10:7: [[H4BIFD0U]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#2: cosine percentile 83; never in the same instance: no; same value type: yes
+- E1#20: cosine percentile 75; never in the same instance: no; same value type: no
+- E1#1: cosine percentile 68; never in the same instance: no; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.64 (entity share 1.00, co-occurrence 0.08, similarity 0.83)
+2. other entity E2: 0.46 (entity share 0.32, co-occurrence 0.06, similarity 1.00)
+3. other entity E0: 0.42 (entity share 0.21, co-occurrence 0.05, similarity 1.00)
+4. relationship(E1, E0): 0.37 (co-occurrence 0.05, similarity 1.00, shared values 0.05)
+5. relationship(E1, E2): 0.35 (co-occurrence 0.06, similarity 1.00, shared values 0.00)
+6. other entity E4: 0.35 (entity share 0.05, co-occurrence 0.00, similarity 1.00)
+7. other entity E3: 0.35 (entity share 0.00, co-occurrence 0.09, similarity 0.96)
+8. relationship(E1, E3): 0.35 (co-occurrence 0.09, similarity 0.96, shared values 0.00)
+9. relationship(E1, E4): 0.33 (co-occurrence 0.00, similarity 1.00, shared values 0.00)
+10. separate table: 0.14 (cardinality 0.14 (mean distinct values per instance 1.06; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#11  (mentions 8, distinct values 1)
+Examples:
+- E1#11:0: [[Leicester]]
+- E1#11:1: [[Leicester]]
+- E1#11:2: [[Leicester]]
+- E1#11:3: [[Leicester]]
+- E1#11:4: [[Leicester]]
+- E1#11:5: [[leicester]]
+- E1#11:6: [[leicester]]
+- E1#11:7: [[Leicester]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#5: cosine percentile 82; never in the same instance: yes; same value type: no
+- E1#15: cosine percentile 82; never in the same instance: no; same value type: yes
+- E1#3: cosine percentile 80; never in the same instance: no; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.63 (entity share 1.00, co-occurrence 0.07, similarity 0.82)
+2. other entity E3: 0.38 (entity share 0.12, co-occurrence 0.10, similarity 0.92)
+3. relationship(E1, E3): 0.34 (co-occurrence 0.10, similarity 0.92, shared values 0.00)
+4. other entity E2: 0.31 (entity share 0.00, co-occurrence 0.05, similarity 0.87)
+5. relationship(E1, E2): 0.31 (co-occurrence 0.05, similarity 0.87, shared values 0.00)
+6. other entity E0: 0.28 (entity share 0.00, co-occurrence 0.00, similarity 0.83)
+7. relationship(E1, E0): 0.28 (co-occurrence 0.00, similarity 0.83, shared values 0.00)
+8. other entity E4: 0.13 (entity share 0.00, co-occurrence 0.00, similarity 0.39)
+9. relationship(E1, E4): 0.13 (co-occurrence 0.00, similarity 0.39, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#12  (mentions 6, distinct values 4, low confidence)
+Examples:
+- E1#12:0: [[How many tickets]]
+- E1#12:1: [[how many seats]]
+- E1#12:2: [[How many train tickets]]
+- E1#12:3: [[There are only 4 trains]]
+- E1#12:4: [[how many tickets]]
+- E1#12:5: [[How many tickets]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#14: cosine percentile 99; never in the same instance: no; same value type: no
+- E1#16: cosine percentile 96; never in the same instance: yes; same value type: yes
+- E1#26: cosine percentile 91; never in the same instance: yes; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.69 (entity share 1.00, co-occurrence 0.09, similarity 0.99)
+2. other entity E0: 0.34 (entity share 0.00, co-occurrence 0.04, similarity 0.99)
+3. relationship(E1, E0): 0.34 (co-occurrence 0.04, similarity 0.99, shared values 0.00)
+4. other entity E2: 0.33 (entity share 0.00, co-occurrence 0.07, similarity 0.94)
+5. relationship(E1, E2): 0.33 (co-occurrence 0.07, similarity 0.94, shared values 0.00)
+6. other entity E3: 0.32 (entity share 0.00, co-occurrence 0.06, similarity 0.91)
+7. relationship(E1, E3): 0.32 (co-occurrence 0.06, similarity 0.91, shared values 0.00)
+8. other entity E4: 0.27 (entity share 0.00, co-occurrence 0.00, similarity 0.82)
+9. relationship(E1, E4): 0.27 (co-occurrence 0.00, similarity 0.82, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#13  (mentions 5, distinct values 4, low confidence)
+Examples:
+- E1#13:0: [[16]]
+- E1#13:1: [[10]]
+- E1#13:2: [[2]]
+- E1#13:3: [[5]]
+- E1#13:4: [[16]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#14: cosine percentile 100; never in the same instance: no; same value type: yes
+- E1#5: cosine percentile 98; never in the same instance: no; same value type: no
+- E1#1: cosine percentile 98; never in the same instance: no; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.69 (entity share 1.00, co-occurrence 0.08, similarity 1.00)
+2. other entity E2: 0.36 (entity share 0.00, co-occurrence 0.08, similarity 1.00)
+3. relationship(E1, E2): 0.36 (co-occurrence 0.08, similarity 1.00, shared values 0.00)
+4. other entity E0: 0.34 (entity share 0.00, co-occurrence 0.02, similarity 1.00)
+5. relationship(E1, E0): 0.34 (co-occurrence 0.02, similarity 1.00, shared values 0.00)
+6. other entity E3: 0.34 (entity share 0.00, co-occurrence 0.05, similarity 0.97)
+7. relationship(E1, E3): 0.34 (co-occurrence 0.05, similarity 0.97, shared values 0.00)
+8. other entity E4: 0.22 (entity share 0.00, co-occurrence 0.00, similarity 0.65)
+9. relationship(E1, E4): 0.22 (co-occurrence 0.00, similarity 0.65, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#14  (mentions 12, distinct values 12, low confidence)
+Examples:
+- E1#14:0: [[1 child]]
+- E1#14:1: [[One train]]
+- E1#14:2: [[twelve]]
+- E1#14:3: [[19 trains]]
+- E1#14:4: [[2 adult]]
+- E1#14:5: [[3 people]]
+- E1#14:6: [[5 choices]]
+- E1#14:7: [[5 people]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#13: cosine percentile 100; never in the same instance: no; same value type: yes
+- E1#12: cosine percentile 99; never in the same instance: no; same value type: no
+- E1#26: cosine percentile 99; never in the same instance: yes; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. separate table: 0.83 (cardinality 0.83 (mean distinct values per instance 1.33; above 1.2 favours a separate table))
+2. current entity E1: 0.69 (entity share 1.00, co-occurrence 0.07, similarity 1.00)
+3. relationship(E1, E2): 0.38 (co-occurrence 0.05, similarity 1.00, shared values 0.08)
+4. other entity E3: 0.35 (entity share 0.00, co-occurrence 0.07, similarity 0.99)
+5. relationship(E1, E3): 0.35 (co-occurrence 0.07, similarity 0.99, shared values 0.00)
+6. other entity E2: 0.35 (entity share 0.00, co-occurrence 0.05, similarity 1.00)
+7. other entity E0: 0.35 (entity share 0.00, co-occurrence 0.04, similarity 1.00)
+8. relationship(E1, E0): 0.35 (co-occurrence 0.04, similarity 1.00, shared values 0.00)
+9. other entity E4: 0.29 (entity share 0.00, co-occurrence 0.00, similarity 0.87)
+10. relationship(E1, E4): 0.29 (co-occurrence 0.00, similarity 0.87, shared values 0.00)
+11. sub-entity of E1: no signal
+
+### E1#15  (mentions 18, distinct values 6)
+Examples:
+- E1#15:0: [[station]]
+- E1#15:1: [[airport]]
+- E1#15:2: [[local restaurant]]
+- E1#15:3: [[park]]
+- E1#15:4: [[town]]
+- E1#15:5: [[train]]
+- E1#15:6: [[station]]
+- E1#15:7: [[airport]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#14: cosine percentile 99; never in the same instance: no; same value type: no
+- E1#20: cosine percentile 97; never in the same instance: no; same value type: yes
+- E1#4: cosine percentile 96; never in the same instance: no; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.69 (entity share 1.00, co-occurrence 0.09, similarity 0.99)
+2. other entity E2: 0.42 (entity share 0.22, co-occurrence 0.04, similarity 0.99)
+3. other entity E0: 0.41 (entity share 0.17, co-occurrence 0.06, similarity 0.99)
+4. other entity E3: 0.40 (entity share 0.11, co-occurrence 0.08, similarity 1.00)
+5. relationship(E1, E3): 0.36 (co-occurrence 0.08, similarity 1.00, shared values 0.00)
+6. relationship(E1, E0): 0.35 (co-occurrence 0.06, similarity 0.99, shared values 0.00)
+7. relationship(E1, E2): 0.35 (co-occurrence 0.04, similarity 0.99, shared values 0.00)
+8. separate table: 0.33 (cardinality 0.33 (mean distinct values per instance 1.13; above 1.2 favours a separate table))
+9. other entity E4: 0.30 (entity share 0.06, co-occurrence 0.00, similarity 0.84)
+10. relationship(E1, E4): 0.28 (co-occurrence 0.00, similarity 0.84, shared values 0.00)
+11. sub-entity of E1: no signal
+
+### E1#16  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E1#16:0: [[How much]]
+- E1#16:1: [[total fee]]
+- E1#16:2: [[What is the price]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#5: cosine percentile 98; never in the same instance: no; same value type: no
+- E1#12: cosine percentile 96; never in the same instance: yes; same value type: yes
+- E1#18: cosine percentile 95; never in the same instance: no; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.69 (entity share 1.00, co-occurrence 0.09, similarity 0.98)
+2. other entity E3: 0.36 (entity share 0.00, co-occurrence 0.08, similarity 0.99)
+3. relationship(E1, E3): 0.36 (co-occurrence 0.08, similarity 0.99, shared values 0.00)
+4. other entity E2: 0.34 (entity share 0.00, co-occurrence 0.04, similarity 1.00)
+5. relationship(E1, E2): 0.34 (co-occurrence 0.04, similarity 1.00, shared values 0.00)
+6. other entity E0: 0.33 (entity share 0.00, co-occurrence 0.00, similarity 1.00)
+7. relationship(E1, E0): 0.33 (co-occurrence 0.00, similarity 1.00, shared values 0.00)
+8. other entity E4: 0.29 (entity share 0.00, co-occurrence 0.00, similarity 0.87)
+9. relationship(E1, E4): 0.29 (co-occurrence 0.00, similarity 0.87, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#17  (mentions 1, distinct values 1)
+Examples:
+- E1#17:0: [[28-minute]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#8: cosine percentile 100; never in the same instance: yes; same value type: no
+- E1#22: cosine percentile 80; never in the same instance: yes; same value type: no
+- E1#14: cosine percentile 78; never in the same instance: yes; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.68 (entity share 1.00, co-occurrence 0.06, similarity 1.00)
+2. other entity E2: 0.34 (entity share 0.00, co-occurrence 0.05, similarity 0.96)
+3. relationship(E1, E2): 0.34 (co-occurrence 0.05, similarity 0.96, shared values 0.00)
+4. other entity E0: 0.29 (entity share 0.00, co-occurrence 0.00, similarity 0.88)
+5. relationship(E1, E0): 0.29 (co-occurrence 0.00, similarity 0.88, shared values 0.00)
+6. other entity E3: 0.24 (entity share 0.00, co-occurrence 0.00, similarity 0.72)
+7. relationship(E1, E3): 0.24 (co-occurrence 0.00, similarity 0.72, shared values 0.00)
+8. other entity E4: 0.11 (entity share 0.00, co-occurrence 0.00, similarity 0.34)
+9. relationship(E1, E4): 0.11 (co-occurrence 0.00, similarity 0.34, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#18  (mentions 3, distinct values 3)
+Examples:
+- E1#18:0: [[17.89]]
+- E1#18:1: [[37.79 GPB]]
+- E1#18:2: [[8.08GBP]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#5: cosine percentile 100; never in the same instance: yes; same value type: no
+- E1#16: cosine percentile 95; never in the same instance: no; same value type: yes
+- E1#13: cosine percentile 95; never in the same instance: yes; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.70 (entity share 1.00, co-occurrence 0.09, similarity 1.00)
+2. other entity E2: 0.34 (entity share 0.00, co-occurrence 0.07, similarity 0.95)
+3. relationship(E1, E2): 0.34 (co-occurrence 0.07, similarity 0.95, shared values 0.00)
+4. other entity E3: 0.31 (entity share 0.00, co-occurrence 0.02, similarity 0.92)
+5. relationship(E1, E3): 0.31 (co-occurrence 0.02, similarity 0.92, shared values 0.00)
+6. other entity E0: 0.31 (entity share 0.00, co-occurrence 0.00, similarity 0.94)
+7. relationship(E1, E0): 0.31 (co-occurrence 0.00, similarity 0.94, shared values 0.00)
+8. other entity E4: 0.19 (entity share 0.00, co-occurrence 0.00, similarity 0.58)
+9. relationship(E1, E4): 0.19 (co-occurrence 0.00, similarity 0.58, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#19  (mentions 4, distinct values 1)
+Examples:
+- E1#19:0: [[peterborough]]
+- E1#19:1: [[Peterborough]]
+- E1#19:2: [[Peterborough]]
+- E1#19:3: [[Peterborough]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#11: cosine percentile 72; never in the same instance: yes; same value type: yes
+- E1#3: cosine percentile 71; never in the same instance: no; same value type: yes
+- E1#23: cosine percentile 67; never in the same instance: yes; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.60 (entity share 1.00, co-occurrence 0.07, similarity 0.72)
+2. other entity E3: 0.27 (entity share 0.00, co-occurrence 0.03, similarity 0.79)
+3. relationship(E1, E3): 0.27 (co-occurrence 0.03, similarity 0.79, shared values 0.00)
+4. other entity E2: 0.24 (entity share 0.00, co-occurrence 0.04, similarity 0.68)
+5. relationship(E1, E2): 0.24 (co-occurrence 0.04, similarity 0.68, shared values 0.00)
+6. other entity E0: 0.23 (entity share 0.00, co-occurrence 0.02, similarity 0.68)
+7. relationship(E1, E0): 0.23 (co-occurrence 0.02, similarity 0.68, shared values 0.00)
+8. other entity E4: 0.13 (entity share 0.00, co-occurrence 0.00, similarity 0.40)
+9. relationship(E1, E4): 0.13 (co-occurrence 0.00, similarity 0.40, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#20  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E1#20:0: [[your chosen date]]
+- E1#20:1: [[your destination]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#26: cosine percentile 97; never in the same instance: yes; same value type: yes
+- E1#15: cosine percentile 97; never in the same instance: no; same value type: yes
+- E1#14: cosine percentile 96; never in the same instance: yes; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.67 (entity share 1.00, co-occurrence 0.05, similarity 0.97)
+2. other entity E3: 0.34 (entity share 0.00, co-occurrence 0.08, similarity 0.94)
+3. relationship(E1, E3): 0.34 (co-occurrence 0.08, similarity 0.94, shared values 0.00)
+4. other entity E0: 0.33 (entity share 0.00, co-occurrence 0.03, similarity 0.97)
+5. relationship(E1, E0): 0.33 (co-occurrence 0.03, similarity 0.97, shared values 0.00)
+6. other entity E2: 0.33 (entity share 0.00, co-occurrence 0.00, similarity 0.98)
+7. relationship(E1, E2): 0.33 (co-occurrence 0.00, similarity 0.98, shared values 0.00)
+8. other entity E4: 0.28 (entity share 0.00, co-occurrence 0.00, similarity 0.83)
+9. relationship(E1, E4): 0.28 (co-occurrence 0.00, similarity 0.83, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#21  (mentions 4, distinct values 1)
+Examples:
+- E1#21:0: [[ely]]
+- E1#21:1: [[ely]]
+- E1#21:2: [[Ely]]
+- E1#21:3: [[Ely]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#15: cosine percentile 70; never in the same instance: no; same value type: yes
+- E1#14: cosine percentile 69; never in the same instance: no; same value type: no
+- E1#13: cosine percentile 68; never in the same instance: no; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.58 (entity share 1.00, co-occurrence 0.05, similarity 0.70)
+2. other entity E0: 0.28 (entity share 0.00, co-occurrence 0.12, similarity 0.71)
+3. relationship(E1, E0): 0.28 (co-occurrence 0.12, similarity 0.71, shared values 0.00)
+4. other entity E3: 0.26 (entity share 0.00, co-occurrence 0.00, similarity 0.77)
+5. relationship(E1, E3): 0.26 (co-occurrence 0.00, similarity 0.77, shared values 0.00)
+6. other entity E2: 0.24 (entity share 0.00, co-occurrence 0.00, similarity 0.71)
+7. relationship(E1, E2): 0.24 (co-occurrence 0.00, similarity 0.71, shared values 0.00)
+8. other entity E4: 0.07 (entity share 0.00, co-occurrence 0.00, similarity 0.22)
+9. relationship(E1, E4): 0.07 (co-occurrence 0.00, similarity 0.22, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#22  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#22:0: [[278]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#18: cosine percentile 90; never in the same instance: yes; same value type: no
+- E1#13: cosine percentile 88; never in the same instance: yes; same value type: yes
+- E1#5: cosine percentile 82; never in the same instance: yes; same value type: no
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.65 (entity share 1.00, co-occurrence 0.04, similarity 0.90)
+2. other entity E2: 0.32 (entity share 0.00, co-occurrence 0.05, similarity 0.91)
+3. relationship(E1, E2): 0.32 (co-occurrence 0.05, similarity 0.91, shared values 0.00)
+4. other entity E0: 0.28 (entity share 0.00, co-occurrence 0.00, similarity 0.85)
+5. relationship(E1, E0): 0.28 (co-occurrence 0.00, similarity 0.85, shared values 0.00)
+6. other entity E3: 0.25 (entity share 0.00, co-occurrence 0.00, similarity 0.76)
+7. relationship(E1, E3): 0.25 (co-occurrence 0.00, similarity 0.76, shared values 0.00)
+8. other entity E4: 0.20 (entity share 0.00, co-occurrence 0.00, similarity 0.60)
+9. relationship(E1, E4): 0.20 (co-occurrence 0.00, similarity 0.60, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#23  (mentions 2, distinct values 2)
+Examples:
+- E1#23:0: [[Bishops Stafford]]
+- E1#23:1: [[bishops stortford]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#11: cosine percentile 76; never in the same instance: yes; same value type: yes
+- E1#15: cosine percentile 70; never in the same instance: no; same value type: yes
+- E1#19: cosine percentile 67; never in the same instance: yes; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.59 (entity share 1.00, co-occurrence 0.01, similarity 0.76)
+2. other entity E0: 0.48 (entity share 0.50, co-occurrence 0.22, similarity 0.72)
+3. relationship(E1, E0): 0.32 (co-occurrence 0.22, similarity 0.72, shared values 0.00)
+4. other entity E2: 0.25 (entity share 0.00, co-occurrence 0.00, similarity 0.74)
+5. other entity E3: 0.25 (entity share 0.00, co-occurrence 0.00, similarity 0.74)
+6. relationship(E1, E2): 0.25 (co-occurrence 0.00, similarity 0.74, shared values 0.00)
+7. relationship(E1, E3): 0.25 (co-occurrence 0.00, similarity 0.74, shared values 0.00)
+8. other entity E4: 0.24 (entity share 0.00, co-occurrence 0.00, similarity 0.73)
+9. relationship(E1, E4): 0.24 (co-occurrence 0.00, similarity 0.73, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#24  (mentions 2, distinct values 1)
+Examples:
+- E1#24:0: [[Broxbourne]]
+- E1#24:1: [[Broxbourne]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#23: cosine percentile 66; never in the same instance: yes; same value type: yes
+- E1#27: cosine percentile 42; never in the same instance: yes; same value type: yes
+- E1#3: cosine percentile 39; never in the same instance: no; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.58 (entity share 1.00, co-occurrence 0.07, similarity 0.66)
+2. other entity E2: 0.34 (entity share 0.50, co-occurrence 0.08, similarity 0.44)
+3. other entity E3: 0.26 (entity share 0.00, co-occurrence 0.03, similarity 0.76)
+4. relationship(E1, E3): 0.26 (co-occurrence 0.03, similarity 0.76, shared values 0.00)
+5. other entity E0: 0.19 (entity share 0.00, co-occurrence 0.00, similarity 0.57)
+6. relationship(E1, E0): 0.19 (co-occurrence 0.00, similarity 0.57, shared values 0.00)
+7. relationship(E1, E2): 0.17 (co-occurrence 0.08, similarity 0.44, shared values 0.00)
+8. other entity E4: 0.06 (entity share 0.00, co-occurrence 0.00, similarity 0.18)
+9. relationship(E1, E4): 0.06 (co-occurrence 0.00, similarity 0.18, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#25  (mentions 2, distinct values 1)
+Examples:
+- E1#25:0: [[Kings Lynn]]
+- E1#25:1: [[Kings Lynn]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#11: cosine percentile 59; never in the same instance: yes; same value type: yes
+- E1#14: cosine percentile 54; never in the same instance: yes; same value type: no
+- E1#15: cosine percentile 53; never in the same instance: no; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.53 (entity share 1.00, co-occurrence 0.01, similarity 0.59)
+2. other entity E3: 0.47 (entity share 0.50, co-occurrence 0.08, similarity 0.82)
+3. other entity E0: 0.42 (entity share 0.50, co-occurrence 0.12, similarity 0.65)
+4. relationship(E1, E3): 0.30 (co-occurrence 0.08, similarity 0.82, shared values 0.00)
+5. relationship(E1, E0): 0.26 (co-occurrence 0.12, similarity 0.65, shared values 0.00)
+6. other entity E2: 0.23 (entity share 0.00, co-occurrence 0.00, similarity 0.70)
+7. relationship(E1, E2): 0.23 (co-occurrence 0.00, similarity 0.70, shared values 0.00)
+8. other entity E4: 0.09 (entity share 0.00, co-occurrence 0.00, similarity 0.27)
+9. relationship(E1, E4): 0.09 (co-occurrence 0.00, similarity 0.27, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#26  (mentions 2, distinct values 2)
+Examples:
+- E1#26:0: [[travel time]]
+- E1#26:1: [[Travellers Rest]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#14: cosine percentile 99; never in the same instance: yes; same value type: no
+- E1#20: cosine percentile 97; never in the same instance: yes; same value type: yes
+- E1#15: cosine percentile 95; never in the same instance: no; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.67 (entity share 1.00, co-occurrence 0.01, similarity 0.99)
+2. relationship(E1, E2): 0.52 (co-occurrence 0.07, similarity 1.00, shared values 0.50)
+3. other entity E2: 0.36 (entity share 0.00, co-occurrence 0.07, similarity 1.00)
+4. other entity E0: 0.35 (entity share 0.00, co-occurrence 0.07, similarity 0.98)
+5. relationship(E1, E0): 0.35 (co-occurrence 0.07, similarity 0.98, shared values 0.00)
+6. other entity E3: 0.31 (entity share 0.00, co-occurrence 0.00, similarity 0.92)
+7. relationship(E1, E3): 0.31 (co-occurrence 0.00, similarity 0.92, shared values 0.00)
+8. other entity E4: 0.26 (entity share 0.00, co-occurrence 0.00, similarity 0.77)
+9. relationship(E1, E4): 0.26 (co-occurrence 0.00, similarity 0.77, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#27  (mentions 4, distinct values 1)
+Examples:
+- E1#27:0: [[norwich]]
+- E1#27:1: [[Norwich]]
+- E1#27:2: [[Norwich]]
+- E1#27:3: [[Norwich]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#4: cosine percentile 66; never in the same instance: no; same value type: no
+- E1#19: cosine percentile 65; never in the same instance: yes; same value type: yes
+- E1#15: cosine percentile 62; never in the same instance: no; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.57 (entity share 1.00, co-occurrence 0.04, similarity 0.66)
+2. other entity E0: 0.29 (entity share 0.00, co-occurrence 0.03, similarity 0.85)
+3. relationship(E1, E0): 0.29 (co-occurrence 0.03, similarity 0.85, shared values 0.00)
+4. other entity E3: 0.29 (entity share 0.00, co-occurrence 0.08, similarity 0.80)
+5. relationship(E1, E3): 0.29 (co-occurrence 0.08, similarity 0.80, shared values 0.00)
+6. other entity E2: 0.25 (entity share 0.00, co-occurrence 0.04, similarity 0.70)
+7. relationship(E1, E2): 0.25 (co-occurrence 0.04, similarity 0.70, shared values 0.00)
+8. other entity E4: 0.05 (entity share 0.00, co-occurrence 0.00, similarity 0.14)
+9. relationship(E1, E4): 0.05 (co-occurrence 0.00, similarity 0.14, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+### E1#28  (mentions 2, distinct values 1)
+Examples:
+- E1#28:0: [[Birmingham new street]]
+- E1#28:1: [[birmingham new street]]
+Merge suggestions (suggestion, no decision), nearest clusters first:
+- E1#15: cosine percentile 67; never in the same instance: no; same value type: yes
+- E1#14: cosine percentile 65; never in the same instance: no; same value type: no
+- E1#23: cosine percentile 57; never in the same instance: yes; same value type: yes
+Placement suggestions (suggestion, no decision), ranked:
+1. current entity E1: 0.58 (entity share 1.00, co-occurrence 0.05, similarity 0.67)
+2. other entity E2: 0.31 (entity share 0.00, co-occurrence 0.10, similarity 0.83)
+3. relationship(E1, E2): 0.31 (co-occurrence 0.10, similarity 0.83, shared values 0.00)
+4. other entity E3: 0.31 (entity share 0.00, co-occurrence 0.00, similarity 0.92)
+5. relationship(E1, E3): 0.31 (co-occurrence 0.00, similarity 0.92, shared values 0.00)
+6. other entity E0: 0.26 (entity share 0.00, co-occurrence 0.00, similarity 0.78)
+7. relationship(E1, E0): 0.26 (co-occurrence 0.00, similarity 0.78, shared values 0.00)
+8. other entity E4: 0.13 (entity share 0.00, co-occurrence 0.00, similarity 0.40)
+9. relationship(E1, E4): 0.13 (co-occurrence 0.00, similarity 0.40, shared values 0.00)
+10. separate table: 0.00 (cardinality 0.00 (mean distinct values per instance 1.00; above 1.2 favours a separate table))
+11. sub-entity of E1: no signal
+
+Return the JSON array now.

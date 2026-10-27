@@ -55,6 +55,11 @@ Timings on the laptop CPU for n50:
   - `fold.py` (F), `staged.py` (G), `roleword.py` (H), `multiview.py` (I), `combos22.py` (J)
   - Score: `scripts/v21_run.py --part F..J [--split test]` -> `results/v22_<part>[_test]/`. Adds a one-to-one F1 (Hungarian matching of clusters to classes).
   - Adopted: `fold.CONFIGS["F_m2_t06_bk"]` (fold clusters < 2 members into the nearest kept centroid if cos ≥ 0.6, booking check).
+- wf_v3 Loop-1 readiness check (contract `LOOP1_CONTRACT.md`, splits `SPLITS.md`; the fresh split loads only with `split.dialogues("fresh", unseal=True)`):
+  - T1: `export_mentions.py --variant F_m2_t06_bk --from-run results/graph_dev50 --out results/graph_v22_dev50`, then `graph_run.py --variant F_m2_t06_bk` (the stability stage re-clusters with the variant) → `results/graph_v22_dev50/`; input hashes in `results/loop1_check/HASHES.md`.
+  - T2 `s1a/recall.py`, `scripts/loop1_recall.py` → `results/loop1_check/{recall.csv, recall_by_attr.csv, fig/loop1_recall_at_k.png}` (the v2.2 point is the frozen T1 export; the rebuild must match it).
+  - T3 `s1a/missing.py`, `scripts/loop1_missing.py` (frozen mentions + raw GLiNER cache) → `results/loop1_check/missing_attributes.csv`.
+  - T5 input `s1a/pilot_input.py`, `scripts/pilot_build.py` → `results/loop1_check/pilot_train/{prompts/*.txt, examples.csv, prompt_stats.md}` → Colab `colab/S1A_llm_colab.ipynb` (`s1a/llm_cache.py`; also T4 `t4_questions.txt` → `contamination_raw.jsonl`) → `pilot_train/responses_<variant>_<tag>.jsonl` → `scripts/pilot_eval.py` (`s1a/pilot_verify.py`, `s1a/pilot_score.py`) → `pilot_train/{decisions,verification,name_check}.csv, scores.md`.
 
 ## Data links
 - `scripts/export_mentions.py` -> `results/graph_<split>50/{docs.jsonl, gold_values.csv, gold_attrs.txt, cache/}`, `<input>/{mentions,clusters,instances}.csv, vectors.npz` -> `scripts/graph_run.py` stages -> `<input>/{coverage.csv, graphs.pkl, stability.csv, nodes.csv, labels.csv, select/, schema/}`

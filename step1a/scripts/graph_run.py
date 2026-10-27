@@ -85,6 +85,8 @@ def graph(d, e):
 def stability(run, name, d, e, args):
     import export_mentions as EX
     docs, inp, enc = EX.prepare(args.split, args.limit, run, name == "spans")
+    if args.variant and name == "spans":
+        EX.apply_variant(inp, args.variant)
     seeds = (0, 1, 2) if name == "spans" else (0,)  # gold input: stage 1 is the gold entity, no seed
     s = ST.stability_scores(name, docs, enc, e, seeds=seeds, n_resamples=args.resamples,
                             build_fn=lambda i, dd, en, sd: MN.build(i, dd, en, sd, inp=inp))
@@ -189,6 +191,7 @@ def main():
     ap.add_argument("--split", choices=("dev", "test"), default="dev", help="for the stability stage")
     ap.add_argument("--limit", type=int, default=50, help="for the stability stage")
     ap.add_argument("--resamples", type=int, default=5)
+    ap.add_argument("--variant", help="spans variant the run was exported with (stability stage re-clusters with it)")
     ap.add_argument("--chosen", help="chosen.json of another run: apply instead of choosing (select stage)")
     args = ap.parse_args()
     run = Path(args.run)
