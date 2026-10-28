@@ -1,0 +1,405 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+
+Entity E2: 57 clusters.
+
+Placement options (copy one exactly into "placement"):
+- current entity E2: the attribute belongs to E2
+- sub-entity of E2: a part of E2 that has attributes of its own
+- other entity E0: the attribute belongs to E0
+- other entity E1: the attribute belongs to E1
+- other entity E3: the attribute belongs to E3
+- other entity E4: the attribute belongs to E4
+- relationship(E2, E0): links E2 and E0
+- relationship(E2, E1): links E2 and E1
+- relationship(E2, E3): links E2 and E3
+- relationship(E2, E4): links E2 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E2#0  (mentions 19, distinct values 12, low confidence)
+Examples:
+- E2#0:0: [[south]]
+- E2#0:1: [[north]]
+- E2#0:2: [[north part of town]]
+- E2#0:3: [[south side of town]]
+- E2#0:4: [[west]]
+- E2#0:5: [[west part of town]]
+- E2#0:6: [[another part of town]]
+- E2#0:7: [[east part of town]]
+
+### E2#1  (mentions 5, distinct values 5, low confidence)
+Examples:
+- E2#1:0: [[Chinese]]
+- E2#1:1: [[Chinese place]]
+- E2#1:2: [[italian place]]
+- E2#1:3: [[venue]]
+- E2#1:4: [[vietnamese place]]
+
+### E2#2  (mentions 4, distinct values 3)
+Examples:
+- E2#2:0: [[30 Bridge Street]]
+- E2#2:1: [[10 Homerton Street]]
+- E2#2:2: [[43 High Street]]
+- E2#2:3: [[30 Bridge Street]]
+
+### E2#3  (mentions 4, distinct values 2)
+Examples:
+- E2#3:0: [[Cherry Hinton]]
+- E2#3:1: [[64 Cherry Hinton Road]]
+- E2#3:2: [[Cherry Hinton]]
+- E2#3:3: [[Cherry Hinton]]
+
+### E2#4  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#4:0: [[C.B 1]]
+
+### E2#5  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#5:0: [[9 H.X]]
+
+### E2#6  (mentions 4, distinct values 4)
+Examples:
+- E2#6:0: [[01223 249955]]
+- E2#6:1: [[01223 360966]]
+- E2#6:2: [[Taxi contact number]]
+- E2#6:3: [[their phone number]]
+
+### E2#7  (mentions 24, distinct values 12, low confidence)
+Examples:
+- E2#7:0: [[restaurant]]
+- E2#7:1: [[hotel]]
+- E2#7:2: [[Peking Restaurant]]
+- E2#7:3: [[restaurant alimentum]]
+- E2#7:4: [[The restaurant]]
+- E2#7:5: [[3 Turkish restaurants]]
+- E2#7:6: [[barbecue restaurant]]
+- E2#7:7: [[british food]]
+
+### E2#8  (mentions 2, distinct values 1)
+Examples:
+- E2#8:0: [[Cocum restaurant]]
+- E2#8:1: [[Cocum restaurant]]
+
+### E2#9  (mentions 11, distinct values 7)
+Examples:
+- E2#9:0: [[3]]
+- E2#9:1: [[six people]]
+- E2#9:2: [[two]]
+- E2#9:3: [[2 people]]
+- E2#9:4: [[four people]]
+- E2#9:5: [[7 people]]
+- E2#9:6: [[8 people]]
+- E2#9:7: [[three]]
+
+### E2#10  (mentions 28, distinct values 20, low confidence)
+Examples:
+- E2#10:0: [[15:15]]
+- E2#10:1: [[18:00]]
+- E2#10:2: [[10:00]]
+- E2#10:3: [[11:15]]
+- E2#10:4: [[15:00]]
+- E2#10:5: [[17:45]]
+- E2#10:6: [[3:15]]
+- E2#10:7: [[09:15]]
+
+### E2#11  (mentions 16, distinct values 5)
+Examples:
+- E2#11:0: [[Thursday]]
+- E2#11:1: [[Wednesday]]
+- E2#11:2: [[Sunday]]
+- E2#11:3: [[Monday]]
+- E2#11:4: [[Friday]]
+- E2#11:5: [[Thursday]]
+- E2#11:6: [[Wednesday]]
+- E2#11:7: [[Sunday]]
+
+### E2#12  (mentions 17, distinct values 17)
+Examples:
+- E2#12:0: [[42XEDGDF]]
+- E2#12:1: [[BPE8LVHA]]
+- E2#12:2: [[cb12as]]
+- E2#12:3: [[cb17aa]]
+- E2#12:4: [[cb21sj]]
+- E2#12:5: [[cb30df]]
+- E2#12:6: [[cb41uy]]
+- E2#12:7: [[CUL9VZ04]]
+
+### E2#13  (mentions 1, distinct values 1)
+Examples:
+- E2#13:0: [[Midsummer House Restaurant]]
+
+### E2#14  (mentions 15, distinct values 14)
+Examples:
+- E2#14:0: [[01223367660]]
+- E2#14:1: [[01223276182]]
+- E2#14:2: [[01223311911]]
+- E2#14:3: [[01223315232]]
+- E2#14:4: [[01223354755]]
+- E2#14:5: [[01223359506]]
+- E2#14:6: [[01223362372]]
+- E2#14:7: [[01223412299]]
+
+### E2#15  (mentions 27, distinct values 8)
+Examples:
+- E2#15:0: [[city centre]]
+- E2#15:1: [[centre]]
+- E2#15:2: [[centre area]]
+- E2#15:3: [[centre of town]]
+- E2#15:4: [[Center]]
+- E2#15:5: [[center of town]]
+- E2#15:6: [[Somewhere in the centre]]
+- E2#15:7: [[town center]]
+
+### E2#16  (mentions 2, distinct values 1)
+Examples:
+- E2#16:0: [[Bedouin]]
+- E2#16:1: [[bedouin]]
+
+### E2#17  (mentions 25, distinct values 11, low confidence)
+Examples:
+- E2#17:0: [[expensive]]
+- E2#17:1: [[moderately priced]]
+- E2#17:2: [[expensive price range]]
+- E2#17:3: [[cheap]]
+- E2#17:4: [[cheap price range]]
+- E2#17:5: [[entry fee]]
+- E2#17:6: [[expensive place]]
+- E2#17:7: [[moderate price range]]
+
+### E2#18  (mentions 3, distinct values 2)
+Examples:
+- E2#18:0: [[Lucky Star]]
+- E2#18:1: [[Good Luck Chinese Food Takeaway]]
+- E2#18:2: [[Lucky Star]]
+
+### E2#19  (mentions 9, distinct values 5, low confidence)
+Examples:
+- E2#19:0: [[4]]
+- E2#19:1: [[7]]
+- E2#19:2: [[10 choices]]
+- E2#19:3: [[2]]
+- E2#19:4: [[9]]
+- E2#19:5: [[4]]
+- E2#19:6: [[7]]
+- E2#19:7: [[4]]
+
+### E2#20  (mentions 3, distinct values 2, low confidence)
+Examples:
+- E2#20:0: [[pizza express]]
+- E2#20:1: [[Pizza Hut]]
+- E2#20:2: [[pizza express]]
+
+### E2#21  (mentions 5, distinct values 3, low confidence)
+Examples:
+- E2#21:0: [[Taj Tandoori]]
+- E2#21:1: [[tandoori palace]]
+- E2#21:2: [[The tandoori palace]]
+- E2#21:3: [[Taj Tandoori]]
+- E2#21:4: [[Tandoori Palace]]
+
+### E2#22  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#22:0: [[kymmoy]]
+
+### E2#23  (mentions 1, distinct values 1)
+Examples:
+- E2#23:0: [[100 Mill Rd]]
+
+### E2#24  (mentions 2, distinct values 2)
+Examples:
+- E2#24:0: [[la Margarita]]
+- E2#24:1: [[La Margherita]]
+
+### E2#25  (mentions 1, distinct values 1)
+Examples:
+- E2#25:0: [[riverboat Georgina]]
+
+### E2#26  (mentions 4, distinct values 2)
+Examples:
+- E2#26:0: [[college]]
+- E2#26:1: [[downing college]]
+- E2#26:2: [[college]]
+- E2#26:3: [[Downing College]]
+
+### E2#27  (mentions 1, distinct values 1)
+Examples:
+- E2#27:0: [[regent street]]
+
+### E2#28  (mentions 2, distinct values 1)
+Examples:
+- E2#28:0: [[Panahar]]
+- E2#28:1: [[panahar]]
+
+### E2#29  (mentions 4, distinct values 1)
+Examples:
+- E2#29:0: [[15 minutes]]
+- E2#29:1: [[15 minutes]]
+- E2#29:2: [[15 minutes]]
+- E2#29:3: [[15 minutes]]
+
+### E2#30  (mentions 3, distinct values 1)
+Examples:
+- E2#30:0: [[thanh binh]]
+- E2#30:1: [[Thanh Binh]]
+- E2#30:2: [[Thanh binh]]
+
+### E2#31  (mentions 2, distinct values 1)
+Examples:
+- E2#31:0: [[17 magdalene street]]
+- E2#31:1: [[17 Magdalene Street]]
+
+### E2#32  (mentions 5, distinct values 2)
+Examples:
+- E2#32:0: [[Cambridge]]
+- E2#32:1: [[Cambridge TownInfo centre]]
+- E2#32:2: [[Cambridge]]
+- E2#32:3: [[Cambridge TownInfo centre]]
+- E2#32:4: [[Cambridge]]
+
+### E2#33  (mentions 1, distinct values 1)
+Examples:
+- E2#33:0: [[Both]]
+
+### E2#34  (mentions 1, distinct values 1)
+Examples:
+- E2#34:0: [[The cambridge chop house]]
+
+### E2#35  (mentions 2, distinct values 1)
+Examples:
+- E2#35:0: [[La Raza]]
+- E2#35:1: [[La raza]]
+
+### E2#36  (mentions 1, distinct values 1)
+Examples:
+- E2#36:0: [[4 - 6 Rose Crescent]]
+
+### E2#37  (mentions 2, distinct values 1)
+Examples:
+- E2#37:0: [[Anatolia]]
+- E2#37:1: [[Anatolia]]
+
+### E2#38  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E2#38:0: [[Italian]]
+- E2#38:1: [[Mexican]]
+
+### E2#39  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E2#39:0: [[Indian]]
+- E2#39:1: [[Indian food]]
+
+### E2#40  (mentions 3, distinct values 1)
+Examples:
+- E2#40:0: [[Graffiti]]
+- E2#40:1: [[graffiti]]
+- E2#40:2: [[graffiti]]
+
+### E2#41  (mentions 1, distinct values 1)
+Examples:
+- E2#41:0: [[anatolia]]
+
+### E2#42  (mentions 4, distinct values 2, low confidence)
+Examples:
+- E2#42:0: [[table]]
+- E2#42:1: [[Your table]]
+- E2#42:2: [[table]]
+- E2#42:3: [[table]]
+
+### E2#43  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E2#43:0: [[travellers rest]]
+- E2#43:1: [[Travellers Rest]]
+
+### E2#44  (mentions 2, distinct values 2)
+Examples:
+- E2#44:0: [[hamilton lodge]]
+- E2#44:1: [[huntingdon road]]
+
+### E2#45  (mentions 2, distinct values 2)
+Examples:
+- E2#45:0: [[the ugly duckling]]
+- E2#45:1: [[Ugly Duckling]]
+
+### E2#46  (mentions 3, distinct values 3)
+Examples:
+- E2#46:0: [[11 Peas Hill City Center]]
+- E2#46:1: [[12 Market Hill]]
+- E2#46:2: [[12 St. Johns Street]]
+
+### E2#47  (mentions 2, distinct values 1)
+Examples:
+- E2#47:0: [[The copper kettle]]
+- E2#47:1: [[The copper kettle]]
+
+### E2#48  (mentions 4, distinct values 3, low confidence)
+Examples:
+- E2#48:0: [[same day]]
+- E2#48:1: [[What day]]
+- E2#48:2: [[what time]]
+- E2#48:3: [[same day]]
+
+### E2#49  (mentions 2, distinct values 1)
+Examples:
+- E2#49:0: [[68 Histon Road]]
+- E2#49:1: [[68 Histon Road]]
+
+### E2#50  (mentions 4, distinct values 1, low confidence)
+Examples:
+- E2#50:0: [[Chesterton]]
+- E2#50:1: [[Chesterton]]
+- E2#50:2: [[Chesterton]]
+- E2#50:3: [[Chesterton]]
+
+### E2#51  (mentions 2, distinct values 2)
+Examples:
+- E2#51:0: [[cafe uno]]
+- E2#51:1: [[The oak bistro]]
+
+### E2#52  (mentions 1, distinct values 1)
+Examples:
+- E2#52:0: [[6 Lensfield Road]]
+
+### E2#53  (mentions 4, distinct values 2)
+Examples:
+- E2#53:0: [[Nirala]]
+- E2#53:1: [[The Nirala]]
+- E2#53:2: [[nirala]]
+- E2#53:3: [[The Nirala]]
+
+### E2#54  (mentions 2, distinct values 2)
+Examples:
+- E2#54:0: [[7 Milton Road]]
+- E2#54:1: [[7 Milton Street]]
+
+### E2#55  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#55:0: [[Jinling Noodle Bar]]
+
+### E2#56  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E2#56:0: [[don pasquale]]
+- E2#56:1: [[Don Pasquale Pizzeria]]
+
+Return the JSON object now.

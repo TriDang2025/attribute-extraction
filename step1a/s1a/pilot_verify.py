@@ -21,11 +21,13 @@ from .units import turn_of
 
 ACTIONS = ("keep", "merge", "split", "not_attribute", "unsure")
 MARKED = ("not_attribute", "unsure")
+NOT_ATTRIBUTE_KEY = "not attribute"  # norm_name("not_attribute")
 J_MIN = 0.2
 DEC_COLS = ["variant", "run_tag", "cluster_id", "name", "description", "value_type", "action",
             "merge_with", "split", "placement", "evidence"]
-ATTR_COLS = ["attr_id", "name", "clusters", "n_mentions", "status", "source"]
+ATTR_COLS = ["attr_id", "name", "clusters", "n_mentions", "status", "source", "description"]
 VERIFY_COLS = ["variant", "run_tag", "attr_id", "name", "status", "n_gliner", "n_values", "jaccard", "unverified"]
+DESC_LABEL_CHARS = 60  # the description label of the GLiNER check is trimmed to this length
 
 
 def response_key(path):
@@ -66,6 +68,88 @@ def decisions_table(objs, cluster_ids, variant, run_tag):
                      "merge_with": json.dumps(list(o.get("merge_with") or [])),
                      "split": json.dumps(list(o.get("split") or [])),
                      "placement": str(o.get("placement") or ""), "evidence": str(o.get("evidence") or "")})
+    return pd.DataFrame(rows, columns=DEC_COLS)
+
+
+def norm_name(name):
+    """Name key: lowercase, `_`, `-` and space equal, runs of them collapsed."""
+    return re.sub(r"[\s_\-]+", " ", str(name or "").lower()).strip()
+
+
+def _split_obj(path):
+    """Parsed dict of the LAST row of one split response file (raw JSON as the fallback), else {}."""
+    rows = [json.loads(line) for line in open(path, encoding="utf-8") if line.strip()]
+    if not rows:
+        return {}
+    parsed = rows[-1].get("parsed")
+    if parsed is None:
+        try:
+            parsed = json.loads(rows[-1].get("raw") or "{}")
+        except ValueError:
+            parsed = {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def load_split_results(dir):
+    """{(ent, run_tag): {cluster_id: parsed split object}} from <dir>/<ent>_split_<cid>_<tag>.jsonl
+    (the cluster id is written with "#" as "-": E1-1 = E1#1)."""
+    out = {}
+    for path in sorted(Path(dir).glob("*_split_*.jsonl")):
+        ent, rest = path.stem.split("_split_", 1)
+        cid, tag = rest.rsplit("_", 1)
+        out.setdefault((ent, tag), {})[cid.replace("-", "#")] = _split_obj(path)
+    return out
+
+
+def decisions_from_v2(obj, cluster_ids, variant, run_tag, split_results=None, require_mixed=True):
+    """v1-style decision table (DEC_COLS) from a v2 object {attributes, clusters} (PILOT_V31_CONTRACT adapter).
+
+    Clusters sharing an attribute -> merge (merge_with = the others); a single one -> keep; "not_attribute" ->
+    not_attribute; a name not in the list -> unsure; omitted clusters get action "". A cluster that is `mixed`
+    (any cluster when require_mixed is False) and has a split result {is_mixed: true, parts: [{name, examples}]}
+    -> split with those parts. Not-attribute and unsure rows carry no name."""
+    obj = obj if isinstance(obj, dict) else {}
+    attrs = {norm_name(a.get("name")): a for a in obj.get("attributes") or [] if isinstance(a, dict) and a.get("name")}
+    by = {str(c.get("cluster_id", "")): c for c in obj.get("clusters") or [] if isinstance(c, dict)}
+    split_results = split_results or {}
+    kind, split = {}, {}
+    for cid in cluster_ids:
+        c = by.get(cid)
+        if c is None:
+            continue
+        key = norm_name(c.get("attribute"))
+        s = split_results.get(cid) or {}
+        parts = [p for p in s.get("parts") or [] if isinstance(p, dict)
+                 and any(str(e).startswith(f"{cid}:") for e in p.get("examples") or [])]  # parts with no own example are dropped
+        if key == NOT_ATTRIBUTE_KEY:
+            kind[cid] = "not_attribute"
+        elif key not in attrs:
+            kind[cid] = "unsure"
+        elif s.get("is_mixed") and len(parts) >= 2 and (c.get("mixed") or not require_mixed):
+            kind[cid], split[cid] = "split", parts
+        else:
+            kind[cid] = key
+    groups = {}
+    for cid, k in kind.items():
+        if k not in ("not_attribute", "unsure", "split"):
+            groups.setdefault(k, []).append(cid)
+    rows = []
+    for cid in cluster_ids:
+        if cid not in by:
+            rows.append({"variant": variant, "run_tag": run_tag, "cluster_id": cid, "action": "",
+                         **{col: "" for col in DEC_COLS[3:] if col != "action"}})
+            continue
+        c, k = by[cid], kind[cid]
+        a = attrs.get(norm_name(c.get("attribute"))) if k not in ("not_attribute", "unsure") else None
+        others = [o for o in groups.get(k, []) if o != cid]
+        action = k if k in MARKED or k == "split" else ("merge" if others else "keep")
+        rows.append({"variant": variant, "run_tag": run_tag, "cluster_id": cid,
+                     "name": str(a.get("name") or "") if a else "",
+                     "description": str(a.get("description") or "") if a else "", "value_type": "",
+                     "action": action, "merge_with": json.dumps(others),
+                     "split": json.dumps([{"name": str(p.get("name") or ""), "examples": list(p.get("examples") or [])}
+                                          for p in split.get(cid, [])]),
+                     "placement": str(c.get("placement") or ""), "evidence": str(c.get("evidence") or "")})
     return pd.DataFrame(rows, columns=DEC_COLS)
 
 
@@ -120,7 +204,8 @@ def final_attributes(dec, mentions, ids, x, examples, entity):
         attr_id = "|".join(sorted(members))
         attrs.append({"attr_id": attr_id, "name": row[named[0]]["name"] if named else "",
                       "clusters": ";".join(sorted(members)), "n_mentions": sum(sizes[c] for c in members),
-                      "status": status, "source": "merge" if len(members) > 1 else "keep"})
+                      "status": status, "source": "merge" if len(members) > 1 else "keep",
+                      "description": row[named[0]]["description"] if named else ""})
         for c in members:
             assign.update({int(i): attr_id for i in pm.loc[pm["cluster_id"] == c, "mention_id"]})
     for c, ps in parts.items():
@@ -130,7 +215,7 @@ def final_attributes(dec, mentions, ids, x, examples, entity):
         for k, (name, _, _) in enumerate(ps):
             mine = [i for i, n in zip(ms, near) if n == k]
             attrs.append({"attr_id": f"{c}/{k}", "name": name, "clusters": c, "n_mentions": len(mine),
-                          "status": "keep", "source": "split"})
+                          "status": "keep", "source": "split", "description": ""})
             assign.update({i: f"{c}/{k}" for i in mine})
     return (assign, pd.DataFrame(attrs, columns=ATTR_COLS),
             {c: [(p[0], p[2]) for p in ps] for c, ps in parts.items()})
@@ -191,9 +276,12 @@ def jaccard(a, b):
     return len(a & b) / len(u) if u else 0.0
 
 
-def verify(attrs, assign, mentions, docs, instances, entity, extract_fn, cache_dir=None, variant="", run_tag=""):
-    """One row per named attribute: A = GLiNER values for its name, B = normalized values of its mentions;
-    J = |A and B| / |A or B|; unverified = J < 0.2 (the attribute is kept)."""
+def verify(attrs, assign, mentions, docs, instances, entity, extract_fn, cache_dir=None, variant="", run_tag="",
+           use_description=False):
+    """One row per named attribute: A = GLiNER values for its label, B = normalized values of its mentions;
+    J = |A and B| / |A or B|; unverified = J < 0.2 (the attribute is kept).
+    use_description=True: the label is the attribute's description (first 60 chars; attributes without one are
+    skipped) and the rows get label_kind "description" (default: the name, no label_kind column)."""
     turns = pilot_turns(instances, entity)
     norm = dict(zip(mentions["mention_id"].astype(int), mentions["norm_value"]))
     by_attr = {}
@@ -201,10 +289,15 @@ def verify(attrs, assign, mentions, docs, instances, entity, extract_fn, cache_d
         by_attr.setdefault(aid, set()).add(S2.normalize(norm[mid]).lower())
     rows = []
     for _, a in attrs[attrs["name"] != ""].iterrows():
-        A = span_values(a["name"], docs, turns, extract_fn, cache_dir)
+        label = str(a["description"] or "").strip()[:DESC_LABEL_CHARS].strip() if use_description else a["name"]
+        if not label:
+            continue
+        A = span_values(label, docs, turns, extract_fn, cache_dir)
         B = by_attr.get(a["attr_id"], set())
         j = jaccard(A, B)
         rows.append({"variant": variant, "run_tag": run_tag, "attr_id": a["attr_id"], "name": a["name"],
                      "status": a["status"], "n_gliner": len(A), "n_values": len(B), "jaccard": j,
                      "unverified": j < J_MIN})
+    if use_description:
+        return pd.DataFrame(rows, columns=VERIFY_COLS).assign(label_kind="description")
     return pd.DataFrame(rows, columns=VERIFY_COLS)

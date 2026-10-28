@@ -1,0 +1,254 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+
+Entity E0: 31 clusters.
+
+Placement options (copy one exactly into "placement"):
+- current entity E0: the attribute belongs to E0
+- sub-entity of E0: a part of E0 that has attributes of its own
+- other entity E1: the attribute belongs to E1
+- other entity E2: the attribute belongs to E2
+- other entity E3: the attribute belongs to E3
+- other entity E4: the attribute belongs to E4
+- relationship(E0, E1): links E0 and E1
+- relationship(E0, E2): links E0 and E2
+- relationship(E0, E3): links E0 and E3
+- relationship(E0, E4): links E0 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E0#0  (mentions 24, distinct values 14, low confidence)
+Examples:
+- E0#0:0: [[guesthouse]]
+- E0#0:1: [[hotel]]
+- E0#0:2: [[Ashley Hotel]]
+- E0#0:3: [[The ashley hotel]]
+- E0#0:4: [[3 star hotel]]
+- E0#0:5: [[4 star hotel]]
+- E0#0:6: [[5 star hotel]]
+- E0#0:7: [[5-star hotels]]
+
+### E0#1  (mentions 19, distinct values 12)
+Examples:
+- E0#1:0: [[moderate price range]]
+- E0#1:1: [[cheap]]
+- E0#1:2: [[cheap price range]]
+- E0#1:3: [[cheaper price range]]
+- E0#1:4: [[expensive hotel]]
+- E0#1:5: [[expensive price range]]
+- E0#1:6: [[moderate price]]
+- E0#1:7: [[moderately priced]]
+
+### E0#2  (mentions 5, distinct values 3, low confidence)
+Examples:
+- E0#2:0: [[how many people]]
+- E0#2:1: [[4 other people]]
+- E0#2:2: [[several]]
+- E0#2:3: [[how many people]]
+- E0#2:4: [[how many people]]
+
+### E0#3  (mentions 2, distinct values 2)
+Examples:
+- E0#3:0: [[Finches Bed and Breakfast]]
+- E0#3:1: [[The finches Bed and Breakfast]]
+
+### E0#4  (mentions 24, distinct values 9)
+Examples:
+- E0#4:0: [[3 nights]]
+- E0#4:1: [[4 nights]]
+- E0#4:2: [[2 nights]]
+- E0#4:3: [[4 star]]
+- E0#4:4: [[2 stars]]
+- E0#4:5: [[three days]]
+- E0#4:6: [[3 stars]]
+- E0#4:7: [[5 nights]]
+
+### E0#5  (mentions 21, distinct values 6)
+Examples:
+- E0#5:0: [[Monday]]
+- E0#5:1: [[Wednesday]]
+- E0#5:2: [[Friday]]
+- E0#5:3: [[Sunday]]
+- E0#5:4: [[Saturday]]
+- E0#5:5: [[Thursday]]
+- E0#5:6: [[Monday]]
+- E0#5:7: [[Wednesday]]
+
+### E0#6  (mentions 16, distinct values 15)
+Examples:
+- E0#6:0: [[E6UVD9OL]]
+- E0#6:1: [[72YCMLXX]]
+- E0#6:2: [[cb41er]]
+- E0#6:3: [[CUL9VZ04]]
+- E0#6:4: [[FC2BDIC9]]
+- E0#6:5: [[FCQZW2OT]]
+- E0#6:6: [[G2YMGI0L]]
+- E0#6:7: [[H4BIFD0U]]
+
+### E0#7  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E0#7:0: [[west]]
+- E0#7:1: [[west side]]
+
+### E0#8  (mentions 15, distinct values 9)
+Examples:
+- E0#8:0: [[north]]
+- E0#8:1: [[south part of town]]
+- E0#8:2: [[any area]]
+- E0#8:3: [[City Centre North B and B]]
+- E0#8:4: [[north part of Cambridge]]
+- E0#8:5: [[north part of town]]
+- E0#8:6: [[Northern part of town]]
+- E0#8:7: [[south]]
+
+### E0#9  (mentions 2, distinct values 2)
+Examples:
+- E0#9:0: [[University Arms]]
+- E0#9:1: [[university arms hotel]]
+
+### E0#10  (mentions 6, distinct values 4)
+Examples:
+- E0#10:0: [[centre]]
+- E0#10:1: [[center]]
+- E0#10:2: [[mall]]
+- E0#10:3: [[The centre]]
+- E0#10:4: [[centre]]
+- E0#10:5: [[centre]]
+
+### E0#11  (mentions 12, distinct values 6)
+Examples:
+- E0#11:0: [[3 people]]
+- E0#11:1: [[5 people]]
+- E0#11:2: [[1 person]]
+- E0#11:3: [[4 people]]
+- E0#11:4: [[6 people]]
+- E0#11:5: [[8 people]]
+- E0#11:6: [[3 people]]
+- E0#11:7: [[5 people]]
+
+### E0#12  (mentions 11, distinct values 5, low confidence)
+Examples:
+- E0#12:0: [[How many days]]
+- E0#12:1: [[what day]]
+- E0#12:2: [[same day]]
+- E0#12:3: [[another day]]
+- E0#12:4: [[arrival day]]
+- E0#12:5: [[How many days]]
+- E0#12:6: [[What day]]
+- E0#12:7: [[same day]]
+
+### E0#13  (mentions 4, distinct values 2)
+Examples:
+- E0#13:0: [[alexander bed and breakfast]]
+- E0#13:1: [[Alexander]]
+- E0#13:2: [[Alexander Bed and Breakfast]]
+- E0#13:3: [[alexander bed and breakfast]]
+
+### E0#14  (mentions 10, distinct values 3)
+Examples:
+- E0#14:0: [[Cambridge]]
+- E0#14:1: [[Cambridge TownInfo Centre]]
+- E0#14:2: [[The Cambridge Belfry]]
+- E0#14:3: [[Cambridge]]
+- E0#14:4: [[Cambridge]]
+- E0#14:5: [[Cambridge]]
+- E0#14:6: [[Cambridge]]
+- E0#14:7: [[Cambridge]]
+
+### E0#15  (mentions 4, distinct values 3, low confidence)
+Examples:
+- E0#15:0: [[11]]
+- E0#15:1: [[4]]
+- E0#15:2: [[8]]
+- E0#15:3: [[11]]
+
+### E0#16  (mentions 1, distinct values 1)
+Examples:
+- E0#16:0: [[Avalon]]
+
+### E0#17  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#17:0: [[10 hotels]]
+
+### E0#18  (mentions 2, distinct values 1)
+Examples:
+- E0#18:0: [[Worth House]]
+- E0#18:1: [[Worth House]]
+
+### E0#19  (mentions 1, distinct values 1)
+Examples:
+- E0#19:0: [[TR8167]]
+
+### E0#20  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#20:0: [[Train TR8167]]
+
+### E0#21  (mentions 2, distinct values 2)
+Examples:
+- E0#21:0: [[Gonville Hotel]]
+- E0#21:1: [[Gonville Place]]
+
+### E0#22  (mentions 2, distinct values 1)
+Examples:
+- E0#22:0: [[Aylesbray Lodge]]
+- E0#22:1: [[Aylesbray Lodge]]
+
+### E0#23  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E0#23:0: [[cityroomz]]
+- E0#23:1: [[room]]
+
+### E0#24  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#24:0: [[23]]
+
+### E0#25  (mentions 3, distinct values 2)
+Examples:
+- E0#25:0: [[The Acorn Guest House]]
+- E0#25:1: [[Acorn Guest house]]
+- E0#25:2: [[The acorn guest house]]
+
+### E0#26  (mentions 1, distinct values 1)
+Examples:
+- E0#26:0: [[01223355017]]
+
+### E0#27  (mentions 1, distinct values 1)
+Examples:
+- E0#27:0: [[main restaurants]]
+
+### E0#28  (mentions 3, distinct values 3)
+Examples:
+- E0#28:0: [[hamilton lodge]]
+- E0#28:1: [[Huntingdon Marriott Hotel]]
+- E0#28:2: [[The Huntingdon Marriott]]
+
+### E0#29  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#29:0: [[fewer nights]]
+
+### E0#30  (mentions 1, distinct values 1)
+Examples:
+- E0#30:0: [[156 chesterton road]]
+
+Return the JSON object now.

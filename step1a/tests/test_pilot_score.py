@@ -1,3 +1,4 @@
+import json
 import sys
 from pathlib import Path
 
@@ -159,3 +160,137 @@ def test_render_scores_blocks_targets_and_context():
         assert h in md
     assert "Target: >= 0.8" in md and "Target: <= 2" in md and "FAIL" in md
     assert "| measure | full | nocontext | delta |" in md
+
+
+
+# ---------------------------------------------------------------- wf_v3.1: name_merge, generic classes, rubric
+def test_name_merge_keeps_instance_exclusivity():
+    # (cluster, instance ids of its mentions)
+    spec = [("E1#0", ["i1", "i2"]), ("E1#1", ["i3"]), ("E1#2", ["i1"]), ("E1#3", ["i4"]), ("E1#4", ["i5"]),
+            ("E1#5", ["i6"]), ("E1#6", ["i7"])]
+    m = pd.DataFrame([{"mention_id": 10 * k + j, "cluster_id": c, "entity": "E1", "instance_id": i}
+                      for k, (c, ins) in enumerate(spec) for j, i in enumerate(ins)])
+    dec = PV.decisions_table([
+        obj("E1#0", "Day", "keep", placement="current entity (E1)"),
+        obj("E1#1", "day", "keep", placement="Current  entity (E1)"),       # same name + placement, other instance
+        obj("E1#2", "day", "keep", placement="current entity (E1)"),        # shares instance i1 with E1#0: no
+        obj("E1#3", "day", "keep", placement="sub-entity of E1"),           # other placement: no
+        obj("E1#4", "arrive_by", "keep", placement="p"), obj("E1#5", "Arrive by", "keep", placement="p"),
+        obj("E1#6", "junk", "not_attribute")], [f"E1#{i}" for i in range(7)], "v2", "r1")
+    out = PS.name_merge(dec, m, "E1").set_index("cluster_id")
+    assert set(out["variant"]) == {"v2+namemerge"} and len(out) == len(dec)
+    assert out["action"].to_dict() == {"E1#0": "merge", "E1#1": "merge", "E1#2": "keep", "E1#3": "keep",
+                                       "E1#4": "merge", "E1#5": "merge", "E1#6": "not_attribute"}
+    assert json.loads(out.at["E1#0", "merge_with"]) == ["E1#1"] and json.loads(out.at["E1#5", "merge_with"]) == ["E1#4"]
+    assert dec.set_index("cluster_id").at["E1#0", "action"] == "keep"  # the input table is untouched
+
+
+def test_name_merge_keeps_and_extends_the_response_groups():
+    m = pd.DataFrame([{"mention_id": k, "cluster_id": c, "entity": "E1", "instance_id": i}
+                      for k, (c, i) in enumerate([("E1#0", "i1"), ("E1#1", "i2"), ("E1#2", "i3")])])
+    dec = PV.decisions_table([obj("E1#0", "x", "merge", merge_with=["E1#1"], placement="p"),
+                              obj("E1#1", "y", "keep", placement="p"), obj("E1#2", "Y", "keep", placement="p")],
+                             ["E1#0", "E1#1", "E1#2"], "v1", "r1")
+    out = PS.name_merge(dec, m, "E1").set_index("cluster_id")
+    assert [json.loads(out.at[c, "merge_with"]) for c in ("E1#0", "E1#1", "E1#2")] == [
+        ["E1#1", "E1#2"], ["E1#0", "E1#2"], ["E1#0", "E1#1"]]
+
+
+TAXI = [("E3#0", "E3", "taxi", "Taxi leave at", 0, 5), ("E3#0", "E3", "taxi", "Taxi arrive by", 1, 5),
+        ("E3#1", "E3", "restaurant", "Restaurant food", 2, 3), ("E3#2", "E3", "hotel", "Hotel area", 3, 3),
+        ("E3#3", "E3", "taxi", "Taxi leave at", 0, 5), ("E3#3", "E3", "hotel", "Hotel area", 3, 5)]
+
+
+def taxi_ctx(**kw):
+    rows, vec = [], []
+    for cid, ent, eg, ga, b, n in TAXI:
+        rows += [(cid, ent, eg, ga)] * n
+        vec += [np.eye(4)[b]] * n
+    m = pd.DataFrame({"mention_id": range(len(rows)), "dialogue_id": "d1", "char_start": [10 * i for i in range(len(rows))],
+                      "char_end": [10 * i + 5 for i in range(len(rows))], "cluster_id": [r[0] for r in rows],
+                      "entity": [r[1] for r in rows], "entity_gold": [r[2] for r in rows],
+                      "gold_attr": [r[3] for r in rows], "norm_value": "v"})
+    gv = pd.DataFrame({"dialogue_id": "d1", "gold_attr": m["gold_attr"], "entity_gold": m["entity_gold"],
+                       "char_start": m["char_start"], "char_end": m["char_end"], "verbatim": True})
+    labels = pd.DataFrame({"cluster_id": ["E3#0", "E3#1", "E3#2", "E3#3"],
+                           "label": ["unlabelled", "gold", "gold", "unlabelled"],
+                           "gold_attr": ["", "Restaurant food", "Hotel area", ""]})
+    ex = pd.DataFrame({"ex_id": ["E3#0:s0", "E3#0:s1", "E3#0:s2"], "cluster_id": "E3#0", "mention_id": [0, 5, 6]})
+    attrs = ["Taxi leave at", "Taxi arrive by", "Restaurant food", "Hotel area"]
+    return PS.Ctx(m, labels, gv, attrs, m["mention_id"].to_numpy(), np.array(vec, float), ex, "E3",
+                  ["restaurant", "taxi"], **kw), m
+
+
+def test_entity_agnostic_gold_classes_and_split_targets():
+    c, _ = taxi_ctx()
+    assert c.train == ["Taxi leave at", "Taxi arrive by", "Restaurant food"]  # no Hotel class for restaurant + taxi
+    dec = PV.decisions_table([obj("E3#0", "when", "split", placement="current entity (E3)", split=[
+        {"name": "leave", "examples": ["E3#0:s0"]}, {"name": "arrive", "examples": ["E3#0:s1", "E3#0:s2"]}]),
+        obj("E3#1", "food", "keep"), obj("E3#2", "area", "keep"), obj("E3#3", "leave", "keep")],
+        ["E3#0", "E3#1", "E3#2", "E3#3"], "v2", "r1")
+    assign, attrs, parts = PV.final_attributes(dec, c.mentions, c.ids, c.x, c.examples, "E3")
+    names = PS.name_check_table({("v2", "r1"): (attrs, assign)}, c.mentions, ["restaurant", "taxi"])
+    r = PS.score_file(dec, attrs, assign, parts, c, pd.DataFrame(columns=PV.VERIFY_COLS), names)
+    # E3#0 mixes two taxi classes (50%) -> target; E3#3 mixes taxi + hotel (hotel is no class of this entity) -> not
+    assert (r["split_done"], r["split_done_n"]) == (1.0, 1) and (r["split_side"], r["split_side_n"]) == (1.0, 3)
+    assert r["recall_before"] == pytest.approx(1 / 3)  # E3#1 is the only pure class before
+    assert r["recall_after"] == pytest.approx(1.0)      # the split makes both taxi classes pure
+    assert PS.train_attrs(c.gv, ["Hotel area", "Taxi leave at"], "hotel") == ["Hotel area"]
+    assert PS._slot("Taxi arrive by", ["restaurant", "taxi"]) == "arrive by"
+
+
+def test_split_kinds_option_keeps_the_role_pair_rule():
+    c, _ = taxi_ctx(split_kinds=PS.SPLIT_KINDS)
+    assert c.split_kinds == PS.SPLIT_KINDS and taxi_ctx()[0].split_kinds is None
+    dec = PV.decisions_table([obj("E3#0", "when", "keep")], ["E3#0"], "v2", "r1")
+    assign, attrs, parts = PV.final_attributes(dec, c.mentions, c.ids, c.x, c.examples, "E3")
+    names = PS.name_check_table({("v2", "r1"): (attrs, assign)}, c.mentions, ["restaurant", "taxi"])
+    r = PS.score_file(dec, attrs, assign, parts, c, pd.DataFrame(columns=PV.VERIFY_COLS), names)
+    assert (r["split_done"], r["split_done_n"]) == (0.0, 1)  # {leave at, arrive by} is a role pair: still a target, not split
+
+
+def rubric_inputs():
+    c, _ = ctx()
+    assign, attrs, parts = PV.final_attributes(decisions(), c.mentions, c.ids, c.x, c.examples, c.entity)
+    clusters = pd.DataFrame({"cluster_id": CIDS, "top_values": [f"v{i}|w{i}" for i in range(9)]})
+    return c, attrs, assign, clusters
+
+
+def test_rubric_sheet_columns_values_and_carry_over():
+    c, attrs, assign, clusters = rubric_inputs()
+    sheet = PS.rubric_sheet({("v2", "r1"): (attrs, assign)}, c.mentions, c.labels, clusters)
+    assert list(sheet.columns) == PS.RUBRIC_COLS and len(sheet) == len(attrs)
+    assert (sheet[["category", "rater1", "rater2", "final"]] == "").all().all()
+    s = sheet.set_index("attr_id")
+    assert s.loc["E1#0|E1#1", ["entity", "label", "majority_gold_attr", "top_values"]].tolist() == [
+        "E1", "gold", "Train day", "v0|w0"]
+    assert s.loc["E1#5", "label"] == "noise" and s.loc["E1#4/0", "majority_gold_attr"] == "Train departure"
+    sheet.loc[sheet["attr_id"] == "E1#5", ["rater1", "final"]] = ["noise_marked", "noise_marked"]
+    again = PS.rubric_sheet({("v2", "r1"): (attrs, assign)}, c.mentions, c.labels, clusters, old=sheet).set_index("attr_id")
+    assert again.loc["E1#5", "final"] == "noise_marked" and again.loc["E1#5", "rater1"] == "noise_marked"
+    assert again.loc["E1#6", "final"] == ""
+
+
+def test_rubric_accuracy_real_vs_noise_and_roles():
+    c, attrs, assign, clusters = rubric_inputs()
+    sheet = PS.rubric_sheet({("v2", "r1"): (attrs, assign)}, c.mentions, c.labels, clusters)
+    fin = {"E1#0|E1#1": "exact", "E1#2|E1#3": "wrong_role", "E1#7": "synonym", "E1#8": "too_general",
+           "E1#5": "noise_marked", "E1#6": "noise_named"}  # the E1#4 split parts stay blank: not counted
+    sheet["final"] = sheet["attr_id"].map(fin).fillna("")
+    r = PS.rubric_accuracy(sheet)[("v2", "r1")]
+    assert (r["real_acc"], r["real_n"]) == (0.5, 4)            # exact + synonym of 4 real rows
+    assert (r["noise_marked"], r["noise_n"]) == (0.5, 2)
+    assert (r["role_acc"], r["role_n"], r["role_wrong"]) == (0.0, 1, 1)  # only the merged leave at / arrive by attr
+    assert PS.rubric_accuracy(sheet.assign(final="")) == {}
+
+
+def test_render_scores_rubric_block_filled_and_not_filled():
+    c, attrs, assign, clusters = rubric_inputs()
+    res, *_ = run(c, decisions())
+    sheet = PS.rubric_sheet({("v2", "r1"): (attrs, assign)}, c.mentions, c.labels, clusters)
+    assert "Name rubric" not in PS.render_scores({"v2 r1": res}, None, "E1")           # wf_v3 callers: no block
+    assert PS.render_scores({"v2 r1": res}, None, "E1", rubric=sheet).endswith("rubric not filled\n")
+    sheet["final"] = sheet["attr_id"].map({"E1#5": "noise_marked", "E1#0|E1#1": "exact"}).fillna("")
+    md = PS.render_scores({"v2 r1": res}, None, "E1", rubric=sheet, pair=("v2", "v2_nocontext"), stab_pair=("v2 r1", "r2"))
+    assert "## Name rubric" in md and "| v2 r1 | 1.000 | 1 | 1.000 | 1 | n/a | 0 | 0 |" in md
+    assert "v2 r1 or v2_nocontext r1 missing." in md and "## Stability (v2 r1 vs r2, report only)" in md

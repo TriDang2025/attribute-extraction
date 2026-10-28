@@ -41,6 +41,14 @@ SPLIT_MIN_SIZE, SPLIT_MIN_SECOND = 8, 0.25  # a split target: >= k examples' wor
 STOP = {"the", "of", "a", "an", "at", "by", "to", "for", "in", "and"}
 YES, NO = {"1", "y", "yes", "true", "right"}, {"0", "n", "no", "false", "wrong"}
 NAME_COLS = ["variant", "run_tag", "attr_id", "name", "majority_gold_attr", "auto_right", "manual", "right"]
+# name rubric (NAMING_RULE.md): the sheet columns and the categories a rater picks
+RUBRIC_COLS = ["variant", "run_tag", "entity", "attr_id", "name", "description", "majority_gold_attr", "top_values",
+               "label", "category", "rater1", "rater2", "final"]
+RUBRIC_HAND = ["category", "rater1", "rater2", "final"]
+CATEGORIES = ("exact", "synonym", "too_general", "wrong_role", "wrong", "noise_named", "noise_marked")
+RIGHT_NAMES = ("exact", "synonym")
+REAL_LABELS = ("gold", "valid_new")
+ROLE_SLOTS = {"departure", "destination", "leave at", "arrive by"}  # the slots of the two role pairs
 
 
 def _recall():
@@ -57,13 +65,19 @@ def mode(values):
     return Counter(values).most_common(1)[0][0] if values else ""
 
 
+def _ents(entity_gold):
+    """Gold entity names as a tuple: "train" -> ("train",), ["restaurant", "taxi"] -> both."""
+    return (entity_gold,) if isinstance(entity_gold, str) else tuple(entity_gold)
+
+
 def train_attrs(gold_values, attrs, entity_gold="train"):
-    """Gold classes whose gold entity (mode of entity_gold) is entity_gold."""
+    """Gold classes whose gold entity (mode of entity_gold) is entity_gold (a name or a list of names)."""
+    ents = set(_ents(entity_gold))
     ent = {}
     for _, r in gold_values.iterrows():
         for c in _classes(r["gold_attr"]):
             ent.setdefault(c, []).append(r["entity_gold"])
-    return [a for a in attrs if mode(ent.get(a, [])) == entity_gold]
+    return [a for a in attrs if mode(ent.get(a, [])) in ents]
 
 
 def merge_hints(mentions, ids, x, entity, k=3):
@@ -97,12 +111,19 @@ def placement_entity(text, current):
 
 def _slot(attr, entity_gold):
     words = attr.lower().split()
-    return " ".join(words[1:] if words and words[0] == entity_gold else words)
+    return " ".join(words[1:] if words and words[0] in _ents(entity_gold) else words)
 
 
 def _tokens(s, entity_gold):
-    toks = [re.sub(r"s$", "", w) for w in re.findall(r"[a-z0-9]+", s.lower()) if w != entity_gold and w not in STOP]
+    toks = [re.sub(r"s$", "", w) for w in re.findall(r"[a-z0-9]+", s.lower())
+            if w not in _ents(entity_gold) and w not in STOP]
     return set(toks)
+
+
+def _majority_gold(assign, attr_id, gold):
+    """Most common gold class (ties: name order) over the mentions assigned to attr_id; "" if none."""
+    cnt = Counter(c for i, aid in assign.items() if aid == attr_id for c in _classes(gold[i]))
+    return sorted(cnt.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if cnt else ""
 
 
 def name_check_table(attrs_by_file, mentions, entity_gold="train"):
@@ -112,8 +133,7 @@ def name_check_table(attrs_by_file, mentions, entity_gold="train"):
     for (variant, tag), (attrs, assign) in attrs_by_file.items():
         gold = {int(i): g for i, g in zip(mentions["mention_id"], mentions["gold_attr"])}
         for _, a in attrs[attrs["name"] != ""].iterrows():
-            cnt = Counter(c for i, aid in assign.items() if aid == a["attr_id"] for c in _classes(gold[i]))
-            maj = sorted(cnt.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if cnt else ""
+            maj = _majority_gold(assign, a["attr_id"], gold)
             auto = int(bool(_tokens(a["name"], entity_gold) & _tokens(maj, entity_gold)))
             rows.append({"variant": variant, "run_tag": tag, "attr_id": a["attr_id"], "name": a["name"],
                          "majority_gold_attr": maj, "auto_right": auto, "manual": "", "right": auto})
@@ -132,12 +152,130 @@ def apply_manual(table, old=None):
     return t
 
 
+def _norm_placement(text):
+    return re.sub(r"\s+", " ", str(text or "").lower()).strip()
+
+
+def name_merge(dec, mentions, entity):
+    """Decision table with variant "<variant>+namemerge": clusters of the entity with the same normalized name
+    (PV.norm_name) and the same placement are merged unless that would put two clusters of one instance_id into one
+    attribute. The response's own merge groups (merge_with, split clusters left out) are kept as they are; a
+    candidate union is checked on the instance sets of both groups. Only keep/merge rows take part."""
+    pm = mentions[(mentions["entity"] == entity) & (mentions["cluster_id"] != "")]
+    rows = {r["cluster_id"]: r for _, r in dec.iterrows()}
+    parent = {c: c for c in rows if rows[c]["action"] != "split"}
+    for c, r in rows.items():
+        if r["action"] == "merge":
+            for t in json.loads(r["merge_with"] or "[]"):
+                if c in parent and t in parent:
+                    parent[PV._find(parent, c)] = PV._find(parent, t)
+    insts = {}
+    for c in parent:
+        root = PV._find(parent, c)
+        insts.setdefault(root, set()).update(pm.loc[pm["cluster_id"] == c, "instance_id"])
+    cand = sorted(c for c in parent if rows[c]["action"] in ("keep", "merge") and PV.norm_name(rows[c]["name"]))
+    for i, a in enumerate(cand):
+        for b in cand[i + 1:]:
+            ra, rb = PV._find(parent, a), PV._find(parent, b)
+            if (ra != rb and PV.norm_name(rows[a]["name"]) == PV.norm_name(rows[b]["name"])
+                    and _norm_placement(rows[a]["placement"]) == _norm_placement(rows[b]["placement"])
+                    and not insts[ra] & insts[rb]):
+                parent[rb] = ra
+                insts[ra] |= insts.pop(rb)
+    groups = {}
+    for c in parent:
+        groups.setdefault(PV._find(parent, c), []).append(c)
+    out = dec.copy()
+    out["variant"] = out["variant"] + "+namemerge"
+    for members in groups.values():
+        if len(members) > 1:
+            for c in members:
+                if rows[c]["action"] in ("keep", "merge"):
+                    k = out.index[out["cluster_id"] == c][0]
+                    out.at[k, "action"] = "merge"
+                    out.at[k, "merge_with"] = json.dumps(sorted(m for m in members if m != c))
+    return out
+
+
+def rubric_sheet(attrs_by_file, mentions, labels, clusters_table, old=None):
+    """Name rubric sheet (NAMING_RULE.md): one row per attribute of each response file, status keep or marked (not
+    attributes are rows too: a noise cluster correctly marked is `noise_marked`). attrs_by_file {(variant, run_tag):
+    (attrs, assign)} as for name_check_table. majority_gold_attr: most common gold class of the attribute's mentions;
+    top_values: up to 5 values of its largest cluster (clusters_table top_values; split parts: their mentions);
+    label: gold / valid_new / noise of the largest member cluster. category / rater1 / rater2 / final are left empty
+    and, when `old` (an earlier sheet) has them for the same (variant, run_tag, attr_id), carried over."""
+    gold = {int(i): g for i, g in zip(mentions["mention_id"], mentions["gold_attr"])}
+    norm = dict(zip(mentions["mention_id"].astype(int), mentions["norm_value"]))
+    lab = dict(zip(labels["cluster_id"], labels["label"]))
+    top = dict(zip(clusters_table["cluster_id"], clusters_table["top_values"]))
+    ent = mentions.groupby("cluster_id")["entity"].first().to_dict()
+    csize = mentions.groupby("cluster_id").size().to_dict()
+    prev = {}
+    if old is not None and len(old):
+        prev = {(r["variant"], str(r["run_tag"]), r["attr_id"]): r for _, r in old.fillna("").iterrows()}
+    rows = []
+    for (variant, tag), (attrs, assign) in attrs_by_file.items():
+        for _, a in attrs[attrs["status"] != "missing"].iterrows():
+            members = a["clusters"].split(";")
+            big = min(members, key=lambda c: (-csize.get(c, 0), c))
+            if a["source"] == "split":
+                vals = [v for v, _ in Counter(norm[i] for i, aid in assign.items() if aid == a["attr_id"]).most_common(5)]
+            else:
+                vals = [v for v in str(top.get(big, "")).split("|") if v][:5]
+            old_row = prev.get((variant, str(tag), a["attr_id"]), {})
+            rows.append({"variant": variant, "run_tag": tag, "entity": ent.get(big, ""), "attr_id": a["attr_id"],
+                         "name": a["name"], "description": a.get("description", ""),
+                         "majority_gold_attr": _majority_gold(assign, a["attr_id"], gold), "top_values": "|".join(vals),
+                         "label": lab.get(big, ""), **{c: str(old_row.get(c, "")) for c in RUBRIC_HAND}})
+    return pd.DataFrame(rows, columns=RUBRIC_COLS)
+
+
+def rubric_accuracy(sheet):
+    """{(variant, run_tag): dict} over the rows with a `final` category (blank rows are not counted):
+    real_acc/real_n: gold + valid_new rows whose final is exact or synonym;
+    noise_marked/noise_n: noise rows whose final is noise_marked (the others are noise_named);
+    role_acc/role_n: real rows whose majority gold slot is departure/destination/leave at/arrive by and whose final
+    is exact or synonym; role_wrong: those with final wrong_role. An empty denominator gives nan."""
+    out = {}
+    done = sheet[sheet["final"].fillna("").astype(str).str.strip() != ""]
+    for key, g in done.groupby(["variant", "run_tag"]):
+        fin = g["final"].astype(str).str.strip().str.lower()
+        real, noise = g["label"].isin(REAL_LABELS), g["label"] == "noise"
+        slot = g["majority_gold_attr"].astype(str).str.lower().str.split(n=1).str[-1]
+        role = real & slot.isin(ROLE_SLOTS)
+        out[key] = {"real_acc": _ratio(fin[real].isin(RIGHT_NAMES).sum(), real.sum())[0], "real_n": int(real.sum()),
+                    "noise_marked": _ratio((fin[noise] == "noise_marked").sum(), noise.sum())[0],
+                    "noise_n": int(noise.sum()),
+                    "role_acc": _ratio(fin[role].isin(RIGHT_NAMES).sum(), role.sum())[0], "role_n": int(role.sum()),
+                    "role_wrong": int((fin[role] == "wrong_role").sum())}
+    return out
+
+
+def _rubric_lines(rubric):
+    """The "## Name rubric" block of scores.md; "rubric not filled" when no row has a final category."""
+    acc = rubric_accuracy(rubric) if rubric is not None and len(rubric) else {}
+    lines = ["", "## Name rubric (NAMING_RULE.md)", ""]
+    if not acc:
+        return lines + ["rubric not filled"]
+    lines += ["| response | real name accuracy | n | noise marked | n | role accuracy | n | wrong_role |",
+              "|---|---|---|---|---|---|---|---|"]
+    for (variant, tag), r in acc.items():
+        lines.append(f"| {variant} {tag} | {_fmt(r['real_acc'])} | {r['real_n']} | {_fmt(r['noise_marked'])} | "
+                     f"{r['noise_n']} | {_fmt(r['role_acc'])} | {r['role_n']} | {r['role_wrong']} |")
+    return lines
+
+
 class Ctx:
     """Everything the checks need besides one response file's decisions."""
 
-    def __init__(self, mentions, labels, gold_values, gold_attrs, ids, x, examples, entity, entity_gold="train"):
+    def __init__(self, mentions, labels, gold_values, gold_attrs, ids, x, examples, entity, entity_gold="train",
+                 split_kinds=None):
+        """entity_gold: one gold entity name or a list (restaurant pilot entity: ["restaurant", "taxi"]).
+        split_kinds: None = a split target is any cluster whose top two classes are both gold classes of the entity
+        (on wf_v3's train entity this gives the same targets as the old rule); SPLIT_KINDS = only the role pairs."""
         self.mentions, self.labels, self.gv, self.ids, self.x = mentions, labels, gold_values, ids, x
         self.examples, self.entity, self.entity_gold = examples, entity, entity_gold
+        self.split_kinds = split_kinds
         self.pm = mentions[(mentions["entity"] == entity) & (mentions["cluster_id"] != "")]
         self.train = train_attrs(gold_values, gold_attrs, entity_gold)
         self.label = labels.set_index("cluster_id")
@@ -182,12 +320,13 @@ def _split_checks(dec, parts, ctx):
     gold = dict(zip(ctx.mentions["mention_id"].astype(int), ctx.mentions["gold_attr"]))
     targets, done, right, total = [], 0, 0, 0
     for cid, g in pt.groupby("cluster_id"):
-        if _gold_cluster(ctx, cid):
-            continue
+        if _gold_cluster(ctx, cid) or (cid in ctx.label.index and ctx.label.at[cid, "label"] == "noise"):
+            continue  # gold clusters are pure; noise clusters are scored by the noise check, not as split targets
         g = g.sort_values(["n_class", "gold_attr"], ascending=[False, True])
         top = g["gold_attr"].tolist()[:2]
-        if (len(top) == 2 and g["size"].iloc[0] >= SPLIT_MIN_SIZE and g["purity"].iloc[1] >= SPLIT_MIN_SECOND
-                and {_slot(a, ctx.entity_gold) for a in top} in SPLIT_KINDS):
+        kind_ok = ({_slot(a, ctx.entity_gold) for a in top} in ctx.split_kinds if ctx.split_kinds is not None
+                   else all(a in ctx.train for a in top))
+        if len(top) == 2 and g["size"].iloc[0] >= SPLIT_MIN_SIZE and g["purity"].iloc[1] >= SPLIT_MIN_SECOND and kind_ok:
             targets.append((cid, top))
     for cid, top in targets:
         if cid not in parts:
@@ -214,8 +353,8 @@ def _placement_checks(dec, ctx):
     for _, r in dec.iterrows():
         ent = placement_entity(r["placement"], ctx.entity)
         want = ctx.cluster_gold.get(r["cluster_id"], "")
-        if r["action"] == "" or not r["placement"] or not want:
-            continue
+        if r["action"] == "" or not r["placement"] or not want or want not in ctx.entity_gold_of.values():
+            continue  # no predicted entity has this gold entity as majority (e.g. taxi): no right answer
         den += 1
         ok += ent is not None and ctx.entity_gold_of.get(ent, "") == want
     return {"place_right": _ratio(ok, den)}
@@ -310,9 +449,11 @@ def _target_text(kind, target):
     return {">=": f">= {target}", "<=": f"<= {target}", "after>=before": ">= before (no loss)", "": "report only"}[kind]
 
 
-def render_scores(results, stab=None, entity="", note=""):
+def render_scores(results, stab=None, entity="", note="", rubric=None, pair=("full", "nocontext"),
+                  stab_pair=("full r1", "r2")):
     """scores.md: one block per check (value and target per response file), the comparison table, context, stability.
-    results: {file label: score_file output}; stab: (value, n) of full r1 vs r2."""
+    results: {file label: score_file output}; stab: (value, n) of the stab_pair responses; pair: variant names of the
+    context comparison (their r1 runs); rubric: name rubric sheet -> a "Name rubric" block at the end (None: no block)."""
     labels = list(results)
     lines = ["# Pilot scores", "", f"Pilot entity {entity}. {note}".strip(), ""]
     block = None
@@ -334,16 +475,20 @@ def render_scores(results, stab=None, entity="", note=""):
         lines.append(f"| {key} | {_target_text(kind, target)} | " + " | ".join(
             f"{_fmt(results[lab].get(key), key == 'noise_kept')} {_met(key, kind, target, results[lab])}".strip()
             for lab in labels) + " |")
-    full, nocon = (next((lab for lab in labels if lab.startswith(p)), None) for p in ("full r1", "nocontext r1"))
-    lines += ["", "## Context (full r1 vs nocontext r1)", ""]
+    full, nocon = (next((lab for lab in labels if lab == f"{p} r1"), None) for p in pair)
+    lines += ["", f"## Context ({pair[0]} r1 vs {pair[1]} r1)", ""]
     if full and nocon:
-        lines += ["Expected: clearly lower without context.", "", "| measure | full | nocontext | delta |", "|---|---|---|---|"]
+        lines += ["Expected: clearly lower without context.", "", f"| measure | {pair[0]} | {pair[1]} | delta |",
+                  "|---|---|---|---|"]
         for key, *_ in CHECKS:
             a, b = results[full].get(key), results[nocon].get(key)
             d = b - a if isinstance(a, (int, float)) and isinstance(b, (int, float)) else float("nan")
             lines.append(f"| {key} | {_fmt(a)} | {_fmt(b)} | {_fmt(d)} |")
     else:
-        lines.append("full r1 or nocontext r1 missing.")
-    lines += ["", "## Stability (full r1 vs r2, report only)", ""]
-    lines.append(f"Clusters with a different action, merge_with or name: {_fmt(stab[0])} (n={stab[1]})" if stab else "full r1 or r2 missing.")
+        lines.append(f"{pair[0]} r1 or {pair[1]} r1 missing.")
+    lines += ["", f"## Stability ({stab_pair[0]} vs {stab_pair[1]}, report only)", ""]
+    lines.append(f"Clusters with a different action, merge_with or name: {_fmt(stab[0])} (n={stab[1]})" if stab
+                 else f"{stab_pair[0]} or {stab_pair[1]} missing.")
+    if rubric is not None:
+        lines += _rubric_lines(rubric)
     return "\n".join(lines) + "\n"

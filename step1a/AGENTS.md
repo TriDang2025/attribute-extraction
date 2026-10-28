@@ -60,6 +60,10 @@ Timings on the laptop CPU for n50:
   - T2 `s1a/recall.py`, `scripts/loop1_recall.py` → `results/loop1_check/{recall.csv, recall_by_attr.csv, fig/loop1_recall_at_k.png}` (the v2.2 point is the frozen T1 export; the rebuild must match it).
   - T3 `s1a/missing.py`, `scripts/loop1_missing.py` (frozen mentions + raw GLiNER cache) → `results/loop1_check/missing_attributes.csv`.
   - T5 input `s1a/pilot_input.py`, `scripts/pilot_build.py` → `results/loop1_check/pilot_train/{prompts/*.txt, examples.csv, prompt_stats.md}` → Colab `colab/S1A_llm_colab.ipynb` (`s1a/llm_cache.py`; also T4 `t4_questions.txt` → `contamination_raw.jsonl`) → `pilot_train/responses_<variant>_<tag>.jsonl` → `scripts/pilot_eval.py` (`s1a/pilot_verify.py`, `s1a/pilot_score.py`) → `pilot_train/{decisions,verification,name_check}.csv, scores.md`.
+- wf_v3.1 Step-3 pilot fixes (contract `PILOT_V31_CONTRACT.md`, naming rule `NAMING_RULE.md`), on train/hotel/restaurant (E1/E0/E2):
+  - `scripts/hint_check.py --encode` (`s1a/hints.py`; window vectors → `results/graph_v22_dev50/spans/window_vectors.npz`, not in git) → `results/loop1_v31/hints.csv`. Window and filtered hints were worse than string hints (train 8% vs 16% same-class), so `v2_hints` is not run.
+  - `scripts/pilot_build_v31.py --no-hints` (`s1a/pilot_input.py` `render_v2`, `render_split`, `schema_*`) → `results/loop1_v31/{prompts/, manifest.json, examples.csv, prompt_stats.md}`; split prompts for every cluster with ≥ 8 mentions.
+  - Colab `colab/S1A_llm_v31_colab.ipynb` (`s1a/llm_cache.py` parsers) → `results/loop1_v31/responses/<job>.jsonl` → `scripts/pilot_eval_v31.py` (`pilot_verify.decisions_from_v2`, `pilot_score.name_merge`, `rubric_sheet`) → `scores_<ent>.md`, `summary.md`, `name_rubric.csv`.
 
 ## Data links
 - `scripts/export_mentions.py` -> `results/graph_<split>50/{docs.jsonl, gold_values.csv, gold_attrs.txt, cache/}`, `<input>/{mentions,clusters,instances}.csv, vectors.npz` -> `scripts/graph_run.py` stages -> `<input>/{coverage.csv, graphs.pkl, stability.csv, nodes.csv, labels.csv, select/, schema/}`

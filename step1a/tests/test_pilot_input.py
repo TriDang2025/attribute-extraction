@@ -198,3 +198,108 @@ def test_example_text_marks_mention_and_previous_turn(built):
     spk, prev, turn = P.example_text(docs["ZZDLG0"], r)
     assert spk == "system" and turn == "it arrives at [[20:30]] sharp."
     assert prev.startswith("user: I want to go to cambridge")
+
+
+# ------------------------------------------------------------------ wf_v3.1
+def ids_in_order(text, ids):
+    return [c for c in sorted(ids, key=text.index)]
+
+
+def test_v2_render_every_cluster_once_and_shuffle(built):
+    export, docs, inp, _ = built
+    ids = [c.cluster_id for c in inp.clusters]
+    for v in P.VARIANTS_V2:
+        text = P.render_v2(inp, export, docs, v)
+        assert all(text.count(f"### {c} ") == 1 for c in ids)
+        assert "graduation_year" in text and "Return the JSON object" in text
+        assert not any(s in text for s in SECRET)
+        assert "train" not in text.lower() and "hotel" not in text.lower()
+    sh = P.render_v2(inp, export, docs, "v2", order_seed=1)
+    assert sh == P.render_v2(inp, export, docs, "v2", order_seed=1)
+    assert all(sh.count(f"### {c} ") == 1 for c in ids)
+    order = lambda t: [c for c in sorted(ids, key=lambda c: t.index(f"### {c} "))]  # noqa: E731
+    assert order(P.render_v2(inp, export, docs, "v2")) == ids and order(sh) != ids
+
+
+def test_v2_variants_context_and_hints(built):
+    export, docs, inp, _ = built
+    nc = P.render_v2(inp, export, docs, "v2_nocontext")
+    assert "I want to go to" not in nc and "[[cambridge]]" in nc
+    hints = {"E0#1": [dict(other="E0#3"), dict(other="E0#0")], "E0#0": []}
+    h = P.render_v2(inp, export, docs, "v2_hints", hints)
+    assert h.count("Possibly the same attribute as:") == 1
+    assert "Possibly the same attribute as: E0#3, E0#0 (automatic suggestion, may be wrong)" in h
+    assert "Possibly" not in P.render_v2(inp, export, docs, "v2", hints)
+    assert "Possibly" not in P.render_v2(inp, export, docs, "v2_hints")
+
+
+def test_v1_prompt_unchanged_by_v2_code(built):
+    export, docs, inp, _ = built
+    text = P.render(inp, export, docs, "nohints")
+    assert text.startswith(P.INSTRUCTION) and "graduation_year" in text and "Possibly" not in text
+    assert "Return the JSON array now." in text
+
+
+def test_schema_enums(built):
+    _, _, inp, _ = built
+    ids = [c.cluster_id for c in inp.clusters]
+    opts = [t for t, _ in inp.options]
+    s1 = P.schema_v1(inp)["items"]["properties"]
+    assert s1["cluster_id"]["enum"] == ids and s1["merge_with"]["items"]["enum"] == ids
+    assert s1["placement"]["enum"] == opts
+    s2 = P.schema_v2(inp)
+    c = s2["properties"]["clusters"]["items"]
+    assert c["properties"]["cluster_id"]["enum"] == ids and c["properties"]["placement"]["enum"] == opts
+    assert set(c["required"]) == {"cluster_id", "attribute", "evidence", "mixed", "placement"}
+    assert s2["required"] == ["attributes", "clusters"]
+    sp = P.schema_split("E0#4", ["E0#4:s0", "E0#4:s1"])
+    assert sp["properties"]["parts"]["items"]["properties"]["examples"]["items"]["enum"] == ["E0#4:s0", "E0#4:s1"]
+    assert sp["properties"]["cluster_id"]["enum"] == ["E0#4"]
+
+
+def test_split_candidates_and_prompt():
+    export, docs = toy()
+    assert P.split_candidates(export, "E0") == ["E0#4"]   # 2 values per instance; others have < 8 mentions
+    assert P.split_candidates(export, "E0", min_mentions=6) == ["E0#4"]  # one value per instance elsewhere
+    assert P.split_candidates(export, "E1") == []
+    text, exs = P.render_split(export, docs, "E0", "E0#4", k=16, seed=0)
+    ids = [e for e, _ in exs]
+    assert len(ids) == len(set(ids)) == 12 and ids[0] == "E0#4:s0"
+    assert all(f"- {e} " in text for e in ids)
+    assert "mixes" in text and not any(s in text for s in SECRET)
+    assert P.render_split(export, docs, "E0", "E0#4", k=5)[1] == exs[:0] + P.render_split(export, docs, "E0", "E0#4", k=5)[1]
+    with pytest.raises(ValueError):
+        P.render_split(export, docs, "E0", "E1#0")
+
+
+def test_manifest_jobs(tmp_path, monkeypatch):
+    import importlib.util
+    import json
+    export, docs = toy()
+    export = MN.Export(**vars(export))  # hints.py uses dataclasses.replace
+    spec = importlib.util.spec_from_file_location("pilot_build_v31", Path(__file__).resolve().parents[1] / "scripts" / "pilot_build_v31.py")
+    B = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(B)
+    monkeypatch.setattr(B.paths, "ROOT", tmp_path)
+    monkeypatch.setattr(B.MN, "load_shared", lambda run: (docs, None, []))
+    monkeypatch.setattr(B.MN, "load", lambda d: export)
+    monkeypatch.setattr(sys, "argv", ["x", "--ents", "train,hotel", "--out", "out", "--run", "run"])
+    B.main()
+    out = tmp_path / "out"
+    jobs = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+    names = [j["job"] for j in jobs]
+    assert len(names) == len(set(names))
+    assert {"train_nohints_r1", "train_nohints_long_r1", "train_v2_r1", "train_v2_r2", "train_v2_nocontext_r1",
+            "hotel_nohints_r1", "hotel_v2_r2", "train_split_E0-4_r1"} <= set(names)
+    assert "hotel_nohints_long_r1" not in names and "hotel_v2_hints_r1" not in names  # no window cache
+    keys = {"job", "entity", "ent", "variant", "run_tag", "kind", "cluster_id", "prompt", "schema", "max_tokens", "format"}
+    for j in jobs:
+        assert set(j) == keys and (out / j["prompt"]).exists() and (out / j["schema"]).exists()
+        assert 2000 <= j["max_tokens"] <= 12000 and j["format"] in ("v1", "v2", "split")
+    sp = [j for j in jobs if j["kind"] == "split"][0]
+    assert sp["max_tokens"] == 3000 and sp["cluster_id"] == "E0#4" and sp["format"] == "split"
+    assert (out / "prompts" / "train_v2_r2.txt").read_text(encoding="utf-8") != (out / "prompts" / "train_v2.txt").read_text(encoding="utf-8")
+    ex = pd.read_csv(out / "examples.csv")
+    assert list(ex.columns) == ["ex_id", "entity", "cluster_id", "mention_id", "variant"]
+    assert (out / "prompt_stats.md").exists()
+    assert B.max_tokens(10000) == 12000 - 0 and B.max_tokens(27000) == 2000

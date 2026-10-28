@@ -15,11 +15,13 @@ from itertools import combinations
 import numpy as np
 
 from . import graph as GR
+from . import llm_cache as LC
 from . import mentions as MN
 from . import signals as SG
 from . import step2 as S2
 
 VARIANTS = ("full", "nocontext", "nohints")
+VARIANTS_V2 = ("v2", "v2_hints", "v2_nocontext")
 K_EXAMPLES = 8
 N_MERGE = 3
 CARD_SEP = 1.2      # mean distinct values per instance above this favours a separate table
@@ -48,6 +50,38 @@ Return ONLY one JSON array, one object per cluster, nothing before or after it. 
  "merge_with": ["E1#5"], "split": [{"name": "str", "examples": ["E1#3:0"]}],
  "placement": "<option text exactly as listed>", "evidence": "<one quoted example>"}
 Use [] for merge_with and split when they do not apply."""
+
+INSTRUCTION_V2 = """\
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}"""
+
+INSTRUCTION_SPLIT = """\
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, give the parts: for each part a snake_case name, a short role, and the ids of the examples
+that belong to it. Every example must be in exactly one part. If it does not mix, give is_mixed false and
+no parts.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "is_mixed": true,
+ "parts": [{"name": "str", "role": "str", "examples": ["C#0:s0"]}]}"""
 
 
 @dataclass
@@ -336,23 +370,31 @@ def _render_hints(ci, entity, context=True):
     return "\n".join(out)
 
 
+def _cluster_head(ci):
+    return (f"### {ci.cluster_id}  (mentions {ci.n_mentions}, distinct values {ci.n_values}"
+            f"{', low confidence' if ci.low_conf else ''})")
+
+
+def _example_lines(export, docs, ci, context):
+    rows = export.mentions.set_index("mention_id")
+    lines = []
+    for ex_id, mid in ci.examples:
+        r = rows.loc[mid]
+        spk, prev, turn = example_text(docs[r["dialogue_id"]], r, context)
+        if context:
+            lines.append(f"- {ex_id} [{spk}]" + (f" previous turn, {prev} | " if prev else " ") + f"turn: {turn}")
+        else:
+            lines.append(f"- {ex_id}: {turn}")
+    return lines
+
+
 def render(inp, export, docs, variant="full"):
     """The prompt text of one variant."""
     if variant not in VARIANTS:
         raise ValueError(variant)
-    rows = export.mentions.set_index("mention_id")
     parts = [INSTRUCTION, f"Entity {inp.entity}: {len(inp.clusters)} clusters.", _render_options(inp)]
     for ci in inp.clusters:
-        head = (f"### {ci.cluster_id}  (mentions {ci.n_mentions}, distinct values {ci.n_values}"
-                f"{', low confidence' if ci.low_conf else ''})")
-        lines = [head, "Examples:"]
-        for ex_id, mid in ci.examples:
-            r = rows.loc[mid]
-            spk, prev, turn = example_text(docs[r["dialogue_id"]], r, variant != "nocontext")
-            if variant == "nocontext":
-                lines.append(f"- {ex_id}: {turn}")
-            else:
-                lines.append(f"- {ex_id} [{spk}]" + (f" previous turn, {prev} | " if prev else " ") + f"turn: {turn}")
+        lines = [_cluster_head(ci), "Examples:", *_example_lines(export, docs, ci, variant != "nocontext")]
         if variant != "nohints":
             lines.append(_render_hints(ci, inp.entity, variant != "nocontext"))
         parts.append("\n".join(lines))
@@ -368,3 +410,89 @@ def examples_table(inp):
 
 def est_tokens(text):
     return int(len(text) / 3.5)
+
+
+# ------------------------------------------------------------------ wf_v3.1: format v2, split pass, schemas
+def render_v2(inp, export, docs, variant="v2", hints=None, order_seed=None):
+    """Prompt text of output format v2. `variant` v2 / v2_hints / v2_nocontext; `hints` {cluster_id: [dict(other, ..)]}
+    is shown only for v2_hints; `order_seed` shuffles the cluster order (default: id order)."""
+    if variant not in VARIANTS_V2:
+        raise ValueError(variant)
+    cl = list(inp.clusters)
+    if order_seed is not None:
+        cl = [cl[i] for i in np.random.default_rng(order_seed).permutation(len(cl))]
+    parts = [INSTRUCTION_V2, f"Entity {inp.entity}: {len(cl)} clusters.", _render_options(inp)]
+    for ci in cl:
+        lines = [_cluster_head(ci), "Examples:", *_example_lines(export, docs, ci, variant != "v2_nocontext")]
+        h = (hints or {}).get(ci.cluster_id) if variant == "v2_hints" else None
+        if h:
+            lines.append("Possibly the same attribute as: " + ", ".join(x["other"] for x in h)
+                         + " (automatic suggestion, may be wrong)")
+        parts.append("\n".join(lines))
+    parts.append("Return the JSON object now.")
+    return "\n\n".join(parts) + "\n"
+
+
+def split_candidates(export, entity, min_mentions=8, min_share=0.15):
+    """Cluster ids of `entity` with >= min_mentions mentions where >= min_share of the cluster's instances
+    hold 2+ distinct norm values of the cluster; in cluster-number order."""
+    m = export.mentions
+    m = m[(m["entity"] == entity) & (m["cluster_id"] != "")]
+    out = []
+    for c, g in m.groupby("cluster_id"):
+        if len(g) >= min_mentions and (g.groupby("instance_id")["norm_value"].nunique() >= 2).mean() >= min_share:
+            out.append(c)
+    return sorted(out, key=lambda c: int(c.rsplit("#", 1)[1]))
+
+
+def render_split(export, docs, entity, cluster_id, k=16, seed=0):
+    """(prompt text, [(ex_id, mention_id)]) of the split pass for one cluster; ex ids `<cid>:s<j>`."""
+    m = export.mentions
+    g = m[(m["entity"] == entity) & (m["cluster_id"] == cluster_id)]
+    if g.empty:
+        raise ValueError(f"{cluster_id} is not a cluster of {entity}")
+    exs = [(f"{cluster_id}:s{j}", mid) for j, mid in enumerate(select_examples(g, k, seed))]
+    ci = ClusterInput(cluster_id, len(g), g["norm_value"].nunique(), False, exs)
+    lines = [f"Cluster {cluster_id} of entity {entity} (mentions {len(g)}, distinct values {ci.n_values}).",
+             "Examples:", *_example_lines(export, docs, ci, True)]
+    return "\n\n".join([INSTRUCTION_SPLIT, "\n".join(lines), "Return the JSON object now."]) + "\n", exs
+
+
+def schema_v1(inp):
+    """JSON schema of format v1 (wf_v3 array) with enums for cluster_id, merge_with and placement."""
+    import copy
+    ids = [c.cluster_id for c in inp.clusters]
+    item = copy.deepcopy(LC._ITEM_SCHEMA)
+    item["properties"]["cluster_id"] = {"enum": ids}
+    item["properties"]["merge_with"] = {"type": "array", "items": {"enum": ids}}
+    item["properties"]["placement"] = {"enum": [t for t, _ in inp.options]}
+    return {"type": "array", "items": item}
+
+
+def schema_v2(inp):
+    """JSON schema of format v2: attributes[] and clusters[] (one per cluster id)."""
+    ids = [c.cluster_id for c in inp.clusters]
+    attr = {"type": "object",
+            "properties": {k: {"type": "string"} for k in ("name", "description", "role")},
+            "required": ["name", "description", "role"]}
+    clu = {"type": "object",
+           "properties": {"cluster_id": {"enum": ids}, "attribute": {"type": "string"},
+                          "evidence": {"type": "string"}, "mixed": {"type": "boolean"},
+                          "placement": {"enum": [t for t, _ in inp.options]}},
+           "required": ["cluster_id", "attribute", "evidence", "mixed", "placement"]}
+    return {"type": "object",
+            "properties": {"attributes": {"type": "array", "items": attr},
+                           "clusters": {"type": "array", "items": clu}},
+            "required": ["attributes", "clusters"]}
+
+
+def schema_split(cluster_id, ex_ids):
+    """JSON schema of the split-pass answer."""
+    part = {"type": "object",
+            "properties": {"name": {"type": "string"}, "role": {"type": "string"},
+                           "examples": {"type": "array", "items": {"enum": list(ex_ids)}}},
+            "required": ["name", "role", "examples"]}
+    return {"type": "object",
+            "properties": {"cluster_id": {"enum": [cluster_id]}, "is_mixed": {"type": "boolean"},
+                           "parts": {"type": "array", "items": part}},
+            "required": ["cluster_id", "is_mixed", "parts"]}
