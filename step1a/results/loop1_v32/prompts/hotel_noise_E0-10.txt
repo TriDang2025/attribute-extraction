@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E0#10  (mentions 6, distinct values 4)
+Examples:
+- E0#10:n0 [user] previous turn, system: Okay! Would you like to stay at City Centre North B and B, or at Worth House? | turn: I would prefer the [[centre]].
+- E0#10:n1 [system] previous turn, user: How about something with 4 stars and something expensive. | turn: I have 2 options for you - The Huntingdon Marriott on the west side, and the University Arms in the [[center]]. Are you interested in one of these?
+- E0#10:n2 [user] turn: I need a five starts hotel close to a [[mall]] and main restaurants. The hotel should include free wifi in the room.
+- E0#10:n3 [user] previous turn, system: I'm sorry for the confusion. There are two expensive hotels with 3 stars and parking. Do you prefer the centre or the south? | turn: [[The centre]] will be fine. Thank you.
+- E0#10:n4 [system] previous turn, user: Thanks Can you help me find a hotel called the university aims no university arms hotel. | turn: I have a hotel called university arms hotel located in the [[centre]]. Would you like to make reservations?
+- E0#10:n5 [system] previous turn, user: I want to stay at a 3 star hotel with free parking. | turn: I'm sorry for the confusion. There are two expensive hotels with 3 stars and parking. Do you prefer the [[centre]] or the south?
+
+Return the JSON object now.

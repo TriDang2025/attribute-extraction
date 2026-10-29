@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E0#4  (mentions 24, distinct values 9)
+Examples:
+- E0#4:n0 [user] previous turn, system: I'm starting to book your reservation at Aylesbray Lodge starting on Monday, how many days will you be staying? | turn: I will be staying for [[3 nights]].
+- E0#4:n1 [user] previous turn, system: Unfortunately the booking was unsuccessful. Can you book for another day or a shorter stay? | turn: Let's try [[4 nights]] only please and I'll need a reference number.
+- E0#4:n2 [user] previous turn, system: The ashley hotel is a moderately priced 2-star hotel in the north part of town. It offers free wifi and free parking. | turn: That is what I am looking for. I need to book for [[2 nights]] starting on Wednesday. Four people will be staying. Please give a reference number.
+- E0#4:n3 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a [[4 star]], expensive hotel for 3 nights, starting on Saturday? 3 people. Wifi please.
+- E0#4:n4 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: The ashley hotel has [[2 stars]]. They're in the postcode cb41er.
+- E0#4:n5 [system] previous turn, user: Yes, can you try it for 3 nights, please. | turn: Neither hotel appears to have [[three days]] available starting on Sunday for three people, can I look something else up for you?
+
+Return the JSON object now.

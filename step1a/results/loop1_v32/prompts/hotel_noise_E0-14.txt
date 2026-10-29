@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E0#14  (mentions 10, distinct values 3)
+Examples:
+- E0#14:n0 [system] previous turn, user: Sure. Check only for hotels which include free parking also. | turn: There are no 4-star lodgings available in [[Cambridge]] that meet your criteria. Shall we check 5-star locations instead?
+- E0#14:n1 [system] previous turn, user: Whew, thanks, sorry for all of the confusion. I think that covers everything. thanks so much for the help. | turn: You're quite welcome. If you need anything else just message us again. Thanks for contacting the [[Cambridge TownInfo Centre]] and have a great day!
+- E0#14:n2 [system] previous turn, user: I would like it to have a four star rating and be located on the west side. | turn: [[The Cambridge Belfry]] fits your requirements, would you like to book a reservation there?
+- E0#14:n3 [user] turn: I need a 3 star hotel in [[Cambridge]], that offers a guesthouse, can you book it for me ?
+- E0#14:n4 [user] turn: Hi, I'm looking for any information that you have on the Lensfield hotel in [[Cambridge]].
+- E0#14:n5 [user] previous turn, system: No I'm sorry we don't have anything matching those criteria. | turn: There are literally no 4 star accommodations of any kind with moderate price and wifi in all of [[Cambridge]]? I find that very hard to believe!
+
+Return the JSON object now.

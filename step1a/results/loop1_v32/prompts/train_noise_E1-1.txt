@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E1#1  (mentions 89, distinct values 62)
+Examples:
+- E1#1:n0 [user] previous turn, system: Sure, the phone number is 01223355017. How many days will you be staying, what day do you need to arrive, and how many people will be staying? | turn: I'm staying for 2 days and it's just myself. What train can I take to depart from the stansted airport that leaves at [[19:30]]?
+- E1#1:n1 [user] turn: I am traveling to Cambridge and would like to find a local restaurant. I want to arrive by train at [[noon]].
+- E1#1:n2 [user] previous turn, system: The TR0017 train leaves Peterborough at 16:48. Would you like me to book you a seat on it? | turn: Is there one a little earlier? I'd actually like to leave closer to [[13:15]].
+- E1#1:n3 [system] previous turn, user: I would like to leave Cambridge after 15:45. | turn: The next train after [[15:45]] leaves at 17:01 from Cambridge. Would you like to book this train?
+- E1#1:n4 [user] previous turn, system: i got 5 choices. what time do you want to leave? | turn: I just need to leave on Wednesday and should arrive by [[18:15]].
+- E1#1:n5 [system] previous turn, user: Could you confirm the travel time and price please? | turn: Train TR5921 leaves Stansted Airport at [[18:24]] and arrives in Cambridge at 18:52 at a price of 10.10 pounds per ticket. Would you like to book this?
+
+Return the JSON object now.

@@ -1,0 +1,18 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E1#13  (mentions 5, distinct values 4)
+Examples:
+- E1#13:n0 [system] previous turn, user: I am looking for a train that will depart from Norwich on Sunday | turn: There are trains every hour on the :16 that will get you there by noon, beginning at 5:[[16]]. Which would you prefer?
+- E1#13:n1 [system] previous turn, user: I'm looking to book a train that goes to ely and leaves on sunday please. | turn: There are [[10]] trains leaving from Cambridge to Ely. Is there a particular departure or arrival time you would prefer?
+- E1#13:n2 [user] previous turn, system: How many train tickets would you like to book? | turn: [[2]] please and I need a ref. number.
+- E1#13:n3 [user] previous turn, system: Sure. Just to confirm, how many seats will you need? | turn: [[5]], please. Include the reference number.
+- E1#13:n4 [system] previous turn, user: I am looking for a train that will depart from Norwich on Sunday | turn: There are trains every hour on the :[[16]] that will get you there by noon, beginning at 5:16. Which would you prefer?
+
+Return the JSON object now.

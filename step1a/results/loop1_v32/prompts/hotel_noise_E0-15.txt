@@ -1,0 +1,17 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E0#15  (mentions 4, distinct values 3)
+Examples:
+- E0#15:n0 [system] previous turn, user: There are literally no 4 star accommodations of any kind with moderate price and wifi in all of Cambridge? I find that very hard to believe! | turn: Sorry, you are right. We actually have [[11]] to choose from.
+- E0#15:n1 [user] previous turn, system: There is one option available. It is cityroomz. Do you want to book? | turn: Yes, please book it for the same day for a party of [[4]] for 4 nights.
+- E0#15:n2 [system] previous turn, user: OK, how about a moderately priced one? | turn: There are [[8]] moderately priced guesthouses in the north. May I suggest the 4 star Acorn Guest house?
+- E0#15:n3 [system] previous turn, user: Hello. I'm hoping to find a guesthouse in the north part of Cambridge. Are there any? | turn: Indeed there are. In fact, there are [[11]]. If you'd like an inexpensive, 4 star guesthouse with free internet and free parking, Worth House is a good choice.
+
+Return the JSON object now.

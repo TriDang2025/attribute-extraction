@@ -1,0 +1,16 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E2#40  (mentions 3, distinct values 1)
+Examples:
+- E2#40:n0 [system] previous turn, user: I'm also looking to eat at a restaurant called graffiti. | turn: [[Graffiti]] is an excellent choice! It's an expensive British restaurant on the west side. Would you like a table there?
+- E2#40:n1 [system] previous turn, user: Is one of those expensive? If so, book me a table there for Thursday for 8 people at 13:30 please. | turn: There's actually two expensive places, [[graffiti]] and travellers rest. Which would you prefer?
+- E2#40:n2 [user] previous turn, system: Booking was successful, the total fee is 66 GBP payable at the station . Reference number is : MU3UYQCK. | turn: I'm also looking to eat at a restaurant called [[graffiti]].
+
+Return the JSON object now.

@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E1#2  (mentions 31, distinct values 22)
+Examples:
+- E1#2:n0 [system] previous turn, user: I need an earlier train. | turn: [[TR9016]] is the earliest departure after 20:45. Would you like to change your specified time?
+- E1#2:n1 [system] previous turn, user: Yes, I need to leave after 15:45. | turn: [[TR5713]] leaves at 15:50 and arrives by 16:07. Will that work for you?
+- E1#2:n2 [system] previous turn, user: I will be departing from stansted airport and want to leave after 18:15. | turn: [[TR5921]] departs the airport at 18:24 and arrives by 18:52, does this suit your needs?
+- E1#2:n3 [system] previous turn, user: What about the train ID? | turn: The train ID for the departure at 21:21 is TR9016 and the trainID that departs at 2312 is [[TR6387]]. Would you like me to book on of these for you?
+- E1#2:n4 [system] previous turn, user: I need to leave after 21:00. | turn: The [[TR7610]] leaves at 21:21 and is a 105 minute ride to Leicester. Would you like me to book you seats?
+- E1#2:n5 [system] previous turn, user: That works can I have the travel time for that please? | turn: [[TR9448]] leaves at 05:54 and arrives at 06:43. The travel time is 49 minutes.
+
+Return the JSON object now.

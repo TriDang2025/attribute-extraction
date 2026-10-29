@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E1#5  (mentions 13, distinct values 10)
+Examples:
+- E1#5:n0 [system] previous turn, user: Could you confirm the travel time and price please? | turn: Train TR5921 leaves Stansted Airport at 18:24 and arrives in Cambridge at 18:52 at a price of [[10.10 pounds]] per ticket. Would you like to book this?
+- E1#5:n1 [system] previous turn, user: Yes, that sounds perfect. I'll need 4 seats. | turn: Your booking was successful, the total fee is [[66 GBP]] payable at the station . Your reference number is : P6G0S9IT. Is there anything else I can help you with?
+- E1#5:n2 [system] previous turn, user: I need 2 adult and 1 child. Thank you. | turn: Booking was successful for TR5713, the total fee is [[10.56 GBP]] payable at the station. Your reference number is : GGE66KI2. Is there anything else I can help you with?
+- E1#5:n3 [system] previous turn, user: What is the price? | turn: Both options are [[12.80 pounds]]. Would you like to book one of these options?
+- E1#5:n4 [system] previous turn, user: How about 7:16? What is the price? | turn: TR4202 is the one that leaves at 7:16 and it costs [[14.08 pounds]] per ticket. Would you like me to book it for you?
+- E1#5:n5 [system] previous turn, user: Yes, please. Can you book me 4 tickets? | turn: Booking was successful, the total fee is [[40.4 GBP]] payable at the station. Reference number is : H4BIFD0U. Will there be anything else today?
+
+Return the JSON object now.

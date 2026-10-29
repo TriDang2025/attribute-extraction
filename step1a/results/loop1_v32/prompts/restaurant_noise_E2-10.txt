@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E2#10  (mentions 28, distinct values 20)
+Examples:
+- E2#10:n0 [user] previous turn, system: i've pulled up their info, what would you like to know? | turn: I need reservations for 5 people at [[15:15]] on Sunday. I'll need the reference number as well.
+- E2#10:n1 [user] previous turn, system: I'm sorry, Restaurant Two Two doesn't have availability then. Would you like to try a different day or time? | turn: Yes, would I be able to get a table there Thursday at [[18:00]] for 7?
+- E2#10:n2 [user] previous turn, system: Neither of the restaurants in the centre are available at that time. Would you like to try a different time? | turn: How about [[10:00]] on the same day as before?
+- E2#10:n3 [system] previous turn, user: Can you try booking it for 11:15? | turn: I was able to fulfill your request. You are booked at Anatolia on Wednesday at [[11:15]]. The reservation is for 6 people. How else may I help you?
+- E2#10:n4 [user] previous turn, system: Would love to! What kind of food do you like? | turn: Actually I am specifically looking for the Cocum restaurant, I would like to book for 7 people at [[15:00]] on monday if possible.
+- E2#10:n5 [user] previous turn, system: Yes, they had a table available and I went ahead and booked it for you. Your reference number is HXSPEY9N. What else can I do for you? | turn: I'll need a taxi to get me from downing college to pizza express by [[17:45]]. can you set that up for me?
+
+Return the JSON object now.

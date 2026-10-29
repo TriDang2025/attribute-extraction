@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E2#9  (mentions 11, distinct values 7)
+Examples:
+- E2#9:n0 [system] previous turn, user: I am craving Turkish food in the centre. Is there a restaurant available? | turn: I have pulled up [[3]]. How about anatolia, they are moderately priced.
+- E2#9:n1 [user] previous turn, system: There are 5 results for restaurants serving indian food, the first is tandoori palace located at 68 Histon Road Chesterton. Would you like a reservation and for how many? | turn: Yes please for [[six people]] thank you.
+- E2#9:n2 [system] previous turn, user: I'm hoping to find a french restaurant in Cambridge. | turn: There are [[two]]. Both are expensive. One is in the north and one is in the centre. Do you have a preference?
+- E2#9:n3 [user] previous turn, system: What day would you like to dine on ? | turn: I want a reservation for [[2 people]] at 17:30 on thursday. Sorry, I don't know why I said the other thing before that. I must be going crazy.
+- E2#9:n4 [system] previous turn, user: Please book a table for 4 at 15:15 on wednesday. | turn: Alright, now have a reservation for [[four people]] at the Tandoori Palace at 3:15 on Wednesday. Is there anything else I can assist you with?
+- E2#9:n5 [user] previous turn, system: Would love to! What kind of food do you like? | turn: Actually I am specifically looking for the Cocum restaurant, I would like to book for [[7 people]] at 15:00 on monday if possible.
+
+Return the JSON object now.

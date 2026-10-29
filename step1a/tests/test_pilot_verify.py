@@ -203,3 +203,15 @@ def test_v2_failed_split_falls_back_to_its_attribute():
                         for c in V2["clusters"]]}
     d = PV.decisions_from_v2(obj, CIDS, "v2", "r1", bad, require_mixed=False).set_index("cluster_id")
     assert d.at["E1#3", "action"] == "merge" and "E1#0" in d.at["E1#3", "merge_with"]
+
+
+def test_split_part_with_merge_into_joins_that_attribute():
+    m, ids, x, ex = toy()
+    d = dec_of({"cluster_id": "E1#0", "name": "day", "action": "keep"},
+               {"cluster_id": "E1#3", "name": "mixed", "action": "split",
+                "split": [{"name": "time", "examples": ["E1#3:0"]},
+                          {"name": "day", "examples": ["E1#3:1"], "merge_into": ["E1#0"]}]})
+    assign, attrs, parts = PV.final_attributes(d, m, ids, x, ex, "E1")
+    a = attrs.set_index("attr_id")
+    assert "E1#3/1" not in a.index and assign[8] == assign[9] == "E1#0" and assign[6] == "E1#3/0"
+    assert a.loc["E1#0", "n_mentions"] == 2 + 2  # its own 2 mentions plus the part's 2

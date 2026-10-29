@@ -161,14 +161,15 @@ def _find(parent, a):
 
 
 def split_parts(dec_row, ex_mention, ids_idx, x):
-    """[(name, unit centroid of its example vectors, [ex_id])] of a split decision; [] if fewer than 2 usable parts."""
+    """[(name, unit centroid of its example vectors, [ex_id], merge_into)] of a split decision; [] if fewer than 2
+    usable parts. merge_into: the clusters of the attribute a wf_v3.2 reconcile joined the part to ([] if none)."""
     parts = []
     for p in json.loads(dec_row["split"] or "[]"):
         eids = [e for e in (p.get("examples") or [])  # only this cluster's examples
                 if str(e).startswith(f"{dec_row['cluster_id']}:") and e in ex_mention and ex_mention[e] in ids_idx]
         if eids:
             c = x[[ids_idx[ex_mention[e]] for e in eids]].mean(axis=0)
-            parts.append((str(p.get("name") or ""), c / max(np.linalg.norm(c), 1e-9), eids))
+            parts.append((str(p.get("name") or ""), c / max(np.linalg.norm(c), 1e-9), eids, list(p.get("merge_into") or [])))
     return parts if len(parts) >= 2 else []
 
 
@@ -208,12 +209,18 @@ def final_attributes(dec, mentions, ids, x, examples, entity):
                       "description": row[named[0]]["description"] if named else ""})
         for c in members:
             assign.update({int(i): attr_id for i in pm.loc[pm["cluster_id"] == c, "mention_id"]})
+    attr_of = {m: a for a in attrs for m in a["clusters"].split(";")}
     for c, ps in parts.items():
         cen = np.stack([p[1] for p in ps])
         ms = pm.loc[pm["cluster_id"] == c, "mention_id"].astype(int).tolist()
         near = (x[[ids_idx[i] for i in ms]] @ cen.T).argmax(axis=1)
-        for k, (name, _, _) in enumerate(ps):
+        for k, (name, _, _, into) in enumerate(ps):
             mine = [i for i, n in zip(ms, near) if n == k]
+            target = attr_of.get(into[0]) if into else None
+            if target is not None:  # reconcile joined the part to an existing attribute
+                target["n_mentions"] += len(mine)
+                assign.update({i: target["attr_id"] for i in mine})
+                continue
             attrs.append({"attr_id": f"{c}/{k}", "name": name, "clusters": c, "n_mentions": len(mine),
                           "status": "keep", "source": "split", "description": ""})
             assign.update({i: f"{c}/{k}" for i in mine})

@@ -1,0 +1,18 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E2#1  (mentions 5, distinct values 5)
+Examples:
+- E2#1:n0 [system] previous turn, user: The restaurant should be in the expensive price range and should be in the south, i do not have a particular food preference. | turn: I have five places. Do you prefer, Italian, [[Chinese]], Mexican or Indian?
+- E2#1:n1 [user] previous turn, system: There are 10 choices and we have cheap, moderate and expensive options, any preference? | turn: I would like a suggestion of a moderately priced [[Chinese place]].
+- E2#1:n2 [user] turn: I would like to try an expensive, [[italian place]] while visiting cambridge.
+- E2#1:n3 [user] previous turn, system: What is the food type you would prefer? | turn: I don't care. I just need to know the address, phone number, and postcode of the [[venue]] please.
+- E2#1:n4 [user] previous turn, system: That works out perfectly. Your reference number is 72YCMLXX. Is there anything else I can help you with today? | turn: I am also looking for a [[vietnamese place]] to dine in the same price range as the hotel.
+
+Return the JSON object now.

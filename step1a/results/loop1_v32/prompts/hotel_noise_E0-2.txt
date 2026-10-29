@@ -1,0 +1,18 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E0#2  (mentions 5, distinct values 3)
+Examples:
+- E0#2:n0 [system] previous turn, user: Maybe. Is either one a 4 star hotel? If so, I'd like to book a room for 4 nights. | turn: Both are 4 stars. How many days would you be staying, and [[how many people]] are in your party? I can see if something is available.
+- E0#2:n1 [user] previous turn, system: There are 8 moderately priced guesthouses in the north. May I suggest the 4 star Acorn Guest house? | turn: Are there any expensive hotels in the north? I plan on staying with [[4 other people]] for 4 nights, starting wednesday.
+- E0#2:n2 [system] previous turn, user: Thank you. I'd also like a guesthouse in the cheaper price range. Can you help me with that? | turn: there are [[several]] in the area of the restaurant. would you like to book the closest one?
+- E0#2:n3 [system] previous turn, user: If this guesthouse is available please book it for me. By the way, what is the price per night? | turn: I do not have the prices, what day would you like to stay, for how many nights, and [[how many people]]?
+- E0#2:n4 [system] previous turn, user: I will be staying for 3 nights. | turn: OK, and [[how many people]] will be staying in the room?
+
+Return the JSON object now.

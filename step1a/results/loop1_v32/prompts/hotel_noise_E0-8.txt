@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E0#8  (mentions 15, distinct values 9)
+Examples:
+- E0#8:n0 [user] previous turn, system: We have 23 different options available. Is there an area you would prefer? | turn: I'm looking for something expensive in the [[north]].
+- E0#8:n1 [user] previous turn, system: I do not have the prices, what day would you like to stay, for how many nights, and how many people? | turn: Before I book, is the guesthouse located in the [[south part of town]] and at what price range?
+- E0#8:n2 [user] previous turn, system: I don't have a 4 star in the moderate price range. Would you like me to look in a different price range? | turn: You don't have any 4 stars in the moderate price range in [[any area]]?
+- E0#8:n3 [system] previous turn, user: I'm looking for a place to stay that is cheap located in the north. | turn: Okay! Would you like to stay at [[City Centre North B and B]], or at Worth House?
+- E0#8:n4 [user] turn: Hello. I'm hoping to find a guesthouse in the [[north part of Cambridge]]. Are there any?
+- E0#8:n5 [system] previous turn, user: I'd like more information about the Ashley Hotel, can you help? | turn: The ashley hotel is a moderately priced 2-star hotel in the [[north part of town]]. It offers free wifi and free parking.
+
+Return the JSON object now.

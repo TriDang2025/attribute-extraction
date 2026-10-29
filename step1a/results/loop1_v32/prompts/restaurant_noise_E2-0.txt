@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E2#0  (mentions 19, distinct values 12)
+Examples:
+- E2#0:n0 [user] previous turn, system: What food type are you looking for? | turn: The restaurant should be in the expensive price range and should be in the [[south]], i do not have a particular food preference.
+- E2#0:n1 [system] previous turn, user: I'm hoping to find a french restaurant in Cambridge. | turn: There are two. Both are expensive. One is in the [[north]] and one is in the centre. Do you have a preference?
+- E2#0:n2 [system] previous turn, user: How about Indian food instead? | turn: There are two Indian restaurants in the [[north part of town]]. What price range are you looking for?
+- E2#0:n3 [system] previous turn, user: Hello, I am looking for a restaurant on the south side of town that serves international food. | turn: I'm sorry, there are no international food restaurants on the [[south side of town]]. Would you like another type of food?
+- E2#0:n4 [user] previous turn, system: Great, your reference number is TYGH2E4A, and the total fee payable at the station is 450.6 GBP. | turn: Great! I also need an expensive restaurant in the [[west]] that serves Persian for the same day and party as well please.
+- E2#0:n5 [system] previous turn, user: Is there anything else? | turn: Thanh binh is located in the [[west part of town]] and is in the cheap price range. Would you like their information?
+
+Return the JSON object now.

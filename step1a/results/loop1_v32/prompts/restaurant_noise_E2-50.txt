@@ -1,0 +1,17 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E2#50  (mentions 4, distinct values 1)
+Examples:
+- E2#50:n0 [system] previous turn, user: Tell me the address of the moderately priced one. | turn: The Nirala is located at 7 Milton Street [[Chesterton]].
+- E2#50:n1 [system] previous turn, user: Okay, thanks! Can you please give me the postcode and address? | turn: The Nirala is located at 7 Milton Road [[Chesterton]], cb41uy. How else can I help you today?
+- E2#50:n2 [system] previous turn, user: Sure, how about one that serves indian food in that area. | turn: There are 5 results for restaurants serving indian food, the first is tandoori palace located at 68 Histon Road [[Chesterton]]. Would you like a reservation and for how many?
+- E2#50:n3 [system] previous turn, user: Yes. I would like to eat Indian food. | turn: The tandoori palace meets your criteria. It is located at 68 Histon Road [[Chesterton]].
+
+Return the JSON object now.

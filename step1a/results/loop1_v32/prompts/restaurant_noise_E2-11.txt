@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E2#11  (mentions 16, distinct values 5)
+Examples:
+- E2#11:n0 [user] previous turn, system: There are two. Both are expensive. One is in the north and one is in the centre. Do you have a preference? | turn: How about the North? Can I get a table there [[Thursday]] at 16:30 for 7?
+- E2#11:n1 [system] previous turn, user: Please book a table for 4 at 15:15 on wednesday. | turn: Alright, now have a reservation for four people at the Tandoori Palace at 3:15 on [[Wednesday]]. Is there anything else I can assist you with?
+- E2#11:n2 [user] previous turn, system: i've pulled up their info, what would you like to know? | turn: I need reservations for 5 people at 15:15 on [[Sunday]]. I'll need the reference number as well.
+- E2#11:n3 [system] previous turn, user: Actually I am specifically looking for the Cocum restaurant, I would like to book for 7 people at 15:00 on monday if possible. | turn: I have a table reserved for you and 6 other guests at the Cocum restaurant on [[Monday]] at 15:00. The reference number is BPE8LVHA.
+- E2#11:n4 [user] previous turn, system: The address to Don Pasquale Pizzeria is 12 Market Hill at City Centre. Would you like the phone number too? | turn: That's perfect, could you book me a table for 4 at 16:15 on [[Friday]]?
+- E2#11:n5 [user] previous turn, system: Yes I have three. When would you like the table reserved for and for how many? | turn: Is one of those expensive? If so, book me a table there for [[Thursday]] for 8 people at 13:30 please.
+
+Return the JSON object now.

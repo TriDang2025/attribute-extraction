@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E0#5  (mentions 21, distinct values 6)
+Examples:
+- E0#5:n0 [user] previous turn, system: the postcode is cb11pt | turn: I would also like to book at a guest house named Aylesbray Lodge, starting [[Monday]].
+- E0#5:n1 [user] previous turn, system: The Acorn Guest House is moderately-priced, in the north. They offer free wifi as well. Would you like me to book you a room? | turn: Sure, I need it for 5 people and 4 nights from [[Wednesday]].
+- E0#5:n2 [system] previous turn, user: Yes, please book it for the same day for a party of 4 for 4 nights. | turn: Do you want the reservations to begin on [[Friday]]?
+- E0#5:n3 [system] previous turn, user: Will you try Sunday arrival? | turn: Yes, I tried [[Sunday]] but it isn't available. Can you shorten your stay at all?
+- E0#5:n4 [user] previous turn, system: Both are 4 stars. How many days would you be staying, and how many people are in your party? I can see if something is available. | turn: I need a reservation for 4 nights starting [[Saturday]].
+- E0#5:n5 [user] previous turn, system: The acorn guest house is available in your selected region. It's moderately priced and includes free internet and parking. | turn: That one sounds fine. I need lodgings beginning [[Thursday]].
+
+Return the JSON object now.

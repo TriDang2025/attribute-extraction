@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E1#12  (mentions 6, distinct values 4)
+Examples:
+- E1#12:n0 [system] previous turn, user: Yes that will work thank you. | turn: [[How many tickets]] would you like me to book for train TR5713?
+- E1#12:n1 [system] previous turn, user: Sunday,can you book it for me and I need a reference number,please | turn: Sure. Just to confirm, [[how many seats]] will you need?
+- E1#12:n2 [system] previous turn, user: Yes, please book it and provide the reference number. | turn: [[How many train tickets]] would you like to book?
+- E1#12:n3 [system] previous turn, user: Is there another day you would like me to check? | turn: [[There are only 4 trains]] that leave on Saturday
+- E1#12:n4 [system] previous turn, user: I'll be heading to Cambridge and I'd like to leave at or a little after 09:00, if possible. | turn: I have the tr1393 which leaves the station at 09:19, [[how many tickets]] would you like?
+- E1#12:n5 [system] previous turn, user: Yes, that works! I would like the reference number please. | turn: [[How many tickets]] do you need?
+
+Return the JSON object now.

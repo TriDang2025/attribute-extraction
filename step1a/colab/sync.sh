@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-# Commit step1a/results/loop1_check and loop1_v31/responses and push to the current branch (wf-v3). Same retry loop as chunking/colab/sync.sh,
+# Commit step1a/results/loop1_check and loop1_v31/responses and push to the current branch. Same retry loop as chunking/colab/sync.sh,
 # which is fixed to chunking/results (the HF data pull is not needed here: prompts come from git).
-#   bash colab/sync.sh push-results MSG
+#   bash colab/sync.sh push-results MSG [RESULTS_SUBDIR]
+# With RESULTS_SUBDIR (e.g. loop1_v32) the whole step1a/results/RESULTS_SUBDIR is added instead of loop1_v31/responses
+# (v3.2 stage 2 writes new prompts and manifest entries on Colab).
 # Auth: GitHub from the GH_TOKEN env var + credential helper set by notebook cell 1.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$(dirname "$ROOT")"
-[ "${1:-}" = push-results ] || { echo "usage: bash colab/sync.sh push-results [MSG]"; exit 1; }
+[ "${1:-}" = push-results ] || { echo "usage: bash colab/sync.sh push-results [MSG] [RESULTS_SUBDIR]"; exit 1; }
 msg="step1a loop1_check: ${2:-update} $(date -u '+%F %H:%M') UTC"
 git add step1a/results/loop1_check
-[ -d step1a/results/loop1_v31/responses ] && git add step1a/results/loop1_v31/responses
+if [ -n "${3:-}" ]; then git add "step1a/results/$3"
+elif [ -d step1a/results/loop1_v31/responses ]; then git add step1a/results/loop1_v31/responses; fi
 if git diff --cached --quiet; then echo "results unchanged"; exit 0; fi
 git commit -q -m "$msg"
 for attempt in 1 2 3; do

@@ -1,0 +1,17 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E2#6  (mentions 4, distinct values 4)
+Examples:
+- E2#6:n0 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is [[01223 249955]].
+- E2#6:n1 [system] previous turn, user: What is the phone number? | turn: The phone number for the Nirala is [[01223 360966]]. Is there anything else I can help you with?
+- E2#6:n2 [system] previous turn, user: Yes please, I need to book a taxi to the restaurant from the hotel for the dinner reservation. | turn: Ok, a grey honda will pick you up at the hamilton lodge in time to arrive at restaurant alimentum for your 10:00 reservations. [[Taxi contact number]] is 07242149665. Anything else?
+- E2#6:n3 [user] previous turn, system: Okay, how about Peking Restaurant located at 10 Homerton Street City Centre? Would you like a reservation? | turn: I don't need a reservation, but could you give me [[their phone number]]?
+
+Return the JSON object now.

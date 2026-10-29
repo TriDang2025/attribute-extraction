@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E0#1  (mentions 19, distinct values 12)
+Examples:
+- E0#1:n0 [user] previous turn, system: There are no 5 star hotels, do you want to choose something else | turn: Yes, can you find a place for me with free wifi in the [[moderate price range]]?
+- E0#1:n1 [user] previous turn, system: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with free internet and free parking, Worth House is a good choice. | turn: I'm looking for a place to stay that is [[cheap]] located in the north.
+- E0#1:n2 [user] previous turn, system: I booked your restaurant table, and the reference number is CUL9VZ04. Is there anything else I can help you with? | turn: Yes, I am looking to book a guesthouse in the [[cheap price range]] that includes free wifi.
+- E0#1:n3 [user] previous turn, system: I have a table reserved for you and 6 other guests at the Cocum restaurant on Monday at 15:00. The reference number is BPE8LVHA. | turn: Thank you. I'd also like a guesthouse in the [[cheaper price range]]. Can you help me with that?
+- E0#1:n4 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a 4 star, [[expensive hotel]] for 3 nights, starting on Saturday? 3 people. Wifi please.
+- E0#1:n5 [system] previous turn, user: No parking preference. Can you please recommend one. | turn: I'm sorry. I am not finding any hotels in the [[expensive price range]] in the North. Would you like to change your search?
+
+Return the JSON object now.

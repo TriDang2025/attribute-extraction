@@ -78,6 +78,49 @@ def _decisions(job, path, cids, split_all):
     return PV.decisions_table(PV.load_objects(path), cids, variant, tag)
 
 
+def score_entries(entries, e, docs, ctx, entity, extract, cache_dir, gold_ents):
+    """Score {(variant, run_tag): (decision table, format)} of one entity with the unchanged scorer.
+    Returns ({(variant, run_tag): (dec, attrs, assign, parts)}, {"<variant> <run_tag>": score_file output + *_desc})."""
+    final, ver_name, ver_desc = {}, {}, {}
+    for (variant, tag), (d, fmt) in entries.items():
+        assign, attrs, parts = PV.final_attributes(d, e.mentions, e.ids, e.x, ctx.examples, entity)
+        final[(variant, tag)] = (d, attrs, assign, parts)
+        empty = pd.DataFrame(columns=PV.VERIFY_COLS)
+        ver_name[(variant, tag)] = empty if extract is None else PV.verify(
+            attrs, assign, e.mentions, docs, e.instances, entity, extract, cache_dir, variant, tag)
+        ver_desc[(variant, tag)] = empty.assign(label_kind="description") if extract is None or fmt != "v2" else PV.verify(
+            attrs, assign, e.mentions, docs, e.instances, entity, extract, cache_dir, variant, tag, use_description=True)
+    names = PS.apply_manual(PS.name_check_table({k: (v[1], v[2]) for k, v in final.items()}, e.mentions, gold_ents))
+    results = {}
+    for (variant, tag), (d, attrs, assign, parts) in final.items():
+        r = PS.score_file(d, attrs, assign, parts, ctx, ver_name[(variant, tag)], names)
+        for k, v in PS._verification_checks(ver_desc[(variant, tag)], names).items():  # description label
+            r[k + "_desc"], r[k + "_desc_n"] = v
+        results[f"{variant} {tag}"] = r
+    return final, results, ver_name, ver_desc
+
+
+def summary_rows(ent, results, sheet):
+    """One summary dict per scored response label of one entity (SUMMARY_COLS + the rubric accuracies)."""
+    acc = PS.rubric_accuracy(sheet)
+    rows = []
+    for label, r in results.items():
+        variant, tag = label.rsplit(" ", 1)
+        ra = acc.get((variant, tag), {})
+        rows.append({"ent": ent, "variant": variant, "run_tag": tag, **{k: r.get(k) for k in SUMMARY_COLS},
+                     "real_acc": ra.get("real_acc"), "noise_rub": ra.get("noise_marked"), "role_acc": ra.get("role_acc")})
+    return rows
+
+
+def summary_table(summary):
+    """Markdown lines of the summary table (rows from summary_rows)."""
+    lines = ["| ent | variant | run | " + " | ".join(SUMMARY_COLS) + " |", "|---|---|---|" + "---|" * len(SUMMARY_COLS)]
+    for r in summary:
+        lines.append(f"| {r['ent']} | {r['variant']} | {r['run_tag']} | "
+                     + " | ".join(PS._fmt(r[c], c == "noise_kept") for c in SUMMARY_COLS) + " |")
+    return lines
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--run", required=True, type=Path)
@@ -116,23 +159,7 @@ def main():
                 entries[(d["variant"].iloc[0], job["run_tag"])] = (d, job["format"])
         if not entries:
             continue
-        final, ver_name, ver_desc = {}, {}, {}
-        for (variant, tag), (d, fmt) in entries.items():
-            assign, attrs, parts = PV.final_attributes(d, e.mentions, e.ids, e.x, examples, entity)
-            final[(variant, tag)] = (d, attrs, assign, parts)
-            empty = pd.DataFrame(columns=PV.VERIFY_COLS)
-            ver_name[(variant, tag)] = empty if extract is None else PV.verify(
-                attrs, assign, e.mentions, docs, e.instances, entity, extract, a.dir / "gliner_cache", variant, tag)
-            ver_desc[(variant, tag)] = empty.assign(label_kind="description") if extract is None or fmt != "v2" else PV.verify(
-                attrs, assign, e.mentions, docs, e.instances, entity, extract, a.dir / "gliner_cache", variant, tag,
-                use_description=True)
-        names = PS.apply_manual(PS.name_check_table({k: (v[1], v[2]) for k, v in final.items()}, e.mentions, gold_ents))
-        results = {}
-        for (variant, tag), (d, attrs, assign, parts) in final.items():
-            r = PS.score_file(d, attrs, assign, parts, ctx, ver_name[(variant, tag)], names)
-            for k, v in PS._verification_checks(ver_desc[(variant, tag)], names).items():  # description label
-                r[k + "_desc"], r[k + "_desc_n"] = v
-            results[f"{variant} {tag}"] = r
+        final, results, ver_name, ver_desc = score_entries(entries, e, docs, ctx, entity, extract, a.dir / "gliner_cache", gold_ents)
         results = {k: results[k] for k in sorted(results, key=_order)}
         raw = {k: (v[1], v[2]) for k, v in final.items() if "+namemerge" not in k[0]}
         sheet = PS.rubric_sheet(raw, e.mentions, labels, clusters, old_rubric)
@@ -141,13 +168,7 @@ def main():
         (a.dir / f"scores_{ent}.md").write_text(
             PS.render_scores(results, stab, entity, note, rubric=sheet, pair=("v2", "v2_nocontext"),
                              stab_pair=("v2 r1", "r2")), encoding="utf-8", newline="\n")
-        acc = PS.rubric_accuracy(sheet)
-        for label, r in results.items():
-            variant, tag = label.rsplit(" ", 1)
-            ra = acc.get((variant, tag), {})
-            summary.append({"ent": ent, "variant": variant, "run_tag": tag, **{k: r.get(k) for k in SUMMARY_COLS},
-                            "real_acc": ra.get("real_acc"), "noise_rub": ra.get("noise_marked"),
-                            "role_acc": ra.get("role_acc")})
+        summary += summary_rows(ent, results, sheet)
         all_dec += [d.assign(ent=ent) for d in decs.values()]
         all_ver += [v.assign(ent=ent, label_kind="name") for v in ver_name.values() if len(v)]
         all_ver += [v.assign(ent=ent) for v in ver_desc.values() if len(v)]
@@ -158,14 +179,10 @@ def main():
     _write(pd.concat(all_dec), a.dir / "decisions.csv")
     _write(pd.concat(all_ver) if all_ver else pd.DataFrame(columns=PV.VERIFY_COLS), a.dir / "verification.csv")
     _write(pd.concat(all_rub), a.dir / "name_rubric.csv")
-    table = pd.DataFrame(summary)
     lines = ["# wf_v3.1 pilot summary", "", f"Run `{a.run}`. Targets and per-check blocks in scores_<ent>.md; "
              "`+namemerge` = same response after merging same-name, same-placement clusters; j_*_desc = GLiNER with the "
-             "description as label (v2 only); real_acc / noise_rub / role_acc come from the filled name rubric.", "",
-             "| ent | variant | run | " + " | ".join(SUMMARY_COLS) + " |", "|---|---|---|" + "---|" * len(SUMMARY_COLS)]
-    for _, r in table.iterrows():
-        lines.append(f"| {r['ent']} | {r['variant']} | {r['run_tag']} | "
-                     + " | ".join(PS._fmt(r[c], c == "noise_kept") for c in SUMMARY_COLS) + " |")
+             "description as label (v2 only); real_acc / noise_rub / role_acc come from the filled name rubric.", ""]
+    lines += summary_table(summary)
     (a.dir / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     print(f"wrote scores_<ent>.md, decisions.csv, verification.csv, name_rubric.csv, summary.md in {a.dir}")
 

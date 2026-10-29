@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E2#17  (mentions 25, distinct values 11)
+Examples:
+- E2#17:n0 [system] previous turn, user: I am looking for a place to dine. The restaurant should serve african food and should be in the centre | turn: There is one African restuarant in the Center. It is named Bedouin, and is [[expensive]]. Their phone number is 01223367660. Would you like me to book for you?
+- E2#17:n1 [user] turn: I'm looking for somewhere to eat, that's [[moderately priced]] and in the city centre.
+- E2#17:n2 [system] previous turn, user: I want to find an expensive restaurant in the centre of town. | turn: The cambridge chop house serves british food, it is in the centre of town and is in the [[expensive price range]].
+- E2#17:n3 [system] previous turn, user: I want to find a Chinese restaurant in the centre of Cambridge. | turn: There are 10 choices and we have [[cheap]], moderate and expensive options, any preference?
+- E2#17:n4 [system] previous turn, user: Is there anything else? | turn: Thanh binh is located in the west part of town and is in the [[cheap price range]]. Would you like their information?
+- E2#17:n5 [system] previous turn, user: Yes, that would be great. Can you also give me the entrance fee and postcode for that college? | turn: The address is regent street and there is no [[entry fee]].
+
+Return the JSON object now.

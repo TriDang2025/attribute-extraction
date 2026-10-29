@@ -216,15 +216,89 @@ def schema_enum(schema, name):
     return None
 
 
+NOISE_VERDICTS = ["attribute", "noise", "unsure"]
+
+
+def _obj_errors(raw, str_keys, extra):
+    """(obj, errors) for a single JSON object: `str_keys` must be strings; `extra(obj, errors)` adds format checks."""
+    try:
+        obj = _extract_json(raw, "{", dict)
+    except ValueError as e:
+        return {}, [str(e)]
+    errors = []
+    for k in str_keys:
+        if k not in obj:
+            errors.append(f"missing key {k}")
+        elif not isinstance(obj[k], str):
+            errors.append(f"{k} not a string")
+    extra(obj, errors)
+    return obj, errors
+
+
+def _enum_check(obj, errors, key, allowed):
+    if allowed is not None and isinstance(obj.get(key), str) and obj[key] not in allowed:
+        errors.append(f"bad {key} {obj[key]!r}")
+
+
+def parse_response_v3(raw, cluster_ids):
+    """(obj, errors) for output format v3: v2 plus a string `reason` on every cluster object."""
+    obj, errors = parse_response_v2(raw, cluster_ids)
+    for i, c in enumerate(obj.get("clusters") or []):
+        if isinstance(c, dict) and not isinstance(c.get("reason"), str):
+            errors.append(f"clusters[{i}] reason missing or not a string")
+    return obj, errors
+
+
+def parse_noise(raw, cluster_ids=None, verdicts=NOISE_VERDICTS):
+    """(obj, errors) for the noise probe: {cluster_id, reason, verdict, name}; None skips an enum check."""
+    def extra(obj, errors):
+        _enum_check(obj, errors, "cluster_id", None if cluster_ids is None else set(cluster_ids))
+        _enum_check(obj, errors, "verdict", verdicts)
+    return _obj_errors(raw, ["cluster_id", "reason", "verdict", "name"], extra)
+
+
+def parse_gate(raw, cluster_ids=None):
+    """(obj, errors) for the coherence gate: {cluster_id, summary, coherent}."""
+    def extra(obj, errors):
+        _enum_check(obj, errors, "cluster_id", None if cluster_ids is None else set(cluster_ids))
+        if not isinstance(obj.get("coherent"), bool):
+            errors.append("coherent missing or not a boolean")
+    return _obj_errors(raw, ["cluster_id", "summary"], extra)
+
+
+def parse_reconcile(raw, unit_ids=None, candidates=None):
+    """(obj, errors) for reconcile: {unit_id, reason, same_as}; same_as is a candidate name or "none"."""
+    def extra(obj, errors):
+        _enum_check(obj, errors, "unit_id", None if unit_ids is None else set(unit_ids))
+        _enum_check(obj, errors, "same_as", None if candidates is None else set(candidates))
+    return _obj_errors(raw, ["unit_id", "reason", "same_as"], extra)
+
+
+def token_fields(out, batch_seconds, batch_size):
+    """Token stats of one vLLM RequestOutput for a response row (PILOT_V32_CONTRACT.md "Token stats")."""
+    return {"prompt_tokens": len(out.prompt_token_ids), "output_tokens": len(out.outputs[0].token_ids),
+            "batch_seconds": round(float(batch_seconds), 2), "batch_size": int(batch_size)}
+
+
 def parse_job(raw, fmt, schema):
-    """(parsed, errors, n_objects) for a manifest job of format v1 | v2 | split; enums come from the job's schema."""
+    """(parsed, errors, n_objects) for a manifest job of format v1 | v2 | v3 | split | noise | gate | reconcile;
+    enums come from the job's schema."""
     if fmt == "v1":
         parsed, errs = parse_v1_enum(raw, schema_enum(schema, "cluster_id"), schema_enum(schema, "placement"))
         return parsed, errs, len(parsed)
-    if fmt == "v2":
-        parsed, errs = parse_response_v2(raw, schema_enum(schema, "cluster_id") or [])
+    if fmt in ("v2", "v3"):
+        parse = parse_response_v2 if fmt == "v2" else parse_response_v3
+        parsed, errs = parse(raw, schema_enum(schema, "cluster_id") or [])
         return parsed, errs, len(parsed.get("clusters") or [])
     if fmt == "split":
         parsed, errs = parse_split(raw, schema_enum(schema, "examples") or [])
         return parsed, errs, len(parsed.get("parts") or [])
-    raise ValueError(f"unknown job format {fmt!r}")
+    if fmt == "noise":
+        parsed, errs = parse_noise(raw, schema_enum(schema, "cluster_id"), schema_enum(schema, "verdict") or NOISE_VERDICTS)
+    elif fmt == "gate":
+        parsed, errs = parse_gate(raw, schema_enum(schema, "cluster_id"))
+    elif fmt == "reconcile":
+        parsed, errs = parse_reconcile(raw, schema_enum(schema, "unit_id"), schema_enum(schema, "same_as"))
+    else:
+        raise ValueError(f"unknown job format {fmt!r}")
+    return parsed, errs, 1 if parsed else 0

@@ -388,6 +388,11 @@ def _example_lines(export, docs, ci, context):
     return lines
 
 
+def _cluster_block(export, docs, ci, context=True):
+    """Head line, "Examples:" and the example lines of one cluster."""
+    return [_cluster_head(ci), "Examples:", *_example_lines(export, docs, ci, context)]
+
+
 def render(inp, export, docs, variant="full"):
     """The prompt text of one variant."""
     if variant not in VARIANTS:
@@ -423,7 +428,7 @@ def render_v2(inp, export, docs, variant="v2", hints=None, order_seed=None):
         cl = [cl[i] for i in np.random.default_rng(order_seed).permutation(len(cl))]
     parts = [INSTRUCTION_V2, f"Entity {inp.entity}: {len(cl)} clusters.", _render_options(inp)]
     for ci in cl:
-        lines = [_cluster_head(ci), "Examples:", *_example_lines(export, docs, ci, variant != "v2_nocontext")]
+        lines = _cluster_block(export, docs, ci, variant != "v2_nocontext")
         h = (hints or {}).get(ci.cluster_id) if variant == "v2_hints" else None
         if h:
             lines.append("Possibly the same attribute as: " + ", ".join(x["other"] for x in h)
@@ -445,17 +450,23 @@ def split_candidates(export, entity, min_mentions=8, min_share=0.15):
     return sorted(out, key=lambda c: int(c.rsplit("#", 1)[1]))
 
 
-def render_split(export, docs, entity, cluster_id, k=16, seed=0):
-    """(prompt text, [(ex_id, mention_id)]) of the split pass for one cluster; ex ids `<cid>:s<j>`."""
+def cluster_example_lines(export, docs, entity, cluster_id, k, seed, tag):
+    """(ClusterInput, example lines) of one cluster with k examples; ex ids `<cid>:<tag><j>`."""
     m = export.mentions
     g = m[(m["entity"] == entity) & (m["cluster_id"] == cluster_id)]
     if g.empty:
         raise ValueError(f"{cluster_id} is not a cluster of {entity}")
-    exs = [(f"{cluster_id}:s{j}", mid) for j, mid in enumerate(select_examples(g, k, seed))]
+    exs = [(f"{cluster_id}:{tag}{j}", mid) for j, mid in enumerate(select_examples(g, k, seed))]
     ci = ClusterInput(cluster_id, len(g), g["norm_value"].nunique(), False, exs)
-    lines = [f"Cluster {cluster_id} of entity {entity} (mentions {len(g)}, distinct values {ci.n_values}).",
-             "Examples:", *_example_lines(export, docs, ci, True)]
-    return "\n\n".join([INSTRUCTION_SPLIT, "\n".join(lines), "Return the JSON object now."]) + "\n", exs
+    return ci, _example_lines(export, docs, ci, True)
+
+
+def render_split(export, docs, entity, cluster_id, k=16, seed=0):
+    """(prompt text, [(ex_id, mention_id)]) of the split pass for one cluster; ex ids `<cid>:s<j>`."""
+    ci, ex_lines = cluster_example_lines(export, docs, entity, cluster_id, k, seed, "s")
+    lines = [f"Cluster {cluster_id} of entity {entity} (mentions {ci.n_mentions}, distinct values {ci.n_values}).",
+             "Examples:", *ex_lines]
+    return "\n\n".join([INSTRUCTION_SPLIT, "\n".join(lines), "Return the JSON object now."]) + "\n", ci.examples
 
 
 def schema_v1(inp):
@@ -469,21 +480,26 @@ def schema_v1(inp):
     return {"type": "array", "items": item}
 
 
-def schema_v2(inp):
-    """JSON schema of format v2: attributes[] and clusters[] (one per cluster id)."""
-    ids = [c.cluster_id for c in inp.clusters]
+def _schema_attr_clusters(ids, options, reason=False):
+    """JSON schema {attributes[], clusters[]}; `reason` adds the required string `reason` after cluster_id."""
     attr = {"type": "object",
             "properties": {k: {"type": "string"} for k in ("name", "description", "role")},
             "required": ["name", "description", "role"]}
-    clu = {"type": "object",
-           "properties": {"cluster_id": {"enum": ids}, "attribute": {"type": "string"},
-                          "evidence": {"type": "string"}, "mixed": {"type": "boolean"},
-                          "placement": {"enum": [t for t, _ in inp.options]}},
-           "required": ["cluster_id", "attribute", "evidence", "mixed", "placement"]}
+    props = {"cluster_id": {"enum": ids}}
+    if reason:
+        props["reason"] = {"type": "string"}
+    props.update({"attribute": {"type": "string"}, "evidence": {"type": "string"}, "mixed": {"type": "boolean"},
+                  "placement": {"enum": options}})
+    clu = {"type": "object", "properties": props, "required": list(props)}
     return {"type": "object",
             "properties": {"attributes": {"type": "array", "items": attr},
                            "clusters": {"type": "array", "items": clu}},
             "required": ["attributes", "clusters"]}
+
+
+def schema_v2(inp):
+    """JSON schema of format v2: attributes[] and clusters[] (one per cluster id)."""
+    return _schema_attr_clusters([c.cluster_id for c in inp.clusters], [t for t, _ in inp.options])
 
 
 def schema_split(cluster_id, ex_ids):
@@ -496,3 +512,170 @@ def schema_split(cluster_id, ex_ids):
             "properties": {"cluster_id": {"enum": [cluster_id]}, "is_mixed": {"type": "boolean"},
                            "parts": {"type": "array", "items": part}},
             "required": ["cluster_id", "is_mixed", "parts"]}
+
+
+# ------------------------------------------------------------------ wf_v3.2: neighbourhoods, format v3, probes
+N_OUTSIDE = 3         # clusters of other groups shown as "elsewhere"
+NBHD_MAX = 20
+NOISE_K = 6
+GATE_K = 16
+REASON_LINE = ('Each cluster object starts with "reason": at most 25 words on why the cluster belongs to that '
+               'attribute, written before "attribute".')
+INSTRUCTION_V3 = INSTRUCTION_V2 + "\n" + REASON_LINE
+
+INSTRUCTION_NOISE = """\
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}"""
+
+INSTRUCTION_GATE = """\
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide whether the cluster is coherent:
+all its values are ONE attribute with one role.
+Examples are marked with [[...]] inside the turn they come from.
+Step 1: summarise in one line what the values are.
+Step 2: does that summary fit all the examples as ONE attribute with one role? If different examples play
+different roles (for example where something starts vs where it ends), the answer is no.
+If unsure, answer coherent true.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "summary": "str", "coherent": true}"""
+
+INSTRUCTION_RECONCILE = """\
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}"""
+
+
+def _cluster_number(cid):
+    return int(cid.rsplit("#", 1)[1])
+
+
+def neighbourhoods(export, entity, max_size=NBHD_MAX):
+    """Groups of the entity's cluster ids: ceil(n / max_size) groups by average-linkage agglomerative clustering
+    on the cosine of the cluster centroids, then rebalanced so no group has more than max_size clusters (the
+    member farthest from its group centroid moves to the nearest group with room). Deterministic; each cluster
+    in exactly one group; clusters in cluster-number order, groups ordered by their first cluster."""
+    from scipy.cluster.hierarchy import cut_tree, linkage
+    m = export.mentions
+    cids = sorted(m[(m["entity"] == entity) & (m["cluster_id"] != "")]["cluster_id"].unique(), key=_cluster_number)
+    g = -(-len(cids) // max_size)
+    if g <= 1:
+        return [cids] if cids else []
+    cents = GR.centroids(export)
+    x = np.array([cents[c] for c in cids], dtype=np.float64)
+    label = cut_tree(linkage(x, method="average", metric="cosine"), n_clusters=g).ravel()
+    groups = [[i for i in range(len(cids)) if label[i] == k] for k in range(g)]
+
+    def centre(members):
+        v = x[members].mean(axis=0)
+        return v / np.linalg.norm(v)
+
+    while max(len(a) for a in groups) > max_size:
+        src = max(range(g), key=lambda k: (len(groups[k]), -k))
+        cs = centre(groups[src])
+        mover = min(groups[src], key=lambda i: (float(x[i] @ cs), i))  # least similar to its own group
+        room = [k for k in range(g) if k != src and len(groups[k]) < max_size]
+        dst = max(room, key=lambda k: (float(x[mover] @ centre(groups[k])), -k))
+        groups[src].remove(mover)
+        groups[dst].append(mover)
+    groups = sorted((sorted(a) for a in groups if a), key=lambda a: a[0])
+    return [[cids[i] for i in a] for a in groups]
+
+
+def outside_context(export, groups, gi, n=N_OUTSIDE):
+    """[(cluster_id, top values)] of the n clusters of other groups nearest (cosine) to the centroid of
+    groups[gi]."""
+    cents = GR.centroids(export)
+    c = np.mean([cents[x] for x in groups[gi]], axis=0)
+    c = c / np.linalg.norm(c)
+    others = [x for k, g in enumerate(groups) if k != gi for x in g]
+    near = sorted(others, key=lambda o: (-float(cents[o] @ c), o))[:n]
+    tv = export.clusters.set_index("cluster_id")["top_values"]
+    return [(o, str(tv[o]).split("|")[:3]) for o in near]
+
+
+def nbhd_target(n_group):
+    """T of "Aim for about T attributes": a third of the group's clusters, at least 1."""
+    return max(1, round(n_group / 3))
+
+
+def render_v3(inp, export, docs, group_ids, outside, target, order_seed=None):
+    """Prompt text of output format v3 for one neighbourhood: only the clusters `group_ids` (in that order, or
+    shuffled with `order_seed`), the `outside` lines [(cluster_id, values)] and the attribute-count target."""
+    by_id = {c.cluster_id: c for c in inp.clusters}
+    cl = [by_id[c] for c in group_ids]
+    if order_seed is not None:
+        cl = [cl[i] for i in np.random.default_rng(order_seed).permutation(len(cl))]
+    parts = [INSTRUCTION_V3, f"Entity {inp.entity}: {len(cl)} clusters.",
+             f"Aim for about {target} attributes (between {target / 2:g} and {target * 3 / 2:g}).",
+             _render_options(inp)]
+    if outside:
+        parts.append("\n".join(f"Elsewhere in this entity (not yours to assign): {c}: {', '.join(vs)}"
+                               for c, vs in outside))
+    parts += ["\n".join(_cluster_block(export, docs, ci)) for ci in cl]
+    parts.append("Return the JSON object now.")
+    return "\n\n".join(parts) + "\n"
+
+
+def schema_v3(inp, group_ids):
+    """JSON schema of format v3: v2 with cluster_id an enum of `group_ids` and a required `reason` after it."""
+    return _schema_attr_clusters(list(group_ids), [t for t, _ in inp.options], reason=True)
+
+
+def _render_probe(instruction, export, docs, entity, cluster_id, k, seed, tag):
+    ci, ex_lines = cluster_example_lines(export, docs, entity, cluster_id, k, seed, tag)
+    block = "\n".join([_cluster_head(ci), "Examples:", *ex_lines])
+    return "\n\n".join([instruction, block, "Return the JSON object now."]) + "\n", ci.examples
+
+
+def render_noise(export, docs, entity, cluster_id, k=NOISE_K, seed=0):
+    """(prompt text, [(ex_id, mention_id)]) of the noise probe of one cluster; ex ids `<cid>:n<j>`."""
+    return _render_probe(INSTRUCTION_NOISE, export, docs, entity, cluster_id, k, seed, "n")
+
+
+def render_gate(export, docs, entity, cluster_id, k=GATE_K, seed=0):
+    """(prompt text, [(ex_id, mention_id)]) of the coherence gate of one cluster; ex ids `<cid>:g<j>`."""
+    return _render_probe(INSTRUCTION_GATE, export, docs, entity, cluster_id, k, seed, "g")
+
+
+def schema_noise(cluster_id):
+    """JSON schema of the noise-probe answer."""
+    return {"type": "object",
+            "properties": {"cluster_id": {"enum": [cluster_id]}, "reason": {"type": "string"},
+                           "verdict": {"enum": ["attribute", "noise", "unsure"]}, "name": {"type": "string"}},
+            "required": ["cluster_id", "reason", "verdict", "name"]}
+
+
+def schema_gate(cluster_id):
+    """JSON schema of the coherence-gate answer."""
+    return {"type": "object",
+            "properties": {"cluster_id": {"enum": [cluster_id]}, "summary": {"type": "string"},
+                           "coherent": {"type": "boolean"}},
+            "required": ["cluster_id", "summary", "coherent"]}
+
+
+def render_reconcile(unit, candidates):
+    """Prompt text of the reconcile pass from plain data (no export): `unit` {unit_id, name, description,
+    lines [example lines]}, `candidates` [(name, description)]."""
+    head = (f"Attribute {unit['unit_id']}: {unit['name']}: {unit['description']}\n"
+            + "Examples:\n" + "\n".join(unit["lines"]))
+    cand = "Candidates:\n" + "\n".join(f"- {n}: {d}" for n, d in candidates)
+    return "\n\n".join([INSTRUCTION_RECONCILE, head, cand, "Return the JSON object now."]) + "\n"
+
+
+def schema_reconcile(unit_id, candidate_names):
+    """JSON schema of the reconcile answer; same_as is a candidate name or "none"."""
+    return {"type": "object",
+            "properties": {"unit_id": {"enum": [unit_id]}, "reason": {"type": "string"},
+                           "same_as": {"enum": list(candidate_names) + ["none"]}},
+            "required": ["unit_id", "reason", "same_as"]}

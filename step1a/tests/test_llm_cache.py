@@ -120,3 +120,76 @@ def test_schema_enum_and_parse_job():
         "cluster_id": {"enum": ["E1#3"]}, "placement": {"enum": ["p"]}}}}
     assert lc.parse_job(json.dumps([OBJ]), "v1", arr)[1] == [f"[0] bad placement 'current entity'"]
     assert lc.parse_job(json.dumps([OBJ]), "v1", {})[1] == []
+
+
+def _schema(**enums):
+    return {"type": "object", "properties": {k: {"enum": v} for k, v in enums.items()}}
+
+
+def test_parse_job_v3():
+    obj = {"attributes": [{"name": "a", "description": "d", "role": "r"}],
+           "clusters": [{"cluster_id": "E1#0", "reason": "why", "attribute": "a", "evidence": "e",
+                         "mixed": False, "placement": "current entity E1"}]}
+    sch = _schema(cluster_id=["E1#0"])
+    assert lc.parse_job(json.dumps(obj), "v3", sch) == (obj, [], 1)
+    no_reason = json.loads(json.dumps(obj))
+    del no_reason["clusters"][0]["reason"]
+    assert "reason missing" in " ".join(lc.parse_job(json.dumps(no_reason), "v3", sch)[1])
+    assert lc.parse_job(json.dumps(no_reason), "v2", sch)[1] == []  # v2 does not need a reason
+    bad = json.loads(json.dumps(obj))
+    bad["clusters"][0]["cluster_id"] = "E1#9"
+    assert "unknown cluster_id" in " ".join(lc.parse_job(json.dumps(bad), "v3", sch)[1])
+
+
+def test_parse_job_noise():
+    sch = _schema(cluster_id=["E1#7"], verdict=["attribute", "noise", "unsure"])
+    ok = {"cluster_id": "E1#7", "reason": "r", "verdict": "attribute", "name": "price"}
+    assert lc.parse_job(json.dumps(ok), "noise", sch) == (ok, [], 1)
+    assert lc.parse_job(json.dumps(dict(ok, verdict="noise", name="")), "noise", sch)[1] == []
+    assert "bad verdict 'maybe'" in " ".join(lc.parse_job(json.dumps(dict(ok, verdict="maybe")), "noise", sch)[1])
+    assert "bad cluster_id" in " ".join(lc.parse_job(json.dumps(dict(ok, cluster_id="E1#8")), "noise", sch)[1])
+    miss = {k: v for k, v in ok.items() if k != "name"}
+    assert lc.parse_job(json.dumps(miss), "noise", sch)[1] == ["missing key name"]
+    assert lc.parse_job(json.dumps(dict(ok, verdict="maybe")), "noise", {})[1][0].startswith("bad verdict")  # default enum
+
+
+def test_parse_job_gate():
+    sch = _schema(cluster_id=["E1#7"])
+    ok = {"cluster_id": "E1#7", "summary": "times", "coherent": True}
+    assert lc.parse_job(json.dumps(ok), "gate", sch) == (ok, [], 1)
+    assert lc.parse_job(json.dumps(dict(ok, coherent="yes")), "gate", sch)[1] == ["coherent missing or not a boolean"]
+    assert lc.parse_job(json.dumps({"cluster_id": "E1#7", "coherent": False}), "gate", sch)[1] == ["missing key summary"]
+    assert "bad cluster_id" in " ".join(lc.parse_job(json.dumps(dict(ok, cluster_id="x")), "gate", sch)[1])
+
+
+def test_parse_job_reconcile():
+    sch = _schema(unit_id=["a0"], same_as=["price", "none"])
+    ok = {"unit_id": "a0", "reason": "same", "same_as": "price"}
+    assert lc.parse_job(json.dumps(ok), "reconcile", sch) == (ok, [], 1)
+    assert lc.parse_job(json.dumps(dict(ok, same_as="none")), "reconcile", sch)[1] == []
+    assert "bad same_as 'cost'" in " ".join(lc.parse_job(json.dumps(dict(ok, same_as="cost")), "reconcile", sch)[1])
+    assert lc.parse_job(json.dumps({"unit_id": "a0", "same_as": "none"}), "reconcile", sch)[1] == ["missing key reason"]
+    assert lc.parse_job("not json", "reconcile", sch)[1] == ["no JSON object found"]
+
+
+def test_parse_job_unknown_format():
+    import pytest
+    with pytest.raises(ValueError):
+        lc.parse_job("{}", "nope", {})
+
+
+def test_token_fields_fake_output():
+    from types import SimpleNamespace as NS
+    out = NS(prompt_token_ids=[1, 2, 3], outputs=[NS(token_ids=[4, 5], text="x")])
+    assert lc.token_fields(out, 12.3456, 64) == {"prompt_tokens": 3, "output_tokens": 2,
+                                                 "batch_seconds": 12.35, "batch_size": 64}
+
+
+def test_v32_notebook_compiles():
+    path = Path(__file__).resolve().parent.parent / "colab" / "S1A_llm_v32_colab.ipynb"
+    nb = json.loads(path.read_text(encoding="utf-8"))
+    codes = [c for c in nb["cells"] if c["cell_type"] == "code"]
+    assert len(codes) == 10
+    for i, c in enumerate(codes):
+        src = "\n".join("" if ln.lstrip().startswith(("!", "%")) else ln for ln in "".join(c["source"]).splitlines())
+        compile(src, f"cell{i + 1}", "exec")

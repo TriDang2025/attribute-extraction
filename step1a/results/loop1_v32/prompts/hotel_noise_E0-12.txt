@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E0#12  (mentions 11, distinct values 5)
+Examples:
+- E0#12:n0 [system] previous turn, user: Maybe. Is either one a 4 star hotel? If so, I'd like to book a room for 4 nights. | turn: Both are 4 stars. [[How many days]] would you be staying, and how many people are in your party? I can see if something is available.
+- E0#12:n1 [system] previous turn, user: Yes, please. Can you also give me the phone number? | turn: Sure, the phone number is 01223355017. How many days will you be staying, [[what day]] do you need to arrive, and how many people will be staying?
+- E0#12:n2 [user] previous turn, system: I have a hotel called university arms hotel located in the centre. Would you like to make reservations? | turn: Yes, for 2 nights for 5 people on the [[same day]]
+- E0#12:n3 [system] previous turn, user: Please book it for 5 people and 5 nights starting from wednesday. | turn: Unfortunately the booking was unsuccessful. Can you book for [[another day]] or a shorter stay?
+- E0#12:n4 [system] previous turn, user: 3 people. Can I get the reference number please? | turn: I'm sorry, but there is nothing available at that time at either hotel. Would you like to try fewer nights or perhaps a different [[arrival day]]?
+- E0#12:n5 [system] previous turn, user: I would like to book one starting Friday. | turn: I have begun a booking for you at Avalon. [[How many days]] will you be staying?
+
+Return the JSON object now.

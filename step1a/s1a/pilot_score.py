@@ -453,7 +453,8 @@ def render_scores(results, stab=None, entity="", note="", rubric=None, pair=("fu
                   stab_pair=("full r1", "r2")):
     """scores.md: one block per check (value and target per response file), the comparison table, context, stability.
     results: {file label: score_file output}; stab: (value, n) of the stab_pair responses; pair: variant names of the
-    context comparison (their r1 runs); rubric: name rubric sheet -> a "Name rubric" block at the end (None: no block)."""
+    context comparison (their r1 runs; None: no block); stab_pair None: no stability block; rubric: name rubric sheet
+    -> a "Name rubric" block at the end (None: no block)."""
     labels = list(results)
     lines = ["# Pilot scores", "", f"Pilot entity {entity}. {note}".strip(), ""]
     block = None
@@ -475,20 +476,93 @@ def render_scores(results, stab=None, entity="", note="", rubric=None, pair=("fu
         lines.append(f"| {key} | {_target_text(kind, target)} | " + " | ".join(
             f"{_fmt(results[lab].get(key), key == 'noise_kept')} {_met(key, kind, target, results[lab])}".strip()
             for lab in labels) + " |")
-    full, nocon = (next((lab for lab in labels if lab == f"{p} r1"), None) for p in pair)
-    lines += ["", f"## Context ({pair[0]} r1 vs {pair[1]} r1)", ""]
-    if full and nocon:
-        lines += ["Expected: clearly lower without context.", "", f"| measure | {pair[0]} | {pair[1]} | delta |",
-                  "|---|---|---|---|"]
-        for key, *_ in CHECKS:
-            a, b = results[full].get(key), results[nocon].get(key)
-            d = b - a if isinstance(a, (int, float)) and isinstance(b, (int, float)) else float("nan")
-            lines.append(f"| {key} | {_fmt(a)} | {_fmt(b)} | {_fmt(d)} |")
-    else:
-        lines.append(f"{pair[0]} r1 or {pair[1]} r1 missing.")
-    lines += ["", f"## Stability ({stab_pair[0]} vs {stab_pair[1]}, report only)", ""]
-    lines.append(f"Clusters with a different action, merge_with or name: {_fmt(stab[0])} (n={stab[1]})" if stab
-                 else f"{stab_pair[0]} or {stab_pair[1]} missing.")
+    if pair:
+        full, nocon = (next((lab for lab in labels if lab == f"{p} r1"), None) for p in pair)
+        lines += ["", f"## Context ({pair[0]} r1 vs {pair[1]} r1)", ""]
+        if full and nocon:
+            lines += ["Expected: clearly lower without context.", "", f"| measure | {pair[0]} | {pair[1]} | delta |",
+                      "|---|---|---|---|"]
+            for key, *_ in CHECKS:
+                a, b = results[full].get(key), results[nocon].get(key)
+                d = b - a if isinstance(a, (int, float)) and isinstance(b, (int, float)) else float("nan")
+                lines.append(f"| {key} | {_fmt(a)} | {_fmt(b)} | {_fmt(d)} |")
+        else:
+            lines.append(f"{pair[0]} r1 or {pair[1]} r1 missing.")
+    if stab_pair:
+        lines += ["", f"## Stability ({stab_pair[0]} vs {stab_pair[1]}, report only)", ""]
+        lines.append(f"Clusters with a different action, merge_with or name: {_fmt(stab[0])} (n={stab[1]})" if stab
+                     else f"{stab_pair[0]} or {stab_pair[1]} missing.")
     if rubric is not None:
         lines += _rubric_lines(rubric)
     return "\n".join(lines) + "\n"
+
+
+# ------------------------------------------------------------------ wf_v3.2: token table (PILOT_V32_CONTRACT.md)
+TOKEN_COLS = ["ent", "variant", "calls", "prompt_tokens", "output_tokens", "total", "x_A", "recall",
+              "recall_per_100k", "estimated"]
+BASE_VARIANT = "A"
+CHARS_PER_TOKEN = 3.5
+
+
+def token_row(ent, variant, job, resp_row, prompt_text):
+    """Token row of one call. prompt_tokens / output_tokens of the response row when present; else the estimate
+    (pilot_input.est_tokens of the prompt text, len(raw) / 3.5) and `estimated` True."""
+    from .pilot_input import est_tokens
+    p, o = (resp_row or {}).get("prompt_tokens"), (resp_row or {}).get("output_tokens")
+    est = p is None or o is None
+    if p is None:
+        p = est_tokens(prompt_text)
+    if o is None:
+        o = int(len(str((resp_row or {}).get("raw") or "")) / CHARS_PER_TOKEN)
+    return {"ent": ent, "variant": variant, "job": job, "prompt_tokens": int(p), "output_tokens": int(o),
+            "estimated": est}
+
+
+def variant_jobs(jobs, variant, gate_failed=()):
+    """The jobs one variant pays for. `jobs` is one entity's manifest jobs (kind/run_tag as in the contract):
+    A = v2 r1 entity job + its split jobs (r1); B = seed-0 nbhd jobs + all split jobs; C = nbhd jobs of seeds 0-2 +
+    all split jobs; D = nbhd 0-2 + noise + gate + split jobs of the gate_failed cluster ids + reconcile."""
+    def entity(j, tags):
+        return j["kind"] == "entity" and j["variant"] == ("v2" if variant == "A" else "nbhd") and j["run_tag"] in tags
+    if variant == "A":
+        return [j for j in jobs if entity(j, ("r1",)) or (j["kind"] == "split" and j["run_tag"] == "r1")]
+    if variant == "B":
+        return [j for j in jobs if entity(j, ("s0",)) or j["kind"] == "split"]
+    if variant == "C":
+        return [j for j in jobs if entity(j, ("s0", "s1", "s2")) or j["kind"] == "split"]
+    if variant == "D":
+        return [j for j in jobs if entity(j, ("s0", "s1", "s2")) or j["kind"] in ("noise", "gate", "reconcile")
+                or (j["kind"] == "split" and j["cluster_id"] in set(gate_failed))]
+    raise ValueError(f"unknown variant {variant!r}")
+
+
+def token_table(rows, recall=None):
+    """DataFrame TOKEN_COLS, one row per (ent, variant) plus ent "all" (sum over entities, recall nan).
+    rows: dicts from token_row; recall: {(ent, variant): strict recall}. x_A = total / total of variant A of the same
+    ent; recall_per_100k = recall / total * 1e5; estimated = any call of the row had an estimated count."""
+    recall = recall or {}
+    df = pd.DataFrame(rows, columns=["ent", "variant", "prompt_tokens", "output_tokens", "estimated"])
+    out = []
+    for ents in (None, True):
+        d = df if ents is None else df.assign(ent="all")
+        for (ent, variant), g in d.groupby(["ent", "variant"], sort=False):
+            out.append({"ent": ent, "variant": variant, "calls": len(g), "prompt_tokens": int(g["prompt_tokens"].sum()),
+                        "output_tokens": int(g["output_tokens"].sum()), "estimated": bool(g["estimated"].any()),
+                        "recall": recall.get((ent, variant), float("nan"))})
+    t = pd.DataFrame(out, columns=TOKEN_COLS)
+    t["total"] = t["prompt_tokens"] + t["output_tokens"]
+    base = t[t["variant"] == BASE_VARIANT].set_index("ent")["total"]
+    t["x_A"] = [tot / base[e] if e in base.index and base[e] else float("nan") for e, tot in zip(t["ent"], t["total"])]
+    t["recall_per_100k"] = [r / tot * 1e5 if tot else float("nan") for r, tot in zip(t["recall"], t["total"])]
+    return t[TOKEN_COLS].reset_index(drop=True)
+
+
+def render_tokens(df):
+    """Markdown table of token_table output; `est` marks rows with estimated counts."""
+    lines = ["| ent | variant | calls | prompt tok | output tok | total | x A | recall | recall per 100K tok | est |",
+             "|---|---|---|---|---|---|---|---|---|---|"]
+    for _, r in df.iterrows():
+        lines.append(f"| {r['ent']} | {r['variant']} | {r['calls']} | {r['prompt_tokens']} | {r['output_tokens']} | "
+                     f"{r['total']} | {_fmt(r['x_A'])} | {_fmt(r['recall'])} | {_fmt(r['recall_per_100k'])} | "
+                     f"{'yes' if r['estimated'] else ''} |")
+    return "\n".join(lines)

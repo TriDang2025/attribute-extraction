@@ -1,0 +1,19 @@
+Below are examples of ONE cluster of spans taken from a dialogue corpus. Decide: is this a value that a database
+column would store (a real attribute value, such as a place, a time, a name or a number of people)? Or is it noise
+(chit-chat, yes/no/ok, booking words, filler)?
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then a verdict: "attribute", "noise" or "unsure". If the verdict is attribute, give its
+database column name in snake_case; otherwise give an empty name. If unsure, answer unsure.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "reason": "str", "verdict": "attribute|noise|unsure", "name": "snake_case or empty"}
+
+### E1#0  (mentions 11, distinct values 2)
+Examples:
+- E1#0:n0 [user] previous turn, system: Sure, the phone number is 01223355017. How many days will you be staying, what day do you need to arrive, and how many people will be staying? | turn: I'm staying for 2 days and it's just myself. What train can I take to depart from the [[stansted airport]] that leaves at 19:30?
+- E1#0:n1 [user] previous turn, system: The earliest leaves at 13:40 and the trains depart every hour through 23:40. If you'd like to choose one I can book it for you. | turn: That would be great. How much would it cost to travel to [[stansted]] from Cambridge?
+- E1#0:n2 [user] turn: Hello, I need to take a train to [[Stansted airport]], arriving by 20:30.
+- E1#0:n3 [system] previous turn, user: Could you confirm the travel time and price please? | turn: Train TR5921 leaves [[Stansted Airport]] at 18:24 and arrives in Cambridge at 18:52 at a price of 10.10 pounds per ticket. Would you like to book this?
+- E1#0:n4 [user] previous turn, system: And where will you be heading to? | turn: I am going to [[Stansted Airport]].
+- E1#0:n5 [user] previous turn, system: The postcode is cb21sj and the phone number is 01223359506. | turn: I also need a train from Cambridge to [[Stansted Airport]]. Can you please look that up for me.
+
+Return the JSON object now.
