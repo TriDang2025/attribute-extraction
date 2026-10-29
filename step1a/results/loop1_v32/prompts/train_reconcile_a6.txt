@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a6: destination: the place where the train arrives
+Examples:
+- E1#11:n0 [system] previous turn, user: I need to leave after 21:00. | turn: The TR7610 leaves at 21:21 and is a 105 minute ride to [[Leicester]]. Would you like me to book you seats?
+- E1#11:n1 [user] previous turn, system: Okay, what day would you like to travel and where will you be leaving from? | turn: I'll be leaving [[Leicester]] and I want to be in Cambridge by 11:30, please.
+- E1#11:n2 [user] previous turn, system: The reference number is G7THDK3O. Is there anything else I can help you with. | turn: Yes, please. I need a train to [[Leicester]] on Thursday, please. I need to get there by 16:15.
+- E1#11:n3 [system] previous turn, user: I need to go from leicester to cambridge. | turn: It looks like train TR6210 will be leaving [[Leicester]] at 11:09 on Saturday and will arrive to Cambridge at 12:54. Can I help you with anything else?
+- E1#11:n4 [system] previous turn, user: Sure. I'd like to leave after 09:45. I'm heading to Cambridge. | turn: The earliest train after that time is TR0032. It leaves [[Leicester]] at 10:09 and arrives in Cambridge at 11:54. Would that work for you?
+- E1#11:n5 [user] previous turn, system: My personal favorite is the Museum of Archaeology and Anthropology at University of Cambridge, Downing Street. It even has free admission! | turn: I'll check that out. Can you also find me a train for Monday I'm leaving [[leicester]]?
+
+Candidates:
+- departure_location: the location from which the train departs
+- departure_time: time when the train departs
+- number_of_trains_or_tickets: 
+- price: cost of the train ticket
+- number_of_people: 
+
+Return the JSON object now.

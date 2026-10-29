@@ -1,0 +1,26 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E0#4-p1: star_rating: specifies the star rating of the hotel
+Examples:
+- E0#4:s3 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a [[4 star]], expensive hotel for 3 nights, starting on Saturday? 3 people. Wifi please.
+- E0#4:s4 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: The ashley hotel has [[2 stars]]. They're in the postcode cb41er.
+- E0#4:s6 [system] previous turn, user: I want to stay at a 3 star hotel with free parking. | turn: I'm sorry for the confusion. There are two expensive hotels with [[3 stars]] and parking. Do you prefer the centre or the south?
+- E0#4:s8 [system] previous turn, user: Yes, please try 5-star hotels with free parking. | turn: Unfortunately, I couldn't find anything with [[5 stars]].
+- E0#4:s12 [user] previous turn, system: I don't have a 4 star in the moderate price range. Would you like me to look in a different price range? | turn: You don't have any [[4 stars]] in the moderate price range in any area?
+
+Candidates:
+- hotel_name: the name of the hotel or guesthouse
+- price_range: the price range of the accommodation
+- location: the location of the accommodation
+- number_of_people: the number of people staying
+- number_of_hotels: 
+
+Return the JSON object now.

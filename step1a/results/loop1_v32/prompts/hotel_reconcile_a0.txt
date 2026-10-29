@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a0: price_range: the price range of the accommodation
+Examples:
+- E0#1:n0 [user] previous turn, system: There are no 5 star hotels, do you want to choose something else | turn: Yes, can you find a place for me with free wifi in the [[moderate price range]]?
+- E0#1:n1 [user] previous turn, system: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with free internet and free parking, Worth House is a good choice. | turn: I'm looking for a place to stay that is [[cheap]] located in the north.
+- E0#1:n2 [user] previous turn, system: I booked your restaurant table, and the reference number is CUL9VZ04. Is there anything else I can help you with? | turn: Yes, I am looking to book a guesthouse in the [[cheap price range]] that includes free wifi.
+- E0#1:n3 [user] previous turn, system: I have a table reserved for you and 6 other guests at the Cocum restaurant on Monday at 15:00. The reference number is BPE8LVHA. | turn: Thank you. I'd also like a guesthouse in the [[cheaper price range]]. Can you help me with that?
+- E0#1:n4 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a 4 star, [[expensive hotel]] for 3 nights, starting on Saturday? 3 people. Wifi please.
+- E0#1:n5 [system] previous turn, user: No parking preference. Can you please recommend one. | turn: I'm sorry. I am not finding any hotels in the [[expensive price range]] in the North. Would you like to change your search?
+
+Candidates:
+- location: the location of the accommodation
+- hotel_name: name of the hotel or guesthouse
+- number_of_people: the number of people staying
+- number_of_nights: the number of nights to stay
+- start_date: the start date of the stay
+
+Return the JSON object now.

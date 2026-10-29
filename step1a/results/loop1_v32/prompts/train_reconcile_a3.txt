@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a3: price: cost of the train ticket
+Examples:
+- E1#5:n0 [system] previous turn, user: Could you confirm the travel time and price please? | turn: Train TR5921 leaves Stansted Airport at 18:24 and arrives in Cambridge at 18:52 at a price of [[10.10 pounds]] per ticket. Would you like to book this?
+- E1#18:n0 [system] previous turn, user: Just one seat. | turn: Your booking was successful! The reference number is 698RE4W1. The total fee of [[17.89]] is payable at the station.
+- E1#5:n1 [system] previous turn, user: Yes, that sounds perfect. I'll need 4 seats. | turn: Your booking was successful, the total fee is [[66 GBP]] payable at the station . Your reference number is : P6G0S9IT. Is there anything else I can help you with?
+- E1#18:n1 [system] previous turn, user: That works for me. Go ahead and book it. | turn: Done - your reference number is GJ3062PE. The total fee is [[37.79 GPB]] which you can pay at the station.
+- E1#5:n2 [system] previous turn, user: I need 2 adult and 1 child. Thank you. | turn: Booking was successful for TR5713, the total fee is [[10.56 GBP]] payable at the station. Your reference number is : GGE66KI2. Is there anything else I can help you with?
+- E1#18:n2 [system] previous turn, user: I would like to leave after 13:00. | turn: First train out after 13:00 is TR6193, leaving at 13:40. It's a 28-minute trip, and each ticket is [[8.08GBP]]. Would you like to book passage?
+
+Candidates:
+- total_fee: 
+- number_of_trains_or_tickets: 
+- departure_time: time when the train departs
+- number_of_people: 
+- travel_time: duration of the train journey
+
+Return the JSON object now.

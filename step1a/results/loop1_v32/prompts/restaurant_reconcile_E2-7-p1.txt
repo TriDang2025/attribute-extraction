@@ -1,0 +1,25 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E2#7-p1: restaurant_type: types of restaurants or cuisine
+Examples:
+- E2#7:s0 [user] previous turn, system: There are many restaurant options available to you. What type of food would you like to eat and what is your price range? | turn: I would like a [[restaurant]] that serves eritrean food and in the expensive price range.
+- E2#7:s10 [user] turn: Hi! I am looking for a [[turkish food restaurant]] around the centre.
+- E2#7:s6 [system] previous turn, user: Yes, I am also looking for a barbeque restaurant in the same area and price range as my hotel. | turn: Unfortunately, I could not find a [[barbecue restaurant]] using your criteria. Is there another type of restaurant you would like to consider?
+- E2#7:s7 [system] previous turn, user: Is the restaurant moderately priced? If so, please book a table for 5 at 18:00 and send me the reference number. | turn: No, I'm sorry the ugly duckling is in the expensive price range. The copper kettle serves [[british food]] and is moderately priced. Would you like a reservation for it?
+
+Candidates:
+- restaurant_name: the name of the restaurant
+- restaurant_food_type: the type of food served by the restaurant
+- restaurant_reservation_time: the time at which the restaurant reservation is made
+- restaurant_location: the location or area of the restaurant
+- cuisine_type: type of cuisine served by the restaurant
+
+Return the JSON object now.

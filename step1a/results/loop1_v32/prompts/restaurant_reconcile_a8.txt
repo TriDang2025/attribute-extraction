@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a8: restaurant_name: name of the restaurant
+Examples:
+- E2#13:n0 [user] turn: I need to book a taxi to come pick me up by 10:30 to take me to [[Midsummer House Restaurant]].
+- E2#21:n0 [system] previous turn, user: We eat Pizza Hut way to much. Can you try something with indian food? It is a special occasion so it can be expensive. | turn: There is [[Taj Tandoori]] which is located on 64 Cherry Hinton Road. Would you like me to book a table for you?
+- E2#22:n0 [system] previous turn, user: Not really, no. What's the address, postcode, and phone number for your favorite? | turn: Oh well if your letting me decide then [[kymmoy]] serves the best asian oriental food! Phone is 01223311911 postcode is cb12as and they are at 100 Mill Rd City Centre
+- E2#24:n0 [user] turn: i want to book a taxi. The taxi should depart from [[la Margarita]] and should go to riverboat Georgina.
+- E2#34:n0 [system] previous turn, user: I want to find an expensive restaurant in the centre of town. | turn: [[The cambridge chop house]] serves british food, it is in the centre of town and is in the expensive price range.
+- E2#35:n0 [user] turn: Do you have information on [[La Raza]]?
+
+Candidates:
+- restaurant_reservation_time: the time at which the restaurant reservation is made
+- restaurant_location: the location or area of the restaurant
+- restaurant_food_type: the type of food served by the restaurant
+- restaurant_address: the address of the restaurant
+- address: street address of the restaurant
+
+Return the JSON object now.

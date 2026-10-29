@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a0: restaurant_location: the location or area of the restaurant
+Examples:
+- E2#0:n0 [user] previous turn, system: What food type are you looking for? | turn: The restaurant should be in the expensive price range and should be in the [[south]], i do not have a particular food preference.
+- E2#15:n0 [system] previous turn, user: Travellers Rest sounds good. | turn: ok the address is huntingdon road in [[city centre]], the phone # is 01223276182, and the postcode is cb30df. will there be anything else ?
+- E2#0:n1 [system] previous turn, user: I'm hoping to find a french restaurant in Cambridge. | turn: There are two. Both are expensive. One is in the [[north]] and one is in the centre. Do you have a preference?
+- E2#15:n1 [system] previous turn, user: I'm hoping to find a french restaurant in Cambridge. | turn: There are two. Both are expensive. One is in the north and one is in the [[centre]]. Do you have a preference?
+- E2#0:n2 [system] previous turn, user: How about Indian food instead? | turn: There are two Indian restaurants in the [[north part of town]]. What price range are you looking for?
+- E2#15:n2 [system] previous turn, user: I would like to try an expensive, italian place while visiting cambridge. | turn: I have 5 of them. 4 in the [[centre area]] and one in the south. Would you like more information?
+
+Candidates:
+- restaurant_reservation_time: the time at which the restaurant reservation is made
+- restaurant_name: name of the restaurant
+- restaurant_food_type: the type of food served by the restaurant
+- restaurant_address: the address of the restaurant
+- address: street address of the restaurant
+
+Return the JSON object now.

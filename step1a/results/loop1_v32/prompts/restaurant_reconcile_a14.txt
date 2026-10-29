@@ -1,0 +1,26 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a14: restaurant_city: city where the restaurant is located
+Examples:
+- E2#32:n0 [user] turn: I want to find a Chinese restaurant in the centre of [[Cambridge]].
+- E2#32:n1 [system] previous turn, user: Thank you for everything, that is all that i need. | turn: Thank you for contacting [[Cambridge TownInfo centre]]. Goodbye!
+- E2#32:n2 [system] previous turn, user: Thanks. That is all I need for now. | turn: enjoy your time in [[Cambridge]]!
+- E2#32:n3 [system] previous turn, user: That is it for today. Thank you so much for your help. Good bye. | turn: Thank you for using [[Cambridge TownInfo centre]]. Please remember us for all of your future travel needs.
+- E2#32:n4 [user] turn: I'm hoping to find a french restaurant in [[Cambridge]].
+
+Candidates:
+- location: 
+- restaurant_location: the location or area of the restaurant
+- restaurant_name: name of the restaurant
+- restaurant_reservation_time: the time at which the restaurant reservation is made
+- restaurant_food_type: the type of food served by the restaurant
+
+Return the JSON object now.

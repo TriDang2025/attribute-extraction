@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a7: number_of_tickets: 
+Examples:
+- E1#12:n0 [system] previous turn, user: Yes that will work thank you. | turn: [[How many tickets]] would you like me to book for train TR5713?
+- E1#12:n1 [system] previous turn, user: Sunday,can you book it for me and I need a reference number,please | turn: Sure. Just to confirm, [[how many seats]] will you need?
+- E1#12:n2 [system] previous turn, user: Yes, please book it and provide the reference number. | turn: [[How many train tickets]] would you like to book?
+- E1#12:n3 [system] previous turn, user: Is there another day you would like me to check? | turn: [[There are only 4 trains]] that leave on Saturday
+- E1#12:n4 [system] previous turn, user: I'll be heading to Cambridge and I'd like to leave at or a little after 09:00, if possible. | turn: I have the tr1393 which leaves the station at 09:19, [[how many tickets]] would you like?
+- E1#12:n5 [system] previous turn, user: Yes, that works! I would like the reference number please. | turn: [[How many tickets]] do you need?
+
+Candidates:
+- number_of_people: 
+- total_fee: 
+- travel_time: duration of the train journey
+- departure_time: time when the train departs
+- number_of_trains_or_tickets: 
+
+Return the JSON object now.

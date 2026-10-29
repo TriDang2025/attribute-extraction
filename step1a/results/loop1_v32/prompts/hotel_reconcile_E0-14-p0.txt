@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E0#14-p0: location: specifies the city or area where the hotel or information is sought
+Examples:
+- E0#14:s0 [system] previous turn, user: Sure. Check only for hotels which include free parking also. | turn: There are no 4-star lodgings available in [[Cambridge]] that meet your criteria. Shall we check 5-star locations instead?
+- E0#14:s3 [user] turn: I need a 3 star hotel in [[Cambridge]], that offers a guesthouse, can you book it for me ?
+- E0#14:s4 [user] turn: Hi, I'm looking for any information that you have on the Lensfield hotel in [[Cambridge]].
+- E0#14:s5 [user] previous turn, system: No I'm sorry we don't have anything matching those criteria. | turn: There are literally no 4 star accommodations of any kind with moderate price and wifi in all of [[Cambridge]]? I find that very hard to believe!
+- E0#14:s6 [system] previous turn, user: I'm curious about the 3-star lodging options available in Cambridge. | turn: There are no 3-star lodgings available in [[Cambridge]]. Shall we check 4-star locations instead?
+- E0#14:s7 [system] previous turn, user: I need a five starts hotel close to a mall and main restaurants. The hotel should include free wifi in the room. | turn: I'm sorry, but there are no 5-star hotels anywhere in [[Cambridge]]. Would you like to broaden your criteria?
+
+Candidates:
+- hotel_name: name of the hotel or guesthouse
+- start_date: the start date of the stay
+- number_of_accommodations: 
+- address: 
+- number_of_people: the number of people staying
+
+Return the JSON object now.

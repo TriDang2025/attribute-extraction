@@ -1,0 +1,25 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a15: cuisine_type: type of cuisine served by the restaurant
+Examples:
+- E2#38:n0 [system] previous turn, user: The restaurant should be in the expensive price range and should be in the south, i do not have a particular food preference. | turn: I have five places. Do you prefer, [[Italian]], Chinese, Mexican or Indian?
+- E2#39:n0 [system] previous turn, user: The restaurant should be in the expensive price range and should be in the south, i do not have a particular food preference. | turn: I have five places. Do you prefer, Italian, Chinese, Mexican or [[Indian]]?
+- E2#38:n1 [system] previous turn, user: The restaurant should be in the expensive price range and should be in the south, i do not have a particular food preference. | turn: I have five places. Do you prefer, Italian, Chinese, [[Mexican]] or Indian?
+- E2#39:n1 [user] previous turn, system: We have nine restaurants that match your search. Do you have another preference? | turn: Yes. I would like to eat [[Indian food]].
+
+Candidates:
+- restaurant_name: name of the restaurant
+- restaurant_food_type: the type of food served by the restaurant
+- restaurant_reservation_time: the time at which the restaurant reservation is made
+- restaurant_location: the location or area of the restaurant
+- location: 
+
+Return the JSON object now.

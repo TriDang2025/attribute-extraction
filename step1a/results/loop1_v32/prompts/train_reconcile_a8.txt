@@ -1,0 +1,26 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a8: number_of_trains_or_tickets: 
+Examples:
+- E1#13:n0 [system] previous turn, user: I am looking for a train that will depart from Norwich on Sunday | turn: There are trains every hour on the :16 that will get you there by noon, beginning at 5:[[16]]. Which would you prefer?
+- E1#13:n1 [system] previous turn, user: I'm looking to book a train that goes to ely and leaves on sunday please. | turn: There are [[10]] trains leaving from Cambridge to Ely. Is there a particular departure or arrival time you would prefer?
+- E1#13:n2 [user] previous turn, system: How many train tickets would you like to book? | turn: [[2]] please and I need a ref. number.
+- E1#13:n3 [user] previous turn, system: Sure. Just to confirm, how many seats will you need? | turn: [[5]], please. Include the reference number.
+- E1#13:n4 [system] previous turn, user: I am looking for a train that will depart from Norwich on Sunday | turn: There are trains every hour on the :[[16]] that will get you there by noon, beginning at 5:16. Which would you prefer?
+
+Candidates:
+- number_of_people: 
+- departure_time: time when the train departs
+- price: cost of the train ticket
+- travel_time: duration of the train journey
+- departure_location: the location from which the train departs
+
+Return the JSON object now.

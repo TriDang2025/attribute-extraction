@@ -1,0 +1,25 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a13: address: street address of the restaurant
+Examples:
+- E2#31:n0 [system] previous turn, user: Yes, please give me their address and phone number. | turn: thanh binh is located at [[17 magdalene street]] city centre and its phone number is 01223315232. Is there anything else I can help you with?
+- E2#44:n0 [system] previous turn, user: Yes please, I need to book a taxi to the restaurant from the hotel for the dinner reservation. | turn: Ok, a grey honda will pick you up at the [[hamilton lodge]] in time to arrive at restaurant alimentum for your 10:00 reservations. Taxi contact number is 07242149665. Anything else?
+- E2#31:n1 [system] previous turn, user: First, tell me how far away from the hotel this restaurant is. | turn: It is also in the west side area, located at [[17 Magdalene Street]] City Centre. Would you like to make a reservation?
+- E2#44:n1 [system] previous turn, user: Travellers Rest sounds good. | turn: ok the address is [[huntingdon road]] in city centre, the phone # is 01223276182, and the postcode is cb30df. will there be anything else ?
+
+Candidates:
+- restaurant_address: the address of the restaurant
+- restaurant_name: name of the restaurant
+- restaurant_reservation_time: the time at which the restaurant reservation is made
+- restaurant_location: the location or area of the restaurant
+- restaurant_food_type: the type of food served by the restaurant
+
+Return the JSON object now.

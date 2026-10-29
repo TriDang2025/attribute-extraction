@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a9: number_of_people: 
+Examples:
+- E1#14:n0 [user] previous turn, system: How many tickets would you like me to book for train TR5713? | turn: I need 2 adult and [[1 child]]. Thank you.
+- E1#14:n1 [system] previous turn, user: I am interested in booking a train to cambridge for next tuesday. | turn: There are several trains departing for Cambridge on Tuesday. [[One train]] departs every hour starting at 06:08
+- E1#14:n2 [system] previous turn, user: I'm leaving from Norwich and would like to leave after 12:15, please. | turn: There are [[twelve]] possible trains leaving after 12:15. Should I book you on one of them?
+- E1#14:n3 [system] previous turn, user: While in Cambridge I want to get a train that leaves on Sunday and goes to stansted airport. | turn: There are [[19 trains]] that day. What time do you need to leave cambridge and/or arrive at the airport?
+- E1#14:n4 [user] previous turn, system: How many tickets would you like me to book for train TR5713? | turn: I need [[2 adult]] and 1 child. Thank you.
+- E1#14:n5 [user] previous turn, system: then train ID TR4679 suits you. it leaves at 13:19 | turn: I'd like to book for [[3 people]].
+
+Candidates:
+- number_of_trains_or_tickets: 
+- departure_time: time when the train departs
+- number_of_tickets: 
+- travel_time: duration of the train journey
+- date_of_travel_destination: 
+
+Return the JSON object now.

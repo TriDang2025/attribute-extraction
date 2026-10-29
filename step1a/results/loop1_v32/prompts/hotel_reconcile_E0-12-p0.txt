@@ -1,0 +1,25 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E0#12-p0: duration: asks about the duration of stay
+Examples:
+- E0#12:s0 [system] previous turn, user: Maybe. Is either one a 4 star hotel? If so, I'd like to book a room for 4 nights. | turn: Both are 4 stars. [[How many days]] would you be staying, and how many people are in your party? I can see if something is available.
+- E0#12:s5 [system] previous turn, user: I would like to book one starting Friday. | turn: I have begun a booking for you at Avalon. [[How many days]] will you be staying?
+- E0#12:s8 [system] previous turn, user: I would also like to book at a guest house named Aylesbray Lodge, starting Monday. | turn: I'm starting to book your reservation at Aylesbray Lodge starting on Monday, [[how many days]] will you be staying?
+- E0#12:s10 [system] previous turn, user: Yes, please. Can you also give me the phone number? | turn: Sure, the phone number is 01223355017. [[How many days]] will you be staying, what day do you need to arrive, and how many people will be staying?
+
+Candidates:
+- number_of_people: the number of people staying
+- start_date: the start date of the stay
+- number_of_nights: the number of nights to stay
+- number_of_accommodations: 
+- location: the location of the accommodation
+
+Return the JSON object now.

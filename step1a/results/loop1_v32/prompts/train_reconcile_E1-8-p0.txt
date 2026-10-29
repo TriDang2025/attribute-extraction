@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E1#8-p0: travel_time_minutes: Indicates the duration of travel in minutes.
+Examples:
+- E1#8:s0 [system] previous turn, user: That sounds great! What's the total travel time on that? It seems like a long trip. | turn: The duration of the travel is [[105 minutes]]. Can I book it for you?
+- E1#8:s1 [system] previous turn, user: Can you tell me the duration of travel time please? | turn: Yes travel is exactly [[49 minutes]].
+- E1#8:s3 [system] previous turn, user: Yes, we will be coming from bishops stortford on Monday. I would like to leave after 19:30. | turn: Their is a train that leaves Monday at 21:29. it costs 10.10 pounds and it's a [[38 minute]] trip. Would you like me to book that for you?
+- E1#8:s4 [system] previous turn, user: I need to leave after 21:00. | turn: The TR7610 leaves at 21:21 and is a [[105 minute]] ride to Leicester. Would you like me to book you seats?
+- E1#8:s5 [system] previous turn, user: That works can I have the travel time for that please? | turn: TR9448 leaves at 05:54 and arrives at 06:43. The travel time is [[49 minutes]].
+- E1#8:s6 [system] previous turn, user: Can I get the travel time in minutes please? | turn: Yes, it's [[105 minutes]] total. Would you like anything else?
+
+Candidates:
+- travel_time: duration of the train journey
+- number_of_people: 
+- number_of_trains_or_tickets: 
+- departure_time: time when the train departs
+- price: cost of the train ticket
+
+Return the JSON object now.

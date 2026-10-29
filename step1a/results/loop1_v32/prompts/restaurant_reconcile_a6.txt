@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a6: restaurant_name: name of the restaurant
+Examples:
+- E2#8:n0 [user] previous turn, system: Would love to! What kind of food do you like? | turn: Actually I am specifically looking for the [[Cocum restaurant]], I would like to book for 7 people at 15:00 on monday if possible.
+- E2#16:n0 [system] previous turn, user: I am looking for a place to dine. The restaurant should serve african food and should be in the centre | turn: There is one African restuarant in the Center. It is named [[Bedouin]], and is expensive. Their phone number is 01223367660. Would you like me to book for you?
+- E2#28:n0 [system] previous turn, user: I need reservations for 5 people at 15:15 on Sunday. I'll need the reference number as well. | turn: Your table at [[Panahar]] has been reserved for 15 minutes starting at 15:15 on Sunday. Your reference number is TIYE4F1Y. Can I help you with anything else?
+- E2#30:n0 [system] previous turn, user: Yes, please give me their address and phone number. | turn: [[thanh binh]] is located at 17 magdalene street city centre and its phone number is 01223315232. Is there anything else I can help you with?
+- E2#37:n0 [system] previous turn, user: Can you try booking it for 11:15? | turn: I was able to fulfill your request. You are booked at [[Anatolia]] on Wednesday at 11:15. The reservation is for 6 people. How else may I help you?
+- E2#41:n0 [system] previous turn, user: I am craving Turkish food in the centre. Is there a restaurant available? | turn: I have pulled up 3. How about [[anatolia]], they are moderately priced.
+
+Candidates:
+- restaurant_reservation_time: the time at which the restaurant reservation is made
+- restaurant_location: the location or area of the restaurant
+- restaurant_food_type: the type of food served by the restaurant
+- cuisine_type: type of cuisine served by the restaurant
+- restaurant_address: the address of the restaurant
+
+Return the JSON object now.

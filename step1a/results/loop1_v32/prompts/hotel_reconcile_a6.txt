@@ -1,0 +1,25 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a6: number_of_accommodations: 
+Examples:
+- E0#15:n0 [system] previous turn, user: There are literally no 4 star accommodations of any kind with moderate price and wifi in all of Cambridge? I find that very hard to believe! | turn: Sorry, you are right. We actually have [[11]] to choose from.
+- E0#15:n1 [user] previous turn, system: There is one option available. It is cityroomz. Do you want to book? | turn: Yes, please book it for the same day for a party of [[4]] for 4 nights.
+- E0#15:n2 [system] previous turn, user: OK, how about a moderately priced one? | turn: There are [[8]] moderately priced guesthouses in the north. May I suggest the 4 star Acorn Guest house?
+- E0#15:n3 [system] previous turn, user: Hello. I'm hoping to find a guesthouse in the north part of Cambridge. Are there any? | turn: Indeed there are. In fact, there are [[11]]. If you'd like an inexpensive, 4 star guesthouse with free internet and free parking, Worth House is a good choice.
+
+Candidates:
+- number_of_people: the number of people staying
+- number_of_options: 
+- location: the location of the accommodation
+- start_date: the start date of the stay
+- number_of_hotels: 
+
+Return the JSON object now.

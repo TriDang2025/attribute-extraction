@@ -1,0 +1,23 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E1#3-p1: origin_city: origin city in train queries
+Examples:
+- E1#3:s4 [user] previous turn, system: Not a problem. Where are you departing from, and what day would you like to travel? | turn: I want to leave from [[cambridge]] on wednesday.
+- E1#3:s13 [system] previous turn, user: I've mixed up my locations. I actually need a train that departs from Cambridge and goes to Stevenage. | turn: I only have two trains that leave from [[Cambridge]] Wednesday. The TR9016 departs at 21:21 and the TR6387 departs 23:21.
+
+Candidates:
+- departure_location: the location from which the train departs
+- departure_time: time when the train departs
+- destination: the place where the train arrives
+- number_of_trains_or_tickets: 
+- price: cost of the train ticket
+
+Return the JSON object now.

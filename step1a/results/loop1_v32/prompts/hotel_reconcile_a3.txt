@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a3: start_date: the start date of the stay
+Examples:
+- E0#5:n0 [user] previous turn, system: the postcode is cb11pt | turn: I would also like to book at a guest house named Aylesbray Lodge, starting [[Monday]].
+- E0#5:n1 [user] previous turn, system: The Acorn Guest House is moderately-priced, in the north. They offer free wifi as well. Would you like me to book you a room? | turn: Sure, I need it for 5 people and 4 nights from [[Wednesday]].
+- E0#5:n2 [system] previous turn, user: Yes, please book it for the same day for a party of 4 for 4 nights. | turn: Do you want the reservations to begin on [[Friday]]?
+- E0#5:n3 [system] previous turn, user: Will you try Sunday arrival? | turn: Yes, I tried [[Sunday]] but it isn't available. Can you shorten your stay at all?
+- E0#5:n4 [user] previous turn, system: Both are 4 stars. How many days would you be staying, and how many people are in your party? I can see if something is available. | turn: I need a reservation for 4 nights starting [[Saturday]].
+- E0#5:n5 [user] previous turn, system: The acorn guest house is available in your selected region. It's moderately priced and includes free internet and parking. | turn: That one sounds fine. I need lodgings beginning [[Thursday]].
+
+Candidates:
+- location: the location of the accommodation
+- number_of_people: the number of people staying
+- hotel_name: the name of the hotel or guesthouse
+- number_of_accommodations: 
+- price_range: the price range of the accommodation
+
+Return the JSON object now.

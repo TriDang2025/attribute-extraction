@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a1: number_of_people: the number of people staying
+Examples:
+- E0#2:n0 [system] previous turn, user: Maybe. Is either one a 4 star hotel? If so, I'd like to book a room for 4 nights. | turn: Both are 4 stars. How many days would you be staying, and [[how many people]] are in your party? I can see if something is available.
+- E0#11:n0 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a 4 star, expensive hotel for 3 nights, starting on Saturday? [[3 people]]. Wifi please.
+- E0#2:n1 [user] previous turn, system: There are 8 moderately priced guesthouses in the north. May I suggest the 4 star Acorn Guest house? | turn: Are there any expensive hotels in the north? I plan on staying with [[4 other people]] for 4 nights, starting wednesday.
+- E0#11:n1 [user] previous turn, system: I have a hotel called university arms hotel located in the centre. Would you like to make reservations? | turn: Yes, for 2 nights for [[5 people]] on the same day
+- E0#2:n2 [system] previous turn, user: Thank you. I'd also like a guesthouse in the cheaper price range. Can you help me with that? | turn: there are [[several]] in the area of the restaurant. would you like to book the closest one?
+- E0#11:n2 [user] previous turn, system: The hotel is found in the Northern part of town and it is in the moderate price range | turn: Great can you book that for [[1 person]] for 3 nights starting friday?
+
+Candidates:
+- location: the location of the accommodation
+- number_of_accommodations: 
+- start_date: the start date of the stay
+- hotel_name: the name of the hotel or guesthouse
+- price_range: the price range of the accommodation
+
+Return the JSON object now.

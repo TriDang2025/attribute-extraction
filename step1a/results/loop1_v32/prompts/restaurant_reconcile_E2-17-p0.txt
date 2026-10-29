@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E2#17-p0: price_range: Describes the cost level of a restaurant.
+Examples:
+- E2#17:s0 [system] previous turn, user: I am looking for a place to dine. The restaurant should serve african food and should be in the centre | turn: There is one African restuarant in the Center. It is named Bedouin, and is [[expensive]]. Their phone number is 01223367660. Would you like me to book for you?
+- E2#17:s2 [system] previous turn, user: I want to find an expensive restaurant in the centre of town. | turn: The cambridge chop house serves british food, it is in the centre of town and is in the [[expensive price range]].
+- E2#17:s3 [system] previous turn, user: I want to find a Chinese restaurant in the centre of Cambridge. | turn: There are 10 choices and we have [[cheap]], moderate and expensive options, any preference?
+- E2#17:s4 [system] previous turn, user: Is there anything else? | turn: Thanh binh is located in the west part of town and is in the [[cheap price range]]. Would you like their information?
+- E2#17:s6 [user] previous turn, system: Booking was successful, the total fee is 64.64 GBP payable at the station. Your reference number is: LTQHUT3Y. Can I assist with anything else today? | turn: Yeah, I'm looking for an [[expensive place]] to dine at in the southern area of the city.
+- E2#17:s7 [user] previous turn, system: Booking was successful, the total fee is 49.5 GBP payable at the station . Reference number is : Y3MAVYRQ. | turn: Thank you so much, now can you please recommend a restaurant in the north with a [[moderate price range]]? Any type of food will do.
+
+Candidates:
+- restaurant_name: name of the restaurant
+- restaurant_reservation_time: the time at which the restaurant reservation is made
+- restaurant_location: the location or area of the restaurant
+- restaurant_food_type: the type of food served by the restaurant
+- restaurant_address: the address of the restaurant
+
+Return the JSON object now.

@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E1#3-p0: destination_city: destination city in train queries
+Examples:
+- E1#3:s0 [system] previous turn, user: I also need a Friday train to Broxbourne. | turn: Certainly. Will you be departing from [[Cambridge]]? What time would you like to leave after or arrive by? There are departures every hour from 5:01 through 23:01.
+- E1#3:s3 [user] turn: I am interested in booking a train to [[cambridge]] for next tuesday.
+- E1#3:s5 [user] turn: I am traveling to [[Cambridge]] and would like to find a local restaurant. I want to arrive by train at noon.
+- E1#3:s6 [user] previous turn, system: A guesthouse has already been booked for you. Is there anything else I can help you with today? | turn: I also need a train from Bishops Stafford to [[Cambridge]].
+- E1#3:s8 [user] previous turn, system: Yes, that's the postcode. Is there anything else I can assist you with? | turn: Yes, I need a train going to [[cambridge]].
+- E1#3:s9 [user] previous turn, system: I have found several trains that you can use. What is your destination? | turn: The train should go to [[Cambridge]] on Tuesday
+
+Candidates:
+- departure_location: the location from which the train departs
+- departure_time: time when the train departs
+- destination: the place where the train arrives
+- number_of_trains_or_tickets: 
+- price: cost of the train ticket
+
+Return the JSON object now.

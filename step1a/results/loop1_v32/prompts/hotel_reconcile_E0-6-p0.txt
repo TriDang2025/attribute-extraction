@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E0#6-p0: reference_number: Reference number for bookings
+Examples:
+- E0#6:s0 [system] previous turn, user: Sure, I need a reservation for 4 people and 2 nights starting on Monday please. | turn: I have made the booking the Reference number is [[E6UVD9OL]]. Is there anything else i can help you with?
+- E0#6:s1 [system] previous turn, user: Let's try 4 nights only please and I'll need a reference number. | turn: That works out perfectly. Your reference number is [[72YCMLXX]]. Is there anything else I can help you with today?
+- E0#6:s3 [system] previous turn, user: Yes, I am looking to book a guesthouse in the cheap price range that includes free wifi. | turn: I was able to book you a room for seven people for three nights, starting Monday, at Finches Bed and Breakfast. Reference number is [[CUL9VZ04]]. Is there anything else?
+- E0#6:s4 [system] previous turn, user: Sure, I need it for 5 people and 4 nights from Wednesday. | turn: Booking was successful. Reference number is : [[FC2BDIC9]].
+- E0#6:s5 [system] previous turn, user: That is what I am looking for. I need to book for 2 nights starting on Wednesday. Four people will be staying. Please give a reference number. | turn: Ok, your reservation is booked, your reference number is [[FCQZW2OT]]. Can I help you with anything else?
+- E0#6:s6 [system] previous turn, user: That sounds great - I want to book it for 5 people for two nights starting Monday. | turn: Alright, I have your party booked at the Alexander. The reference number is : [[G2YMGI0L]]. Is there anything else I can do for you today?
+
+Candidates:
+- train_id: 
+- phone_number: contact phone number of the hotel
+- location: the location of the accommodation
+- start_date: the start date of the stay
+- price_range: the price range of the accommodation
+
+Return the JSON object now.

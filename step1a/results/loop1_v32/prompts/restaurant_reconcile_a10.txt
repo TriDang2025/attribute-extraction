@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a10: restaurant_name: the name of the restaurant
+Examples:
+- E2#18:n0 [system] previous turn, user: How about Chinese food? | turn: There are the Peking Restaurant, which is expensive, the Good Luck Chinese Food Takeaway, which is also expensive, and the [[Lucky Star]], which is cheap.
+- E2#20:n0 [user] previous turn, system: Yes, they had a table available and I went ahead and booked it for you. Your reference number is HXSPEY9N. What else can I do for you? | turn: I'll need a taxi to get me from downing college to [[pizza express]] by 17:45. can you set that up for me?
+- E2#40:n0 [system] previous turn, user: I'm also looking to eat at a restaurant called graffiti. | turn: [[Graffiti]] is an excellent choice! It's an expensive British restaurant on the west side. Would you like a table there?
+- E2#51:n0 [system] previous turn, user: Staying in the centre would be more convenient. What are my choices? | turn: How about [[cafe uno]] or don pasquale pizzeria?
+- E2#18:n1 [system] previous turn, user: How about Chinese food? | turn: There are the Peking Restaurant, which is expensive, the [[Good Luck Chinese Food Takeaway]], which is also expensive, and the Lucky Star, which is cheap.
+- E2#20:n1 [user] previous turn, system: No, they do not. How about Pizza Hut Cherry Hinton? It is Italian but it is popular with the Americans here. | turn: We eat [[Pizza Hut]] way to much. Can you try something with indian food? It is a special occasion so it can be expensive.
+
+Candidates:
+- restaurant_reservation_time: the time at which the restaurant reservation is made
+- restaurant_food_type: the type of food served by the restaurant
+- restaurant_location: the location or area of the restaurant
+- restaurant_address: the address of the restaurant
+- cuisine_type: type of cuisine served by the restaurant
+
+Return the JSON object now.

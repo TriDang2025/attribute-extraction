@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute E0#0-p1: hotel_type: types of hotels or guesthouses
+Examples:
+- E0#0:s0 [user] previous turn, system: Yes, hamilton lodge is located on 156 chesterton road. | turn: If this [[guesthouse]] is available please book it for me. By the way, what is the price per night?
+- E0#0:s1 [system] previous turn, user: I need a hotel in the west with free parking please. | turn: Do you care about the price range? I have one cheap and one expensive [[hotel]] that fits your current criteria.
+- E0#0:s8 [system] previous turn, user: I will also need a place to stay. | turn: [[A guesthouse]] has already been booked for you. Is there anything else I can help you with today?
+- E0#0:s9 [system] previous turn, user: 3 people. Can I get the reference number please? | turn: I'm sorry, but there is nothing available at that time at [[either hotel]]. Would you like to try fewer nights or perhaps a different arrival day?
+- E0#0:s11 [system] previous turn, user: Yes, can you try it for 3 nights, please. | turn: [[Neither hotel]] appears to have three days available starting on Sunday for three people, can I look something else up for you?
+- E0#0:s12 [system] previous turn, user: Before I book, is the guesthouse located in the south part of town and at what price range? | turn: [[The hotel]] is found in the Northern part of town and it is in the moderate price range
+
+Candidates:
+- hotel_name: the name of the hotel or guesthouse
+- number_of_hotels: 
+- location: the location of the accommodation
+- number_of_people: the number of people staying
+- price_range: the price range of the accommodation
+
+Return the JSON object now.

@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a4: location: the location of the accommodation
+Examples:
+- E0#7:n0 [user] previous turn, system: Your booking was successful, the total fee is 66 GBP payable at the station . Your reference number is : P6G0S9IT. Is there anything else I can help you with? | turn: I need a hotel in the [[west]] with free parking please.
+- E0#8:n0 [user] previous turn, system: We have 23 different options available. Is there an area you would prefer? | turn: I'm looking for something expensive in the [[north]].
+- E0#10:n0 [user] previous turn, system: Okay! Would you like to stay at City Centre North B and B, or at Worth House? | turn: I would prefer the [[centre]].
+- E0#7:n1 [user] previous turn, system: There are 10 hotels that meet your needs. Would you like to narrow your search by area? | turn: I would like it to have a four star rating and be located on the [[west side]].
+- E0#8:n1 [user] previous turn, system: I do not have the prices, what day would you like to stay, for how many nights, and how many people? | turn: Before I book, is the guesthouse located in the [[south part of town]] and at what price range?
+- E0#10:n1 [system] previous turn, user: How about something with 4 stars and something expensive. | turn: I have 2 options for you - The Huntingdon Marriott on the west side, and the University Arms in the [[center]]. Are you interested in one of these?
+
+Candidates:
+- number_of_people: the number of people staying
+- start_date: the start date of the stay
+- hotel_name: name of the hotel or guesthouse
+- price_range: the price range of the accommodation
+- number_of_accommodations: 
+
+Return the JSON object now.

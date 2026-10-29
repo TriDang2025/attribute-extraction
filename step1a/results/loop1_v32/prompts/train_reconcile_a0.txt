@@ -1,0 +1,27 @@
+Below is ONE attribute (a candidate database column) with example values from a dialogue corpus, and a list of
+candidate attributes of the same table. Decide whether it is the SAME attribute as one candidate: the same kind
+of value playing the same role. Values that play different roles (where something starts vs where it ends,
+the earliest vs the latest time) are different attributes.
+Examples are marked with [[...]] inside the turn they come from.
+Give a short reason, then "same_as": the name of that candidate, or "none" if it is its own attribute.
+If unsure, answer none.
+Return ONLY one JSON object, nothing before or after it:
+{"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}
+
+Attribute a0: departure_location: the location from which the train departs
+Examples:
+- E1#0:n0 [user] previous turn, system: Sure, the phone number is 01223355017. How many days will you be staying, what day do you need to arrive, and how many people will be staying? | turn: I'm staying for 2 days and it's just myself. What train can I take to depart from the [[stansted airport]] that leaves at 19:30?
+- E1#6:n0 [user] previous turn, system: Most are free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50 pound fee, and Trinity has a 1 pound fee. | turn: I need a train that leaves at 20:45 from [[stevenage]] to cambridge
+- E1#19:n0 [user] turn: I need to find a train that leaves [[peterborough]] on friday.
+- E1#23:n0 [user] previous turn, system: A guesthouse has already been booked for you. Is there anything else I can help you with today? | turn: I also need a train from [[Bishops Stafford]] to Cambridge.
+- E1#25:n0 [user] previous turn, system: Sheep's Green and Lammas Land Park Fen Causeway is located at Fen Causeway, Newnham road, postal code cb322ad. | turn: Thanks! I'm also looking for a train from Cambridge to [[Kings Lynn]].
+- E1#27:n0 [user] turn: Could you help me find a train to [[norwich]]?
+
+Candidates:
+- departure_time: time when the train departs
+- destination: the place where the train arrives
+- number_of_people: 
+- arrival_location: the location where the train arrives
+- price: cost of the train ticket
+
+Return the JSON object now.
