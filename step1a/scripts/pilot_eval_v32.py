@@ -6,7 +6,7 @@ A = wf_v3.1 v2 r1 + its split pass (read from --dir31, no new run); B = nbhd, se
 Each variant is scored as is and again after name_merge ("+namemerge"). Reads <dir>/manifest.json, examples.csv,
 responses/<job>.jsonl; <dir31> as in pilot_eval_v31.py. A variant whose responses are missing is skipped with a note.
 Writes <dir>/{scores_<ent>.md, decisions.csv, verification.csv, name_rubric.csv, tokens.csv, summary.md}.
-Recall per 100K tokens uses recall_after of the "+namemerge" row. GLiNER cache: <dir>/gliner_cache; --no-gliner skips it.
+Recall per 100K tokens uses recall_after of the "+namemerge" row. GLiNER cache: <dir>/gliner_cache/<ent> (per entity: the label alone is not a key); --no-gliner skips it.
 """
 
 import argparse
@@ -140,7 +140,7 @@ def main():
         for entries, path in ((entries_a, a.dir31 / "examples.csv"), (entries_r, a.dir / "examples.csv")):
             if entries:
                 ctx = ctx_of(path)
-                f, r, vn, vd = score_entries(entries, e, docs, ctx, entity, extract, a.dir / "gliner_cache", gold_ents)
+                f, r, vn, vd = score_entries(entries, e, docs, ctx, entity, extract, a.dir / "gliner_cache" / ent, gold_ents)
                 final.update(f), results.update(r), ver_name.update(vn), ver_desc.update(vd)
         results = {k: results[k] for k in sorted(results, key=lambda k: (k[0], "+namemerge" in k))}
         for letter in decs:

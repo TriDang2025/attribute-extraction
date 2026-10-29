@@ -7,7 +7,7 @@ again after name_merge ("+namemerge"). v1 responses go through decisions_table, 
 the split results of the same run tag, else the first tag found for that entity).
 Writes <dir>/{scores_<ent>.md, decisions.csv, verification.csv, name_rubric.csv, summary.md}. name_rubric.csv keeps
 the hand-filled columns on re-runs; its names are the responses as is (no "+namemerge" rows).
-GLiNER outputs are cached per label in <dir>/gliner_cache/; --no-gliner skips verification (no GLiNER load).
+GLiNER outputs are cached per entity and label in <dir>/gliner_cache/<ent>/; --no-gliner skips verification (no GLiNER load).
 """
 
 import argparse
@@ -159,7 +159,7 @@ def main():
                 entries[(d["variant"].iloc[0], job["run_tag"])] = (d, job["format"])
         if not entries:
             continue
-        final, results, ver_name, ver_desc = score_entries(entries, e, docs, ctx, entity, extract, a.dir / "gliner_cache", gold_ents)
+        final, results, ver_name, ver_desc = score_entries(entries, e, docs, ctx, entity, extract, a.dir / "gliner_cache" / ent, gold_ents)
         results = {k: results[k] for k in sorted(results, key=_order)}
         raw = {k: (v[1], v[2]) for k, v in final.items() if "+namemerge" not in k[0]}
         sheet = PS.rubric_sheet(raw, e.mentions, labels, clusters, old_rubric)
