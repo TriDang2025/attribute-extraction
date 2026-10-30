@@ -2,11 +2,13 @@
 unchanged scorer.
 
 python scripts/pilot_eval_v33.py --run results/graph_v22_dev50 --dir results/loop1_v33 --dir32 results/loop1_v32
-        [--no-gliner] [--human-noise <noise_sheet.csv>] [--no-cue-spread]
+        [--no-gliner] [--noise rule|model] [--jury <jury.csv>] [--no-cue-spread]
 C = v3.2 C (nbhd, 3-order vote + split pass) read from --dir32, no rerun; E / E1 / E2 = v3.3 entity jobs, 3-order vote,
 then the v3.2 gate and split responses of --dir32 (PC.decisions_e); F = de-lexicalised `f` jobs, seed 0, no gate/split,
 no GLiNER. Each is scored as is and after name_merge ("+namemerge"). P4 cue spread is on for every variant (C too);
---no-cue-spread gives the old centroid-only spread. --human-noise: filled noise sheet applied to the gold labels.
+--no-cue-spread gives the old centroid-only spread. --noise rule (default): non-gold clusters relabelled by gold share
+(PS.rule_noise_labels, no model or human); --noise model: the v2.1 model labels of labels.csv (v3.2 numbers).
+--jury: CSV with cluster_id + jury (noise|real|mixed) from blind LLM raters, applied after the noise labels.
 Writes <dir>/{scores_<ent>.md, decisions.csv, verification.csv, name_rubric.csv, tokens.csv, summary.md, role_mix.csv}.
 GLiNER cache: <dir>/gliner_cache/<ent>; --no-gliner skips it. A variant whose responses are missing is skipped with a note.
 """
@@ -78,17 +80,18 @@ def main():
     ap.add_argument("--dir", required=True, type=Path)
     ap.add_argument("--dir32", type=Path, default=Path("results/loop1_v32"))
     ap.add_argument("--no-gliner", action="store_true")
-    ap.add_argument("--human-noise", type=Path, default=None)
+    ap.add_argument("--noise", choices=["rule", "model"], default="rule")
+    ap.add_argument("--jury", type=Path, default=None)
     ap.add_argument("--no-cue-spread", action="store_true")
     a = ap.parse_args()
 
     e = MN.load(a.run / "spans")
     docs, gv, gold_attrs = MN.load_shared(a.run)
     labels = _read(a.run / "spans" / "labels.csv")
-    if a.human_noise is not None:
-        sheet_in = _read(a.human_noise)
-        if (sheet_in["human"].str.strip() != "").any():
-            labels = PS.apply_human_labels(labels, sheet_in)
+    if a.noise == "rule":
+        labels = PS.rule_noise_labels(labels, e.mentions)
+    if a.jury is not None:
+        labels = PS.apply_human_labels(labels, _read(a.jury), col="jury", by="jury")
     clusters = _read(a.run / "spans" / "clusters.csv")
     jobs33, jobs32 = _jobs(a.dir), _jobs(a.dir32)
     old_rubric = _read(a.dir / "name_rubric.csv") if (a.dir / "name_rubric.csv").exists() else None
@@ -183,7 +186,9 @@ def main():
              "after merging same-name, same-placement clusters. "
              + ("P4 cue spread is OFF (--no-cue-spread)." if a.no_cue_spread else
                 "P4 cue spread is ON for every variant, C included.")
-             + (f" Gold labels use the human noise sheet `{a.human_noise}`." if a.human_noise else "")
+             + (f" Noise labels: gold-share rule (non-gold cluster with < {PS.RULE_NOISE_SHARE} of its spans gold = noise, "
+                "else mixed)." if a.noise == "rule" else " Noise labels: v2.1 model labels (labels.csv).")
+             + (f" Rule-noise clusters relabelled by the LLM jury `{a.jury}`." if a.jury else "")
              + " place_base = placement score if every placement were `current entity`; place_current = share of rows "
              "placed on the current entity; cue = attribute_cue clusters.", ""]
     lines += summary_table33(summary)

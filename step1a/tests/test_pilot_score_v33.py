@@ -145,3 +145,23 @@ def test_variant_jobs_v33_letters():
     assert names(PS.variant_jobs(JOBS33, "E2", [])) == ["e2_0", "e2_1", "ga_1", "ga_2"]
     assert names(PS.variant_jobs(JOBS33, "F", ["E1#2"])) == ["f_0", "f_1"]
     assert names(PS.variant_jobs(JOBS33, "C")) == ["n_s0", "sp_1", "sp_2"]  # v3.2 letters unchanged
+
+
+def test_rule_noise_labels_by_gold_share():
+    m = pd.DataFrame({"cluster_id": ["E1#0"] * 4 + ["E1#1"] * 2 + ["E1#2"] * 2 + [""],
+                      "gold_attr": ["A", "", "", "", "A", "B", "A", "A", "A"]})
+    labels = pd.DataFrame({"cluster_id": ["E1#0", "E1#1", "E1#2"], "label": ["valid_new", "noise", "gold"],
+                           "label_by": ["model", "model", "rule"]})
+    out = PS.rule_noise_labels(labels, m).set_index("cluster_id")
+    assert out.at["E1#0", "label"] == "noise"  # 1 of 4 spans gold
+    assert out.at["E1#1", "label"] == "mixed"  # all gold, but split over 2 attributes
+    assert out.at["E1#2", "label"] == "gold" and out.at["E1#2", "label_by"] == "rule"
+    assert out.at["E1#0", "label_by"] == "rule" and labels.at[1, "label"] == "noise"  # input not modified
+
+
+def test_apply_jury_column():
+    labels = pd.DataFrame({"cluster_id": ["E1#0", "E1#1"], "label": ["noise", "noise"], "label_by": ["rule"] * 2})
+    jury = pd.DataFrame({"cluster_id": ["E1#0", "E1#1"], "jury": ["real", "noise"]})
+    out = PS.apply_human_labels(labels, jury, col="jury", by="jury").set_index("cluster_id")
+    assert out.at["E1#0", "label"] == "valid_new" and out.at["E1#0", "label_by"] == "jury"
+    assert out.at["E1#1", "label_by"] == "rule"

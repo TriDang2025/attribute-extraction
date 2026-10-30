@@ -118,7 +118,12 @@ attributes if a cluster is the same attribute; otherwise make a new one):
   - real → `valid_new` if it was noise, else unchanged;
   - mixed → `mixed`.
 
-  A `mixed` row is excluded from the noise denominator and counted in the report. The eval uses it when `--human-noise <sheet>` is given and the sheet has filled rows.
+  A `mixed` row is excluded from the noise denominator and counted in the report.
+
+**Change 2026-10-30: no human labels.** Hand labels are biased and not replicable, so the eval uses:
+- **Rule: `rule_noise_labels(labels, mentions)`** (`--noise rule`, default). Every non-gold cluster gets `noise` when fewer than half (`RULE_NOISE_SHARE` = 0.5) of its spans carry a gold attribute, else `mixed`. Gold rows are kept. It is deterministic. Limit: gold tags only the values that ended in the final booking, so offered times, train ids and prices count as noise (35 of its 57 E0–E2 noise clusters are real values). It is reported as a strict lower bound only.
+- **Headline (decided 2026-10-30): LLM jury** (`--noise rule --jury jury.csv`) on the rule-noise clusters of E0–E2 (`jury_sheet.csv`, 57 clusters). The fixed rubric is in `jury_rubric.md`; Haiku and Sonnet rate blind (no gold, no model marks). The `jury` column = the label both agree on, else `mixed`. Agreement: 55 of 57, kappa 0.93; the raw ratings are saved in `jury_<model>.csv`. Result: real 35, noise 20, mixed 2. It matches the v2.1 noise/valid_new labels on all 55 agreed clusters.
+- `--noise model` gives the v3.2 labels (regression only). `noise_sheet.csv` is kept as a viewer, unused by the eval.
 
 ## Combine + eval (W3)
 - `PC.decisions_e(out_dir, ent, var, gate_dir) -> (DataFrame, stats)`: vote over the seeds of `var` (seeds 0..2, or seed 0 only for f), then `apply_gate` with the gate and split results from `gate_dir` (v3.2), except for F.

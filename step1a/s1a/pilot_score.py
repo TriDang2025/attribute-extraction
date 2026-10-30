@@ -584,24 +584,41 @@ def noise_sheet(mentions, labels, decisions_list, docs, example_fn=None):
     return pd.DataFrame(rows, columns=SHEET_COLS)
 
 
-def apply_human_labels(labels, sheet):
-    """labels with the filled `human` rows of the sheet applied (blank rows ignored): noise -> noise; real ->
-    valid_new if the label was noise, else unchanged; mixed -> mixed. Changed rows get label_by "human"."""
+def apply_human_labels(labels, sheet, col="human", by="human"):
+    """labels with the filled `col` rows of the sheet applied (blank rows ignored): noise -> noise; real ->
+    valid_new if the label was noise, else unchanged; mixed -> mixed. Changed rows get label_by `by`."""
     out = labels.copy()
     pos = {c: i for i, c in enumerate(out["cluster_id"])}
     for _, r in sheet.iterrows():
-        h = str(r["human"]).strip().lower()
+        h = str(r[col]).strip().lower()
         if not h:
             continue
         if h not in HUMAN_LABELS:
-            raise ValueError(f"{r['cluster_id']}: human label {h!r} is not one of {sorted(HUMAN_LABELS)}")
+            raise ValueError(f"{r['cluster_id']}: {col} label {h!r} is not one of {sorted(HUMAN_LABELS)}")
         i = pos[r["cluster_id"]]
         old = out["label"].iloc[i]
         new = HUMAN_LABELS[h] if h != "real" or old == "noise" else old
         if new != old:
             out.iloc[i, out.columns.get_loc("label")] = new
             if "label_by" in out.columns:
-                out.iloc[i, out.columns.get_loc("label_by")] = "human"
+                out.iloc[i, out.columns.get_loc("label_by")] = by
+    return out
+
+
+RULE_NOISE_SHARE = 0.5
+
+
+def rule_noise_labels(labels, mentions, thr=RULE_NOISE_SHARE):
+    """labels with every non-gold cluster relabelled by its gold share (members with any gold_attr / all members):
+    below `thr` -> noise, else mixed (real values, but no single gold attribute reaches the purity rule). Gold rows
+    are kept. No model or human input, so the noise denominator is reproducible. Changed rows get label_by "rule"."""
+    m = mentions[mentions["cluster_id"] != ""]
+    share = (m["gold_attr"].map(lambda a: isinstance(a, str) and a != "")).groupby(m["cluster_id"]).mean()
+    out = labels.copy()
+    non_gold = out["label"] != "gold"
+    out.loc[non_gold, "label"] = [("noise" if share.get(c, 0.0) < thr else "mixed") for c in out.loc[non_gold, "cluster_id"]]
+    if "label_by" in out.columns:
+        out.loc[non_gold, "label_by"] = "rule"
     return out
 
 
