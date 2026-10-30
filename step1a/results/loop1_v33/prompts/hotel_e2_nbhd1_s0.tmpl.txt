@@ -1,0 +1,111 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+Each cluster object starts with "reason": at most 25 words on why the cluster belongs to that attribute, written before "attribute".
+
+Entity E0: 11 clusters.
+
+Aim for about 4 attributes (between 2 and 6).
+
+Placement options (copy one exactly into "placement"):
+- current entity E0: the attribute belongs to E0
+- sub-entity of E0: a part of E0 that has attributes of its own
+- other entity E1: the attribute belongs to E1
+- other entity E2: the attribute belongs to E2
+- other entity E3: the attribute belongs to E3
+- other entity E4: the attribute belongs to E4
+- relationship(E0, E1): links E0 and E1
+- relationship(E0, E2): links E0 and E2
+- relationship(E0, E3): links E0 and E3
+- relationship(E0, E4): links E0 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+Elsewhere in this entity (not yours to assign): E0#0: guesthouse, hotel, ashley hotel
+Elsewhere in this entity (not yours to assign): E0#23: cityroomz, room
+Elsewhere in this entity (not yours to assign): E0#4: 3 night, 4 night, 2 night
+
+{{CARRY_OVER}}
+
+### E0#6  (mentions 16, distinct values 15)
+Examples:
+- E0#6:0 [system] previous turn, user: Sure, I need a reservation for 4 people and 2 nights starting on Monday please. | turn: I have made the booking the Reference number is [[E6UVD9OL]]. Is there anything else i can help you with?
+- E0#6:1 [system] previous turn, user: Let's try 4 nights only please and I'll need a reference number. | turn: That works out perfectly. Your reference number is [[72YCMLXX]]. Is there anything else I can help you with today?
+- E0#6:2 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: The ashley hotel has 2 stars. They're in the postcode [[cb41er]].
+- E0#6:3 [system] previous turn, user: Yes, I am looking to book a guesthouse in the cheap price range that includes free wifi. | turn: I was able to book you a room for seven people for three nights, starting Monday, at Finches Bed and Breakfast. Reference number is [[CUL9VZ04]]. Is there anything else?
+- E0#6:4 [system] previous turn, user: Sure, I need it for 5 people and 4 nights from Wednesday. | turn: Booking was successful. Reference number is : [[FC2BDIC9]].
+- E0#6:5 [system] previous turn, user: That is what I am looking for. I need to book for 2 nights starting on Wednesday. Four people will be staying. Please give a reference number. | turn: Ok, your reservation is booked, your reference number is [[FCQZW2OT]]. Can I help you with anything else?
+- E0#6:6 [system] previous turn, user: That sounds great - I want to book it for 5 people for two nights starting Monday. | turn: Alright, I have your party booked at the Alexander. The reference number is : [[G2YMGI0L]]. Is there anything else I can do for you today?
+- E0#6:7 [system] previous turn, user: Yes please, for 4 people. How about the TR8167 please. | turn: Oh! It looks like we've already booked Train TR8167 for your group of 4. Your reference number is [[H4BIFD0U]]. Is there anything else I can help you with today?
+
+### E0#9  (mentions 2, distinct values 2)
+Examples:
+- E0#9:0 [system] previous turn, user: How about something with 4 stars and something expensive. | turn: I have 2 options for you - The Huntingdon Marriott on the west side, and the [[University Arms]] in the center. Are you interested in one of these?
+- E0#9:1 [system] previous turn, user: Thanks Can you help me find a hotel called the university aims no university arms hotel. | turn: I have a hotel called [[university arms hotel]] located in the centre. Would you like to make reservations?
+
+### E0#14  (mentions 10, distinct values 3)
+Examples:
+- E0#14:0 [system] previous turn, user: Sure. Check only for hotels which include free parking also. | turn: There are no 4-star lodgings available in [[Cambridge]] that meet your criteria. Shall we check 5-star locations instead?
+- E0#14:1 [system] previous turn, user: Whew, thanks, sorry for all of the confusion. I think that covers everything. thanks so much for the help. | turn: You're quite welcome. If you need anything else just message us again. Thanks for contacting the [[Cambridge TownInfo Centre]] and have a great day!
+- E0#14:2 [system] previous turn, user: I would like it to have a four star rating and be located on the west side. | turn: [[The Cambridge Belfry]] fits your requirements, would you like to book a reservation there?
+- E0#14:3 [user] turn: I need a 3 star hotel in [[Cambridge]], that offers a guesthouse, can you book it for me ?
+- E0#14:4 [user] turn: Hi, I'm looking for any information that you have on the Lensfield hotel in [[Cambridge]].
+- E0#14:5 [user] previous turn, system: No I'm sorry we don't have anything matching those criteria. | turn: There are literally no 4 star accommodations of any kind with moderate price and wifi in all of [[Cambridge]]? I find that very hard to believe!
+- E0#14:6 [system] previous turn, user: I'm curious about the 3-star lodging options available in Cambridge. | turn: There are no 3-star lodgings available in [[Cambridge]]. Shall we check 4-star locations instead?
+- E0#14:7 [system] previous turn, user: I need a five starts hotel close to a mall and main restaurants. The hotel should include free wifi in the room. | turn: I'm sorry, but there are no 5-star hotels anywhere in [[Cambridge]]. Would you like to broaden your criteria?
+
+### E0#16  (mentions 1, distinct values 1)
+Examples:
+- E0#16:0 [system] previous turn, user: I would like to book one starting Friday. | turn: I have begun a booking for you at [[Avalon]]. How many days will you be staying?
+
+### E0#18  (mentions 2, distinct values 1)
+Examples:
+- E0#18:0 [system] previous turn, user: Hello. I'm hoping to find a guesthouse in the north part of Cambridge. Are there any? | turn: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with free internet and free parking, [[Worth House]] is a good choice.
+- E0#18:1 [system] previous turn, user: I'm looking for a place to stay that is cheap located in the north. | turn: Okay! Would you like to stay at City Centre North B and B, or at [[Worth House]]?
+
+### E0#19  (mentions 1, distinct values 1)
+Examples:
+- E0#19:0 [user] previous turn, system: There are 2 trains that meet your criteria. The TR8167 and the TR9693. Would you like me to book one of them for you? | turn: Yes please, for 4 people. How about the [[TR8167]] please.
+
+### E0#20  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#20:0 [system] previous turn, user: Yes please, for 4 people. How about the TR8167 please. | turn: Oh! It looks like we've already booked [[Train TR8167]] for your group of 4. Your reference number is H4BIFD0U. Is there anything else I can help you with today?
+
+### E0#22  (mentions 2, distinct values 1)
+Examples:
+- E0#22:0 [user] previous turn, system: the postcode is cb11pt | turn: I would also like to book at a guest house named [[Aylesbray Lodge]], starting Monday.
+- E0#22:1 [system] previous turn, user: I would also like to book at a guest house named Aylesbray Lodge, starting Monday. | turn: I'm starting to book your reservation at [[Aylesbray Lodge]] starting on Monday, how many days will you be staying?
+
+### E0#24  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#24:0 [system] previous turn, user: I would like a guesthouse with free wifi please. | turn: We have [[23]] different options available. Is there an area you would prefer?
+
+### E0#26  (mentions 1, distinct values 1)
+Examples:
+- E0#26:0 [system] previous turn, user: Yes, please. Can you also give me the phone number? | turn: Sure, the phone number is [[01223355017]]. How many days will you be staying, what day do you need to arrive, and how many people will be staying?
+
+### E0#30  (mentions 1, distinct values 1)
+Examples:
+- E0#30:0 [system] previous turn, user: I need a 3 star hotel in Cambridge, that offers a guesthouse, can you book it for me ? | turn: Yes, hamilton lodge is located on [[156 chesterton road]].
+
+Return the JSON object now.

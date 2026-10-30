@@ -17,3 +17,6 @@ Notebook `S1A_llm_v31_colab.ipynb`, branch `wf-v3.1`, jobs from `results/loop1_v
 3. Run cell 1, then cell 2 (`pip install vllm`; resolver warnings are harmless). Then **Runtime > Restart session**, rerun cell 1, skip cell 2.
 4. Cells 3-7: GPU check, load model (cell 4 resolves the model revision sha and records it with the vLLM version), token counts (stop if any prompt > 30000), run entity jobs then split jobs with guided JSON per job schema (unguided retry marked `guided: false`). Responses go to `results/loop1_v31/responses/<job>.jsonl`; reruns reuse the cache.
 5. Cell 8: `bash colab/sync.sh push-results` pushes `loop1_check` and `loop1_v31/responses`. Then `git pull` locally.
+
+## wf_v3.3 pilot (carry-over rounds)
+Notebook `S1A_llm_v33_colab.ipynb`, branch `wf-v3.3`, jobs from `results/loop1_v33/manifest.json` (contract `../PILOT_V33_CONTRACT.md`); same setup as v3.1; round 0 runs first, then rounds 1 and 2 after `pilot_combine.fill_carry`; push with `bash colab/sync.sh push-results "v3.3 pilot responses" loop1_v33`.

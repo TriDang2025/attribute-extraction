@@ -78,12 +78,13 @@ def _decisions(job, path, cids, split_all):
     return PV.decisions_table(PV.load_objects(path), cids, variant, tag)
 
 
-def score_entries(entries, e, docs, ctx, entity, extract, cache_dir, gold_ents):
+def score_entries(entries, e, docs, ctx, entity, extract, cache_dir, gold_ents, left_words=None):
     """Score {(variant, run_tag): (decision table, format)} of one entity with the unchanged scorer.
-    Returns ({(variant, run_tag): (dec, attrs, assign, parts)}, {"<variant> <run_tag>": score_file output + *_desc})."""
+    Returns ({(variant, run_tag): (dec, attrs, assign, parts)}, {"<variant> <run_tag>": score_file output + *_desc}).
+    `left_words` {mention_id: word} turns on the cue-word split spread of PV.final_attributes."""
     final, ver_name, ver_desc = {}, {}, {}
     for (variant, tag), (d, fmt) in entries.items():
-        assign, attrs, parts = PV.final_attributes(d, e.mentions, e.ids, e.x, ctx.examples, entity)
+        assign, attrs, parts = PV.final_attributes(d, e.mentions, e.ids, e.x, ctx.examples, entity, left_words)
         final[(variant, tag)] = (d, attrs, assign, parts)
         empty = pd.DataFrame(columns=PV.VERIFY_COLS)
         ver_name[(variant, tag)] = empty if extract is None else PV.verify(

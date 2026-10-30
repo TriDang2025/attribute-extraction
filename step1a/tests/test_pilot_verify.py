@@ -215,3 +215,37 @@ def test_split_part_with_merge_into_joins_that_attribute():
     a = attrs.set_index("attr_id")
     assert "E1#3/1" not in a.index and assign[8] == assign[9] == "E1#0" and assign[6] == "E1#3/0"
     assert a.loc["E1#0", "n_mentions"] == 2 + 2  # its own 2 mentions plus the part's 2
+
+
+def test_attribute_cue_is_a_marked_non_column():
+    m, ids, x, ex = toy()
+    assert "attribute_cue" in PV.ACTIONS and "attribute_cue" in PV.MARKED
+    obj = {"attributes": [{"name": "day", "description": "d"}],
+           "clusters": [{"cluster_id": "E1#0", "attribute": "day"}, {"cluster_id": "E1#1", "attribute": "attribute_cue"},
+                        {"cluster_id": "E1#2", "attribute": "Attribute-Cue"}]}
+    d = PV.decisions_from_v2(obj, CIDS[:4], "v3", "s0").set_index("cluster_id")
+    assert d.loc["E1#1", "action"] == "attribute_cue" and d.loc["E1#2", "action"] == "attribute_cue"
+    assert d.loc["E1#1", "name"] == "" and d.loc["E1#0", "action"] == "keep" and d.loc["E1#3", "action"] == ""
+    _, attrs, _ = PV.final_attributes(d.reset_index(), m, ids, x, ex, "E1")
+    st = attrs.set_index("attr_id")["status"].to_dict()
+    assert st["E1#1"] == "attribute_cue" and st["E1#0"] == "keep"
+    assert attrs["status"].isin(PV.MARKED).sum() == 2  # the scorer counts both as marked
+
+
+def test_cue_spread_sends_mention_to_the_part_with_its_cue_word():
+    m, ids, x, ex = toy()
+    d = dec_of({"cluster_id": "E1#3", "name": "mixed", "action": "split",
+                "split": [{"name": "time", "examples": ["E1#3:0"]}, {"name": "people", "examples": ["E1#3:1"]}]})
+    lw = {6: "from", 7: "to", 8: "to", 9: "to"}  # part 0 cue {from}; part 1 cue {to}
+    base = PV.final_attributes(d, m, ids, x, ex, "E1")[0]
+    assert base[7] == "E1#3/0"  # nearest centroid: 11:00 sits next to 10:00
+    assert PV.final_attributes(d, m, ids, x, ex, "E1", left_words=None)[0] == base  # None = old behaviour
+    spread = PV.final_attributes(d, m, ids, x, ex, "E1", left_words=lw)[0]
+    assert spread[7] == "E1#3/1" and spread[6] == "E1#3/0"
+    lw2 = {6: "to", 7: "to", 8: "to", 9: "to"}  # word in both cue sets: nearest centroid
+    assert PV.final_attributes(d, m, ids, x, ex, "E1", left_words=lw2)[0] == base
+
+
+def test_left_word_map_uses_the_column():
+    m, _, _, _ = toy()
+    assert PV.left_word_map(m.assign(left_word="by")) == {i: "by" for i in range(len(m))}

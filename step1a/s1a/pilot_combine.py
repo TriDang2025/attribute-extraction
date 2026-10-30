@@ -77,8 +77,9 @@ def _empty_row(variant, tag, cid):
 
 
 # ---------------------------------------------------------------- B: one order
-def decisions_b(out_dir, ent, seed=0, split_results=None):
-    """v2 decision table of the nbhd group responses of one order, concatenated (before the name merge).
+def decisions_b(out_dir, ent, seed=0, split_results=None, variant="nbhd", group0=None):
+    """v2 decision table of the group responses (jobs of this `variant`) of one order, concatenated (before the
+    name merge). `group0`: variant to read group 0 from instead (wf_v3.3 E1 shares its group-0 jobs with E).
     Each group goes through PV.decisions_from_v2 (require_mixed=False; the v3 `reason` key is ignored there).
     split_results {cluster_id: split obj}; None = the manifest's split responses of the entity, {} = no splits.
     A group whose response is missing gives rows with action "" for its cluster ids (the schema's enum)."""
@@ -87,22 +88,25 @@ def decisions_b(out_dir, ent, seed=0, split_results=None):
         split_results = _split_results(out_dir, ent)
     parts = []
     for job in sorted(_jobs_of(out_dir, ent, "entity", tag), key=lambda j: (j["nbhd"] or 0)):
-        if job["variant"] != "nbhd":
+        if job["variant"] != (group0 if group0 and (job["nbhd"] or 0) == 0 else variant):
             continue
         obj = load_obj(out_dir, job)
         ids = LC.schema_enum(_schema(out_dir, job), "cluster_id")
         if ids is None:
             ids = [c.get("cluster_id") for c in (obj or {}).get("clusters") or [] if isinstance(c, dict)]
-        parts.append(PV.decisions_from_v2(obj, list(ids), "nbhd", tag, split_results, require_mixed=False))
+        parts.append(PV.decisions_from_v2(obj, list(ids), variant, tag, split_results, require_mixed=False))
     return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=PV.DEC_COLS)
 
 
 # ---------------------------------------------------------------- shared table helpers
 def _key(row):
-    """Vote key of a decision row: normalized name, "not attribute", "unsure", or None for an omitted cluster."""
+    """Vote key of a decision row: normalized name, "not attribute", "attribute cue", "unsure", or None for an
+    omitted cluster."""
     act = row["action"]
     if act == "not_attribute":
         return PV.NOT_ATTRIBUTE_KEY
+    if act == "attribute_cue":
+        return PV.ATTRIBUTE_CUE_KEY
     if act == "unsure":
         return "unsure"
     if act == "":
@@ -395,6 +399,96 @@ def decisions_d(out_dir, ent, generic=None):
     stats["reconcile_merged"] = sum(1 for a in answers.values() if PV.norm_name(a.get("same_as", "none")) not in ("none", ""))
     out["variant"], out["run_tag"] = "full", "vote3"
     return out, stats
+
+
+# ---------------------------------------------------------------- wf_v3.3: E variants and carry-over
+E_SEEDS = (0, 1, 2)
+CARRY_TOKEN = "{{CARRY_OVER}}"
+CARRY_HEAD = ("Attributes already found in other parts of this entity (reuse the exact name and list it again in your\n"
+              "attributes if a cluster is the same attribute; otherwise make a new one):")
+NOT_COLUMN_KEYS = (PV.NOT_ATTRIBUTE_KEY, PV.ATTRIBUTE_CUE_KEY)
+
+
+def render_carry(attrs):
+    """The carry-over block for [(name, description)]: unique by norm_name (first seen wins), not_attribute and
+    attribute_cue left out. "" when nothing is left."""
+    seen, lines = set(NOT_COLUMN_KEYS), []
+    for name, desc in attrs:
+        key = PV.norm_name(name)
+        if key and key not in seen:
+            seen.add(key)
+            lines.append(f"- {name}: {desc}" if str(desc or "").strip() else f"- {name}")
+    return CARRY_HEAD + "\n" + "\n".join(lines) if lines else ""
+
+
+def _carry_attrs(out_dir, parents):
+    """[(name, description)] of the parsed responses of the parent jobs, in parent order. Raises when a parent
+    response is missing or unparsable."""
+    attrs = []
+    for j in parents:
+        obj = load_obj(out_dir, j)
+        if obj is None:
+            raise ValueError(f"carry-over parent {j['job']} has no parsed response in {Path(out_dir) / 'responses'}")
+        attrs += [(str(a.get("name") or ""), str(a.get("description") or ""))
+                  for a in obj.get("attributes") or [] if isinstance(a, dict)]
+    return attrs
+
+
+def _fill_text(tmpl, block):
+    """tmpl with the placeholder replaced by the block; with no block the placeholder line is dropped."""
+    if block:
+        return tmpl.replace(CARRY_TOKEN, block)
+    if "\n\n" + CARRY_TOKEN in tmpl:  # its own paragraph: drop it with its separator, as in the e1 prompts
+        return tmpl.replace("\n\n" + CARRY_TOKEN, "", 1)
+    return "".join(ln for ln in tmpl.splitlines(keepends=True) if ln.strip() != CARRY_TOKEN).replace(CARRY_TOKEN, "")
+
+
+def fill_carry(out_dir, round):
+    """Write the .txt of every manifest job of this round that has carry_from, from its .tmpl.txt with the carry
+    block of its parents' parsed responses (variant f: the delex map of <out_dir>/delex_map.json applied to the
+    whole text). Returns the filled jobs; raises if a parent has no parsed response. Deterministic. Colab-safe:
+    s1a.delex is imported only for variant f."""
+    out_dir = Path(out_dir)
+    jobs = load_jobs(out_dir)
+    by_name = {j["job"]: j for j in jobs}
+    mine = [j for j in jobs if j.get("carry_from") and j.get("round") == round]
+    missing = sorted({n for j in mine for n in j["carry_from"] if load_obj(out_dir, by_name[n]) is None})
+    if missing:  # checked before writing anything, so a round is never half filled
+        raise ValueError(f"round {round}: carry-over parents without a parsed response (delete their "
+                         f"responses/<job>.jsonl and rerun them): {missing}")
+    mp = None
+    done = []
+    for j in mine:
+        text = _fill_text((out_dir / j["prompt"]).with_suffix(".tmpl.txt").read_text(encoding="utf-8"),
+                          render_carry(_carry_attrs(out_dir, [by_name[n] for n in j["carry_from"]])))
+        if j["variant"] == "f":
+            from . import delex
+            mp = json.loads((out_dir / "delex_map.json").read_text(encoding="utf-8")) if mp is None else mp
+            text = delex.apply(text, mp)
+        (out_dir / j["prompt"]).write_text(text, encoding="utf-8", newline="\n")
+        done.append(j)
+    return done
+
+
+def decisions_e(out_dir, ent, var, gate_dir):
+    """(table, stats) of a wf_v3.3 variant: var e | e1 | e2 | f. Vote over the orders (seeds 0-2; f: seed 0 only) of
+    its entity jobs in out_dir (e1: group 0 from the `e` jobs, groups >= 1 from `e1`), then apply_gate with the gate
+    and split responses of gate_dir (the v3.2 folder; f has no gate). stats: agree_mean, agree_full_share, ties, cue
+    (attribute_cue clusters), gate_failed, split."""
+    seeds = (0,) if var == "f" else E_SEEDS
+    tabs = [decisions_b(out_dir, ent, s, split_results={}, variant=var, group0="e" if var == "e1" else None)
+            for s in seeds]
+    dec, stats = vote(tabs)
+    if var != "f":
+        gate = _by_cluster(gate_dir, ent, "gate")
+        dec = apply_gate(dec, gate, _split_results(gate_dir, ent))
+        stats["gate_failed"] = sum(1 for g in gate.values() if g.get("coherent") is False)
+    else:
+        stats["gate_failed"] = 0
+    stats["cue"] = int((dec["action"] == "attribute_cue").sum())
+    stats["split"] = int((dec["action"] == "split").sum())
+    dec["variant"], dec["run_tag"] = var, f"s0-{len(seeds) - 1}"
+    return dec, stats
 
 
 # ---------------------------------------------------------------- stage 2

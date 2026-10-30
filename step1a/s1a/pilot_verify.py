@@ -19,9 +19,10 @@ from . import spans as SP
 from . import step2 as S2
 from .units import turn_of
 
-ACTIONS = ("keep", "merge", "split", "not_attribute", "unsure")
-MARKED = ("not_attribute", "unsure")
+ACTIONS = ("keep", "merge", "split", "not_attribute", "unsure", "attribute_cue")
+MARKED = ("not_attribute", "unsure", "attribute_cue")  # clusters that are not a column
 NOT_ATTRIBUTE_KEY = "not attribute"  # norm_name("not_attribute")
+ATTRIBUTE_CUE_KEY = "attribute cue"  # norm_name("attribute_cue")
 J_MIN = 0.2
 DEC_COLS = ["variant", "run_tag", "cluster_id", "name", "description", "value_type", "action",
             "merge_with", "split", "placement", "evidence"]
@@ -105,9 +106,9 @@ def decisions_from_v2(obj, cluster_ids, variant, run_tag, split_results=None, re
     """v1-style decision table (DEC_COLS) from a v2 object {attributes, clusters} (PILOT_V31_CONTRACT adapter).
 
     Clusters sharing an attribute -> merge (merge_with = the others); a single one -> keep; "not_attribute" ->
-    not_attribute; a name not in the list -> unsure; omitted clusters get action "". A cluster that is `mixed`
+    not_attribute; "attribute_cue" -> attribute_cue (a question about an attribute, not a column); a name not in the list -> unsure; omitted clusters get action "". A cluster that is `mixed`
     (any cluster when require_mixed is False) and has a split result {is_mixed: true, parts: [{name, examples}]}
-    -> split with those parts. Not-attribute and unsure rows carry no name."""
+    -> split with those parts. Not-attribute, attribute-cue and unsure rows carry no name."""
     obj = obj if isinstance(obj, dict) else {}
     attrs = {norm_name(a.get("name")): a for a in obj.get("attributes") or [] if isinstance(a, dict) and a.get("name")}
     by = {str(c.get("cluster_id", "")): c for c in obj.get("clusters") or [] if isinstance(c, dict)}
@@ -123,6 +124,8 @@ def decisions_from_v2(obj, cluster_ids, variant, run_tag, split_results=None, re
                  and any(str(e).startswith(f"{cid}:") for e in p.get("examples") or [])]  # parts with no own example are dropped
         if key == NOT_ATTRIBUTE_KEY:
             kind[cid] = "not_attribute"
+        elif key == ATTRIBUTE_CUE_KEY:
+            kind[cid] = "attribute_cue"
         elif key not in attrs:
             kind[cid] = "unsure"
         elif s.get("is_mixed") and len(parts) >= 2 and (c.get("mixed") or not require_mixed):
@@ -131,7 +134,7 @@ def decisions_from_v2(obj, cluster_ids, variant, run_tag, split_results=None, re
             kind[cid] = key
     groups = {}
     for cid, k in kind.items():
-        if k not in ("not_attribute", "unsure", "split"):
+        if k not in MARKED + ("split",):
             groups.setdefault(k, []).append(cid)
     rows = []
     for cid in cluster_ids:
@@ -140,7 +143,7 @@ def decisions_from_v2(obj, cluster_ids, variant, run_tag, split_results=None, re
                          **{col: "" for col in DEC_COLS[3:] if col != "action"}})
             continue
         c, k = by[cid], kind[cid]
-        a = attrs.get(norm_name(c.get("attribute"))) if k not in ("not_attribute", "unsure") else None
+        a = attrs.get(norm_name(c.get("attribute"))) if k not in MARKED else None
         others = [o for o in groups.get(k, []) if o != cid]
         action = k if k in MARKED or k == "split" else ("merge" if others else "keep")
         rows.append({"variant": variant, "run_tag": run_tag, "cluster_id": cid,
@@ -173,8 +176,33 @@ def split_parts(dec_row, ex_mention, ids_idx, x):
     return parts if len(parts) >= 2 else []
 
 
-def final_attributes(dec, mentions, ids, x, examples, entity):
+def left_word_map(mentions, docs=None):
+    """{mention_id: left word} for the P4 cue spread: the mentions table's `left_word` column when it has one, else
+    computed with mentions.left_word from docs {dialogue_id: Doc} (columns dialogue_id, turn, char_start)."""
+    ids = mentions["mention_id"].astype(int)
+    if "left_word" in mentions.columns:
+        return dict(zip(ids, mentions["left_word"].astype(str)))
+    from . import mentions as MN  # heavy import, only for the fallback
+    return {int(i): MN.left_word(docs[d], int(t), int(s)) for i, d, t, s in
+            zip(ids, mentions["dialogue_id"], mentions["turn"], mentions["char_start"])}
+
+
+def _cue_parts(ms, near, ps, ex_mention, left_words):
+    """Part index of each mention of a split cluster: the one part whose cue set (left words of its example
+    mentions) holds the mention's left word, else the nearest centroid (`near`)."""
+    cues = [{left_words.get(ex_mention[e], "") for e in p[2] if e in ex_mention} - {""} for p in ps]
+    out = []
+    for i, n in zip(ms, near):
+        hit = [k for k, c in enumerate(cues) if left_words.get(i, "") in c]
+        out.append(hit[0] if len(hit) == 1 else n)
+    return out
+
+
+def final_attributes(dec, mentions, ids, x, examples, entity, left_words=None):
     """(assign {mention_id: attr_id}, attrs DataFrame, parts {cluster_id: [(name, [ex_id])]}).
+
+    left_words {mention_id: word} (left_word_map) switches on the P4 cue spread of split clusters; None = nearest
+    centroid only.
 
     Merge groups are the transitive union of merge_with (ids outside the pilot entity are ignored; split
     clusters stay out of groups). A split part gets each mention of its cluster whose vector is nearest to
@@ -214,6 +242,8 @@ def final_attributes(dec, mentions, ids, x, examples, entity):
         cen = np.stack([p[1] for p in ps])
         ms = pm.loc[pm["cluster_id"] == c, "mention_id"].astype(int).tolist()
         near = (x[[ids_idx[i] for i in ms]] @ cen.T).argmax(axis=1)
+        if left_words is not None:
+            near = _cue_parts(ms, near, ps, ex_mention, left_words)
         for k, (name, _, _, into) in enumerate(ps):
             mine = [i for i, n in zip(ms, near) if n == k]
             target = attr_of.get(into[0]) if into else None

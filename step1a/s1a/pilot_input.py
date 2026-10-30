@@ -120,10 +120,31 @@ def find_pilot_entity(mentions, gold_entity="train"):
 
 
 # ------------------------------------------------------------------ examples
-def select_examples(g, k=K_EXAMPLES, seed=0):
+# wf_v3.3 P3: words left of a span that mark where something starts / ends (used only for example choice)
+CUE_ROLES = {"start": frozenset({"from", "leaving", "leave", "depart", "departing", "departs", "after"}),
+             "end": frozenset({"to", "arrive", "arriving", "arrives", "into", "by", "before"})}
+
+
+def _role_first(by_val, pools, roles, words):
+    """(did, mid) of the best mention whose left word is in `words`: the most frequent value among such
+    mentions (ties by value), its first such mention in the pool order; removed from the pool. None if none."""
+    cnt = Counter()
+    for v, items in by_val.items():
+        cnt[v] = sum(1 for _, mid in items if roles.get(mid, "") in words)
+    best = [v for v in cnt if cnt[v] > 0]
+    if not best:
+        return None
+    v = min(best, key=lambda x: (-cnt[x], x))
+    i = next(j for j, (_, mid) in enumerate(pools[v]) if roles.get(mid, "") in words)
+    return pools[v].pop(i)
+
+
+def select_examples(g, k=K_EXAMPLES, seed=0, roles=None):
     """Mention ids of one cluster's mentions `g` (rows of mentions.csv): round-robin over the distinct
     values (most frequent first), within a value a mention from a dialogue not yet used when possible.
-    Fewer than k when the cluster is smaller; never k copies of one value when more values exist."""
+    Fewer than k when the cluster is smaller; never k copies of one value when more values exist.
+    `roles` {mention_id: left word}: when the cluster has both start and end mentions (CUE_ROLES), the
+    first two picks are one of each (most frequent value of each role); the rest is the round-robin."""
     rng = np.random.default_rng([seed, zlib.crc32(str(g["cluster_id"].iloc[0]).encode())])
     by_val = {}
     for v, did, mid in zip(g["norm_value"], g["dialogue_id"], g["mention_id"]):
@@ -134,6 +155,13 @@ def select_examples(g, k=K_EXAMPLES, seed=0):
         items = by_val[v]
         pools[v] = [items[i] for i in rng.permutation(len(items))]
     picked, used = [], set()
+    if roles and k >= 2:
+        has = {r: any(roles.get(int(m), "") in w for m in g["mention_id"]) for r, w in CUE_ROLES.items()}
+        if all(has.values()):
+            for r in ("start", "end"):
+                did, mid = _role_first(by_val, pools, roles, CUE_ROLES[r])
+                used.add(did)
+                picked.append(mid)
     while len(picked) < k and any(pools.values()):
         for v in order:
             if len(picked) >= k:
@@ -257,8 +285,8 @@ def _scaled_card(card):
     return float(np.clip((card - 1.0) / (CARD_SEP - 1.0) / 2.0, 0.0, 1.0))  # CARD_SEP -> 0.5
 
 
-def build_input(export, docs, entity, k=K_EXAMPLES, seed=0, graphs=None):
-    """The pilot input of `entity` from a loaded export and docs ({doc_id: Doc})."""
+def build_input(export, docs, entity, k=K_EXAMPLES, seed=0, graphs=None, roles=None):
+    """The pilot input of `entity` from a loaded export and docs ({doc_id: Doc}); `roles` as select_examples."""
     m = export.mentions
     m = m[m["cluster_id"] != ""]
     graphs = graphs or GR.build_graphs(export)
@@ -300,7 +328,7 @@ def build_input(export, docs, entity, k=K_EXAMPLES, seed=0, graphs=None):
     for c in cids:
         g = by_cluster[c]
         ci = ClusterInput(c, len(g), g["norm_value"].nunique(), c in low,
-                          [(f"{c}:{j}", mid) for j, mid in enumerate(select_examples(g, k, seed))])
+                          [(f"{c}:{j}", mid) for j, mid in enumerate(select_examples(g, k, seed, roles))])
         near = sorted((o for o in cids if o != c), key=lambda o: (-cosine(c, o), o))[:N_MERGE]
         for o in near:
             ci.merge.append(dict(other=o, pct=_percentile(pairs, cosine(c, o)),
@@ -556,6 +584,25 @@ Return ONLY one JSON object, nothing before or after it:
 {"unit_id": "a0", "reason": "str", "same_as": "<candidate name or none>"}"""
 
 
+CUE_LINE = ('Use "attribute_cue" for clusters whose examples are questions or requests about an attribute rather '
+            'than its values (what day, how many tickets, which area); it means an attribute exists but this '
+            'cluster is not a column.')
+NOISE_RULE = ("If fewer than half of a cluster's examples are real values that a database would store, choose "
+              '"not_attribute" (or "attribute_cue" for questions).')
+CARRY_PLACEHOLDER = "{{CARRY_OVER}}"
+_NOISE_SENT = ('Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,\n'
+               '   and values that a database would not store.')
+_EX_TAIL = '"mixed": false, "placement": "current entity E9"}]}'
+assert _NOISE_SENT in INSTRUCTION_V3 and INSTRUCTION_V3.count(_EX_TAIL) == 1
+INSTRUCTION_V33 = (INSTRUCTION_V3
+                   .replace(_NOISE_SENT, 'Use "not_attribute" for noise. ' + CUE_LINE + '\n   Noise is common: yes, ok, '
+                            'thanks, booking words,\n   and values that a database would not store. ' + NOISE_RULE)
+                   .replace(_EX_TAIL, '"mixed": false, "placement": "current entity E9"},\n'
+                            '              {"cluster_id": "E9#2", "attribute": "attribute_cue", '
+                            '"evidence": "[[what day]] do you want?",\n'
+                            '               "mixed": false, "placement": "current entity E9"}]}'))
+
+
 def _cluster_number(cid):
     return int(cid.rsplit("#", 1)[1])
 
@@ -609,19 +656,23 @@ def nbhd_target(n_group):
     return max(1, round(n_group / 3))
 
 
-def render_v3(inp, export, docs, group_ids, outside, target, order_seed=None):
+def render_v3(inp, export, docs, group_ids, outside, target, order_seed=None, carry=None, cue_rule=False):
     """Prompt text of output format v3 for one neighbourhood: only the clusters `group_ids` (in that order, or
-    shuffled with `order_seed`), the `outside` lines [(cluster_id, values)] and the attribute-count target."""
+    shuffled with `order_seed`), the `outside` lines [(cluster_id, values)] and the attribute-count target.
+    wf_v3.3: `cue_rule` True uses INSTRUCTION_V33; `carry` (a text block, or CARRY_PLACEHOLDER) goes after the
+    outside block and before the clusters. The defaults give the v3.2 prompt."""
     by_id = {c.cluster_id: c for c in inp.clusters}
     cl = [by_id[c] for c in group_ids]
     if order_seed is not None:
         cl = [cl[i] for i in np.random.default_rng(order_seed).permutation(len(cl))]
-    parts = [INSTRUCTION_V3, f"Entity {inp.entity}: {len(cl)} clusters.",
+    parts = [INSTRUCTION_V33 if cue_rule else INSTRUCTION_V3, f"Entity {inp.entity}: {len(cl)} clusters.",
              f"Aim for about {target} attributes (between {target / 2:g} and {target * 3 / 2:g}).",
              _render_options(inp)]
     if outside:
         parts.append("\n".join(f"Elsewhere in this entity (not yours to assign): {c}: {', '.join(vs)}"
                                for c, vs in outside))
+    if carry is not None:
+        parts.append(carry)
     parts += ["\n".join(_cluster_block(export, docs, ci)) for ci in cl]
     parts.append("Return the JSON object now.")
     return "\n\n".join(parts) + "\n"

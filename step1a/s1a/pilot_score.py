@@ -360,6 +360,21 @@ def _placement_checks(dec, ctx):
     return {"place_right": _ratio(ok, den)}
 
 
+def placement_baseline(dec, ctx):
+    """(ratio, n) of `_placement_checks` when every given placement is replaced by "current entity <ctx.entity>":
+    what the same rows score if the model always answered "stay". Rows without a placement stay empty, so n equals
+    the place_right n."""
+    stay = dec.assign(placement=[f"current entity {ctx.entity}" if p else "" for p in dec["placement"]])
+    return _placement_checks(stay, ctx)["place_right"]
+
+
+def placement_current(dec, ctx):
+    """(share, n): of the rows with an action and a placement, the share whose placement resolves (placement_entity)
+    to ctx.entity."""
+    ents = [placement_entity(p, ctx.entity) for a, p in zip(dec["action"], dec["placement"]) if a != "" and p]
+    return _ratio(sum(e == ctx.entity for e in ents), len(ents))
+
+
 def _train_checks(relabelled, attrs, ctx):
     marked = set(attrs.loc[attrs["status"].isin(PV.MARKED), "attr_id"])
     after = ctx._recall_of(relabelled)
@@ -399,7 +414,9 @@ def score_file(dec, attrs, assign, parts, ctx, ver, names):
     relabelled = PV.relabel(ctx.mentions, assign)
     res = {}
     for part in (_merge_checks(attrs, ctx), _split_checks(dec, parts, ctx), _noise_checks(dec, ctx),
-                 _placement_checks(dec, ctx), _train_checks(relabelled, attrs, ctx),
+                 _placement_checks(dec, ctx),
+                 {"place_base": placement_baseline(dec, ctx), "place_current": placement_current(dec, ctx)},
+                 _train_checks(relabelled, attrs, ctx),
                  _suggestion_checks(dec, ctx), _verification_checks(ver, names)):
         res.update(part)
     out = {}
@@ -497,6 +514,97 @@ def render_scores(results, stab=None, entity="", note="", rubric=None, pair=("fu
     return "\n".join(lines) + "\n"
 
 
+# ------------------------------------------------------------------ wf_v3.3: role mix, noise sheet (PILOT_V33_CONTRACT.md)
+ROLE_COLS = ["entity", "cluster_id", "n", "departure", "destination", "leave_at", "arrive_by", "role_kind",
+             "major_role", "major_share"]
+ROLE_KEYS = ["departure", "destination", "leave_at", "arrive_by"]
+SHEET_COLS = ["ent", "entity", "cluster_id", "n", "top_values", "examples", "gold_label", "model_marked_by", "human"]
+HUMAN_LABELS = {"noise": "noise", "real": "valid_new", "mixed": "mixed"}
+SHEET_EXAMPLES = 6
+
+
+def _role_slot(gold_class):
+    """Role key (ROLE_KEYS) of a gold class such as "Train departure" / "Taxi arrive by", else None."""
+    low = gold_class.lower()
+    for key in ROLE_KEYS:
+        if low.endswith(key.replace("_", " ")):
+            return key
+    return None
+
+
+def role_table(mentions, entity):
+    """Role mix of the clusters of `entity` that hold at least one departure / destination / leave at / arrive by
+    mention (gold_attr; a multi-class mention counts for each class). n = cluster size; role_kind "place" or "time"
+    by the larger pair (tie: ""); major_role = the largest of the four (ties: ROLE_KEYS order); major_share = its
+    count over the sum of the four role counts."""
+    pm = mentions[(mentions["entity"] == entity) & (mentions["cluster_id"] != "")]
+    rows = []
+    for cid, g in pm.groupby("cluster_id", sort=True):
+        cnt = Counter(k for ga in g["gold_attr"] for c in _classes(ga) if (k := _role_slot(c)))
+        total = sum(cnt.values())
+        if not total:
+            continue
+        place, time = cnt["departure"] + cnt["destination"], cnt["leave_at"] + cnt["arrive_by"]
+        major = max(ROLE_KEYS, key=lambda k: cnt[k])
+        rows.append({"entity": entity, "cluster_id": cid, "n": len(g), **{k: cnt[k] for k in ROLE_KEYS},
+                     "role_kind": "place" if place > time else "time" if time > place else "", "major_role": major,
+                     "major_share": cnt[major] / total})
+    return pd.DataFrame(rows, columns=ROLE_COLS)
+
+
+def _default_examples(mentions, docs, entity, cid):
+    from . import pilot_input as PIN
+    return PIN.cluster_example_lines(SimpleNamespace(mentions=mentions), docs, entity, cid, SHEET_EXAMPLES, 0, "n")[1]
+
+
+def noise_sheet(mentions, labels, decisions_list, docs, example_fn=None):
+    """Hand-labelling sheet (SHEET_COLS), one row per cluster that is gold noise (labels.csv) or marked (PV.MARKED
+    actions) in any of the decision tables (each with variant, run_tag, cluster_id, action, optional ent).
+    model_marked_by: "<variant> <run_tag>" of every table that marked it, sorted, ";"-joined. examples: 6 lines
+    joined " || ", from example_fn(docs, entity, cluster_id) -> list of lines (default: PIN.cluster_example_lines).
+    `human` is left empty."""
+    example_fn = example_fn or (lambda d, e, c: _default_examples(mentions, d, e, c))
+    marked, ent_of = {}, {}
+    for dec in decisions_list:
+        for _, r in dec.iterrows():
+            ent_of.setdefault(r["cluster_id"], r["ent"] if "ent" in dec.columns else "")
+            if r["action"] in PV.MARKED:
+                marked.setdefault(r["cluster_id"], set()).add(f"{r['variant']} {r['run_tag']}")
+    label = dict(zip(labels["cluster_id"], labels["label"]))
+    cids = sorted(set(marked) | {c for c, v in label.items() if v == "noise"})
+    pm = mentions[mentions["cluster_id"].isin(cids)]
+    rows = []
+    for cid, g in pm.groupby("cluster_id", sort=True):
+        entity = g["entity"].iloc[0]
+        top = [v for v, _ in Counter(g["norm_value"]).most_common(5)]
+        rows.append({"ent": ent_of.get(cid, ""), "entity": entity, "cluster_id": cid, "n": len(g),
+                     "top_values": "|".join(top), "examples": " || ".join(example_fn(docs, entity, cid)),
+                     "gold_label": label.get(cid, ""), "model_marked_by": ";".join(sorted(marked.get(cid, ()))),
+                     "human": ""})
+    return pd.DataFrame(rows, columns=SHEET_COLS)
+
+
+def apply_human_labels(labels, sheet):
+    """labels with the filled `human` rows of the sheet applied (blank rows ignored): noise -> noise; real ->
+    valid_new if the label was noise, else unchanged; mixed -> mixed. Changed rows get label_by "human"."""
+    out = labels.copy()
+    pos = {c: i for i, c in enumerate(out["cluster_id"])}
+    for _, r in sheet.iterrows():
+        h = str(r["human"]).strip().lower()
+        if not h:
+            continue
+        if h not in HUMAN_LABELS:
+            raise ValueError(f"{r['cluster_id']}: human label {h!r} is not one of {sorted(HUMAN_LABELS)}")
+        i = pos[r["cluster_id"]]
+        old = out["label"].iloc[i]
+        new = HUMAN_LABELS[h] if h != "real" or old == "noise" else old
+        if new != old:
+            out.iloc[i, out.columns.get_loc("label")] = new
+            if "label_by" in out.columns:
+                out.iloc[i, out.columns.get_loc("label_by")] = "human"
+    return out
+
+
 # ------------------------------------------------------------------ wf_v3.2: token table (PILOT_V32_CONTRACT.md)
 TOKEN_COLS = ["ent", "variant", "calls", "prompt_tokens", "output_tokens", "total", "x_A", "recall",
               "recall_per_100k", "estimated"]
@@ -521,9 +629,17 @@ def token_row(ent, variant, job, resp_row, prompt_text):
 def variant_jobs(jobs, variant, gate_failed=()):
     """The jobs one variant pays for. `jobs` is one entity's manifest jobs (kind/run_tag as in the contract):
     A = v2 r1 entity job + its split jobs (r1); B = seed-0 nbhd jobs + all split jobs; C = nbhd jobs of seeds 0-2 +
-    all split jobs; D = nbhd 0-2 + noise + gate + split jobs of the gate_failed cluster ids + reconcile."""
+    all split jobs; D = nbhd 0-2 + noise + gate + split jobs of the gate_failed cluster ids + reconcile.
+    wf_v3.3 (jobs = v3.3 entity jobs + the v3.2 gate and split jobs): E = `e` jobs + gate + split jobs of gate_failed;
+    E1 = `e` jobs of nbhd 0 + `e1` jobs + gate + failed splits; E2 = `e2` jobs + gate + failed splits; F = `f` jobs."""
     def entity(j, tags):
         return j["kind"] == "entity" and j["variant"] == ("v2" if variant == "A" else "nbhd") and j["run_tag"] in tags
+
+    def gate_split(j):
+        return j["kind"] == "gate" or (j["kind"] == "split" and j["cluster_id"] in set(gate_failed))
+
+    def ent_job(j, name, nbhd0=False):
+        return j["kind"] == "entity" and j["variant"] == name and (not nbhd0 or j.get("nbhd") == 0)
     if variant == "A":
         return [j for j in jobs if entity(j, ("r1",)) or (j["kind"] == "split" and j["run_tag"] == "r1")]
     if variant == "B":
@@ -533,6 +649,14 @@ def variant_jobs(jobs, variant, gate_failed=()):
     if variant == "D":
         return [j for j in jobs if entity(j, ("s0", "s1", "s2")) or j["kind"] in ("noise", "gate", "reconcile")
                 or (j["kind"] == "split" and j["cluster_id"] in set(gate_failed))]
+    if variant == "E":
+        return [j for j in jobs if ent_job(j, "e") or gate_split(j)]
+    if variant == "E1":
+        return [j for j in jobs if ent_job(j, "e", nbhd0=True) or ent_job(j, "e1") or gate_split(j)]
+    if variant == "E2":
+        return [j for j in jobs if ent_job(j, "e2") or gate_split(j)]
+    if variant == "F":
+        return [j for j in jobs if ent_job(j, "f")]
     raise ValueError(f"unknown variant {variant!r}")
 
 

@@ -1,0 +1,105 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+Each cluster object starts with "reason": at most 25 words on why the cluster belongs to that attribute, written before "attribute".
+
+Entity E1: 9 clusters.
+
+Aim for about 3 attributes (between 1.5 and 4.5).
+
+Placement options (copy one exactly into "placement"):
+- current entity E1: the attribute belongs to E1
+- sub-entity of E1: a part of E1 that has attributes of its own
+- other entity E0: the attribute belongs to E0
+- other entity E2: the attribute belongs to E2
+- other entity E3: the attribute belongs to E3
+- other entity E4: the attribute belongs to E4
+- relationship(E1, E0): links E1 and E0
+- relationship(E1, E2): links E1 and E2
+- relationship(E1, E3): links E1 and E3
+- relationship(E1, E4): links E1 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+Elsewhere in this entity (not yours to assign): E1#15: station, airport, local restaurant
+Elsewhere in this entity (not yours to assign): E1#14: 1 child, 1 train, 12
+Elsewhere in this entity (not yours to assign): E1#11: leicester
+
+### E1#27  (mentions 4, distinct values 1)
+Examples:
+- E1#27:0 [user] previous turn, system: Sure. Where are you departing from? | turn: I'm leaving from [[Norwich]] and would like to leave after 12:15, please.
+- E1#27:1 [user] turn: Could you help me find a train to [[norwich]]?
+- E1#27:2 [user] previous turn, system: Hi there, let's start with the train arrival, where would you be travelling from? | turn: I am looking for a train that will depart from [[Norwich]] on Sunday
+- E1#27:3 [user] previous turn, system: There are twelve possible trains leaving after 12:15. Should I book you on one of them? | turn: I am sorry. I need the train to leave after 21:15 from [[Norwich]]. Are there any available?
+
+### E1#0  (mentions 11, distinct values 2)
+Examples:
+- E1#0:0 [system] previous turn, user: I'm staying for 2 days and it's just myself. What train can I take to depart from the stansted airport that leaves at 19:30? | turn: I only have trains that leave at 20:24 and later on a Friday from [[Stansted airport]]. Will this time and day work for you?
+- E1#0:1 [user] turn: Hello, I need to take a train to [[Stansted airport]], arriving by 20:30.
+- E1#0:2 [system] previous turn, user: Could you confirm the travel time and price please? | turn: Train TR5921 leaves [[Stansted Airport]] at 18:24 and arrives in Cambridge at 18:52 at a price of 10.10 pounds per ticket. Would you like to book this?
+- E1#0:3 [user] previous turn, system: The earliest leaves at 13:40 and the trains depart every hour through 23:40. If you'd like to choose one I can book it for you. | turn: That would be great. How much would it cost to travel to [[stansted]] from Cambridge?
+- E1#0:4 [user] previous turn, system: And where will you be heading to? | turn: I am going to [[Stansted Airport]].
+- E1#0:5 [user] previous turn, system: The postcode is cb21sj and the phone number is 01223359506. | turn: I also need a train from Cambridge to [[Stansted Airport]]. Can you please look that up for me.
+- E1#0:6 [user] previous turn, system: On what day do you wish to depart? | turn: I need to leave cambridge on saturday arrive at [[stansted airport]] by 20:30
+- E1#0:7 [user] previous turn, system: Sure, the phone number is 01223355017. How many days will you be staying, what day do you need to arrive, and how many people will be staying? | turn: I'm staying for 2 days and it's just myself. What train can I take to depart from the [[stansted airport]] that leaves at 19:30?
+
+### E1#6  (mentions 2, distinct values 1)
+Examples:
+- E1#6:0 [user] previous turn, system: Most are free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50 pound fee, and Trinity has a 1 pound fee. | turn: I need a train that leaves at 20:45 from [[stevenage]] to cambridge
+- E1#6:1 [user] previous turn, system: TR9448 leaves at 05:54 and arrives at 06:43. The travel time is 49 minutes. | turn: I've mixed up my locations. I actually need a train that departs from Cambridge and goes to [[Stevenage]].
+
+### E1#23  (mentions 2, distinct values 2)
+Examples:
+- E1#23:0 [user] previous turn, system: A guesthouse has already been booked for you. Is there anything else I can help you with today? | turn: I also need a train from [[Bishops Stafford]] to Cambridge.
+- E1#23:1 [user] previous turn, system: I could do that for you. Can you give me a time ? | turn: Yes, we will be coming from [[bishops stortford]] on Monday. I would like to leave after 19:30.
+
+### E1#19  (mentions 4, distinct values 1)
+Examples:
+- E1#19:0 [user] turn: I need to find a train that leaves [[peterborough]] on friday.
+- E1#19:1 [user] previous turn, system: You came to the right place! Where would you like to go? | turn: I'd like to go to Cambridge and will be departing from [[Peterborough]].
+- E1#19:2 [system] previous turn, user: I would like to leave on Tuesday. | turn: The TR0017 train leaves [[Peterborough]] at 16:48. Would you like me to book you a seat on it?
+- E1#19:3 [user] previous turn, system: Can you please give me your departure location? | turn: I am leaving from [[Peterborough]].
+
+### E1#24  (mentions 2, distinct values 1)
+Examples:
+- E1#24:0 [user] previous turn, system: Your table was booked. Your reference number is 42XEDGDF. Is there anything else I can help you with? | turn: I also need a Friday train to [[Broxbourne]].
+- E1#24:1 [user] previous turn, system: OK, what are your departure and arrival stations, and what time do you want to travel? | turn: I'd like to go to Cambridge via [[Broxbourne]]. I'd like to leave on Thursday and arrive no later than 12:00.
+
+### E1#28  (mentions 2, distinct values 1)
+Examples:
+- E1#28:0 [system] previous turn, user: I would like to depart from birmingham new street after 14:45. | turn: There are 9 trains that depart from [[Birmingham new street]] to Cambridge on Tuesday after 14:45. The earliest is 15:40, does that work?
+- E1#28:1 [user] previous turn, system: There are several trains departing for Cambridge on Tuesday. One train departs every hour starting at 06:08 | turn: I would like to depart from [[birmingham new street]] after 14:45.
+
+### E1#25  (mentions 2, distinct values 1)
+Examples:
+- E1#25:0 [user] previous turn, system: Booking was successful. Reference number is : FC2BDIC9. | turn: I also need a train on Wednesday, leaving from [[Kings Lynn]].
+- E1#25:1 [user] previous turn, system: Sheep's Green and Lammas Land Park Fen Causeway is located at Fen Causeway, Newnham road, postal code cb322ad. | turn: Thanks! I'm also looking for a train from Cambridge to [[Kings Lynn]].
+
+### E1#21  (mentions 4, distinct values 1)
+Examples:
+- E1#21:0 [user] turn: I am looking for a train departung after 8:30 from [[Ely]].
+- E1#21:1 [user] turn: I'm looking to book a train that goes to [[ely]] and leaves on sunday please.
+- E1#21:2 [system] previous turn, user: The train should go to Cambridge on Tuesday | turn: TR4669 leaves [[ely]] at 09:35 and arrives in Cambridge at 09:52. How does that sound?
+- E1#21:3 [system] previous turn, user: I'm looking to book a train that goes to ely and leaves on sunday please. | turn: There are 10 trains leaving from Cambridge to [[Ely]]. Is there a particular departure or arrival time you would prefer?
+
+Return the JSON object now.

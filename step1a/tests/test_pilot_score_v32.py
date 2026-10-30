@@ -38,7 +38,7 @@ def test_variant_jobs_follow_the_contract():
         "ga_1", "ga_2", "n_s0", "n_s1", "n_s2", "no_1", "rc_a0", "sp_2"]
     assert not [j for j in PS.variant_jobs(JOBS32, "D") if j["kind"] == "split"]
     with pytest.raises(ValueError):
-        PS.variant_jobs(JOBS32, "E")
+        PS.variant_jobs(JOBS32, "Z")
 
 
 def test_token_row_measured_and_estimated():
