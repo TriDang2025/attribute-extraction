@@ -11,6 +11,7 @@ from dataclasses import replace
 import pandas as pd
 
 from . import pilot_score as PS
+from . import pilot_verify as PV
 from .labels import _classes
 
 PURE = 0.6                  # purity needed to call a group a found attribute (same as recall.recall_table strict)
@@ -18,7 +19,7 @@ COVERAGE = {"old": 0.0, "cov0": 0.0, "cov10": 0.10, "cov25": 0.25}
 NOISE_MAX = {"old": 0.20, "n10": 0.10, "n20": 0.20, "n30": 0.30}  # "old" has no noise rule; n20 is used
 NOISE_CLASSES = ("noise", "cue")
 FOUND_COLS = ["attr", "found", "best_group", "purity", "coverage", "case"]
-MERGE_COLS = ["attr_id", "name", "members", "member_attrs", "member_roles", "noise_share", "right", "reason"]
+MERGE_COLS = ["attr_id", "name", "members", "member_attrs", "member_roles", "noise_share", "right", "reason", "judged"]
 FOUND_RULES = ("cov0", "cov10", "cov25")
 MERGE_RULES = ("n10", "n20", "n30")
 Q5_VARIANTS = ("A r1", "B s0", "C s012", "D s012")
@@ -71,13 +72,19 @@ def _top(counter):
 
 def found(ed, label, rules, extra):
     """One row per gold attr of the entity (ctx.train): found = some group has purity >= 0.6 and coverage >= the rule's
-    threshold (old = cov0). best_group is that group, else the group with the highest purity. A split part is a group."""
+    threshold (old = cov0). best_group is that group, else the group with the highest purity. A split part is a group.
+    marked_found=skip: a group whose status (its decision) is in PV.MARKED is no candidate; the coverage denominator
+    still holds all of the attr's clustered mentions."""
     thr = COVERAGE[rules.found]
     m = _mentions(ed, label, rules, extra)
     m = m[m["group"] != ""]
+    total = Counter(a for golds in m["golds"] for a in set(golds))  # every clustered mention of the attr, marked or not
+    if rules.marked_found == "skip":
+        attrs = ed.variants[label].attrs
+        if "status" in attrs.columns:
+            m = m[~m["group"].isin(set(attrs.loc[attrs["status"].isin(PV.MARKED), "attr_id"]))]
     size = m[m["counted"]].groupby("group").size().to_dict()
     n_attr = Counter((g, a) for g, golds in zip(m["group"], m["golds"]) for a in set(golds))
-    total = Counter(a for golds in m["golds"] for a in set(golds))
     rows = []
     for attr in ed.ctx_r.train:
         cands = [(g, n, n / size[g], n / total[attr]) for (g, a), n in n_attr.items() if a == attr and size.get(g)]
@@ -105,30 +112,56 @@ def _merge_reason(tops, slots, pairs, noise, noise_max, no_gold=False):
     return "noise" if noise >= noise_max else ""
 
 
+def _unknown_clusters(ed, rules, extra):
+    """Cluster ids labelled unknown (no counted mention) when rules.unknown == "out", else the empty set."""
+    if rules.unknown != "out":
+        return set()
+    if "unknown_clusters" in extra:  # tests
+        return set(extra["unknown_clusters"])
+    from . import rules_labels
+    cl = rules_labels.cluster_labels(ed, rules, extra)
+    return set(cl.loc[cl["label"] == "unknown", "cluster_id"])
+
+
 def merges(ed, label, rules, extra):
     """One row per attribute with mentions from >= 2 clusters (a reconcile part joined to an attribute counts as a
     member cluster). Right = same top gold attr in every member (a member with no gold mention makes it wrong:
-    "no_gold_member"), no role-pair mix, and noise share (noise + cue over counted mentions) below the rule's limit."""
+    "no_gold_member"), no role-pair mix, and noise share (noise + cue over counted mentions) below the rule's limit.
+    unknown=out: unknown clusters are dropped from the members first. merge_gold=min2: members with no gold top attr
+    are dropped too (same-attr / same-role judging only; the noise share still counts every counted member), and the
+    merge is judged only when >= 2 members remain. judged=False rows (fewer than 2 members
+    left) carry right=False, reason "unjudged" and are not counted by score_rules."""
     noise_max = NOISE_MAX[rules.merge]
     pairs = _pairs(ed, rules, extra)
     name = ed.variants[label].attrs.set_index("attr_id")["name"].to_dict()
     m = _mentions(ed, label, rules, extra)
     m = m[m["group"] != ""]
+    unknown = _unknown_clusters(ed, rules, extra)
     rows = []
     for gid, g in m.groupby("group", sort=True):
         members = sorted(g["cluster_id"].unique())
         if len(members) < 2:
             continue
+        g = g[~g["cluster_id"].isin(unknown)] if unknown.intersection(members) else g
+        counted = g[g["counted"]]  # noise share over every counted member, also those min2 drops below
         tops = {c: _top(Counter(a for golds in s["golds"] for a in golds)) for c, s in g.groupby("cluster_id")}
+        if rules.merge_gold == "min2":
+            g = g[g["cluster_id"].isin({c for c, t in tops.items() if t})]
+            tops = {c: t for c, t in tops.items() if t}
+        if len(tops) < 2 and (unknown or rules.merge_gold == "min2"):
+            rows.append({"attr_id": gid, "name": name.get(gid, ""), "members": ";".join(members), "member_attrs": "",
+                         "member_roles": "", "noise_share": float("nan"), "right": False, "reason": "unjudged",
+                         "judged": False})
+            continue
+        members = sorted(tops)
         slots = {a: PS._slot(a, ed.gold_ents) for a in tops.values() if a}
-        counted = g[g["counted"]]
         noise = counted["cls"].isin(NOISE_CLASSES).mean() if len(counted) else 0.0
         reason = _merge_reason({t for t in tops.values() if t}, slots, pairs, noise, noise_max,
                                no_gold=any(t == "" for t in tops.values()))
         rows.append({"attr_id": gid, "name": name.get(gid, ""), "members": ";".join(members),
                      "member_attrs": ";".join(tops[c] for c in members),
                      "member_roles": ";".join(slots.get(tops[c], "") for c in members),
-                     "noise_share": float(noise), "right": reason == "", "reason": reason})
+                     "noise_share": float(noise), "right": reason == "", "reason": reason, "judged": True})
     return pd.DataFrame(rows, columns=MERGE_COLS)
 
 

@@ -22,7 +22,6 @@ from s1a import score_rules as SR  # noqa: E402
 from s1a.score_rules import NEW_COLS, OLD_COLS, Rules  # noqa: E402
 
 COLS = ["setting", "ent", "variant"] + OLD_COLS + NEW_COLS
-SWEEP_SHOWN = ["recall", "noise_marked_v", "merge_prec", "place_acc", "name_acc"]
 
 
 def slug(setting):
@@ -36,24 +35,62 @@ def score_setting(setting, data, shared, extra):
     return pd.DataFrame(rows, columns=COLS)
 
 
-def _recall_cell(r):
-    """"n/m" when found_n and gold_n are numbers (stage 2 present), else the recall value."""
-    if isinstance(r["found_n"], str) or isinstance(r["gold_n"], str):
-        return SR.fmt(r["recall_v"])
-    return f"{int(r['found_n'])}/{int(r['gold_n'])}"
+SWEEP_SHOWN = ["found", "noise marked", "merge", "place", "names", "unknown_n", "merge_unjudged", "wrong_entity_n"]
+POOLED_TARGET = 0.70
+
+
+def _count_cell(r, k, n, old_value, rule_names):
+    """fmt_count(k, n) for a measure from the stage-2 code; the decimal old measure (its count is not the one scored)
+    when every rule that drives it is "old"; "n/a" when stage 2 is missing. Found and merge always have counts."""
+    rules = Rules.parse(r["setting"])
+    if all(getattr(rules, x) == "old" for x in rule_names):
+        return SR.fmt(old_value)
+    return SR.fmt_count(k, n)
+
+
+def _count(share, n):
+    """Integer count behind a share of n (rounded); the value as it is when either is missing."""
+    try:
+        return round(float(share) * float(n)) if not pd.isna(float(share)) else float("nan")
+    except (TypeError, ValueError):
+        return SR.NA
+
+
+def sweep_cells(r):
+    """The SWEEP_SHOWN cells of one score row; every proportion is "k/n (0.xxx)" (SR.fmt_count)."""
+    return [
+        SR.fmt_count(r["found_n"], r["gold_n"]),
+        _count_cell(r, _count(r["noise_marked_v"], r["noise_n"]), r["noise_n"], r["noise_marked"],
+                    ("unlabeled", "noise_kind", "cluster_label")),
+        SR.fmt_count(r["merge_right"], r["merge_n"]),
+        _count_cell(r, _count(r["place_acc"], r["place_n"]), r["place_n"], r["place_right"], ("placement",)),
+        _count_cell(r, r["name_right"], r["name_base"], r["real_acc"], ("names",)),
+        SR.fmt(r["unknown_n"], True), SR.fmt(r["merge_unjudged"], True), SR.fmt(r["wrong_entity_n"], True)]
+
+
+def pooled_lines(df):
+    """Rows (setting, variant, text) of pooled noise over the entities: "pooled noise marked k/n (0.xx), target >= 0.70"."""
+    out = []
+    for (setting, variant), g in df.groupby(["setting", "variant"], sort=False):
+        pooled = SR.pooled_noise(g)
+        out.append((setting, variant, f"pooled noise marked {SR.fmt_count(pooled['marked'], pooled['n'])}, "
+                                      f"target >= {POOLED_TARGET:.2f}"))
+    return out
 
 
 def sweep_md(df):
-    """One markdown table per entity: a row per setting and variant, five shown measures."""
-    lines = ["# wf_v3.4 sweep", "", "recall = found_n/gold_n (recall_v when stage 2 is missing); rest as in score_v34.py.", ""]
+    """One markdown table per entity: a row per setting and variant (counts), then the pooled noise per variant."""
+    lines = ["# wf_v3.5 sweep", "", "Proportions are k/n (share). Old settings show the old decimal measure where it has "
+             "no count. Placement is reported but not used in any verdict.", ""]
     for ent, g in df.groupby("ent", sort=False):
         lines += [f"## {ent}", "", "| setting | variant | " + " | ".join(SWEEP_SHOWN) + " |",
                   "|---|---|" + "---|" * len(SWEEP_SHOWN)]
         for _, r in g.iterrows():
-            cells = [_recall_cell(r)] + [SR.fmt(r[c]) for c in SWEEP_SHOWN[1:]]
-            lines.append(f"| {r['setting']} | {r['variant']} | " + " | ".join(cells) + " |")
+            lines.append(f"| {r['setting']} | {r['variant']} | " + " | ".join(sweep_cells(r)) + " |")
         lines.append("")
-    return "\n".join(lines)
+    lines += ["## pooled noise (all entities)", "", "| setting | variant | pooled |", "|---|---|---|"]
+    lines += [f"| {s} | {v} | {t} |" for s, v, t in pooled_lines(df)]
+    return "\n".join(lines) + "\n"
 
 
 def read_summary(path):

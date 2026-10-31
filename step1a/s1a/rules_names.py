@@ -11,6 +11,7 @@ import importlib
 import json
 import re
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -31,6 +32,7 @@ SEEDS = ("C s0", "C s1", "C s2")
 ORDER_VARIANTS = ("C s0", "C s1", "C s2", "A r1", "A r2")
 GAIN_VARIANTS = ("B s0", "C s012", "D s012")
 GAIN_MIN = 2
+INVALID_RUNS_PATH = Path(__file__).resolve().parents[1] / "config" / "invalid_runs.json"
 OLD_CLUSTER_LABEL = {"gold": "real", "valid_new": "real", "noise": "noise"}
 _DURATION = re.compile(r"\d+\s*(?:minutes?|mins?|hours?|hrs?)", re.I)
 TOP_N = 5
@@ -147,27 +149,48 @@ def _rated_by_key(rated):
     return out
 
 
+def _level_rows(ed, label):
+    """[(row at the level, row at L1)] of one variant label, paired by attr_id. A level copy of the data
+    (v34_data.with_level, ed.mentions_l1 set) has its majority gold attr at the level; the rated sheet was keyed on the
+    L1 majority, so the L1 row is the rating key. Without a level copy both rows are the same."""
+    rows = _variant_rows(ed, label, {})
+    if getattr(ed, "mentions_l1", None) is None:
+        return [(r, r) for r in rows]
+    l1 = {r["attr_id"]: r for r in _variant_rows(replace(ed, mentions=ed.mentions_l1, mentions_l1=None), label, {})}
+    return [(r, l1[r["attr_id"]]) for r in rows]
+
+
 def name_scores(ed, label, rules, extra):
-    """{name_right, name_base, name_acc, valid_extra, role_right, role_base} of one variant label from
+    """{name_right, name_base, name_acc, valid_extra, role_right, role_base, names_unrated} of one variant label from
     extra["names_rated"]. base = gold attrs in ctx.train; name_right = those with >= 1 group (attribute) rated right
     (a group counts for its majority gold attr); valid_extra = groups rated valid_extra; role_* = the same over gold
-    attrs whose slot is in a role pair. {} when no rated sheet is given."""
+    attrs whose slot is in a role pair; names_unrated = groups with a name that has no rating (variants of a newer
+    pilot than the rated sheet). {} when no rated sheet is given.
+    GT level L2 / L3 (level copy): the rating is looked up with the L1 majority attr, since the raters saw it. A group
+    rated right counts for its L1 majority attr (when that attr is in the level's base). APPROXIMATION: a group rated
+    valid_extra whose majority gold attr at the level is an attr that has no L1 mention (a non-L1 attr) in the level's
+    base counts as right for that attr; the raters never judged the level's attr itself."""
     rated = extra.get("names_rated")
     if rated is None:
         return {}
     ctx = ed.ctx_a if label.startswith("A") else ed.ctx_r
     base = list(ctx.train)
     got = _rated_by_key(rated)
-    right, extras = set(), 0
-    for r in _variant_rows(ed, label, {}):
-        lab = got.get(tuple(r[c] for c in JOIN_KEYS)) if r["name"] else None
-        if lab == "right" and r["majority_gold_attr"] in base:
+    l1_attrs = {c for g in (ed.mentions_l1["gold_attr"] if getattr(ed, "mentions_l1", None) is not None else []) for c in _classes(g)}
+    right, extras, unrated = set(), 0, 0
+    for r, r1 in _level_rows(ed, label):
+        lab = got.get(tuple(r1[c] for c in JOIN_KEYS)) if r["name"] else None
+        unrated += bool(r["name"]) and lab is None
+        if lab == "right" and r1["majority_gold_attr"] in base:
+            right.add(r1["majority_gold_attr"])
+        elif lab == "valid_extra" and r["majority_gold_attr"] in base and r["majority_gold_attr"] not in l1_attrs                 and getattr(ed, "mentions_l1", None) is not None:
             right.add(r["majority_gold_attr"])
         extras += lab == "valid_extra"
     slots = _role_slots(extra, rules)
     role_base = [a for a in base if PS._slot(a, ed.gold_ents) in slots]
     return {"name_right": len(right), "name_base": len(base), "name_acc": len(right) / len(base) if base else np.nan,
-            "valid_extra": extras, "role_right": len(right & set(role_base)), "role_base": len(role_base)}
+            "valid_extra": extras, "role_right": len(right & set(role_base)), "role_base": len(role_base),
+            "names_unrated": unrated}
 
 
 # ---- order effects (Q7)
@@ -259,39 +282,63 @@ def agreement(ed, rules, extra):
 
 # ---- order range and gain verdict (Q8)
 
-def _found_table(rows):
-    """DataFrame ent x variant of found_n (numeric; n/a becomes NaN) from score rows (list of dicts or DataFrame)."""
+def invalid_runs(path=INVALID_RUNS_PATH):
+    """[{ent, variant, reason}] of runs left out of order_range and gain_verdict (config/invalid_runs.json)."""
+    path = Path(path)
+    return json.loads(path.read_text(encoding="utf-8"))["runs"] if path.exists() else []
+
+
+def _found_table(rows, invalid=None):
+    """DataFrame ent x variant of found_n (numeric; n/a becomes NaN) from score rows (list of dicts or DataFrame).
+    Cells of invalid runs (list of {ent, variant}; None = the config file) are NaN."""
     df = pd.DataFrame(rows)
     df["found_n"] = pd.to_numeric(df["found_n"], errors="coerce")
-    return df.pivot_table(index="ent", columns="variant", values="found_n", aggfunc="first", dropna=False)
+    t = df.pivot_table(index="ent", columns="variant", values="found_n", aggfunc="first", dropna=False)
+    for r in invalid_runs() if invalid is None else invalid:
+        if r["ent"] in t.index and r["variant"] in t.columns:
+            t.loc[r["ent"], r["variant"]] = np.nan
+    return t
 
 
-def order_range(rows):
+def order_range(rows, invalid=None):
     """found_n per entity (plus a total row "all") for C s0/s1/s2 and A r1/r2. range_C and range_A = max - min within
-    one method (order alone); range = the larger of the two, so a method difference (A vs C) is not order noise."""
-    t = _found_table(rows)
+    one method (order alone); range = the larger of the two, so a method difference (A vs C) is not order noise.
+    Invalid runs are dropped: the entity's range uses the runs left, the "all" row sums only entities where every run
+    of the method is valid. Column `invalid` lists the dropped runs of the row."""
+    t = _found_table(rows, invalid)
     t = t[[v for v in ORDER_VARIANTS if v in t.columns]]
-    t.loc["all"] = t.sum()
-    for meth in ("C", "A"):
-        cols = [v for v in t.columns if v.startswith(meth + " ")]
-        t[f"range_{meth}"] = t[cols].max(axis=1) - t[cols].min(axis=1) if cols else float("nan")
-    t["range"] = t[["range_C", "range_A"]].max(axis=1)
-    return t.reset_index()
+    bad = {e: [f"{v}" for v in t.columns if np.isnan(t.loc[e, v])] for e in t.index}
+    per_ent = {meth: [v for v in t.columns if v.startswith(meth + " ")] for meth in ("C", "A")}
+    out = t.copy()
+    for meth, cols in per_ent.items():
+        out[f"range_{meth}"] = t[cols].max(axis=1) - t[cols].min(axis=1) if cols else float("nan")
+    total = {}
+    for meth, cols in per_ent.items():
+        ok = t.index[t[cols].notna().all(axis=1)] if cols else []
+        total[f"range_{meth}"] = (t.loc[ok, cols].sum().max() - t.loc[ok, cols].sum().min()) if len(ok) else float("nan")
+    out.loc["all"] = t.sum(min_count=len(t))  # NaN where a run of the variant is invalid in some entity
+    for k, v in total.items():
+        out.loc["all", k] = v
+    out["range"] = out[["range_C", "range_A"]].max(axis=1)
+    bad["all"] = [f"{e} {v}" for e in t.index for v in bad[e]]
+    out["invalid"] = ["; ".join(bad[e]) for e in out.index]
+    return out.reset_index()
 
 
-def gain_verdict(rows, base="A r1"):
+def gain_verdict(rows, base="A r1", invalid=None):
     """For B s0, C s012, D s012: gain = found_n over `base` (per entity and total). A gain counts if total >= 2, no
-    entity loses an attribute, and total > the order-only range of the total."""
-    t = _found_table(rows)
+    entity loses an attribute, and total > the order-only range of the total. Entities where the variant or the base
+    run is invalid are left out of the gain."""
+    t = _found_table(rows, invalid)
     ents = [e for e in t.index]
-    rng = order_range(rows).set_index("ent").loc["all", "range"]
+    rng = order_range(rows, invalid).set_index("ent").loc["all", "range"]
     out = []
     for v in GAIN_VARIANTS:
         if v not in t.columns:
             continue
         d = t[v] - t[base]
         total = float(d.sum())
-        ok = total >= GAIN_MIN and bool((d >= 0).all()) and total > rng
+        ok = total >= GAIN_MIN and bool((d.dropna() >= 0).all()) and total > (0 if np.isnan(rng) else rng)
         why = ("" if ok else "total < %d" % GAIN_MIN if total < GAIN_MIN else "an entity loses one"
                if (d < 0).any() else "within order range")
         out.append({"variant": v, **{e: d[e] for e in ents}, "total_gain": total, "order_range": rng, "counts": ok,

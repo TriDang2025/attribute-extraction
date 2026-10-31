@@ -20,15 +20,20 @@ OLD_COLS = ["merge_pure", "merge_frag", "split_done", "split_side", "noise_marke
             "recall_after", "p1_after", "real_acc", "noise_rub", "role_acc"]
 NEW_COLS = ["noise_n", "noise_marked_v", "cue_n", "found_n", "gold_n", "recall_v", "merge_n", "merge_right",
             "merge_prec", "place_acc", "place_n", "place_base", "name_right", "name_base", "name_acc", "valid_extra",
-            "role_right", "role_base", "agree_groups", "agree_noise", "agree_names"]
+            "role_right", "role_base", "agree_groups", "agree_noise", "agree_names", "unknown_n", "merge_unjudged",
+            "wrong_entity_n", "names_unrated", "cue_clusters", "cue_request", "cue_share"]
 NA = "n/a"
 
 OPTIONS = {"unlabeled": ("old", "exclude", "noise"), "noise_kind": ("old", "pattern", "jury"),
            "cluster_label": ("old", "0.5", "0.6", "0.7"), "role_pairs": ("old", "config"), "names": ("old", "v34"),
            "found": ("old", "cov0", "cov10", "cov25"), "merge": ("old", "n10", "n20", "n30"),
-           "placement": ("old", "majority"), "agreement": ("old", "split")}
+           "placement": ("old", "majority"), "agreement": ("old", "split"), "gt": ("old", "L1", "L2", "L3"),
+           "unknown": ("old", "out"), "merge_gold": ("old", "min2"), "marked_found": ("old", "skip"),
+           "other_entity": ("old", "wrong_entity")}
 DEFAULT = {"unlabeled": "exclude", "noise_kind": "pattern", "cluster_label": "0.6", "role_pairs": "config",
-           "names": "v34", "found": "cov10", "merge": "n20", "placement": "majority", "agreement": "split"}
+           "names": "v34", "found": "cov10", "merge": "n20", "placement": "majority", "agreement": "split",
+           "gt": "L1", "unknown": "out", "merge_gold": "min2", "marked_found": "skip", "other_entity": "wrong_entity"}
+NO_SWEEP = ("gt",)  # the GT level changes the data, not the scorer: scripts/score_v35.py sets it per run
 
 
 @dataclass(frozen=True)
@@ -42,6 +47,11 @@ class Rules:
     merge: str = "old"          # Q6
     placement: str = "old"      # Q9
     agreement: str = "old"      # Q7
+    gt: str = "old"             # GT level: old = L1 (the field only; the level is applied to the data by the caller)
+    unknown: str = "old"        # out = unknown clusters leave the noise base and merge judging
+    merge_gold: str = "old"     # min2 = members without a gold top attr are left out; judge when >= 2 have gold
+    marked_found: str = "old"   # skip = a group whose decision is marked cannot be the best group for found
+    other_entity: str = "old"   # wrong_entity = other-entity mentions get class wrong_entity (not real, not noise)
 
     def __post_init__(self):
         for f in fields(self):
@@ -78,6 +88,8 @@ def single_changes():
     """Settings of the sweep: old, default, and default with one rule changed to each other option."""
     out = ["old", "default"]
     for key, options in OPTIONS.items():
+        if key in NO_SWEEP:
+            continue
         out += [f"default,{key}={o}" for o in options if o != DEFAULT[key]]
     return out
 
@@ -143,6 +155,8 @@ def _share(num, den):
 
 
 def _noise_columns(ed, label, rules, extra):
+    """noise base = clusters labelled noise (an unknown cluster is never in it); unknown_n and wrong_entity_n are
+    reported under every setting."""
     cl = _call("rules_labels", "cluster_labels", ed, rules, extra)
     mc = _call("rules_labels", "mention_class", ed, rules, extra)
     out = {}
@@ -150,9 +164,10 @@ def _noise_columns(ed, label, rules, extra):
         dec = ed.variants[label].dec.set_index("cluster_id")["action"]
         noise = [c for c in cl.loc[cl["label"] == "noise", "cluster_id"]]
         marked = sum(c in dec.index and dec[c] in PV.MARKED for c in noise)
-        out.update(noise_n=len(noise), noise_marked_v=_share(marked, len(noise)))
+        out.update(noise_n=len(noise), noise_marked_v=_share(marked, len(noise)),
+                   unknown_n=int((cl["label"] == "unknown").sum()))
     if mc is not None:
-        out["cue_n"] = int((mc == "cue").sum())
+        out.update(cue_n=int((mc == "cue").sum()), wrong_entity_n=int((mc == "wrong_entity").sum()))
     return out
 
 
@@ -168,8 +183,9 @@ def _merge_columns(ed, label, rules, extra):
     df = _call("rules_groups", "merges", ed, label, rules, extra)
     if df is None:
         return {}
-    n, right = len(df), int(df["right"].astype(int).sum()) if len(df) else 0
-    return {"merge_n": n, "merge_right": right, "merge_prec": _share(right, n)}
+    judged = df[df["judged"].astype(bool)] if "judged" in df.columns else df
+    n, right = len(judged), int(judged["right"].astype(int).sum()) if len(judged) else 0
+    return {"merge_n": n, "merge_right": right, "merge_prec": _share(right, n), "merge_unjudged": len(df) - n}
 
 
 def _place_columns(ed, label, rules, extra):
@@ -178,6 +194,13 @@ def _place_columns(ed, label, rules, extra):
 
 def _name_columns(ed, label, rules, extra):
     return _call("rules_names", "name_scores", ed, label, rules, extra) or {}
+
+
+def _cue_columns(ed, label, rules, extra):
+    """T5: attribute_cue clusters against the request flag; needs extra["gt_levels"] (gt_levels.csv, bool columns)."""
+    gt = extra.get("gt_levels")
+    r = None if gt is None else _call("rules_labels", "cue_scores", ed, label, gt)
+    return {} if r is None else {"cue_clusters": r["cue_n"], "cue_request": r["cue_request"], "cue_share": r["cue_share"]}
 
 
 def _agree_columns(ed, label, rules, extra):
@@ -193,6 +216,7 @@ GROUPS = [
     (_merge_columns, ("merge",), {"merge_prec": "merge_pure"}),
     (_place_columns, ("placement",), {"place_acc": "place_right"}),
     (_name_columns, ("names",), {"name_acc": "real_acc"}),
+    (_cue_columns, ("gt",), {}),
     (_agree_columns, ("agreement",), {c: "agree_mean" for c in ("agree_groups", "agree_noise", "agree_names")}),
 ]
 
@@ -209,24 +233,68 @@ def new_columns(ed, label, rules, extra, old_row):
     return row
 
 
+def level_entity(ed, rules, extra):
+    """`ed` read at the GT level of rules.gt (v34_data.with_level, cached in extra["_level"]); `ed` itself for the old
+    setting or when extra holds no "gt_levels" table. The old columns are always scored on the original `ed`."""
+    gt = extra.get("gt_levels")
+    if rules.gt == "old" or gt is None:
+        return ed
+    from . import v34_data
+    level = int(rules.gt[1])
+    cache = extra.setdefault("_level", {})
+    key = (id(ed), level)
+    if key not in cache:
+        cache[key] = (ed, v34_data.with_level({ed.ent: ed}, gt, level)[ed.ent])
+    return cache[key][1]
+
+
 def score_entity(ed, shared, rules, extra):
     """One dict per variant label of the entity: ent, variant, OLD_COLS, NEW_COLS. `shared` goes to the stage-2
-    functions as extra["shared"]; the old columns are cached in extra["_old"]."""
+    functions as extra["shared"]; the old columns are cached in extra["_old"]. Rules.gt L1-L3 with extra["gt_levels"]
+    scores the new columns on the level copy of `ed` (level_entity)."""
     extra.setdefault("shared", shared)
     other = extra.setdefault("_other_gold", {})  # other-entity gold values per entity (rules_labels "other_entity")
     if ed.ent not in other:
         other[ed.ent] = _call("rules_labels", "other_gold_values", shared, ed)
     extra["other_gold"] = other[ed.ent]
     cache = extra.setdefault("_old", {})
-    if ed.ent not in cache:
-        cache[ed.ent] = old_columns(ed, extra)
+    if id(ed) not in cache:
+        cache[id(ed)] = old_columns(ed, extra)
+    led = level_entity(ed, rules, extra)
     rows = []
     for label in ed.variants:
-        old = cache[ed.ent][label]
-        new = new_columns(ed, label, rules, extra, {**old, "agree_mean": ed.vote_stats.get("agree_mean", NA)}
+        old = cache[id(ed)][label]
+        new = new_columns(led, label, rules, extra, {**old, "agree_mean": ed.vote_stats.get("agree_mean", NA)}
                           if label == "C s012" else old)
         rows.append({"ent": ed.ent, "variant": label, **old, **new})
     return rows
+
+
+def fmt_count(k, n):
+    """"4/7 (0.571)"; "0/0 (n/a)" when n is 0; "n/a" when k or n is missing."""
+    try:
+        k, n = float(k), float(n)
+    except (TypeError, ValueError):
+        return NA
+    if np.isnan(k) or np.isnan(n):
+        return NA
+    return f"{int(k)}/{int(n)} ({k / n:.3f})" if n else f"{int(k)}/0 ({NA})"
+
+
+def pooled_noise(rows):
+    """dict(marked, n, share) of one variant over its entity rows (noise_marked_v x noise_n, rounded back to a count);
+    rows without numbers are skipped. share is NaN when n is 0."""
+    marked = n = 0
+    for r in pd.DataFrame(rows).to_dict("records"):
+        try:
+            size, share = float(r["noise_n"]), float(r["noise_marked_v"])
+        except (TypeError, ValueError):
+            continue
+        if np.isnan(size) or np.isnan(share):
+            continue
+        n += int(size)
+        marked += int(round(share * size))
+    return {"marked": marked, "n": n, "share": marked / n if n else float("nan")}
 
 
 def fmt(v, count=False):

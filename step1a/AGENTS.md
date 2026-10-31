@@ -64,6 +64,7 @@ Timings on the laptop CPU for n50:
   - `scripts/hint_check.py --encode` (`s1a/hints.py`; window vectors → `results/graph_v22_dev50/spans/window_vectors.npz`, not in git) → `results/loop1_v31/hints.csv`. Window and filtered hints were worse than string hints (train 8% vs 16% same-class), so `v2_hints` is not run.
   - `scripts/pilot_build_v31.py --no-hints` (`s1a/pilot_input.py` `render_v2`, `render_split`, `schema_*`) → `results/loop1_v31/{prompts/, manifest.json, examples.csv, prompt_stats.md}`; split prompts for every cluster with ≥ 8 mentions.
   - Colab `colab/S1A_llm_v31_colab.ipynb` (`s1a/llm_cache.py` parsers) → `results/loop1_v31/responses/<job>.jsonl` → `scripts/pilot_eval_v31.py` (`pilot_verify.decisions_from_v2`, `pilot_score.name_merge`, `rubric_sheet`) → `scores_<ent>.md`, `summary.md`, `name_rubric.csv`.
+- wf_v3.5 Colab batch (T8 rerun, T14 oracle split, T18-T20 variant g; `PILOT_V35_BATCH.md`): `scripts/pilot_build_v35.py` (`s1a/oracle_v35.py`, `s1a/role_guard.py`, `pilot_input.render_v3(role_examples=)`) -> `results/loop1_v35/colab/` and `results/loop1_v35/oracle_clusters.csv` -> `colab/S1A_llm_v35_colab.ipynb` -> `results/loop1_v35/colab/responses/`.
 
 ## Data links
 - `scripts/export_mentions.py` -> `results/graph_<split>50/{docs.jsonl, gold_values.csv, gold_attrs.txt, cache/}`, `<input>/{mentions,clusters,instances}.csv, vectors.npz` -> `scripts/graph_run.py` stages -> `<input>/{coverage.csv, graphs.pkl, stability.csv, nodes.csv, labels.csv, select/, schema/}`

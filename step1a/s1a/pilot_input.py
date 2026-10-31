@@ -17,6 +17,7 @@ import numpy as np
 from . import graph as GR
 from . import llm_cache as LC
 from . import mentions as MN
+from .pilot_verify import norm_name
 from . import signals as SG
 from . import step2 as S2
 
@@ -292,7 +293,7 @@ def build_input(export, docs, entity, k=K_EXAMPLES, seed=0, graphs=None, roles=N
     graphs = graphs or GR.build_graphs(export)
     cents = GR.centroids(export)
     mine = m[m["entity"] == entity]
-    cids = sorted(mine["cluster_id"].unique(), key=lambda c: int(c.rsplit("#", 1)[1]))
+    cids = sorted(mine["cluster_id"].unique(), key=_cluster_number)
     ents = sorted(set(m["entity"]) - {entity})
     low = low_conf_clusters(export.mentions, entity)
     cos = {(a, b): float(cents[a] @ cents[b]) for a, b in combinations(cids, 2)}
@@ -302,7 +303,7 @@ def build_input(export, docs, entity, k=K_EXAMPLES, seed=0, graphs=None, roles=N
         return cos[(a, b)] if (a, b) in cos else cos[(b, a)]
 
     by_cluster = {c: g for c, g in m.groupby("cluster_id")}
-    by_entity = {e: sorted(m[m["entity"] == e]["cluster_id"].unique(), key=lambda c: int(c.rsplit("#", 1)[1]))
+    by_entity = {e: sorted(m[m["entity"] == e]["cluster_id"].unique(), key=_cluster_number)
                  for e in [entity] + ents}
     inst = {}
     for r in export.instances.itertuples():
@@ -475,7 +476,7 @@ def split_candidates(export, entity, min_mentions=8, min_share=0.15):
     for c, g in m.groupby("cluster_id"):
         if len(g) >= min_mentions and (g.groupby("instance_id")["norm_value"].nunique() >= 2).mean() >= min_share:
             out.append(c)
-    return sorted(out, key=lambda c: int(c.rsplit("#", 1)[1]))
+    return sorted(out, key=_cluster_number)
 
 
 def cluster_example_lines(export, docs, entity, cluster_id, k, seed, tag):
@@ -508,8 +509,9 @@ def schema_v1(inp):
     return {"type": "array", "items": item}
 
 
-def _schema_attr_clusters(ids, options, reason=False):
-    """JSON schema {attributes[], clusters[]}; `reason` adds the required string `reason` after cluster_id."""
+def _schema_attr_clusters(ids, options, reason=False, role_example_ids=None):
+    """JSON schema {attributes[], clusters[]}; `reason` adds the required string `reason` after cluster_id.
+    `role_example_ids` (list) adds the optional (not required) property role_examples after placement."""
     attr = {"type": "object",
             "properties": {k: {"type": "string"} for k in ("name", "description", "role")},
             "required": ["name", "description", "role"]}
@@ -518,7 +520,14 @@ def _schema_attr_clusters(ids, options, reason=False):
         props["reason"] = {"type": "string"}
     props.update({"attribute": {"type": "string"}, "evidence": {"type": "string"}, "mixed": {"type": "boolean"},
                   "placement": {"enum": options}})
-    clu = {"type": "object", "properties": props, "required": list(props)}
+    required = list(props)
+    if role_example_ids is not None:
+        props["role_examples"] = {"type": "array", "items": {
+            "type": "object",
+            "properties": {"attribute": {"type": "string"},
+                           "examples": {"type": "array", "items": {"enum": list(role_example_ids)}}},
+            "required": ["attribute", "examples"]}}
+    clu = {"type": "object", "properties": props, "required": required}
     return {"type": "object",
             "properties": {"attributes": {"type": "array", "items": attr},
                            "clusters": {"type": "array", "items": clu}},
@@ -603,8 +612,21 @@ INSTRUCTION_V33 = (INSTRUCTION_V3
                             '               "mixed": false, "placement": "current entity E9"}]}'))
 
 
+_MIXED_SENT = ('If a cluster holds two attributes (two roles), assign its\n'
+               '   most frequent attribute and set "mixed" to true.')
+ROLE_EXAMPLES_LINE = ('If a cluster holds two attributes (two roles), assign its most frequent attribute, set "mixed" to '
+                      'true and add "role_examples": for each role or attribute of the cluster, its attribute name '
+                      'and the ids of the examples that show it, e.g. [{"attribute": "departure_station", '
+                      '"examples": ["E9#1:0"]}, {"attribute": "destination_station", "examples": ["E9#1:3"]}]. '
+                      'Give each example id once. Leave "role_examples" out when "mixed" is false.')
+assert INSTRUCTION_V3.count(_MIXED_SENT) == 1
+INSTRUCTION_V35G = INSTRUCTION_V3.replace(_MIXED_SENT, ROLE_EXAMPLES_LINE)
+
+
 def _cluster_number(cid):
-    return int(cid.rsplit("#", 1)[1])
+    """Sort key of "E1#12"; the oracle parts "E1#12.a" / "E1#12.b" (wf_v3.5) sort right after 12."""
+    num, _, part = cid.rsplit("#", 1)[1].partition(".")
+    return int(num) + (0.1 * (ord(part) - 96) if part else 0)
 
 
 def neighbourhoods(export, entity, max_size=NBHD_MAX):
@@ -656,16 +678,22 @@ def nbhd_target(n_group):
     return max(1, round(n_group / 3))
 
 
-def render_v3(inp, export, docs, group_ids, outside, target, order_seed=None, carry=None, cue_rule=False):
+def render_v3(inp, export, docs, group_ids, outside, target, order_seed=None, carry=None, cue_rule=False,
+              role_examples=False):
     """Prompt text of output format v3 for one neighbourhood: only the clusters `group_ids` (in that order, or
     shuffled with `order_seed`), the `outside` lines [(cluster_id, values)] and the attribute-count target.
     wf_v3.3: `cue_rule` True uses INSTRUCTION_V33; `carry` (a text block, or CARRY_PLACEHOLDER) goes after the
-    outside block and before the clusters. The defaults give the v3.2 prompt."""
+    outside block and before the clusters. wf_v3.5 g: `role_examples` True uses INSTRUCTION_V35G (a mixed cluster
+    lists the example ids of each role; pair it with schema_v3(role_examples=True)); it cannot be combined with
+    `cue_rule`. The defaults give the v3.2 prompt."""
+    if role_examples and cue_rule:
+        raise ValueError("role_examples and cue_rule cannot be combined")
     by_id = {c.cluster_id: c for c in inp.clusters}
     cl = [by_id[c] for c in group_ids]
     if order_seed is not None:
         cl = [cl[i] for i in np.random.default_rng(order_seed).permutation(len(cl))]
-    parts = [INSTRUCTION_V33 if cue_rule else INSTRUCTION_V3, f"Entity {inp.entity}: {len(cl)} clusters.",
+    instruction = INSTRUCTION_V35G if role_examples else INSTRUCTION_V33 if cue_rule else INSTRUCTION_V3
+    parts = [instruction, f"Entity {inp.entity}: {len(cl)} clusters.",
              f"Aim for about {target} attributes (between {target / 2:g} and {target * 3 / 2:g}).",
              _render_options(inp)]
     if outside:
@@ -678,9 +706,15 @@ def render_v3(inp, export, docs, group_ids, outside, target, order_seed=None, ca
     return "\n\n".join(parts) + "\n"
 
 
-def schema_v3(inp, group_ids):
-    """JSON schema of format v3: v2 with cluster_id an enum of `group_ids` and a required `reason` after it."""
-    return _schema_attr_clusters(list(group_ids), [t for t, _ in inp.options], reason=True)
+def schema_v3(inp, group_ids, role_examples=False):
+    """JSON schema of format v3: v2 with cluster_id an enum of `group_ids` and a required `reason` after it.
+    `role_examples` (wf_v3.5 g) adds the optional role_examples field, its example ids an enum of the examples
+    shown for `group_ids`."""
+    ids = None
+    if role_examples:
+        keep = set(group_ids)
+        ids = [ex for c in inp.clusters if c.cluster_id in keep for ex, _ in c.examples]
+    return _schema_attr_clusters(list(group_ids), [t for t, _ in inp.options], reason=True, role_example_ids=ids)
 
 
 def _render_probe(instruction, export, docs, entity, cluster_id, k, seed, tag):
@@ -722,6 +756,29 @@ def render_reconcile(unit, candidates):
             + "Examples:\n" + "\n".join(unit["lines"]))
     cand = "Candidates:\n" + "\n".join(f"- {n}: {d}" for n, d in candidates)
     return "\n\n".join([INSTRUCTION_RECONCILE, head, cand, "Return the JSON object now."]) + "\n"
+
+
+_ROLE_PAIR_SENT = ("Values that play different roles (where something starts vs where it ends,\n"
+                   "the earliest vs the latest time) are different attributes.")
+ROLE_PAIR_RULE = ("Never merge across a role pair: departure with destination, leave at with arrive by, location "
+                  "with address.\nIf the unit and a candidate form such a pair, answer none, even when their values look alike.")
+assert INSTRUCTION_RECONCILE.count(_ROLE_PAIR_SENT) == 1
+INSTRUCTION_RECONCILE_V35 = INSTRUCTION_RECONCILE.replace(_ROLE_PAIR_SENT, _ROLE_PAIR_SENT + "\n" + ROLE_PAIR_RULE)
+
+
+def render_reconcile_v35(unit, candidates, roles=None):
+    """wf_v3.5 reconcile prompt: as render_reconcile, with the role of the unit and of each candidate (`roles`
+    {norm name: role}, from the entity answers' attributes; omitted when unknown) and the role-pair rule."""
+    roles = roles or {}
+
+    def tag(name):
+        r = roles.get(norm_name(name), "")
+        return f" (role: {r})" if r else ""
+
+    head = (f"Attribute {unit['unit_id']}: {unit['name']}{tag(unit['name'])}: {unit['description']}\n"
+            + "Examples:\n" + "\n".join(unit["lines"]))
+    cand = "Candidates:\n" + "\n".join(f"- {n}{tag(n)}: {d}" for n, d in candidates)
+    return "\n\n".join([INSTRUCTION_RECONCILE_V35, head, cand, "Return the JSON object now."]) + "\n"
 
 
 def schema_reconcile(unit_id, candidate_names):

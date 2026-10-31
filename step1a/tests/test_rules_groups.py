@@ -149,3 +149,53 @@ def test_merge_with_no_gold_member_is_wrong():
     slots = {"Train day": "day"}
     assert RG._merge_reason({"Train day"}, slots, set(), 0.0, 0.2, no_gold=True) == "no_gold_member"
     assert RG._merge_reason({"Train day"}, slots, set(), 0.0, 0.2) == ""
+
+
+def test_found_marked_group_skipped():
+    rows = rows_of("c1", "Train price", 6, 0)
+    ed, extra = make_ed(rows, {r[0]: "g" for r in rows})
+    ed.variants["v"].attrs["status"] = "not_attribute"
+    assert RG.found(ed, "v", Rules(found="cov0"), extra).set_index("attr").loc["Train price", "found"]  # old
+    d = RG.found(ed, "v", Rules(found="cov0", marked_found="skip"), extra).set_index("attr").loc["Train price"]
+    assert not d["found"] and d["best_group"] == ""
+    ed.variants["v"].attrs["status"] = "keep"
+    assert RG.found(ed, "v", Rules(found="cov0", marked_found="skip"), extra).set_index("attr").loc["Train price", "found"]
+
+
+def test_merges_unknown_and_min2():
+    # c1, c2 have gold price; c3 has no gold mention (a noise class), c4 is unlabeled only (unknown under exclude)
+    rows = rows_of("c1", "Train price", 4, 0) + rows_of("c2", "Train price", 4, 10)
+    rows += [(20 + i, "c3", "", "train", "noise") for i in range(2)] + [(30 + i, "c4", "", "train", "unlabeled") for i in range(2)]
+    ed, extra = make_ed(rows, {r[0]: "g" for r in rows}, names={"g": "Merged"})
+    old = RG.merges(ed, "v", Rules(merge="n30"), extra).iloc[0]
+    assert not old["right"] and old["reason"] == "no_gold_member" and old["judged"]
+    ex = Rules(merge="n30", unlabeled="exclude", unknown="out")
+    extra["unknown_clusters"] = ["c4"]  # in a real run: cluster_labels gives c4 the label unknown (no counted mention)
+    row = RG.merges(ed, "v", ex, extra).iloc[0]
+    assert row["reason"] == "no_gold_member" and row["members"] == "c1;c2;c3"  # c4 dropped, c3 still judged under old
+    both = RG.merges(ed, "v", Rules(merge="n30", unlabeled="exclude", unknown="out", merge_gold="min2"), extra).iloc[0]
+    assert both["right"] and both["judged"] and both["members"] == "c1;c2" and abs(both["noise_share"] - 0.2) < 1e-9  # c3 noise counts
+    # only one member with gold: not judged
+    rows = rows_of("c1", "Train price", 4, 0) + [(20 + i, "c3", "", "train", "noise") for i in range(2)]
+    ed, extra = make_ed(rows, {r[0]: "g" for r in rows})
+    one = RG.merges(ed, "v", Rules(merge="n30", merge_gold="min2"), extra).iloc[0]
+    assert not one["judged"] and not one["right"] and one["reason"] == "unjudged"
+
+
+def test_merge_noise_share_uses_unfiltered_group():
+    # two gold clusters (10 + 10) and a pure-noise cluster (8): min2 judges the 2 gold members, noise is 8 of 28
+    rows = rows_of("c1", "Train price", 10, 0) + rows_of("c2", "Train price", 10, 100)
+    rows += [(500 + i, "c3", "", "train", "noise") for i in range(8)]
+    ed, extra = make_ed(rows, {r[0]: "g" for r in rows})
+    row = RG.merges(ed, "v", Rules(merge="n20", merge_gold="min2"), extra).iloc[0]
+    assert row["judged"] and row["members"] == "c1;c2" and not row["right"] and row["reason"] == "noise"
+    assert abs(row["noise_share"] - 8 / 28) < 1e-9
+
+
+def test_found_marked_skip_keeps_full_coverage_denominator():
+    # price: 6 in a marked group, 3 in a kept pure group; coverage of the kept group is 3 of 9, not 3 of 3
+    rows = rows_of("c1", "Train price", 6, 0) + rows_of("c2", "Train price", 3, 10)
+    ed, extra = make_ed(rows, {r[0]: "gm" if r[1] == "c1" else "gk" for r in rows})
+    ed.variants["v"].attrs["status"] = ["not_attribute" if a == "gm" else "keep" for a in ed.variants["v"].attrs["attr_id"]]
+    d = RG.found(ed, "v", Rules(found="cov25", marked_found="skip"), extra).set_index("attr").loc["Train price"]
+    assert d["best_group"] == "gk" and abs(d["coverage"] - 3 / 9) < 1e-9 and d["found"]

@@ -69,7 +69,8 @@ def test_name_scores():
                           "description": ["d", "d"], "majority_gold_attr": ["Train departure", ""],
                           "label": ["right", "valid_extra"]})
     r = RN.name_scores(ed, "A r1", Rules.default(), {"names_rated": rated})
-    assert r == {"name_right": 1, "name_base": 2, "name_acc": 0.5, "valid_extra": 1, "role_right": 1, "role_base": 2}
+    assert r == {"name_right": 1, "name_base": 2, "name_acc": 0.5, "valid_extra": 1, "role_right": 1, "role_base": 2,
+                 "names_unrated": 0}
     # the station name was never rated right for B: no credit; two ratings of one key keep the lower label
     both = pd.concat([rated, rated.iloc[[0]].assign(label="wrong")], ignore_index=True)
     assert RN.name_scores(ed, "A r1", Rules.default(), {"names_rated": both})["name_right"] == 0
@@ -139,3 +140,18 @@ def test_gain_verdict():
     assert h.loc["C s012", "reason"] == "an entity loses one"
     # n/a found_n is ignored, not a crash
     assert RN.gain_verdict([dict(r, found_n="n/a") for r in ROWS]).shape[0] == 3
+
+
+def test_invalid_runs_dropped():
+    rows = [dict(r, found_n=r["found_n"]) for r in ROWS] + [{"ent": "restaurant", "variant": v, "found_n": f} for v, f in
+            {"A r1": 2, "A r2": 9, "C s0": 2, "C s1": 2, "C s2": 3, "B s0": 2, "C s012": 4, "D s012": 2}.items()]
+    inv = [{"ent": "restaurant", "variant": "A r2", "reason": "6 parse errors"}]
+    r = RN.order_range(rows, invalid=inv).set_index("ent")
+    assert r.loc["restaurant", "range_A"] == 0 and r.loc["restaurant", "invalid"] == "A r2"
+    assert r.loc["all", "invalid"] == "restaurant A r2"
+    assert r.loc["all", "range_A"] == 1  # train + hotel only: A r1 8, A r2 9
+    assert RN.order_range(rows, invalid=[]).set_index("ent").loc["restaurant", "range_A"] == 7
+    g = RN.gain_verdict(rows, invalid=inv).set_index("variant")
+    assert g.loc["C s012", "total_gain"] == 6 and g.loc["C s012", "counts"]
+    # the shipped config lists the restaurant A r2 run
+    assert {"ent": "restaurant", "variant": "A r2"}.items() <= RN.invalid_runs()[0].items()

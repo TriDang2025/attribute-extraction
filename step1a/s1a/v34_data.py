@@ -4,8 +4,9 @@ attributes and mention assignment per entity, plus the per-mention evidence tabl
 load_all(run, dir32, dir31) re-reads the saved responses the way scripts/pilot_eval_v32.py does; no old file is edited.
 """
 
+import copy
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import pandas as pd
@@ -49,6 +50,8 @@ class EntityData:
     variants: dict           # {label: VariantOut}
     vote_stats: dict         # C vote stats (PC.vote)
     seed_decs: dict          # {"C s0": dec, "C s1": dec, "C s2": dec}
+    mentions_l1: object = None  # set by with_level: the L1 mentions this copy was made from (None = not a level copy)
+    level: int = 0           # set by with_level (0 = the data as loaded)
 
 
 @dataclass
@@ -195,3 +198,69 @@ def attrs_table(data):
                                       "name": a["name"], "description": a["description"],
                                       "clusters": a["clusters"], "source": a["source"], "status": a["status"]}))
     return pd.concat(rows, ignore_index=True)[ATTR_OUT_COLS]
+
+
+# ---- GT levels (wf_v3.5)
+
+def read_gt_levels(path):
+    """results/loop1_v35/gt_levels.csv as strings, plus is_request / is_choice as bool."""
+    gt = pd.read_csv(path, dtype=str, keep_default_na=False, na_filter=False, encoding="utf-8")
+    for c in ("is_request", "is_choice"):
+        gt[c] = gt[c] == "True"
+    return gt
+
+
+def _relabel(mentions, gt, level):
+    """`mentions` with gold_attr / entity_gold = gt_L<level> / ent_L<level> and the bool columns is_request,
+    is_choice from `gt` (rows without a gt row: no label, False)."""
+    by = gt.set_index(gt["mention_id"].astype(int))
+    mid = mentions["mention_id"].astype(int)
+    pick = {"gold_attr": f"gt_L{level}", "entity_gold": f"ent_L{level}"}
+    cols = {k: by[v].reindex(mid).fillna("").values for k, v in pick.items()}
+    cols.update({c: by[c].reindex(mid).fillna(False).astype(bool).values for c in ("is_request", "is_choice")})
+    return mentions.assign(**cols)
+
+
+def level_attrs(mentions, gold_ents, first=()):
+    """`first` (every L1 attr of the entity, also those with no mention in the table: the levels are cumulative), then
+    the other gold attrs of the labelled mention table whose entity (mode of entity_gold over the attr's mentions) is
+    in `gold_ents`, sorted."""
+    ent = {}
+    for ga, eg in zip(mentions["gold_attr"], mentions["entity_gold"]):
+        for c in PS._classes(ga):
+            ent.setdefault(c, []).append(eg)
+    ok = {a for a, v in ent.items() if PS.mode(v) in set(gold_ents)}
+    return list(first) + sorted(ok - set(first))
+
+
+def _level_ctx(ctx, full, gold_ents, level):
+    """Copy of a PS.Ctx that reads the level's labels: mentions, pm, cluster_gold, entity_gold_of; for L2 / L3 also
+    `train` (the L1 attrs plus the level's new attrs of the dev50 mentions, level_attrs)."""
+    c = copy.copy(ctx)
+    c.mentions = full
+    c.pm = full[(full["entity"] == ctx.entity) & (full["cluster_id"] != "")]
+    c.cluster_gold = {k: PS.mode(g["entity_gold"]) for k, g in c.pm.groupby("cluster_id")}
+    clustered = full[full["cluster_id"] != ""]
+    c.entity_gold_of = {e: PS.mode(g["entity_gold"]) for e, g in clustered.groupby("entity")}
+    if level >= 2:
+        c.train = level_attrs(full, gold_ents, ctx.train)
+    return c
+
+
+def with_level(data, gt, level):
+    """Copy of `data` ({ent: EntityData}) whose gold labels are GT level 1, 2 or 3 (gt = gt_levels DataFrame):
+    mentions (and each ctx's mentions) get gold_attr / entity_gold from gt_L<level> / ent_L<level> plus is_request and
+    is_choice; for L2 / L3 each ctx.train becomes the L1 attrs of the entity plus the level's new attrs that occur in dev50. The rest of the
+    scorer then reads the level through the usual fields. L1 keeps ctx.train. mentions_l1 holds the original table."""
+    if level not in (1, 2, 3):
+        raise ValueError(f"level must be 1, 2 or 3, got {level!r}")
+    out, full_cache = {}, {}
+    for ent, ed in data.items():
+        ctxs = {}
+        for name in ("ctx_a", "ctx_r"):
+            ctx = getattr(ed, name)
+            if id(ctx.mentions) not in full_cache:
+                full_cache[id(ctx.mentions)] = _relabel(ctx.mentions, gt, level)
+            ctxs[name] = _level_ctx(ctx, full_cache[id(ctx.mentions)], ed.gold_ents, level)
+        out[ent] = replace(ed, mentions=_relabel(ed.mentions, gt, level), mentions_l1=ed.mentions, level=level, **ctxs)
+    return out

@@ -18,7 +18,9 @@ ROLE_PAIRS_PATH = "config/role_pairs.json"
 THRESHOLDS = {"0.5": 0.5, "0.6": 0.6, "0.7": 0.7}
 NOISE_KINDS = ("question", "result_count", "general", "broken")
 KINDS = ("question", "result_count", "other_entity", "general", "broken", "odd_format", "other")
-SPECIAL = ("unlabeled", "noise", "cue")  # not an attribute class: left out of top_attr
+SPECIAL = ("unlabeled", "noise", "cue", "wrong_entity")  # not an attribute class: left out of top_attr
+FREQUENT_DIALOGUES = 0.20  # other_entity=wrong_entity: a gold value in >= 20% of the dialogues is "frequent"
+FREQUENT_ENTITIES = 2      # ... or in >= 2 entities
 OLD_LABEL = {"gold": "real", "valid_new": "real", "noise": "noise"}
 
 # closed English lists (no dataset words)
@@ -130,6 +132,26 @@ def _other_gold(ed, extra):
     return {_norm(v): e for v, e in zip(m["norm_value"], m["entity_gold"])}
 
 
+def frequent_values(shared):
+    """Set of normalised gold values that are too common to prove another entity: in gold of >= 2 entities, or in >= 20%
+    of the dialogues (len(shared.docs))."""
+    gv = shared.gv
+    norm = gv["value"].map(_norm)
+    ents = gv.groupby(norm)["entity_gold"].nunique()
+    dialogues = gv.groupby(norm)["dialogue_id"].nunique() / max(len(shared.docs), 1)
+    return set(ents[ents >= FREQUENT_ENTITIES].index) | set(dialogues[dialogues >= FREQUENT_DIALOGUES].index)
+
+
+def _frequent(extra):
+    """extra["frequent"] (tests), else computed once from extra["shared"] (cached in extra["_frequent"]), else empty."""
+    extra = extra if extra is not None else {}
+    if extra.get("frequent") is not None:
+        return extra["frequent"]
+    if "_frequent" not in extra and extra.get("shared") is not None:
+        extra["_frequent"] = frequent_values(extra["shared"])
+    return extra.get("_frequent", set())
+
+
 def _jury_of(extra):
     jury = (extra or {}).get("jury")
     if jury is None:
@@ -137,11 +159,14 @@ def _jury_of(extra):
     return dict(zip(jury["cluster_id"], jury["jury"]))
 
 
-def _unlabeled_class(row, rules, other, jury):
+def _unlabeled_class(row, rules, other, jury, frequent):
     if rules.noise_kind == "pattern":
         kind = noise_kind_of(row["text"], row["turn_text"], other)
+        norm = _norm(row["text"])
+        wrong = getattr(rules, "other_entity", "old") == "wrong_entity" and norm not in frequent
         mapped = {"question": "cue", "result_count": "noise", "general": "noise", "broken": "noise",
-                  "odd_format": "real_extra", "other_entity": f"other_entity:{other.get(_norm(row['text']), '')}"}
+                  "odd_format": "real_extra",
+                  "other_entity": "wrong_entity" if wrong else f"other_entity:{other.get(norm, '')}"}
         if kind in mapped:
             return mapped[kind]
     elif rules.noise_kind == "jury":
@@ -153,13 +178,30 @@ def _unlabeled_class(row, rules, other, jury):
 
 def mention_class(ed, rules, extra):
     """Series indexed by mention_id: gold attr ("A;B" kept) / unlabeled / noise / cue / real_extra /
-    other_entity:<Entity>. Q3: exclude keeps "unlabeled" (the shares leave it out), noise turns it into "noise"; Q1
-    pattern / jury first re-classify the unlabelled mentions."""
+    other_entity:<Entity> / wrong_entity. Q3: exclude keeps "unlabeled" (the shares leave it out), noise turns it into
+    "noise"; Q1 pattern / jury first re-classify the unlabelled mentions. other_entity=wrong_entity turns
+    other_entity:<E> into "wrong_entity" unless the value is frequent (frequent_values)."""
     m = ed.mentions
     other = _other_gold(ed, extra) if rules.noise_kind == "pattern" else {}
+    frequent = _frequent(extra) if getattr(rules, "other_entity", "old") == "wrong_entity" else set()
     jury = _jury_of(extra) if rules.noise_kind == "jury" else {}
-    cls = [g if g else _unlabeled_class(r, rules, other, jury) for g, (_, r) in zip(m["gold_attr"], m.iterrows())]
+    choice = m["is_choice"] if "is_choice" in m.columns else pd.Series(False, index=m.index)  # T6 (with_level data)
+    cls = [g if g else "noise" if ch else _unlabeled_class(r, rules, other, jury, frequent)
+           for g, ch, (_, r) in zip(m["gold_attr"], choice, m.iterrows())]
     return pd.Series(cls, index=m["mention_id"].astype(int).values, name="class")
+
+
+def cue_scores(ed, label, gt_levels):
+    """T5: the variant's `attribute_cue` clusters scored against the request flag of gt_levels (is_request per
+    mention_id). dict(cue_n = cue clusters, cue_request = cue clusters whose mentions are >= 50% request mentions,
+    cue_share = cue_request / cue_n, NaN when there is none)."""
+    dec = ed.variants[label].dec
+    cues = set(dec.loc[dec["action"] == "attribute_cue", "cluster_id"])
+    req = dict(zip(gt_levels["mention_id"].astype(int), gt_levels["is_request"].astype(bool)))
+    m = ed.mentions[ed.mentions["cluster_id"].isin(cues)]
+    flags = pd.Series([req.get(int(i), False) for i in m["mention_id"]], index=m.index).groupby(m["cluster_id"]).mean()
+    hit = int((flags >= 0.5).sum())
+    return {"cue_n": len(cues), "cue_request": hit, "cue_share": hit / len(cues) if cues else float("nan")}
 
 
 # ---- Q2: cluster labels

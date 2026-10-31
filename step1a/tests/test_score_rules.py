@@ -33,7 +33,7 @@ def test_parse():
 
 def test_single_changes():
     s = SR.single_changes()
-    assert s[:2] == ["old", "default"] and len(s) == 2 + 17
+    assert s[:2] == ["old", "default"] and len(s) == 2 + 17 + 4
     assert all(Rules.parse(x) != Rules.default() for x in s[2:])
     assert "default,found=cov25" in s and "default,found=cov10" not in s
 
@@ -83,3 +83,42 @@ def test_stage2_values_used_unless_rule_old(monkeypatch):
     # the found rule stays "old": recall_v copies recall_after, found_n still comes from stage 2
     row = SR.new_columns(toy(), "A r1", Rules.parse("default,found=old"), {}, OLD)
     assert row["recall_v"] == 0.4 and row["found_n"] == 2
+
+
+def test_v1_switches():
+    d = Rules.default()
+    assert (d.gt, d.unknown, d.merge_gold, d.marked_found, d.other_entity) == ("L1", "out", "min2", "skip", "wrong_entity")
+    o = Rules.old()
+    assert (o.gt, o.unknown, o.merge_gold, o.marked_found, o.other_entity) == ("old",) + ("old",) * 4
+    assert Rules.parse("default,unknown=old,gt=L2").gt == "L2"
+    with pytest.raises(ValueError):
+        Rules.parse("default,gt=L9")
+    s = SR.single_changes()
+    assert "default,unknown=old" in s and "default,other_entity=old" in s and not any("gt=" in x for x in s)
+    assert all(Rules.parse(x) != Rules.default() for x in s[2:])
+
+
+def test_new_cols_and_fmt_count():
+    assert {"unknown_n", "merge_unjudged", "wrong_entity_n"} <= set(NEW_COLS)
+    assert SR.fmt_count(4, 7) == "4/7 (0.571)" and SR.fmt_count(0, 0) == "0/0 (n/a)"
+    assert SR.fmt_count("n/a", 3) == "n/a" and SR.fmt_count(float("nan"), 3) == "n/a"
+
+
+def test_pooled_noise():
+    rows = [{"noise_n": 4, "noise_marked_v": 0.75}, {"noise_n": 6, "noise_marked_v": 0.5},
+            {"noise_n": "n/a", "noise_marked_v": "n/a"}, {"noise_n": 0, "noise_marked_v": float("nan")}]
+    p = SR.pooled_noise(rows)
+    assert (p["marked"], p["n"]) == (6, 10) and p["share"] == pytest.approx(0.6)
+    assert SR.pooled_noise([])["n"] == 0
+
+
+def test_columns_unknown_and_merge_unjudged(monkeypatch):
+    funcs = {"cluster_labels": lambda ed, rules, extra: pd.DataFrame(
+                 {"cluster_id": ["E1#0", "E1#1", "E1#2"], "label": ["noise", "unknown", "unknown"]}),
+             "mention_class": lambda ed, rules, extra: pd.Series(["wrong_entity", "cue", "wrong_entity"]),
+             "merges": lambda ed, label, rules, extra: pd.DataFrame(
+                 {"right": [True, False, False], "judged": [True, True, False]})}
+    fake(monkeypatch, funcs)
+    row = SR.new_columns(toy(), "A r1", Rules.default(), {}, OLD)
+    assert (row["unknown_n"], row["wrong_entity_n"], row["cue_n"]) == (2, 2, 1)
+    assert (row["merge_n"], row["merge_right"], row["merge_unjudged"]) == (2, 1, 1)

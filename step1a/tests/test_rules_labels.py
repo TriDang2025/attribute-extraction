@@ -123,3 +123,31 @@ def test_role_pairs_file():
     assert RL.role_pairs() == [("departure", "destination"), ("leave at", "arrive by")]
     assert RL.role_pairs(entity="hotel") == []
     assert RL.role_pairs(entity="taxi") == RL.role_pairs()
+
+
+def test_other_entity_wrong_entity_and_frequent():
+    # "Cambridge" is another entity's gold value; with wrong_entity it is neither real nor noise and counts against the top share
+    ed = make([("c1", "Stansted", "Train destination", "train"), ("c1", "Cambridge", "", ""),
+               ("c1", "Cambridge", "", ""), ("c2", "Ely", "", "")], {"c1": "gold", "c2": "noise"})
+    base = R("exclude", "pattern")
+    old = list(RL.mention_class(ed, base, {"other_gold": OTHER}))
+    assert old[1:3] == ["other_entity:hotel"] * 2
+    new = SimpleNamespace(**vars(base), other_entity="wrong_entity")
+    assert list(RL.mention_class(ed, new, {"other_gold": OTHER}))[1:3] == ["wrong_entity"] * 2
+    # frequent value: stays as in old
+    freq = RL.mention_class(ed, new, {"other_gold": OTHER, "frequent": {"cambridge"}})
+    assert list(freq)[1:3] == ["other_entity:hotel"] * 2
+    # the class is not an attribute: top share 1/3 (below 0.6), noise share 0 -> mixed
+    row = RL.cluster_labels(ed, new, {"other_gold": OTHER}).set_index("cluster_id").loc["c1"]
+    assert row["n_counted"] == 3 and row["top_attr"] == "Train destination" and row["label"] == "mixed"
+
+
+def test_frequent_values():
+    gv = pd.DataFrame({"dialogue_id": ["d1", "d2", "d3", "d4", "d5", "d6", "d1"],
+                       "value": ["Cambridge", "Cambridge", "Ely", "Bath", "Bath", "Bath", "Ely"],
+                       "entity_gold": ["hotel", "train", "hotel", "hotel", "hotel", "hotel", "hotel"]})
+    shared = SimpleNamespace(gv=gv, docs={f"d{i}": None for i in range(1, 11)})
+    # Cambridge: 2 entities; Bath: 3/10 dialogues (0.3), 3/15 is 0.2 too; Ely: 2/10 dialogues (0.2 counts)
+    assert RL.frequent_values(shared) == {"cambridge", "bath", "ely"}
+    shared.docs = {f"d{i}": None for i in range(1, 16)}  # Bath 3/15 = 0.2 stays, Ely 2/15 goes
+    assert RL.frequent_values(shared) == {"cambridge", "bath"}
