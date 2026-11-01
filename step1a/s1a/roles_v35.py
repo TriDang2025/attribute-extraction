@@ -26,6 +26,10 @@ SPLIT_THR = 0.25           # silhouette threshold for context_split (fixed in ad
 MIXED_SHARE = 0.6          # a cluster whose top gold attr is below this share is "mixed"
 EVAL_COLS = ["cluster_id", "n", "n_gold_role", "covered", "correct", "accuracy", "coverage"]
 _PUNCT = re.compile(r"^\W+|\W+$")
+# wf_v3.6: the cue words that are not about the domain (from / to ... work for any pair); the rest of CUE_ROLES are the
+# domain words (leave / depart / arrive and their forms)
+CUE_GENERAL = {"start": frozenset({"from", "after"}), "end": frozenset({"to", "into", "by", "before"})}
+CUE_DOMAIN = {side: PIN.CUE_ROLES[side] - CUE_GENERAL[side] for side in PIN.CUE_ROLES}
 
 
 def _key(slot):
@@ -85,19 +89,26 @@ def _local_start(row):
     return turn.find(text)
 
 
-def j_side(row, k=LEFT_WORDS):
-    """0 / 1 / None: the nearest of the k words before the value (turn text) that is a start / end cue word
-    (pilot_input.CUE_ROLES); the mention's `left_word` is checked first when the turn text has no usable offset."""
+def j_word(row, k=LEFT_WORDS, words=None):
+    """(side, word): the nearest of the k words before the value (turn text) that is a start (0) / end (1) cue word of
+    `words` ({"start": set, "end": set}; default pilot_input.CUE_ROLES), and that word; (None, None) when there is
+    none. The mention's `left_word` is checked instead when the turn text has no usable offset."""
+    words = PIN.CUE_ROLES if words is None else words
     start = _local_start(row)
     if start >= 0:
-        words = [_PUNCT.sub("", t).lower() for t in str(row["turn_text"])[:start].split()][-k:]
+        left = [_PUNCT.sub("", t).lower() for t in str(row["turn_text"])[:start].split()][-k:]
     else:
-        words = [str(row.get("left_word", ""))]
-    for w in reversed(words):
+        left = [str(row.get("left_word", ""))]
+    for w in reversed(left):
         for side, name in enumerate(("start", "end")):
-            if w in PIN.CUE_ROLES[name]:
-                return side
-    return None
+            if w in words[name]:
+                return side, w
+    return None, None
+
+
+def j_side(row, k=LEFT_WORDS, words=None):
+    """0 / 1 / None: the side of j_word (start / end cue word before the value)."""
+    return j_word(row, k, words)[0]
 
 
 def _summary(g, pred, gold):
@@ -110,9 +121,10 @@ def _summary(g, pred, gold):
             "coverage": covered.sum() / n_gold if n_gold else np.nan}
 
 
-def role_word_eval(mentions, gold_role_s, pairs=None):
+def role_word_eval(mentions, gold_role_s, pairs=None, words=None):
     """T15: per cluster with >= 1 gold-role mention. J gives a side from the words before the value; correct when it
-    equals the side of the gold role. accuracy = correct / covered, coverage = covered / n_gold_role."""
+    equals the side of the gold role. accuracy = correct / covered, coverage = covered / n_gold_role. `words`: cue
+    word sets for j_side (default: all of pilot_input.CUE_ROLES)."""
     pairs = pairs if pairs is not None else RL.role_pairs()
     rows = []
     for c, g in mentions.groupby("cluster_id"):
@@ -121,7 +133,7 @@ def role_word_eval(mentions, gold_role_s, pairs=None):
         if gr.empty:
             continue
         gold = gr.map(lambda r: _side(r, pairs))
-        pred = pd.Series([j_side(r) for _, r in g.loc[gr.index].iterrows()], index=gr.index, dtype=object)
+        pred = pd.Series([j_side(r, words=words) for _, r in g.loc[gr.index].iterrows()], index=gr.index, dtype=object)
         rows.append({"cluster_id": c, **_summary(g, pred, gold)})
     return pd.DataFrame(rows, columns=EVAL_COLS)
 

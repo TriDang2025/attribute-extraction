@@ -3,13 +3,19 @@ levels 1, 2 and 3 (results/loop1_v35/gt_levels.csv). No LLM, no models.
 
 python scripts/score_v35.py --setting default --levels 1,2,3 --dir33 <attribute-extraction-wf-v3.3/step1a/results/loop1_v33>
         [--run results/graph_v22_dev50 --dir32 results/loop1_v32 --dir31 results/loop1_v31 --out results/loop1_v35]
+        [--repair [--repairs-out results/loop1_v36/repairs.csv]] [--invalid config/invalid_runs_v36.json]
 Writes <out>/all_variants.csv (setting, level, ent, variant + OLD_COLS + NEW_COLS, every label incl. +namemerge) and
 <out>/all_variants.md (one table per level, variants x counts over the 3 entities). "default" = rules v1 (score_rules.DEFAULT);
 Rules.gt is set per level. v3.3 variants are scored with the P4 cue spread (as in v3.3); the v3.2 ones without (as in v3.4).
 Names of the v3.3 variants are not in the rated sheet: unrated groups count as not right and are shown as "[u unrated]".
+wf_v3.6 flags (both off by default, which keeps the output above unchanged): --repair parse-repairs the A responses
+(llm_cache.repair_undeclared: names used in `clusters` but not declared join the attribute list) and writes the repaired
+names to --repairs-out (columns variant, ent, job, repaired_names, n_repaired); --invalid picks the invalid-runs file
+that marks cells "invalid" in all_variants.md (default config/invalid_runs.json).
 """
 
 import argparse
+import json
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -80,14 +86,14 @@ HEAD = ["found train", "found hotel", "found restaurant", "noise pooled (target 
         "names right/base", "role right/base", "cue request/clusters"]
 
 
-def all_variants_md(df):
+def all_variants_md(df, invalid_path=RN.INVALID_RUNS_PATH):
     lines = ["# wf_v3.5 all variants", "",
              f"Setting `{df['setting'].iloc[0]}`; GT level 1 = TEAR gold, 2 = + MultiWOZ 2.2 schema slots, 3 = + DB columns "
              "(choice mentions are noise at every level). Counts are k/n (share); noise, merge, names, role and cue are "
              "summed over the 3 entities. C33 = v3.2 C scored with the cue spread (v3.3 way). Names of the v3.3 variants "
              "are not rated: unrated groups count as not right. At L2/L3 a valid_extra group counts as right when its "
              "majority attr is a non-L1 attr of the level (approximation). Placement is not used.", ""]
-    bad = RN.invalid_runs()
+    bad = RN.invalid_runs(invalid_path)
     for level, lv in df.groupby("level", sort=True):
         lines += [f"## Level {level}", "", "| variant | " + " | ".join(HEAD) + " |", "|---|" + "---|" * len(HEAD)]
         for variant in SHOWN:
@@ -99,6 +105,15 @@ def all_variants_md(df):
     return "\n".join(lines) + "\n"
 
 
+REPAIR_COLS = ["variant", "ent", "job", "repaired_names", "n_repaired"]
+
+
+def repairs_frame(rows):
+    """DataFrame (REPAIR_COLS) of repair rows [{variant, ent, job, repaired_names: [str]}]; names as a JSON list."""
+    return pd.DataFrame([{**r, "repaired_names": json.dumps(r["repaired_names"]), "n_repaired": len(r["repaired_names"])}
+                         for r in rows], columns=REPAIR_COLS)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--run", type=Path, default=Path("results/graph_v22_dev50"))
@@ -108,16 +123,24 @@ def main():
     ap.add_argument("--out", type=Path, default=Path("results/loop1_v35"))
     ap.add_argument("--setting", default="default")
     ap.add_argument("--levels", default="1,2,3")
+    ap.add_argument("--repair", action="store_true", help="parse-repair the A responses (undeclared attribute names)")
+    ap.add_argument("--repairs-out", type=Path, default=Path("results/loop1_v36/repairs.csv"))
+    ap.add_argument("--invalid", type=Path, default=RN.INVALID_RUNS_PATH, help="invalid-runs JSON (default config/invalid_runs.json)")
     a = ap.parse_args()
 
     levels = [int(x) for x in a.levels.split(",")]
-    shared, data = v34_data.load_all(a.run, a.dir32, a.dir31)
+    repairs = [] if a.repair else None
+    shared, data = v34_data.load_all(a.run, a.dir32, a.dir31, repairs)
     data33, notes = v35_data.load_v33(shared, data, a.dir33, a.dir32)
     extra = SR.load_extra(a.out, a.dir32)
     extra["gt_levels"] = v34_data.read_gt_levels(a.out / "gt_levels.csv")
     df = score_levels(a.setting, levels, data, shared, extra, data33)
     df.to_csv(a.out / "all_variants.csv", index=False, encoding="utf-8", lineterminator="\n")
-    md = all_variants_md(df) + "".join(f"\nNote: {n}\n" for n in notes)
+    if a.repair:
+        a.repairs_out.parent.mkdir(parents=True, exist_ok=True)
+        repairs_frame(repairs).to_csv(a.repairs_out, index=False, encoding="utf-8", lineterminator="\n")
+        print(f"wrote {a.repairs_out} ({len(repairs)} repaired responses)")
+    md = all_variants_md(df, a.invalid) + "".join(f"\nNote: {n}\n" for n in notes)
     (a.out / "all_variants.md").write_text(md, encoding="utf-8", newline="\n")
     print(f"wrote all_variants.csv and all_variants.md in {a.out} ({len(df)} rows)")
 

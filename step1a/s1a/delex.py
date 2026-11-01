@@ -6,8 +6,10 @@ so the model cannot name a cluster from a value it knows. `build_map` makes {low
 length and shape of the real string; train ids TR1234 become TX1234-like ids.
 """
 
+import json
 import random
 import re
+import zipfile
 import zlib
 
 import pandas as pd
@@ -16,6 +18,15 @@ NAME_ATTRS = ("train departure", "train destination", "hotel name", "restaurant 
               "taxi departure", "taxi destination", "train id")
 TR_ID = re.compile(r"\bTR\d{4}\b", re.IGNORECASE)
 MIN_LEN = 3
+# wf_v3.6 F2: generic words that must never be mapped, even when a database name or a station equals one of them
+STOP = frozenset({
+    "hotel", "hotels", "restaurant", "restaurants", "guesthouse", "guest house", "guesthouses", "guest houses",
+    "bed and breakfast", "b and b", "lodge", "train", "trains", "taxi", "taxis", "cab", "bus", "station",
+    "attraction", "attractions", "museum", "college", "park", "church", "theatre", "cinema", "gallery", "pool",
+    "swimming pool", "bar", "pub", "cafe", "travel time", "time", "centre", "center", "city centre", "city center",
+    "town centre", "town center", "north", "south", "east", "west", "cambridge", "the", "and", "road", "street",
+    "place", "house", "room", "area", "name", "address", "phone", "postcode", "food", "price"})
+NAME_DBS = ("hotel", "restaurant", "attraction")
 _VOWELS, _CONSONANTS = "aeiou", "bcdfghjklmnprstvw"
 
 
@@ -75,6 +86,32 @@ def build_map(mentions, gold_attrs=NAME_ATTRS, texts=()):
     cols = [c for c in ("norm_value", "text") if c in mentions]  # norm_value is stemmed; text is the span as written
     keys = [v.strip().lower() for c in cols for v, ok in zip(mentions[c], named)
             if ok and isinstance(v, str) and len(v.strip()) >= MIN_LEN]
+    mp = extend({}, keys)
+    for t in texts:
+        mp = add_tr_ids(mp, t)
+    return mp
+
+
+def db_names(zip_path):
+    """Real entity names of the MultiWOZ 2.4 databases (MULTIWOZ2.4.zip): the `name` of every hotel, restaurant and
+    attraction, and every train departure / destination station. Sorted list of distinct lowercased strings."""
+    z = zipfile.ZipFile(zip_path)
+    out = set()
+    for d in NAME_DBS:
+        out |= {r["name"] for r in json.loads(z.read(f"MULTIWOZ2.4/{d}_db.json")) if r.get("name")}
+    for r in json.loads(z.read("MULTIWOZ2.4/train_db.json")):
+        out |= {r["departure"], r["destination"]}
+    return sorted({_norm(n) for n in out})
+
+
+def build_map_v2(names, texts=()):
+    """wf_v3.6 F2 map {real lowercased string: fake}: only real entity names. `names` = db_names(...) (strings;
+    lowercased and whitespace-normalised here; a name with a leading "the" is mapped with and without it), plus every TR + 4-digit train id in `texts`. Strings in STOP and
+    strings shorter than 3 characters are never mapped. The span labels of a run play no part (v3.3 F, build_map,
+    mapped generic words that the spans of name clusters held)."""
+    keys = []
+    for n in (_norm(x) for x in names):
+        keys += [k for k in (n, n[4:] if n.startswith("the ") else n) if len(k) >= MIN_LEN and k not in STOP]
     mp = extend({}, keys)
     for t in texts:
         mp = add_tr_ids(mp, t)

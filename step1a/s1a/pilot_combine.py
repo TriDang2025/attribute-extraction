@@ -443,11 +443,14 @@ def _fill_text(tmpl, block):
     return "".join(ln for ln in tmpl.splitlines(keepends=True) if ln.strip() != CARRY_TOKEN).replace(CARRY_TOKEN, "")
 
 
+DELEX_VARIANTS = ("f", "f2")   # de-lexicalised variants: seed 0 only, no gate, delex map applied in fill_carry
+
+
 def fill_carry(out_dir, round):
     """Write the .txt of every manifest job of this round that has carry_from, from its .tmpl.txt with the carry
-    block of its parents' parsed responses (variant f: the delex map of <out_dir>/delex_map.json applied to the
+    block of its parents' parsed responses (variants f and f2: the delex map of <out_dir>/delex_map.json applied to the
     whole text). Returns the filled jobs; raises if a parent has no parsed response. Deterministic. Colab-safe:
-    s1a.delex is imported only for variant f."""
+    s1a.delex is imported only for variants f and f2."""
     out_dir = Path(out_dir)
     jobs = load_jobs(out_dir)
     by_name = {j["job"]: j for j in jobs}
@@ -461,7 +464,7 @@ def fill_carry(out_dir, round):
     for j in mine:
         text = _fill_text((out_dir / j["prompt"]).with_suffix(".tmpl.txt").read_text(encoding="utf-8"),
                           render_carry(_carry_attrs(out_dir, [by_name[n] for n in j["carry_from"]])))
-        if j["variant"] == "f":
+        if j["variant"] in DELEX_VARIANTS:
             from . import delex
             mp = json.loads((out_dir / "delex_map.json").read_text(encoding="utf-8")) if mp is None else mp
             text = delex.apply(text, mp)
@@ -475,11 +478,11 @@ def decisions_e(out_dir, ent, var, gate_dir):
     its entity jobs in out_dir (e1: group 0 from the `e` jobs, groups >= 1 from `e1`), then apply_gate with the gate
     and split responses of gate_dir (the v3.2 folder; f has no gate). stats: agree_mean, agree_full_share, ties, cue
     (attribute_cue clusters), gate_failed, split."""
-    seeds = (0,) if var == "f" else E_SEEDS
+    seeds = (0,) if var in DELEX_VARIANTS else E_SEEDS
     tabs = [decisions_b(out_dir, ent, s, split_results={}, variant=var, group0="e" if var == "e1" else None)
             for s in seeds]
     dec, stats = vote(tabs)
-    if var != "f":
+    if var not in DELEX_VARIANTS:
         gate = _by_cluster(gate_dir, ent, "gate")
         dec = apply_gate(dec, gate, _split_results(gate_dir, ent))
         stats["gate_failed"] = sum(1 for g in gate.values() if g.get("coherent") is False)

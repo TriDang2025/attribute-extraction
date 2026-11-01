@@ -31,7 +31,12 @@ DATA = {
     "conversation": ("Conversation", ROOT / "data/conversation"),
     "incidents": ("Incidents", ROOT / "data/incidents_small"),
     "weather": ("Weather", ROOT / "data/weather_small"),
+    "conversation_dev50": ("Conversation", ROOT / "data/conversation"),  # same pool/embeddings as conversation
 }
+# dev50 (wf_v3.6): the 50 Step-1a dev dialogues are texts to extract (and not demonstrations): their own test
+# file and previews, and the pool without their ids. Results go to results/conversation_dev50/.
+HELD_OUT = {"conversation_dev50": {"test": ROOT / "data/conversation_dev50.jsonl",
+                                   "previews": ROOT / "data/conversation/previews_dev50.jsonl"}}
 RESULTS = ROOT / "results"
 
 # Paper Table 2, Llama-3-8B-Instruct: (RAG, TEAR) per (dataset, metric, sim).
@@ -73,7 +78,7 @@ def _hidden(key: str, level: str) -> List[str]:
 
 
 def _tests(key: str, n: Optional[int]) -> List[Dict[str, Any]]:
-    rows = load_jsonl(str(DATA[key][1] / "test.jsonl"))
+    rows = load_jsonl(str(HELD_OUT[key]["test"] if key in HELD_OUT else DATA[key][1] / "test.jsonl"))
     return rows[:n] if n else rows
 
 
@@ -95,13 +100,16 @@ def _embedder(args, key: str) -> CachedEmbedder:
 
 
 def _previews(key: str) -> Dict[str, str]:
-    path = DATA[key][1] / "previews.jsonl"
+    path = HELD_OUT[key]["previews"] if key in HELD_OUT else DATA[key][1] / "previews.jsonl"
     return {r["id"]: r["sequence"] for r in _read(path)}
 
 
 def _pipeline(args, key, level, retrieval, seed, schema=None) -> TearPipeline:
     dataset = DATA[key][0]
     pool = load_jsonl(str(DATA[key][1] / "pool.jsonl"))
+    if key in HELD_OUT:  # held-out texts never serve as demonstrations
+        held = {r["id"] for r in _tests(key, None)}
+        pool = [r for r in pool if r["id"] not in held]
     return TearPipeline(_client(args, seed), pool, dataset, schema or _schema(key, level),
                         shots=config(dataset)["shots"], retrieval=retrieval,
                         embedder=_embedder(args, key), max_attempts=args.max_attempts)
@@ -280,11 +288,12 @@ def _fmt(values: List[float]) -> str:
 
 def cmd_report(args):
     sims = [s for s in ("EM", "chrf", "BS") if s != "BS" or not args.no_bs]
+    shown = {k: v for k, v in DATA.items() if k not in HELD_OUT}  # dev50 is scored by step1a/scripts/score_tear_v36.py
     lines, data = ["# Reproduction results (Llama-3-8B-Instruct Q4_K_M)", ""], {"table2": [], "ar": [], "tearstar": []}
     lines += ["## Table 2: table extraction, full schema", "",
               "| Dataset | Metric | sim. | Paper RAG | Ours RAG | Paper TEAR | Ours TEAR |", "|---|---|---|---|---|---|---|"]
     notes = []
-    for key, (dataset, folder) in DATA.items():
+    for key, (dataset, folder) in shown.items():
         gold = {r["id"]: r["table"] for r in _read(folder / "test.jsonl")}
         per = {}
         for method in ("rag", "tear"):
@@ -308,7 +317,7 @@ def cmd_report(args):
     lines += ["## Figure 4: attribute recommendation recall-AUC (%)", "",
               "| Dataset | Level | Hidden | Z | P* | Judge calls | Z' | elbow k | Accepted | TEAR chrf | TEAR BS | CFR chrf | CFR BS |",
               "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
-    for key, (dataset, folder) in DATA.items():
+    for key, (dataset, folder) in shown.items():
         for path in sorted((RESULTS / key).glob("ar_L*_s*.json")):
             level, seed = path.stem.split("_")[1][1:], path.stem.split("_")[2][1:]
             ar = json.loads(path.read_text(encoding="utf-8"))
@@ -330,7 +339,7 @@ def cmd_report(args):
 
     lines += ["## Figure 5/17: TEAR vs TEAR* under exploratory schemas (scored against the full-schema gold)", "",
               "| Dataset | Level | Method | header-F1 EM | header-F1 chrf | structured-F1 EM | structured-F1 chrf |", "|---|---|---|---|---|---|---|"]
-    for key, (dataset, folder) in DATA.items():
+    for key, (dataset, folder) in shown.items():
         gold = {r["id"]: r["table"] for r in _read(folder / "test.jsonl")}
         for level in ("1", "2", "3"):
             for method in ("tear", "tearstar"):

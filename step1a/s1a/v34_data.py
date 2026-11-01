@@ -91,8 +91,10 @@ def _finalize(dec, e, ctx, entity):
     return VariantOut(dec, attrs, assign, parts)
 
 
-def _entity_decs(ent, cids, dir32, dir31, jobs32, jobs31, split31):
-    """({label: dec}, vote_stats, seed_decs) of VARIANTS (as is, before the name merge). Missing responses raise."""
+def _entity_decs(ent, cids, dir32, dir31, jobs32, jobs31, split31, repairs=None):
+    """({label: dec}, vote_stats, seed_decs) of VARIANTS (as is, before the name merge). Missing responses raise.
+    `repairs` (list or None): when a list, the A responses are parse-repaired and a row {variant, ent, job,
+    repaired_names} is appended for each that needed it."""
     mine = [j for j in jobs32 if j["ent"] == ent]
     split = _objs(dir32, mine, "split")
     decs = {}
@@ -102,7 +104,10 @@ def _entity_decs(ent, cids, dir32, dir31, jobs32, jobs31, split31):
         path = dir31 / "responses" / f"{job['job']}.jsonl" if job else None
         if path is None or not path.exists():
             raise FileNotFoundError(f"{ent}: no v2 {tag} response in {dir31}")
-        decs[f"A {tag}"] = _decisions(job, path, cids, split31)
+        rep = None if repairs is None else []
+        decs[f"A {tag}"] = _decisions(job, path, cids, split31, rep)
+        if repairs is not None:
+            repairs.extend({"variant": f"A {tag}", "ent": ent, **r} for r in rep)
     for s in SEEDS:
         nbhd = [j for j in mine if j["kind"] == "entity" and j["run_tag"] == f"s{s}"]
         if not _have(dir32, nbhd):
@@ -116,8 +121,10 @@ def _entity_decs(ent, cids, dir32, dir31, jobs32, jobs31, split31):
     return {k: decs[k] for k in VARIANTS}, vote_stats, seed_decs
 
 
-def load_all(run, dir32, dir31):
-    """(Shared, {ent: EntityData}) for train, hotel, restaurant. Labels: VARIANTS and "<letter>+namemerge <tag>"."""
+def load_all(run, dir32, dir31, repairs=None):
+    """(Shared, {ent: EntityData}) for train, hotel, restaurant. Labels: VARIANTS and "<letter>+namemerge <tag>".
+    `repairs`: None = as saved; a list = the A responses get the v2 parse repair (llm_cache.repair_undeclared) and the
+    list receives one row per repaired response (see _entity_decs)."""
     run, dir32, dir31 = Path(run), Path(dir32), Path(dir31)
     e = MN.load(run / "spans")
     docs, gv, gold_attrs = MN.load_shared(run)
@@ -138,7 +145,7 @@ def load_all(run, dir32, dir31):
             return PS.Ctx(e.mentions, labels_all, gv, gold_attrs, e.ids, e.x, _examples(path, cids), entity, gold_ents)
 
         ctx_a, ctx_r = ctx_of(dir31 / "examples.csv"), ctx_of(dir32 / "examples.csv")
-        decs, vote_stats, seed_decs = _entity_decs(ent, cids, dir32, dir31, jobs32, jobs31, split31)
+        decs, vote_stats, seed_decs = _entity_decs(ent, cids, dir32, dir31, jobs32, jobs31, split31, repairs)
         variants = {}
         for label, dec in decs.items():
             letter, tag = label.split(" ")

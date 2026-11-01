@@ -24,8 +24,8 @@ NEW_COLS = ["noise_n", "noise_marked_v", "cue_n", "found_n", "gold_n", "recall_v
             "wrong_entity_n", "names_unrated", "cue_clusters", "cue_request", "cue_share"]
 NA = "n/a"
 
-OPTIONS = {"unlabeled": ("old", "exclude", "noise"), "noise_kind": ("old", "pattern", "jury"),
-           "cluster_label": ("old", "0.5", "0.6", "0.7"), "role_pairs": ("old", "config"), "names": ("old", "v34"),
+OPTIONS = {"unlabeled": ("old", "exclude", "noise"), "noise_kind": ("old", "pattern", "jury", "mwoz"),
+           "cluster_label": ("old", "0.5", "0.6", "0.7"), "role_pairs": ("old", "config"), "names": ("old", "v34", "l2rated"),
            "found": ("old", "cov0", "cov10", "cov25"), "merge": ("old", "n10", "n20", "n30"),
            "placement": ("old", "majority"), "agreement": ("old", "split"), "gt": ("old", "L1", "L2", "L3"),
            "unknown": ("old", "out"), "merge_gold": ("old", "min2"), "marked_found": ("old", "skip"),
@@ -34,12 +34,14 @@ DEFAULT = {"unlabeled": "exclude", "noise_kind": "pattern", "cluster_label": "0.
            "names": "v34", "found": "cov10", "merge": "n20", "placement": "majority", "agreement": "split",
            "gt": "L1", "unknown": "out", "merge_gold": "min2", "marked_found": "skip", "other_entity": "wrong_entity"}
 NO_SWEEP = ("gt",)  # the GT level changes the data, not the scorer: scripts/score_v35.py sets it per run
+# these need level data or rated files that the sweep does not have (scripts/noise_v36.py, scripts/names_l2_v36.py)
+NO_SWEEP_VALUES = (("noise_kind", "mwoz"), ("names", "l2rated"))
 
 
 @dataclass(frozen=True)
 class Rules:
     unlabeled: str = "old"      # Q3
-    noise_kind: str = "old"     # Q1
+    noise_kind: str = "old"     # Q1; mwoz = model-free noise from the GT level (rules_labels.mention_class)
     cluster_label: str = "old"  # Q2
     role_pairs: str = "old"     # Q10
     names: str = "old"          # Q4
@@ -90,7 +92,7 @@ def single_changes():
     for key, options in OPTIONS.items():
         if key in NO_SWEEP:
             continue
-        out += [f"default,{key}={o}" for o in options if o != DEFAULT[key]]
+        out += [f"default,{key}={o}" for o in options if o != DEFAULT[key] and (key, o) not in NO_SWEEP_VALUES]
     return out
 
 
@@ -113,12 +115,15 @@ def _call(module, name, *args):
     return None if fn is None else fn(*args)
 
 
-def load_extra(out_dir, dir32):
-    """Files read once: old name rubric, jury.csv, rated names sheet (None when absent), role pairs (None until W3)."""
+def load_extra(out_dir, dir32, l2_dir=None):
+    """Files read once: old name rubric, jury.csv, rated names sheet (None when absent), role pairs (None until W3).
+    l2_dir (names=l2rated): the folder with names_l2_rater{1,2}.csv and names_to_rate_l2_key.csv; "names_l2" is None
+    when it is not given or the rated files are absent."""
     def read(path):
         return pd.read_csv(path, dtype=str, keep_default_na=False, na_filter=False, encoding="utf-8") if path.exists() else None
     return {"old_rubric": read(dir32 / "name_rubric.csv"), "jury": read(out_dir / "jury.csv"),
-            "names_rated": read(out_dir / "names_rated.csv"), "role_pairs": _call("rules_labels", "role_pairs")}
+            "names_rated": read(out_dir / "names_rated.csv"), "role_pairs": _call("rules_labels", "role_pairs"),
+            "names_l2": None if l2_dir is None else _call("rules_names", "read_l2_rated", l2_dir)}
 
 
 # ---- old columns

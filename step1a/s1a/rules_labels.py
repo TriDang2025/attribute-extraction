@@ -18,7 +18,7 @@ ROLE_PAIRS_PATH = "config/role_pairs.json"
 THRESHOLDS = {"0.5": 0.5, "0.6": 0.6, "0.7": 0.7}
 NOISE_KINDS = ("question", "result_count", "general", "broken")
 KINDS = ("question", "result_count", "other_entity", "general", "broken", "odd_format", "other")
-SPECIAL = ("unlabeled", "noise", "cue", "wrong_entity")  # not an attribute class: left out of top_attr
+SPECIAL = ("unlabeled", "noise", "cue", "wrong_entity", "request")  # not an attribute class: left out of top_attr
 FREQUENT_DIALOGUES = 0.20  # other_entity=wrong_entity: a gold value in >= 20% of the dialogues is "frequent"
 FREQUENT_ENTITIES = 2      # ... or in >= 2 entities
 OLD_LABEL = {"gold": "real", "valid_new": "real", "noise": "noise"}
@@ -176,12 +176,25 @@ def _unlabeled_class(row, rules, other, jury, frequent):
     return "noise" if rules.unlabeled == "noise" else "unlabeled"
 
 
+def _mwoz_classes(m):
+    """noise_kind=mwoz, model-free: choice -> noise; a mention with a label at the data's GT level keeps it; else a
+    request mention (a question phrase for a requested slot) -> "request" (not an attribute, not noise); else noise.
+    Needs the level columns is_choice / is_request (v34_data.with_level)."""
+    if "is_choice" not in m.columns or "is_request" not in m.columns:
+        raise ValueError("noise_kind=mwoz needs level data (v34_data.with_level: is_choice / is_request columns)")
+    return ["noise" if ch else g if g else "request" if rq else "noise"
+            for g, ch, rq in zip(m["gold_attr"], m["is_choice"], m["is_request"])]
+
+
 def mention_class(ed, rules, extra):
     """Series indexed by mention_id: gold attr ("A;B" kept) / unlabeled / noise / cue / real_extra /
     other_entity:<Entity> / wrong_entity. Q3: exclude keeps "unlabeled" (the shares leave it out), noise turns it into
     "noise"; Q1 pattern / jury first re-classify the unlabelled mentions. other_entity=wrong_entity turns
-    other_entity:<E> into "wrong_entity" unless the value is frequent (frequent_values)."""
+    other_entity:<E> into "wrong_entity" unless the value is frequent (frequent_values). noise_kind=mwoz ignores Q3
+    and Q1: see _mwoz_classes (adds the class "request")."""
     m = ed.mentions
+    if rules.noise_kind == "mwoz":
+        return pd.Series(_mwoz_classes(m), index=m["mention_id"].astype(int).values, name="class")
     other = _other_gold(ed, extra) if rules.noise_kind == "pattern" else {}
     frequent = _frequent(extra) if getattr(rules, "other_entity", "old") == "wrong_entity" else set()
     jury = _jury_of(extra) if rules.noise_kind == "jury" else {}

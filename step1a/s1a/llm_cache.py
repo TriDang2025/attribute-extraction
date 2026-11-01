@@ -9,6 +9,7 @@ ACTIONS = ["keep", "merge", "split", "not_attribute", "unsure"]
 STR_KEYS = ["cluster_id", "name", "description", "placement", "evidence"]
 REQUIRED = STR_KEYS + ["value_type", "action", "merge_with", "split"]
 NOT_ATTRIBUTE = "not_attribute"
+ATTRIBUTE_CUE = "attribute_cue"
 
 _ITEM_SCHEMA = {
     "type": "object",
@@ -165,6 +166,30 @@ def parse_response_v2(raw, cluster_ids, attribute_names_check=True):
             errors.append(f"clusters[{i}] attribute {at!r} not in the attribute list")
     errors += [f"missing cluster_id {cid!r}" for cid in cluster_ids if cid not in seen]
     return obj, errors
+
+
+def _name_key(name):
+    return re.sub(r"[\s_\-]+", " ", str(name or "").lower()).strip()
+
+
+def repair_undeclared(obj):
+    """(obj, repaired_names) for a format-v2/v3 object: every cluster attribute that is neither `not_attribute` /
+    `attribute_cue` nor in `attributes` is appended to `attributes` as {name, description "", role "", repaired true}
+    (first-seen order). Names compare as in pilot_verify.norm_name (case, `_`, `-`, space equal), so a name that only
+    differs in spelling of the separators is not repaired. Returns a copy; `obj` is not changed. Not an object:
+    returned as is."""
+    if not isinstance(obj, dict):
+        return obj, []
+    attrs = [a for a in obj.get("attributes") or []]
+    names = {_name_key(a.get("name")) for a in attrs if isinstance(a, dict)}
+    added = []
+    for c in obj.get("clusters") or []:
+        at = c.get("attribute") if isinstance(c, dict) else None
+        if isinstance(at, str) and _name_key(at) not in names | {_name_key(NOT_ATTRIBUTE), _name_key(ATTRIBUTE_CUE)}:
+            names.add(_name_key(at))
+            added.append(at)
+    fixed = {**obj, "attributes": attrs + [{"name": n, "description": "", "role": "", "repaired": True} for n in added]}
+    return fixed, added
 
 
 def parse_split(raw, ex_ids):

@@ -25,6 +25,7 @@ Long runs (workflow):
 - `eval/reproduce.py` -> `results/<dataset>/te_<method>_L<level>_s<seed>.jsonl` -> `disc_L<l>_s<s>.jsonl` -> `coh_L<l>_s<s>.json` -> `ar_L<l>_s<s>.json` -> `te_tearstar_L<l>_s<s>.jsonl` (+ meta json) -> `results/report.{md,json}`
 - `eval/reproduce.py` -> `data/conversation/embeddings_<name>.json` (embedding cache)
 - `tools/run_all.py` -> `results/conversation_input_first<N>.jsonl`, `results/run_all.log`
+- `data_build/dev50.py` -> `data/conversation_dev50.jsonl` -> `eval/reproduce.py` (dataset `conversation_dev50`, pool without its ids), `tools/run_all.py` (`TEAR_DEV50=1`) -> `results/conversation_dev50/te_tear_Lfull_s0.jsonl` -> `../step1a/scripts/score_tear_v36.py`; see `colab/DEV50_RUN.md`
 
 ## Status (2026-10-19)
 - All paper components implemented; 49 unit tests pass.

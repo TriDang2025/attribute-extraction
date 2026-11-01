@@ -447,15 +447,17 @@ def est_tokens(text):
 
 
 # ------------------------------------------------------------------ wf_v3.1: format v2, split pass, schemas
-def render_v2(inp, export, docs, variant="v2", hints=None, order_seed=None):
+def render_v2(inp, export, docs, variant="v2", hints=None, order_seed=None, noise_rule=False):
     """Prompt text of output format v2. `variant` v2 / v2_hints / v2_nocontext; `hints` {cluster_id: [dict(other, ..)]}
-    is shown only for v2_hints; `order_seed` shuffles the cluster order (default: id order)."""
+    is shown only for v2_hints; `order_seed` shuffles the cluster order (default: id order). wf_v3.6 AE: `noise_rule`
+    True uses INSTRUCTION_V2_AE (the v2 instruction plus E's noise rule); the default gives the v3.1 prompt."""
     if variant not in VARIANTS_V2:
         raise ValueError(variant)
     cl = list(inp.clusters)
     if order_seed is not None:
         cl = [cl[i] for i in np.random.default_rng(order_seed).permutation(len(cl))]
-    parts = [INSTRUCTION_V2, f"Entity {inp.entity}: {len(cl)} clusters.", _render_options(inp)]
+    parts = [INSTRUCTION_V2_AE if noise_rule else INSTRUCTION_V2, f"Entity {inp.entity}: {len(cl)} clusters.",
+             _render_options(inp)]
     for ci in cl:
         lines = _cluster_block(export, docs, ci, variant != "v2_nocontext")
         h = (hints or {}).get(ci.cluster_id) if variant == "v2_hints" else None
@@ -610,6 +612,15 @@ INSTRUCTION_V33 = (INSTRUCTION_V3
                             '              {"cluster_id": "E9#2", "attribute": "attribute_cue", '
                             '"evidence": "[[what day]] do you want?",\n'
                             '               "mixed": false, "placement": "current entity E9"}]}'))
+
+# wf_v3.6 AE: the v2 instruction + the noise rule of E, right after the v2 noise sentence (nothing else changes; no
+# attribute_cue line, and the rule's attribute_cue clause is dropped: v2 has no attribute_cue label, so an answer using
+# it would be a parse error). INSTRUCTION_V2_AE minus " " + NOISE_RULE_AE is INSTRUCTION_V2.
+NOISE_RULE_AE = NOISE_RULE.replace(' (or "attribute_cue" for questions)', "")
+assert NOISE_RULE_AE != NOISE_RULE
+_NOISE_END = "and values that a database would not store."
+assert INSTRUCTION_V2.count(_NOISE_END) == 1
+INSTRUCTION_V2_AE = INSTRUCTION_V2.replace(_NOISE_END, _NOISE_END + " " + NOISE_RULE_AE)
 
 
 _MIXED_SENT = ('If a cluster holds two attributes (two roles), assign its\n'

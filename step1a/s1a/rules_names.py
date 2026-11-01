@@ -24,6 +24,9 @@ from . import shapes
 from .labels import _classes
 
 LABELS = ("right", "too_general", "wrong_role", "valid_extra", "wrong")  # best first: the lower label wins a tie
+L2_LABELS = ("right", "partly", "wrong")  # names_l2_rubric.md; names=l2rated, best first
+L2_FILES = ("names_l2_rater1.csv", "names_l2_rater2.csv")
+L2_KEY_FILE = "names_to_rate_l2_key.csv"  # row -> JOIN_KEYS (+ variant, for audit); written by s1a.names_l2
 RATE_COLS = ["ent", "name", "description", "majority_gold_attr", "role", "cluster_label", "top_values"]
 SHEET_COLS = ["row", "ent", "variant label", "attr_id", "name", "description", "majority_gold_attr", "role",
               "cluster_label", "top_values", "old_final", "freq", "valid_extra_candidate"]
@@ -135,18 +138,33 @@ def _role_slots(extra, rules):
     return {str(s).lower().replace("_", " ") for p in pairs for s in p[:2]}
 
 
-def _rated_by_key(rated):
+def _rated_by_key(rated, labels=LABELS):
     """{(ent, name, description, majority_gold_attr): label}; several rows for one key keep the lowest label."""
-    rank = {lab: i for i, lab in enumerate(LABELS)}
+    rank = {lab: i for i, lab in enumerate(labels)}
     out = {}
     for _, r in rated.iterrows():
         lab = str(r["label"]).strip().lower()
         if lab not in rank:
-            raise ValueError(f"names_rated: unknown label {r['label']!r}, expected one of {LABELS}")
+            raise ValueError(f"names_rated: unknown label {r['label']!r}, expected one of {tuple(labels)}")
         k = tuple(r[c] for c in JOIN_KEYS)
         if k not in out or rank[lab] > rank[out[k]]:
             out[k] = lab
     return out
+
+
+def read_l2_rated(folder):
+    """names=l2rated: DataFrame (JOIN_KEYS + label) from names_l2_rater1.csv / names_l2_rater2.csv (columns row, label)
+    joined to the key file by row; the lower label of the two raters wins. None when a file is missing."""
+    folder = Path(folder)
+    paths = [folder / f for f in (*L2_FILES, L2_KEY_FILE)]
+    if not all(p.exists() for p in paths):
+        return None
+    read = lambda p: pd.read_csv(p, dtype=str, keep_default_na=False, na_filter=False, encoding="utf-8")  # noqa: E731
+    key = read(paths[2])[["row"] + JOIN_KEYS].drop_duplicates("row")
+    rows = pd.concat([read(p)[["row", "label"]] for p in paths[:2]], ignore_index=True).merge(key, on="row")
+    got = _rated_by_key(rows, L2_LABELS)
+    return pd.DataFrame([dict(zip(JOIN_KEYS, k), label=lab) for k, lab in got.items()],
+                        columns=JOIN_KEYS + ["label"])
 
 
 def _level_rows(ed, label):
@@ -169,16 +187,33 @@ def name_scores(ed, label, rules, extra):
     GT level L2 / L3 (level copy): the rating is looked up with the L1 majority attr, since the raters saw it. A group
     rated right counts for its L1 majority attr (when that attr is in the level's base). APPROXIMATION: a group rated
     valid_extra whose majority gold attr at the level is an attr that has no L1 mention (a non-L1 attr) in the level's
-    base counts as right for that attr; the raters never judged the level's attr itself."""
+    base counts as right for that attr; the raters never judged the level's attr itself.
+    names=l2rated, GT level L2 / L3: the approximation is replaced. A group with a name is looked up in extra["names_l2"]
+    (read_l2_rated: raters judged the name against the level majority attr's L2 slot name and description) under
+    (ent, name, description, majority attr at the level); label right counts for that attr (when it is in the base). A
+    name without a rating (a majority attr the sheet does not hold, e.g. an L3 DB column) counts as not right and is
+    reported in names_unrated; valid_extra is 0 (the L2 labels are right / partly / wrong). L1 stays as names=v34."""
     rated = extra.get("names_rated")
     if rated is None:
         return {}
+    l2 = rules.names == "l2rated" and getattr(ed, "level", 0) >= 2
+    if l2 and extra.get("names_l2") is None:
+        raise ValueError("names=l2rated needs extra['names_l2'] (names_l2_rater{1,2}.csv; score_rules.load_extra l2_dir)")
+    got_l2 = _rated_by_key(extra["names_l2"], L2_LABELS) if l2 else {}
     ctx = ed.ctx_a if label.startswith("A") else ed.ctx_r
     base = list(ctx.train)
     got = _rated_by_key(rated)
     l1_attrs = {c for g in (ed.mentions_l1["gold_attr"] if getattr(ed, "mentions_l1", None) is not None else []) for c in _classes(g)}
     right, extras, unrated = set(), 0, 0
     for r, r1 in _level_rows(ed, label):
+        if l2:
+            if not r["majority_gold_attr"]:
+                continue  # no L2 majority: not on the sheet, not scored
+            lab = got_l2.get(tuple(r[c] for c in JOIN_KEYS)) if r["name"] else None
+            unrated += bool(r["name"]) and lab is None
+            if lab == "right" and r["majority_gold_attr"] in base:
+                right.add(r["majority_gold_attr"])
+            continue
         lab = got.get(tuple(r1[c] for c in JOIN_KEYS)) if r["name"] else None
         unrated += bool(r["name"]) and lab is None
         if lab == "right" and r1["majority_gold_attr"] in base:

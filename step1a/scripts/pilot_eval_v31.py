@@ -19,6 +19,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from s1a import llm_cache as LC  # noqa: E402
 from s1a import mentions as MN  # noqa: E402
 from s1a import pilot_score as PS  # noqa: E402
 from s1a import pilot_verify as PV  # noqa: E402
@@ -67,11 +68,19 @@ def _check_row(path):
               f"{(r.get('errors') or [])[:3]}", file=sys.stderr)
 
 
-def _decisions(job, path, cids, split_all):
+def _decisions(job, path, cids, split_all, repairs=None):
+    """Decision table of one response file. `repairs` (a list, default None = off) turns on the v2 parse repair
+    (llm_cache.repair_undeclared): names a cluster uses but the model never declared join the attribute list, and a
+    row {job, repaired_names} is appended for each response that needed it."""
     _check_row(path)
     variant, tag = job["variant"], job["run_tag"]
     if job["format"] == "v2":
         objs = PV.load_objects(path)
+        if repairs is not None and objs:
+            fixed, names = LC.repair_undeclared(objs[0])
+            objs = [fixed] + objs[1:]
+            if names:
+                repairs.append({"job": job["job"], "repaired_names": names})
         by_tag = split_all.get(job["ent"], {})
         split = by_tag.get(tag) or (by_tag[sorted(by_tag)[0]] if by_tag else None)
         return PV.decisions_from_v2(objs[0] if objs else {}, cids, variant, tag, split, require_mixed=False)
