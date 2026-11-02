@@ -39,9 +39,11 @@ def _schema(out_dir, job):
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
-def load_obj(out_dir, job):
+def load_obj(out_dir, job, repairs=None):
     """Parsed response of a manifest job (the LAST row of responses/<job>.jsonl; llm_cache.parse_job of its raw
-    text when the row has no usable `parsed`), or None if the file is missing, empty or the parse gave nothing."""
+    text when the row has no usable `parsed`), or None if the file is missing, empty or the parse gave nothing.
+    `repairs` (a list, default None = off): a format v2 / v3 response gets the parse repair
+    (llm_cache.repair_undeclared) and a row {job, repaired_names} is appended when it needed one."""
     path = Path(out_dir) / "responses" / f"{job['job']}.jsonl"
     if not path.exists():
         return None
@@ -55,7 +57,13 @@ def load_obj(out_dir, job):
             parsed, _, _ = LC.parse_job(row.get("raw") or "", job["format"], _schema(out_dir, job))
         except ValueError:
             return None
-    return parsed if isinstance(parsed, dict) and parsed else None
+    if not (isinstance(parsed, dict) and parsed):
+        return None
+    if repairs is not None and job["format"] in ("v2", "v3"):
+        parsed, names = LC.repair_undeclared(parsed)
+        if names:
+            repairs.append({"job": job["job"], "repaired_names": names})
+    return parsed
 
 
 def _jobs_of(out_dir, ent, kind, run_tag=None):
@@ -77,12 +85,13 @@ def _empty_row(variant, tag, cid):
 
 
 # ---------------------------------------------------------------- B: one order
-def decisions_b(out_dir, ent, seed=0, split_results=None, variant="nbhd", group0=None):
+def decisions_b(out_dir, ent, seed=0, split_results=None, variant="nbhd", group0=None, repairs=None):
     """v2 decision table of the group responses (jobs of this `variant`) of one order, concatenated (before the
     name merge). `group0`: variant to read group 0 from instead (wf_v3.3 E1 shares its group-0 jobs with E).
     Each group goes through PV.decisions_from_v2 (require_mixed=False; the v3 `reason` key is ignored there).
     split_results {cluster_id: split obj}; None = the manifest's split responses of the entity, {} = no splits.
-    A group whose response is missing gives rows with action "" for its cluster ids (the schema's enum)."""
+    A group whose response is missing gives rows with action "" for its cluster ids (the schema's enum).
+    `repairs` (list or None): opt-in parse repair of the group responses, see load_obj."""
     tag = f"s{seed}"
     if split_results is None:
         split_results = _split_results(out_dir, ent)
@@ -90,7 +99,7 @@ def decisions_b(out_dir, ent, seed=0, split_results=None, variant="nbhd", group0
     for job in sorted(_jobs_of(out_dir, ent, "entity", tag), key=lambda j: (j["nbhd"] or 0)):
         if job["variant"] != (group0 if group0 and (job["nbhd"] or 0) == 0 else variant):
             continue
-        obj = load_obj(out_dir, job)
+        obj = load_obj(out_dir, job, repairs)
         ids = LC.schema_enum(_schema(out_dir, job), "cluster_id")
         if ids is None:
             ids = [c.get("cluster_id") for c in (obj or {}).get("clusters") or [] if isinstance(c, dict)]
@@ -473,14 +482,14 @@ def fill_carry(out_dir, round):
     return done
 
 
-def decisions_e(out_dir, ent, var, gate_dir):
+def decisions_e(out_dir, ent, var, gate_dir, repairs=None):
     """(table, stats) of a wf_v3.3 variant: var e | e1 | e2 | f. Vote over the orders (seeds 0-2; f: seed 0 only) of
     its entity jobs in out_dir (e1: group 0 from the `e` jobs, groups >= 1 from `e1`), then apply_gate with the gate
     and split responses of gate_dir (the v3.2 folder; f has no gate). stats: agree_mean, agree_full_share, ties, cue
     (attribute_cue clusters), gate_failed, split."""
     seeds = (0,) if var in DELEX_VARIANTS else E_SEEDS
-    tabs = [decisions_b(out_dir, ent, s, split_results={}, variant=var, group0="e" if var == "e1" else None)
-            for s in seeds]
+    tabs = [decisions_b(out_dir, ent, s, split_results={}, variant=var, group0="e" if var == "e1" else None,
+                        repairs=repairs) for s in seeds]
     dec, stats = vote(tabs)
     if var not in DELEX_VARIANTS:
         gate = _by_cluster(gate_dir, ent, "gate")

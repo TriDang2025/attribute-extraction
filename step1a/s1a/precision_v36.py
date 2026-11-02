@@ -85,26 +85,31 @@ def precision_md(table, notes=()):
 
 # ---- task 11: seed-0 variants (F, E s0, F2 hook)
 
-def seed0_decisions(out_dir, ent, var, shared=None):
+def seed0_decisions(out_dir, ent, var, shared=None, repairs=None):
     """Vote table of one order (seed 0), no gate or split, of the entity jobs of variant `var` (e | f | f2 | ...) in
-    `out_dir`; None when a response file is missing. Same reading as v3.3 F (decisions_e with var f)."""
+    `out_dir`; None when a response file is missing. Same reading as v3.3 F (decisions_e with var f).
+    `repairs` (list or None): opt-in parse repair, rows {job, repaired_names} (pilot_combine.load_obj)."""
     jobs = [j for j in _jobs(out_dir) if j["ent"] == ent and j["kind"] == "entity" and j["variant"] == var
             and j["run_tag"] == "s0"]
     if not _have(out_dir, jobs):
         return None
-    return PC.vote([PC.decisions_b(out_dir, ent, 0, {}, variant=var)])[0]
+    return PC.vote([PC.decisions_b(out_dir, ent, 0, {}, variant=var, repairs=repairs)])[0]
 
 
-def seed0_variants(data33, shared, out_dir, specs):
+def seed0_variants(data33, shared, out_dir, specs, repairs=None):
     """New EntityData dict: `data33` (v35_data.load_v33 output) with one more variant per spec (label letter, job
     variant, e.g. ("F", "f"), ("E", "e"), ("F2", "f2")), labelled "<letter> s0", scored with the cue spread like the
-    v3.3 variants. Entities without responses for a spec skip it; returns (data, notes)."""
+    v3.3 variants. Entities without responses for a spec skip it; returns (data, notes). `repairs` (list or None):
+    opt-in parse repair; a row {variant, ent, job, repaired_names} is appended for each repaired response."""
     left_words = PV.left_word_map(shared.e.mentions, shared.docs)
     out, notes = {}, []
     for ent, ed in data33.items():
         variants = dict(ed.variants)
         for letter, var in specs:
-            dec = seed0_decisions(out_dir, ent, var)
+            rows = None if repairs is None else []
+            dec = seed0_decisions(out_dir, ent, var, repairs=rows)
+            if rows:
+                repairs.extend({"variant": f"{letter} s0", "ent": ent, **r} for r in rows)
             if dec is None:
                 notes.append(f"{ent}: {letter} s0 skipped, `{var}` seed-0 responses missing in {out_dir}")
                 continue
