@@ -15,10 +15,10 @@ _A = SF.compose(SF.drop_stop, SF.drop_slot_names)
 _B = partial(SH.shape, kinds=SH.CODES)
 
 
-def _v(note, beta=0.0, by_type=True, t=0.4, cannot_link=False):
+def _v(note, beta=0.0, by_type=True, t=0.4, cannot_link=False, type_fn=None):
     return Variant(span_filter=_A, note=note,
                    cluster_fn=partial(C.cluster_fn, beta=beta, k=1, by_type=by_type, t=t,
-                                      cannot_link=cannot_link, text_fn=_B))
+                                      cannot_link=cannot_link, text_fn=_B, type_fn=type_fn))
 
 
 CONFIGS = {

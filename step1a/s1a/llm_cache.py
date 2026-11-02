@@ -299,6 +299,18 @@ def parse_reconcile(raw, unit_ids=None, candidates=None):
     return _obj_errors(raw, ["unit_id", "reason", "same_as"], extra)
 
 
+def parse_baseline(raw):
+    """(obj, errors) for the LLM-only baseline (wf_v3.7): {"attributes": [{name, description}]}, every entry strings."""
+    def extra(obj, errors):
+        att = obj.get("attributes")
+        if not isinstance(att, list):
+            errors.append("attributes missing or not a list")
+            return
+        errors += [f"attributes[{i}] needs string name and description" for i, a in enumerate(att)
+                   if not (isinstance(a, dict) and isinstance(a.get("name"), str) and isinstance(a.get("description"), str))]
+    return _obj_errors(raw, [], extra)
+
+
 def token_fields(out, batch_seconds, batch_size):
     """Token stats of one vLLM RequestOutput for a response row (PILOT_V32_CONTRACT.md "Token stats")."""
     return {"prompt_tokens": len(out.prompt_token_ids), "output_tokens": len(out.outputs[0].token_ids),
@@ -315,6 +327,9 @@ def parse_job(raw, fmt, schema):
         parse = parse_response_v2 if fmt == "v2" else parse_response_v3
         parsed, errs = parse(raw, schema_enum(schema, "cluster_id") or [])
         return parsed, errs, len(parsed.get("clusters") or [])
+    if fmt == "baseline":
+        parsed, errs = parse_baseline(raw)
+        return parsed, errs, len(parsed.get("attributes") or [])
     if fmt == "split":
         parsed, errs = parse_split(raw, schema_enum(schema, "examples") or [])
         return parsed, errs, len(parsed.get("parts") or [])

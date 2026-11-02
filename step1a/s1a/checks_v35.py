@@ -4,7 +4,6 @@ T38 extras by GT level. Pure functions of EntityData (ed) and plain DataFrames; 
 A levels table (gt_levels.csv) has mention_id, gt_L1/L2/L3, ent_L1/L2/L3, is_request, is_choice.
 """
 
-import re
 from collections import Counter
 from dataclasses import replace
 from itertools import combinations
@@ -18,6 +17,7 @@ from . import score_rules as SR
 from . import step2 as S2
 from . import v34_data as VD
 from .labels import _classes
+from .value_types import value_type_v35  # noqa: F401  (T26; moved to value_types.py, re-exported)
 
 LEVELS = (1, 2, 3)
 MAJ = 0.6                                  # share of a group's mentions a label needs to be its majority (= Q5 purity)
@@ -71,23 +71,6 @@ def noise_vote_scores(ed, rules, extra, levels=None, need=2, current="C s012"):
 
 
 # ---- T26: value types
-
-_PRICE = re.compile(r"\d\s*-?\s*(?:gbp|gpb|pounds?|quid)\b")
-_DURATION = re.compile(r"\d\s*-?\s*(?:minutes?|mins?|hours?|hrs?)\b")
-
-
-def value_type_v35(text):
-    """step2.value_type plus two fixes: a number glued to or hyphenated with a currency (8.08GBP, 37.79 GPB) is a
-    price; a number with a duration unit (28-minute, 105 minutes) is a duration (the frozen function gives text /
-    number). Everything else is the frozen result."""
-    raw = str(text).strip()
-    low = S2.normalize(raw)
-    if "£" in raw or _PRICE.search(low):
-        return "price"
-    if _DURATION.search(low):
-        return "duration"
-    return S2.value_type(raw)
-
 
 def _majority_type(types):
     return sorted(Counter(types).items(), key=lambda kv: (-kv[1], kv[0]))[0][0]

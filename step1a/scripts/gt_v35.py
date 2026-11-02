@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT))
 from s1a import gt_ext as GT  # noqa: E402
 from s1a import mentions as MN  # noqa: E402
 from s1a import pilot_input as PIN  # noqa: E402
+from s1a import run_data_v37 as RD  # noqa: E402
 
 DB_ZIP = ROOT.parent / "chunking" / "data" / "MULTIWOZ2.4.zip"
 
@@ -43,6 +44,8 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--map", default=str(ROOT / "config" / "tear_to_mwoz.json"))
     ap.add_argument("--q34", default=str(ROOT / "results" / "loop1_v34"))
+    ap.add_argument("--auto-entities", action="store_true",
+                    help="stage-1 entity ids -> domains looked up from the mentions (runs other than dev50)")
     a = ap.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -63,7 +66,8 @@ def main():
     matched = GT.match(mentions, spans, utt, mw_utts)
     schema = {s["name"] for svc in json.loads((Path(a.mwoz) / "schema.json").read_text(encoding="utf-8")) for s in svc["slots"]}
     tear_map = json.loads(Path(a.map).read_text(encoding="utf-8"))
-    lv = GT.levels(mentions, matched, tear_map, GT.load_db(DB_ZIP), schema, utt)
+    ent_dom = {v: k for k, v in RD.entity_ids(mentions).items()} if a.auto_entities else None
+    lv = GT.levels(mentions, matched, tear_map, GT.load_db(DB_ZIP), schema, utt, ent_dom)
 
     matched.to_csv(out / "mwoz_match.csv", index=False)
     lv.to_csv(out / "gt_levels.csv", index=False)
@@ -73,7 +77,7 @@ def main():
     q34 = Path(a.q34)
     old = {"q2": pd.read_csv(q34 / "q2_table.csv") if (q34 / "q2_table.csv").exists() else None,
            "q1": pd.read_csv(q34 / "q1_table_values.csv", keep_default_na=False) if (q34 / "q1_table_values.csv").exists() else None}
-    table, extra = GT.coverage(mentions, lv, old)
+    table, extra = GT.coverage(mentions, lv, old, ent_dom)
     table.to_csv(out / "gt_coverage.csv", index=False)
     tm, mm = matched["text_match"].value_counts(), matched["match"].value_counts()
     md = ["# GT coverage (wf_v3.5, W1)", "",

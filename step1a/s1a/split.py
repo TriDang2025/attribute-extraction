@@ -10,11 +10,15 @@ from chk.data import load_dialogues
 
 N_DEV = 300
 FRESH = slice(N_DEV + 350, N_DEV + 450)
+DEV50B = slice(50, 100)  # wf_v3.7: pool[50:100], confirm decisions only, never tune
+RUNNABLE = ("dev", "dev50b", "test")  # --split choices of the scripts ("fresh" is never a flag)
 
 
 def dialogues(split, limit=None, unseal=False):
     if split == "dev":
         out = load_dialogues(N_DEV)
+    elif split == "dev50b":
+        out = load_dialogues(N_DEV)[DEV50B]
     elif split == "test":
         out = load_dialogues()[N_DEV:]
     elif split == "fresh":

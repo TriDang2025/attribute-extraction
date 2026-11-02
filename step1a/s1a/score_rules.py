@@ -38,6 +38,9 @@ NO_SWEEP = ("gt",)  # the GT level changes the data, not the scorer: scripts/sco
 NO_SWEEP_VALUES = (("noise_kind", "mwoz"), ("names", "l2rated"))
 
 
+BASES = {}  # base setting name -> Rules factory, filled below the class
+
+
 @dataclass(frozen=True)
 class Rules:
     unlabeled: str = "old"      # Q3
@@ -69,21 +72,29 @@ class Rules:
         return Rules(**DEFAULT)
 
     @staticmethod
+    def v1_1():
+        """Rules v1.1 (RULES_V1_1.md, wf_v3.7): `default` with the model-free noise set (noise_kind=mwoz) as the only change."""
+        return replace(Rules.default(), noise_kind="mwoz")
+
+    @staticmethod
     def parse(setting):
-        """"old" | "default" | "default,found=cov25,merge=n10" | "old,unlabeled=exclude"; the first token may be left out."""
+        """"old" | "default" | "v1.1" | "default,found=cov25,merge=n10" | "old,unlabeled=exclude"; the first token may be left out."""
         tokens = [t.strip() for t in setting.split(",") if t.strip()]
         rules = Rules.old()
         if tokens and "=" not in tokens[0]:
             base = tokens.pop(0)
-            if base not in ("old", "default"):
-                raise ValueError(f"unknown base setting {base!r}: expected old or default")
-            rules = Rules.default() if base == "default" else Rules.old()
+            if base not in BASES:
+                raise ValueError(f"unknown base setting {base!r}: expected one of {tuple(BASES)}")
+            rules = BASES[base]()
         for t in tokens:
             key, _, value = t.partition("=")
             if key not in OPTIONS or not value:
                 raise ValueError(f"bad rule {t!r}: expected <rule>=<option>, rules are {sorted(OPTIONS)}")
             rules = replace(rules, **{key: value})
         return rules
+
+
+BASES.update({"old": Rules.old, "default": Rules.default, "v1.1": Rules.v1_1})
 
 
 def single_changes():

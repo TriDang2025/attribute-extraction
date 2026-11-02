@@ -89,21 +89,32 @@ def _local_start(row):
     return turn.find(text)
 
 
-def j_word(row, k=LEFT_WORDS, words=None):
-    """(side, word): the nearest of the k words before the value (turn text) that is a start (0) / end (1) cue word of
-    `words` ({"start": set, "end": set}; default pilot_input.CUE_ROLES), and that word; (None, None) when there is
-    none. The mention's `left_word` is checked instead when the turn text has no usable offset."""
+def left_tokens(before, k=LEFT_WORDS):
+    """The last k words of the text before a value, lowercased, punctuation stripped (an all-punctuation word stays as "")."""
+    return [_PUNCT.sub("", t).lower() for t in str(before).split()][-k:]
+
+
+def side_word(left, words=None):
+    """(side, word): the nearest word of `left` (nearest last) that is a start (0) / end (1) cue word of `words`
+    ({"start": set, "end": set}; default pilot_input.CUE_ROLES); (None, None) when there is none."""
     words = PIN.CUE_ROLES if words is None else words
-    start = _local_start(row)
-    if start >= 0:
-        left = [_PUNCT.sub("", t).lower() for t in str(row["turn_text"])[:start].split()][-k:]
-    else:
-        left = [str(row.get("left_word", ""))]
     for w in reversed(left):
         for side, name in enumerate(("start", "end")):
             if w in words[name]:
                 return side, w
     return None, None
+
+
+def row_left(row, k=LEFT_WORDS):
+    """left_tokens of a mention row (turn text before the value); the mention's `left_word` when the turn text has no
+    usable offset."""
+    start = _local_start(row)
+    return left_tokens(str(row["turn_text"])[:start], k) if start >= 0 else [str(row.get("left_word", ""))]
+
+
+def j_word(row, k=LEFT_WORDS, words=None):
+    """(side, word) of side_word over the k words before the value of a mention row (see row_left)."""
+    return side_word(row_left(row, k), words)
 
 
 def j_side(row, k=LEFT_WORDS, words=None):

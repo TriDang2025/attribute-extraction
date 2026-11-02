@@ -6,6 +6,7 @@ Caches (resumable) go to <out>/cache; the dev caches of the n50 runs seed them. 
 """
 
 import argparse
+import json
 import shutil
 import sys
 import time
@@ -73,22 +74,29 @@ def prepare(split, limit, out, with_spans=True):
 
 
 def apply_variant(inp, name):
-    """Set the spans filter and cluster_fn of a variant from s1a/combos.py (v2.1) or s1a/fold.py (v2.2)."""
-    from s1a import combos, fold
-    v = (combos.CONFIGS | fold.CONFIGS)[name]
+    """Set the spans filter and cluster_fn of a variant from s1a/combos.py (v2.1), s1a/fold.py (v2.2) or s1a/combos23.py (v2.3)."""
+    from s1a import combos, combos23, fold
+    v = (combos.CONFIGS | fold.CONFIGS | combos23.CONFIGS)[name]
     inp.spans = v.span_filter(inp.spans) if v.span_filter else inp.spans
     inp.cluster_fn = v.cluster_fn
     print(f"variant {name}: {v.note}; {len(inp.spans)} spans", flush=True)
 
 
+def save_split_stats(variant, d):
+    """<d>/j_split.json: the J split of a v2.3 variant (combos23.LAST_SPLIT: mention indices of each split cluster and part)."""
+    from s1a import combos23
+    if variant in combos23.CONFIGS and combos23.LAST_SPLIT:
+        (d / "j_split.json").write_text(json.dumps(combos23.LAST_SPLIT), encoding="utf-8", newline="\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--split", choices=("dev", "test"), default="dev")
+    ap.add_argument("--split", choices=SPL.RUNNABLE, default="dev")
     ap.add_argument("--limit", type=int, default=50)
     ap.add_argument("--input", choices=("spans", "gold", "both"), default="both")
     ap.add_argument("--out", required=True)
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--variant", help="spans variant from s1a/combos.py or s1a/fold.py (span filter + cluster_fn)")
+    ap.add_argument("--variant", help="spans variant from s1a/combos.py, s1a/fold.py or s1a/combos23.py (span filter + cluster_fn)")
     ap.add_argument("--from-run", help="run dir whose cache/ seeds this one (e.g. results/graph_dev50)")
     args = ap.parse_args()
     out = Path(args.out)
@@ -104,6 +112,8 @@ def main():
         t1 = time.time()
         e = MN.build(name, docs, enc, args.seed, inp=inp)
         MN.save(e, out / name)
+        if name == "spans" and args.variant:
+            save_split_stats(args.variant, out / name)
         print(f"{name}: {len(e.mentions)} mentions, {len(e.clusters)} clusters, {len(e.instances)} instances, "
               f"x {e.x.shape}, {time.time() - t1:.0f}s -> {out / name}", flush=True)
     enc.save()

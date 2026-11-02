@@ -33,6 +33,7 @@ from s1a import node_filter as NF  # noqa: E402
 from s1a import paths  # noqa: E402
 from s1a import schema_eval as SE  # noqa: E402
 from s1a import signals as SG  # noqa: E402
+from s1a import split as SPL  # noqa: E402
 from s1a import stability as ST  # noqa: E402
 
 SIGNALS = ["n_mentions", "n_values", "n_docs", "support", "wilson_lo", "degree", "wdegree_npmi", "pagerank",
@@ -188,7 +189,7 @@ def main():
     ap.add_argument("--input", choices=("spans", "gold", "both"), default="both")
     ap.add_argument("--stage", required=True, action="append",
                     choices=("coverage", "graph", "stability", "signals", "labels", "select", "schema"))
-    ap.add_argument("--split", choices=("dev", "test"), default="dev", help="for the stability stage")
+    ap.add_argument("--split", choices=SPL.RUNNABLE, default="dev", help="for the stability stage")
     ap.add_argument("--limit", type=int, default=50, help="for the stability stage")
     ap.add_argument("--resamples", type=int, default=5)
     ap.add_argument("--variant", help="spans variant the run was exported with (stability stage re-clusters with it)")

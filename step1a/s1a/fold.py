@@ -55,10 +55,12 @@ def fold(x, labels, parts, min_size, tau=None, books=None, texts=None):
     return out
 
 
-def cluster_fn(spans, docs, enc, groups, books, min_size=3, tau=None, use_books=False, base=None):
-    """`base` clustering (default: V21), then fold. Returns (x, new labels)."""
+def cluster_fn(spans, docs, enc, groups, books, min_size=3, tau=None, use_books=False, base=None, type_fn=None):
+    """`base` clustering (default: V21), then fold. type_fn(text) = value type of the partition (default
+    step2.value_type). Returns (x, new labels)."""
+    type_fn = type_fn or S2.value_type
     x, labels = (base or V21.cluster_fn)(spans, docs, enc, groups, books)
-    parts = [(g, S2.value_type(u.text)) for g, u in zip(groups, spans)]
+    parts = [(g, type_fn(u.text)) for g, u in zip(groups, spans)]
     texts = [u.text for u in spans]
     return x, fold(x, labels, parts, min_size, tau, books if use_books else None, texts)
 

@@ -258,13 +258,15 @@ def _request_slot(m, mt, domain, utterances):
     return ""
 
 
-def levels(mentions, matched, tear_map, db, schema=None, utterances=None):
+def levels(mentions, matched, tear_map, db, schema=None, utterances=None, entity_domain=None):
     """One row per mention (LEVEL_COLS).
 
     schema: set of "domain-slot" names of schema.json (default: no filter). utterances: dev50 turn texts, used for the
     request pattern (default: the mention's context window). is_request is a bool, request_slot the requested slot.
+    entity_domain: {stage-1 entity id: domain} (default ENTITY_DOMAIN, the dev50 ids; other runs: run_data_v37.entity_ids).
     """
     index = db_index(db)
+    entity_domain = ENTITY_DOMAIN if entity_domain is None else entity_domain
     utterances = utterances or {}
     mt = matched.set_index("mention_id").to_dict("index")
     out = []
@@ -274,7 +276,7 @@ def levels(mentions, matched, tear_map, db, schema=None, utterances=None):
         e1 = "" if pd.isna(m["entity_gold"]) else m["entity_gold"]
         is_choice = t["match"] != "none" and t["mw_slot"] == "choice"
         g2, e2 = g1, e1
-        domain = ENTITY_DOMAIN.get(m["entity"], "")
+        domain = entity_domain.get(m["entity"], "")
         # "Booking-*" acts have no schema domain: the booking belongs to the cluster's entity
         mdom = domain if t["mw_domain"] == "booking" and domain else t["mw_domain"]
         if not g2 and t["match"] != "none" and not is_choice and (schema is None or f"{mdom}-{t['mw_slot']}" in schema):
@@ -296,16 +298,16 @@ def fmt_count(k, n):
     return f"{k}/{n} ({k / n:.3f})" if n else f"{k}/0 (n/a)"
 
 
-def coverage(mentions, lv, old=None):
+def coverage(mentions, lv, old=None, entity_domain=None):
     """(table, extra): table = labelled share per level by entity x speaker ("k/n (0.xxx)");
     extra = dict of counts for the v3.4 unknown clusters and "other" values.
 
     mentions needs columns entity, speaker, cluster_id, norm_value, mention_id. old = {"q2": q2_table df, "q1": q1_table_values df}
     (both optional). A cluster / value counts as labelled when any of its mentions has the label; the cluster
-    count is also given for >= 50% of its mentions.
+    count is also given for >= 50% of its mentions. entity_domain: as in levels().
     """
     d = mentions.merge(lv, on="mention_id")
-    d["entity_name"] = d["entity"].map(ENTITY_DOMAIN).fillna("other")
+    d["entity_name"] = d["entity"].map(ENTITY_DOMAIN if entity_domain is None else entity_domain).fillna("other")
     rows = []
     for (ent, sp), g in [(k, g) for k, g in d.groupby(["entity_name", "speaker"])] + [(("all", "all"), d)]:
         rows.append({"entity": ent, "speaker": sp, "n": len(g),

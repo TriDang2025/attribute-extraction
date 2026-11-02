@@ -96,22 +96,23 @@ def agreement(out):
     return int((m["label_x"] == m["label_y"]).sum()), len(m)
 
 
-def all_variants_md(df, invalid, notes, df_l2r=None):
+def all_variants_md(df, invalid, notes, df_l2r=None, levels=LEVELS, rows=ROWS, title="wf_v3.6 all variants",
+                    rules="Rules v1"):
     bad = invalid
-    lines = ["# wf_v3.6 all variants", "",
-             "Rules v1, GT level 1 = TEAR gold, 2 = + MultiWOZ 2.2 schema slots (choice mentions are noise at every level). "
+    lines = [f"# {title}", "",
+             f"{rules}, GT level 1 = TEAR gold, 2 = + MultiWOZ 2.2 schema slots (choice mentions are noise at every level). "
              "Counts are k/n (share); noise, merge, names, role and cue are summed over the 3 entities. A r1 / A r2 / A s2 "
              "are A's orders 0 / 1 / 2 (A r2 now parse-repaired, so no run is invalid); AE s0 / s1 / s2 are AE's orders. "
              "Range rows give the min\u2013max of each count over the 3 orders (n as it varies). The names column uses the v34 "
              "rule (rated sheet of v3.4 / v3.5; unrated groups count as not right; at L2 a valid_extra group counts as right, "
              "an approximation). At L2, `names L2 rated` is the names=l2rated switch (2 raters, name vs L2 slot, "
              "names_l2_rater{1,2}.csv); unrated groups count as not right.", ""]
-    for level in LEVELS:
+    for level in levels:
         by = variant_rows(df[df["level"] == level])
         l2r = variant_rows(df_l2r) if level == 2 and df_l2r is not None else None
         head = HEAD + ([L2_NAMES] if l2r else [])
         lines += [f"## Level {level}", "", "| variant | " + " | ".join(head) + " |", "|---|" + "---|" * len(head)]
-        for row in ROWS:
+        for row in rows:
             if isinstance(row, tuple):
                 orders = [by[v] for v in RANGES[row[1]] if v in by]
                 if len(orders) == 3:
@@ -314,8 +315,9 @@ def names_part(bundles, gt, a, out):
     return len(rater), len(old)
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+def make_parser(out=Path("results/loop1_v36"), doc=__doc__):
+    """The command line of this script; score_v37 builds its own on the same arguments (other --out default)."""
+    ap = argparse.ArgumentParser(description=doc, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--run", type=Path, default=Path("results/graph_v22_dev50"))
     ap.add_argument("--dir32", type=Path, default=Path("results/loop1_v32"))
     ap.add_argument("--dir31", type=Path, default=Path("results/loop1_v31"))
@@ -324,9 +326,13 @@ def main():
     ap.add_argument("--gt", type=Path, default=Path("results/loop1_v35"))
     ap.add_argument("--mwoz", required=True, type=Path, help="MultiWOZ 2.2 folder (schema.json)")
     ap.add_argument("--tear-map", type=Path, default=Path("config/tear_to_mwoz.json"))
-    ap.add_argument("--out", type=Path, default=Path("results/loop1_v36"))
+    ap.add_argument("--out", type=Path, default=out)
     ap.add_argument("--invalid", type=Path, default=Path("config/invalid_runs_v36.json"))
-    a = ap.parse_args()
+    return ap
+
+
+def main():
+    a = make_parser().parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     invalid = RN.invalid_runs(a.invalid)
 

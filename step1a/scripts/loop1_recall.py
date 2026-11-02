@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import export_mentions as EX  # noqa: E402
 from s1a import combos, combos22, fold, paths, recall, staged  # noqa: E402
 from s1a import mentions as MN  # noqa: E402
+from s1a import split as SPL  # noqa: E402
 from s1a.variants import Variant  # noqa: E402
 
 SEED = 42
@@ -79,7 +80,7 @@ def plot(df, n_attrs, path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", default="results/graph_v22_dev50", help="run dir: cache, docs, gold values")
-    ap.add_argument("--split", choices=("dev", "test"), default="dev")
+    ap.add_argument("--split", choices=SPL.RUNNABLE, default="dev")
     ap.add_argument("--limit", type=int, default=50)
     ap.add_argument("--out", default="results/loop1_check")
     ap.add_argument("--boot", type=int, default=1000, help="bootstrap resamples for the v2.2 point")

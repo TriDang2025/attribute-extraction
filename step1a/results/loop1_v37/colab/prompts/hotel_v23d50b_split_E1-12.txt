@@ -1,0 +1,28 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, give the parts: for each part a snake_case name, a short role, and the ids of the examples
+that belong to it. Every example must be in exactly one part. If it does not mix, give is_mixed false and
+no parts.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "is_mixed": true,
+ "parts": [{"name": "str", "role": "str", "examples": ["C#0:s0"]}]}
+
+Cluster E1#12 of entity E1 (mentions 14, distinct values 5).
+Examples:
+- E1#12:s0 [user] turn: I'm looking for a 2 star hotel in the [[north]].
+- E1#12:s1 [system] previous turn, user: I know I have found places with those requirements before. I just don't remember the name. I really want to stay moderately priced with the 3 stars and parking. | turn: There are no hotels matching your criteria in the [[East]], but there are 3 hotels in the south, north, and west. Would you like to try one of those?
+- E1#12:s2 [system] previous turn, user: I will be visiting Cambridge soon and need a place to stay. I am looking for a guesthouse with at least a star 3 rating. | turn: 4 guesthouses match your request and they're all moderately priced. Do you want to be in the north, [[south]], or west side of town?
+- E1#12:s3 [system] previous turn, user: Try either a hotel or guesthouse. | turn: The express by holiday inn cambridge is a 2 star hotel in the [[east area]] that is expensive. It has wifi and parking. Would you like to make a reservation?
+- E1#12:s4 [user] previous turn, system: I have no hotels in the north that meet those specification. May I try something else? | turn: I just need a 3 star hotel in the [[north center]].
+- E1#12:s5 [user] previous turn, system: To help narrow this down, can you tell me what area of town you'd like most? | turn: Yes, I would like to be in the [[north]]. Oh and I would like to be in the expensive price range.
+- E1#12:s6 [user] turn: I am looking for a cheap hotel on the [[east]].
+- E1#12:s7 [system] previous turn, user: I know I have found places with those requirements before. I just don't remember the name. I really want to stay moderately priced with the 3 stars and parking. | turn: There are no hotels matching your criteria in the East, but there are 3 hotels in the [[south]], north, and west. Would you like to try one of those?
+- E1#12:s8 [system] previous turn, user: I just need a 3 star hotel in the north center. | turn: There are no 3 star hotels in the [[North]]. You sure a guesthouse won't work?
+- E1#12:s9 [user] previous turn, system: One more time let me know exactly what you need by looking at what you wrote down on your right, so we can book you. | turn: i need an expensive hotel in the [[north]]
+- E1#12:s10 [system] previous turn, user: I know I have found places with those requirements before. I just don't remember the name. I really want to stay moderately priced with the 3 stars and parking. | turn: There are no hotels matching your criteria in the East, but there are 3 hotels in the south, [[north]], and west. Would you like to try one of those?
+- E1#12:s11 [system] previous turn, user: I will be visiting Cambridge soon and need a place to stay. I am looking for a guesthouse with at least a star 3 rating. | turn: 4 guesthouses match your request and they're all moderately priced. Do you want to be in the [[north]], south, or west side of town?
+- E1#12:s12 [user] previous turn, system: There are two that might suit you. The Gonville Hotel is in the centre and The Lensfield Hotel is in the south part of town. Do either of those sound good? | turn: I would like a hotel in the [[north]], please.
+- E1#12:s13 [system] previous turn, user: I would like a hotel in the north, please. | turn: I have no hotels in the [[north]] that meet those specification. May I try something else?
+
+Return the JSON object now.

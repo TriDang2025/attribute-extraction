@@ -152,11 +152,12 @@ def _rated_by_key(rated, labels=LABELS):
     return out
 
 
-def read_l2_rated(folder):
+def read_l2_rated(folder, files=L2_FILES, key_file=L2_KEY_FILE):
     """names=l2rated: DataFrame (JOIN_KEYS + label) from names_l2_rater1.csv / names_l2_rater2.csv (columns row, label)
-    joined to the key file by row; the lower label of the two raters wins. None when a file is missing."""
+    joined to the key file by row; the lower label of the two raters wins. None when a file is missing. `files` /
+    `key_file`: other rater and key file names (wf_v3.7: names_l2_v37_rater{1,2}.csv + names_to_rate_l2_v37_key.csv)."""
     folder = Path(folder)
-    paths = [folder / f for f in (*L2_FILES, L2_KEY_FILE)]
+    paths = [folder / f for f in (*files, key_file)]
     if not all(p.exists() for p in paths):
         return None
     read = lambda p: pd.read_csv(p, dtype=str, keep_default_na=False, na_filter=False, encoding="utf-8")  # noqa: E731
