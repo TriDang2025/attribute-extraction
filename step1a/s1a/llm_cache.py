@@ -317,8 +317,51 @@ def token_fields(out, batch_seconds, batch_size):
             "batch_seconds": round(float(batch_seconds), 2), "batch_size": int(batch_size)}
 
 
+def parse_dupcheck(raw, column_ids=None):
+    """(obj, errors) for the wf_v3.8 duplicate check: {"joins": [{"columns": [id, ...], "reason": str}]}; every join has
+    >= 2 distinct ids (from `column_ids` when given) and a string reason."""
+    def extra(obj, errors):
+        joins = obj.get("joins")
+        if not isinstance(joins, list):
+            errors.append("joins missing or not a list")
+            return
+        allowed = None if column_ids is None else set(column_ids)
+        for i, j in enumerate(joins):
+            cols = j.get("columns") if isinstance(j, dict) else None
+            if not isinstance(cols, list) or len({str(c) for c in cols}) < 2:
+                errors.append(f"joins[{i}] needs a list of >= 2 distinct columns")
+            elif allowed is not None and any(not isinstance(c, int) or c not in allowed for c in cols):
+                errors.append(f"joins[{i}] unknown column id")
+            if not (isinstance(j, dict) and isinstance(j.get("reason"), str)):
+                errors.append(f"joins[{i}] reason missing or not a string")
+    return _obj_errors(raw, [], extra)
+
+
+def parse_evidence(raw, example_ids=None):
+    """(obj, errors) for the wf_v3.8 example / neighbour check: {"answers": [{"id": int, "fits": "yes"|"no"}]}; one answer per
+    id of `example_ids` when given (none missing, none twice, none unknown)."""
+    def extra(obj, errors):
+        ans = obj.get("answers")
+        if not isinstance(ans, list):
+            errors.append("answers missing or not a list")
+            return
+        seen = []
+        for i, a in enumerate(ans):
+            if not (isinstance(a, dict) and a.get("fits") in ("yes", "no") and isinstance(a.get("id"), int)):
+                errors.append(f"answers[{i}] needs an integer id and fits yes|no")
+                continue
+            if example_ids is not None and a["id"] not in example_ids:
+                errors.append(f"answers[{i}] unknown id {a['id']}")
+            elif a["id"] in seen:
+                errors.append(f"id {a['id']} answered more than once")
+            seen.append(a["id"])
+        if example_ids is not None:
+            errors += [f"id {x} not answered" for x in example_ids if x not in seen]
+    return _obj_errors(raw, [], extra)
+
+
 def parse_job(raw, fmt, schema):
-    """(parsed, errors, n_objects) for a manifest job of format v1 | v2 | v3 | split | noise | gate | reconcile;
+    """(parsed, errors, n_objects) for a manifest job of format v1 | v2 | v3 | split | noise | gate | reconcile | baseline | dupcheck | evidence;
     enums come from the job's schema."""
     if fmt == "v1":
         parsed, errs = parse_v1_enum(raw, schema_enum(schema, "cluster_id"), schema_enum(schema, "placement"))
@@ -330,6 +373,12 @@ def parse_job(raw, fmt, schema):
     if fmt == "baseline":
         parsed, errs = parse_baseline(raw)
         return parsed, errs, len(parsed.get("attributes") or [])
+    if fmt == "dupcheck":
+        parsed, errs = parse_dupcheck(raw, schema_enum(schema, "columns"))
+        return parsed, errs, len(parsed.get("joins") or [])
+    if fmt == "evidence":
+        parsed, errs = parse_evidence(raw, schema_enum(schema, "id"))
+        return parsed, errs, len(parsed.get("answers") or [])
     if fmt == "split":
         parsed, errs = parse_split(raw, schema_enum(schema, "examples") or [])
         return parsed, errs, len(parsed.get("parts") or [])

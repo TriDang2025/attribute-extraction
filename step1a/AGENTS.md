@@ -70,6 +70,10 @@ Timings on the laptop CPU for n50:
   - v2.3 = `combos23.CONFIGS["V23"]` (`--variant V23`; v2.2 + `value_types.value_type_v35` in both type partitions + J split of `roles_v37`: general + learned cue words, unknown-role part; `spans/j_split.json`). `scripts/cue_words_v37.py` -> `cue_words.md`; `scripts/step1a_v23.py` (`s1a/step1a_v37.py` L2 recall, `run_data_v37.entity_data`, W1's `ceiling_v37`) -> `results/loop1_v37/step1a_v22_v23.md`. Driver of the v2.3 exports: `results/run23_v37.sh`.
   - Colab batch (T14 + W3's baseline): `scripts/pilot_build_v37.py` (A orders s0/s1/s2 = None/1/2 and the v3.1 split pass on runs v23d50 / v22d50b / v23d50b; names `<ent>_a_<run>_s<n>`, `<ent>_<run>_split_<cid>_r1`) -> `results/loop1_v37/colab/{prompts/, manifest.json (family a | split | baseline, `run` per job), examples.csv, prompt_stats.md}` -> `colab/S1A_llm_v37_colab.ipynb` -> `colab/responses/` -> `run_data_v37.load_a` (A s0-s2, A s012).
 
+- wf_v3.8 (rules `RULES_V1_2.md`: recall guard + verdict rule v0; batch contract `WF_V38_BATCH.md`):
+  - Phase 1 (no LLM): `scripts/dashboard_v38.py` (`s1a/dashboard_v38.py`, `s1a/nosplit_v38.py`) -> `results/loop1_v38/dash/`; `scripts/merges_v38.py` (`s1a/merges_v38.py`) -> `results/loop1_v38/merges/`; `scripts/noise_cases_v38.py` (`s1a/noise_cases_v38.py`) -> `results/loop1_v38/noise/`.
+  - Colab batch (tasks 7-9, one stage): `scripts/batch_build_v38.py` (`s1a/batch_v38.py`; needs the gitignored `vectors.npz` of graph_v22_dev50/dev50b) -> `results/loop1_v38/colab/{prompts/, manifest.json, columns.csv, examples.csv, prompt_stats.md}` -> `colab/S1A_llm_v38_colab.ipynb` (`llm_cache` formats dupcheck / evidence) -> `colab/responses/`.
+
 ## Data links
 - `scripts/export_mentions.py` -> `results/graph_<split>50/{docs.jsonl, gold_values.csv, gold_attrs.txt, cache/}`, `<input>/{mentions,clusters,instances}.csv, vectors.npz` -> `scripts/graph_run.py` stages -> `<input>/{coverage.csv, graphs.pkl, stability.csv, nodes.csv, labels.csv, select/, schema/}`
 - `../chunking/results/S_n50/chunks/chroma_bge-m3.jsonl` -> `s1a/paths.py` `CHROMA_CHUNKS` -> `scripts/run.py`, `scripts/plug_in.py` (size 50/400)

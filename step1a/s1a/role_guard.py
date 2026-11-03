@@ -21,10 +21,10 @@ def _words(text):
     return set(re.split(r"[^a-z0-9]+", str(text).lower())) - {""}
 
 
-def forbidden_merge(a, b):
-    """True when attribute texts a and b (name + " " + role) sit on opposite sides of a forbidden pair."""
+def forbidden_merge(a, b, pairs=PAIRS):
+    """True when attribute texts a and b (name + " " + role) sit on opposite sides of a forbidden pair of `pairs`."""
     wa, wb = _words(a), _words(b)
-    for left, right in PAIRS:
+    for left, right in pairs:
         a_l, a_r, b_l, b_r = bool(wa & left), bool(wa & right), bool(wb & left), bool(wb & right)
         if (a_l and not a_r and b_r and not b_l) or (a_r and not a_l and b_l and not b_r):
             return True
