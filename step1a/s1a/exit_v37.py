@@ -76,8 +76,17 @@ def _ok(flag):
     return "n/a" if flag is None else "pass" if flag else "FAIL"
 
 
-def exit_md(table, runs, notes=()):
-    lines = ["# wf_v3.7 exit bar for freezing Step 3 as v1 (L2, rules v1.1)", "",
+def exit_e(a_right, baseline_right):
+    """(e): A beats the LLM-only baseline when A's right names (names L2 rated, summed over the entities of the set) are
+    strictly more than the right names of the baseline's union of versions (baseline_v37.csv, version "union", same set
+    and base). None when either count is missing (pending the baseline)."""
+    if a_right is None or baseline_right is None:
+        return None
+    return a_right > baseline_right
+
+
+def exit_md(table, runs, notes=(), e=None, title="wf_v3.7 exit bar for freezing Step 3 as v1 (L2, rules v1.1)"):
+    lines = [f"# {title}", "",
              "Bar (RULES_V1_1.md): (a) finds >= 90% of the attributes that Step 1a makes recoverable (ceiling table: some "
              "single cluster passes purity >= 0.6 and coverage >= 10%); (b) found attributes change by <= 1 across orders; "
              "(c) <= 1.2 columns per found attribute; (d) >= 9 of the 13 noise clusters caught with >= 70% of the noise "
@@ -90,7 +99,7 @@ def exit_md(table, runs, notes=()):
         lines.append(f"| {r['run']} | {r['a_found_recoverable']}/{r['a_recoverable']} | {r['a_share']} | {r['found_total']}"
                      + (f", range {int(r['b_range'])}" if pd.notna(r["b_range"]) else "") + f" | {r['c_columns']} | "
                      f"{r['d_caught']}/{r['d_noise_n']} | {r['d_precision']} | {_ok(r['a_pass'])} | {_ok(r['b_pass'])} | "
-                     f"{_ok(r['c_pass'])} | {_ok(r['d_pass'])} | pending the baseline |")
+                     f"{_ok(r['c_pass'])} | {_ok(r['d_pass'])} | {(e or {}).get(r['run'], 'pending the baseline')} |")
     lines += ["", "## Single runs", "", "| run | found | of which recoverable | found, not recoverable | columns per found | "
               "noise caught | marks right |", "|---|---|---|---|---|---|---|"]
     for v, m in runs.items():

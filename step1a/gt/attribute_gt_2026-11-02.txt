@@ -1,0 +1,814 @@
+Attribute ground truth (GT), exported 2026-11-02
+git commit: 582405d with uncommitted scoring changes
+scoring rules: v1.1 (RULES_V1_1.md)
+
+Levels: L1 = TEAR gold (user goal); L2 = L1 + MultiWOZ 2.2 schema slots (span labels); L3 = L2 + MultiWOZ 2.4 database columns (exact value match, same domain, not id-like, value in <= 30% of rows).
+Counts: mentions of dev50 (50 dialogues) and dev50b (50 dialogues) per attribute, by the final (L3) label of the mention, split by who said it. A mention with a multi-attribute label counts once for each attribute.
+Level of an attribute: the lowest level that has it (L1 = TEAR attribute, L2 = schema slot, L3 = database column only).
+
+Source files:
+  TEAR levels (full schema): C:\Users\nguye\repos\attribute-extraction-wf-v3.7\tear\data\conversation\levels.json
+  TEAR to MultiWOZ map: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\config\tear_to_mwoz.json
+  role pairs: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\config\role_pairs.json
+  MultiWOZ 2.2 schema: C:\Users\nguye\data\MultiWOZ_2.2\schema.json
+  MultiWOZ 2.2 dialogues and acts: C:\Users\nguye\data\MultiWOZ_2.2 (train/dev/test dialogues_*.json, dialog_acts.json)
+  MultiWOZ 2.4 databases (read in place): C:\Users\nguye\repos\attribute-extraction-wf-v3.7\chunking\data\MULTIWOZ2.4.zip (MULTIWOZ2.4/<domain>_db.json)
+  dev50 mentions: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\graph_v22_dev50\spans\mentions.csv
+  dev50 turns (speaker): C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\graph_v22_dev50\docs.jsonl
+  dev50 GT levels: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v35\gt_levels.csv
+  dev50 MultiWOZ match: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v35\mwoz_match.csv
+  dev50 match failures: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v35\match_failures.csv
+  dev50b mentions: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\graph_v22_dev50b\spans\mentions.csv
+  dev50b turns (speaker): C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\graph_v22_dev50b\docs.jsonl
+  dev50b GT levels: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v37\dev50b\gt\gt_levels.csv
+  dev50b MultiWOZ match: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v37\dev50b\gt\mwoz_match.csv
+  dev50b match failures: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v37\dev50b\gt\match_failures.csv
+
+==============================================================================
+ENTITY: train (10 attributes)
+==============================================================================
+
+Train arrive by
+  TEAR name         : Train arrive by
+  MultiWOZ 2.2 slot : train-arriveby
+  level             : L1
+  description       : arrival time of the train
+  value type        : time (56 of 57 mentions)
+  role partner      : Train leave at
+  database column   : yes (column arriveBy)
+  mentions dev50    : user 10, system 22 (total 32)
+  mentions dev50b   : user 10, system 15 (total 25)
+  examples          : 11:30 (3); 12:00 (3); 20:30 (2); 10:54 (2); 18:15 (2)
+
+Train confirmed reference
+  TEAR name         : Train confirmed reference
+  MultiWOZ 2.2 slot : train-ref
+  level             : L1
+  description       : reference number of the train booking
+  value type        : id (26 of 26 mentions)
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 0, system 18 (total 18)
+  mentions dev50b   : user 0, system 8 (total 8)
+  examples          : h4bifd0u (2); vbaemg3z (1); 69luuzq7 (1); tnu1h19g (1); p6g0s9it (1)
+
+Train day
+  TEAR name         : Train day
+  MultiWOZ 2.2 slot : train-day
+  level             : L1
+  description       : day of the train
+  value type        : day (64 of 64 mentions); categorical: monday, tuesday, wednesday, thursday, friday, saturday, sunday
+  role partner      : none
+  database column   : yes (column day)
+  mentions dev50    : user 31, system 10 (total 41)
+  mentions dev50b   : user 14, system 9 (total 23)
+  examples          : saturday (15); sunday (10); friday (9); tuesday (9); wednesday (7)
+
+Train departure
+  TEAR name         : Train departure
+  MultiWOZ 2.2 slot : train-departure
+  level             : L1
+  description       : departure location of the train
+  value type        : text (73 of 73 mentions)
+  role partner      : Train destination
+  database column   : yes (column departure)
+  mentions dev50    : user 30, system 18 (total 48)
+  mentions dev50b   : user 15, system 10 (total 25)
+  examples          : cambridge (35); peterborough (8); leicester (7); birmingham new street (4); stansted airport (4)
+
+Train destination
+  TEAR name         : Train destination
+  MultiWOZ 2.2 slot : train-destination
+  level             : L1
+  description       : destination of the train
+  value type        : text (74 of 74 mentions)
+  role partner      : Train departure
+  database column   : yes (column destination)
+  mentions dev50    : user 30, system 11 (total 41)
+  mentions dev50b   : user 18, system 15 (total 33)
+  examples          : cambridge (38); stevenage (7); stansted airport (6); broxbourne (5); leicester (3)
+
+Train leave at
+  TEAR name         : Train leave at
+  MultiWOZ 2.2 slot : train-leaveat
+  level             : L1
+  description       : leaving time for the train
+  value type        : time (77 of 78 mentions)
+  role partner      : Train arrive by
+  database column   : yes (column leaveAt)
+  mentions dev50    : user 21, system 37 (total 58)
+  mentions dev50b   : user 5, system 15 (total 20)
+  examples          : 19:30 (4); 13:15 (3); 13:40 (3); 13:00 (3); 14:45 (3)
+
+Train requested people
+  TEAR name         : Train requested people
+  MultiWOZ 2.2 slot : train-bookpeople
+  level             : L1
+  description       : how many train tickets you need
+  value type        : number (14 of 18 mentions)
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 7, system 4 (total 11)
+  mentions dev50b   : user 6, system 1 (total 7)
+  examples          : 5 (2); 8 people (2); 5 people (2); 1 pound fee (1); 19 train (1)
+
+Train duration
+  TEAR name         : none
+  MultiWOZ 2.2 slot : train-duration
+  level             : L2
+  description       : duration of the travel
+  value type        : duration (11 of 11 mentions)
+  role partner      : none
+  database column   : yes (column duration)
+  mentions dev50    : user 0, system 8 (total 8)
+  mentions dev50b   : user 0, system 3 (total 3)
+  examples          : 49 minute (4); 105 minute (4); 28-minute (1); 38 minute (1); 163 minute (1)
+
+Train price
+  TEAR name         : none
+  MultiWOZ 2.2 slot : train-price
+  level             : L2
+  description       : price of the train
+  value type        : price (20 of 23 mentions)
+  role partner      : none
+  database column   : yes (column price)
+  mentions dev50    : user 0, system 14 (total 14)
+  mentions dev50b   : user 0, system 9 (total 9)
+  examples          : 10.10 pound (3); 12.80 pound (2); 66 gbp (2); 8.08 pound (1); 8.08gbp (1)
+
+Train trainid
+  TEAR name         : none
+  MultiWOZ 2.2 slot : train-trainid
+  level             : L2
+  description       : id of the train
+  value type        : id (45 of 48 mentions)
+  role partner      : none
+  database column   : yes (column trainID)
+  mentions dev50    : user 1, system 31 (total 32)
+  mentions dev50b   : user 0, system 16 (total 16)
+  examples          : tr9016 (4); tr5713 (3); tr9448 (2); tr6387 (2); tr7610 (2)
+
+==============================================================================
+ENTITY: hotel (15 attributes)
+==============================================================================
+
+Hotel area
+  TEAR name         : Hotel area
+  MultiWOZ 2.2 slot : hotel-area
+  level             : L1
+  description       : area or place of the hotel
+  value type        : text (52 of 52 mentions); categorical: centre, east, north, south, west
+  role partner      : none
+  database column   : yes (column area)
+  mentions dev50    : user 9, system 13 (total 22)
+  mentions dev50b   : user 14, system 16 (total 30)
+  examples          : north (14); centre (8); cambridge (3); south (3); centre of town (3)
+
+Hotel confirmed name
+  TEAR name         : Hotel confirmed name
+  MultiWOZ 2.2 slot : none (no schema slot)
+  level             : L1
+  description       : name of the hotel the system confirmed in a booking (own description, no schema description)
+  value type        : unknown (no dev mention)
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 0, system 0 (total 0)
+  mentions dev50b   : user 0, system 0 (total 0)
+  examples          : none
+
+Hotel confirmed reference
+  TEAR name         : Hotel confirmed reference
+  MultiWOZ 2.2 slot : hotel-ref
+  level             : L1
+  description       : reference number of the hotel booking
+  value type        : id (30 of 30 mentions)
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 0, system 16 (total 16)
+  mentions dev50b   : user 0, system 14 (total 14)
+  examples          : cul9vz04 (2); e6uvd9ol (2); zq6ooe4y (1); yqbmmcj6 (1); 72ycmlxx (1)
+
+Hotel internet
+  TEAR name         : Hotel internet
+  MultiWOZ 2.2 slot : hotel-internet
+  level             : L1
+  description       : whether the hotel has internet
+  value type        : unknown (no dev mention); categorical: free, no, yes
+  role partner      : none
+  database column   : yes (column internet)
+  mentions dev50    : user 0, system 0 (total 0)
+  mentions dev50b   : user 0, system 0 (total 0)
+  examples          : none
+
+Hotel name
+  TEAR name         : Hotel name
+  MultiWOZ 2.2 slot : hotel-name
+  level             : L1
+  description       : name of the hotel
+  value type        : text (68 of 68 mentions)
+  role partner      : none
+  database column   : yes (column name)
+  mentions dev50    : user 4, system 26 (total 30)
+  mentions dev50b   : user 5, system 33 (total 38)
+  examples          : alexander bed and breakfast (7); acorn guest house (4); allenbell (4); finch bed and breakfast (3); ashley hotel (3)
+
+Hotel parking
+  TEAR name         : Hotel parking
+  MultiWOZ 2.2 slot : hotel-parking
+  level             : L1
+  description       : whether the hotel has parking
+  value type        : unknown (no dev mention); categorical: free, no, yes
+  role partner      : none
+  database column   : yes (column parking)
+  mentions dev50    : user 0, system 0 (total 0)
+  mentions dev50b   : user 0, system 0 (total 0)
+  examples          : none
+
+Hotel price range
+  TEAR name         : Hotel price range
+  MultiWOZ 2.2 slot : hotel-pricerange
+  level             : L1
+  description       : price budget of the hotel
+  value type        : text (30 of 30 mentions); categorical: expensive, cheap, moderate
+  role partner      : none
+  database column   : yes (column pricerange)
+  mentions dev50    : user 10, system 4 (total 14)
+  mentions dev50b   : user 5, system 11 (total 16)
+  examples          : moderate price range (6); cheap (6); moderately priced (5); expensive price range (3); expensive (2)
+
+Hotel requested day
+  TEAR name         : Hotel requested day
+  MultiWOZ 2.2 slot : hotel-bookday
+  level             : L1
+  description       : day of the hotel booking
+  value type        : day (37 of 39 mentions); categorical: monday, tuesday, wednesday, thursday, friday, saturday, sunday
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 18, system 5 (total 23)
+  mentions dev50b   : user 14, system 2 (total 16)
+  examples          : wednesday (10); monday (6); friday (6); sunday (6); thursday (4)
+
+Hotel requested people
+  TEAR name         : Hotel requested people
+  MultiWOZ 2.2 slot : hotel-bookpeople
+  level             : L1
+  description       : number of people for the hotel booking
+  value type        : number (32 of 33 mentions); categorical: 1, 2, 3, 4, 5, 6, 7, 8
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 15, system 2 (total 17)
+  mentions dev50b   : user 16, system 0 (total 16)
+  examples          : 3 people (6); 5 people (5); 8 people (4); 3 night (3); 2 people (3)
+
+Hotel requested stay
+  TEAR name         : Hotel requested stay
+  MultiWOZ 2.2 slot : hotel-bookstay
+  level             : L1
+  description       : length of stay at the hotel
+  value type        : number (41 of 44 mentions); categorical: 1, 2, 3, 4, 5, 6, 7, 8
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 18, system 2 (total 20)
+  mentions dev50b   : user 19, system 5 (total 24)
+  examples          : 2 night (10); 4 night (9); 3 night (8); 5 night (3); 3 day (2)
+
+Hotel stars
+  TEAR name         : Hotel stars
+  MultiWOZ 2.2 slot : hotel-stars
+  level             : L1
+  description       : star rating of the hotel
+  value type        : number (18 of 26 mentions); categorical: 0, 1, 2, 3, 4, 5
+  role partner      : none
+  database column   : yes (column stars)
+  mentions dev50    : user 9, system 3 (total 12)
+  mentions dev50b   : user 12, system 2 (total 14)
+  examples          : 4 night (4); 2 star (3); 3 star (3); 4 star (2); 5 star (1)
+
+Hotel type
+  TEAR name         : Hotel type
+  MultiWOZ 2.2 slot : hotel-type
+  level             : L1
+  description       : what is the type of the hotel
+  value type        : text (42 of 45 mentions); categorical: guesthouse, hotel
+  role partner      : none
+  database column   : yes (column type)
+  mentions dev50    : user 11, system 3 (total 14)
+  mentions dev50b   : user 17, system 14 (total 31)
+  examples          : guesthouse (19); hotel (15); 3 guesthouse (2); 5 star hotel (1); 5-star hotel (1)
+
+Hotel address
+  TEAR name         : none
+  MultiWOZ 2.2 slot : hotel-address
+  level             : L2
+  description       : address of the hotel
+  value type        : text (7 of 7 mentions)
+  role partner      : none
+  database column   : yes (column address)
+  mentions dev50    : user 0, system 2 (total 2)
+  mentions dev50b   : user 1, system 4 (total 5)
+  examples          : 74 chesterton road (2); gonville place (1); 156 chesterton road (1); 138 perne road (1); 365 milton road (1)
+
+Hotel phone
+  TEAR name         : none
+  MultiWOZ 2.2 slot : hotel-phone
+  level             : L2
+  description       : phone number of the hotel
+  value type        : number (4 of 4 mentions)
+  role partner      : none
+  database column   : yes (column phone)
+  mentions dev50    : user 0, system 1 (total 1)
+  mentions dev50b   : user 0, system 3 (total 3)
+  examples          : 01223355017 (1); 01223353888 (1); 01223365664 (1); 01223247015 (1)
+
+Hotel postcode
+  TEAR name         : none
+  MultiWOZ 2.2 slot : hotel-postcode
+  level             : L2
+  description       : postal code of the hotel
+  value type        : id (2 of 2 mentions)
+  role partner      : none
+  database column   : yes (column postcode)
+  mentions dev50    : user 0, system 1 (total 1)
+  mentions dev50b   : user 0, system 1 (total 1)
+  examples          : cb41er (1); cb13js (1)
+
+==============================================================================
+ENTITY: restaurant (12 attributes)
+==============================================================================
+
+Restaurant area
+  TEAR name         : Restaurant area
+  MultiWOZ 2.2 slot : restaurant-area
+  level             : L1
+  description       : area or place of the restaurant
+  value type        : text (61 of 61 mentions); categorical: centre, east, north, south, west
+  role partner      : none
+  database column   : yes (column area)
+  mentions dev50    : user 17, system 22 (total 39)
+  mentions dev50b   : user 7, system 15 (total 22)
+  examples          : centre (12); city centre (8); south (3); north (3); centre of town (3)
+
+Restaurant confirmed name
+  TEAR name         : Restaurant confirmed name
+  MultiWOZ 2.2 slot : none (no schema slot)
+  level             : L1
+  description       : name of the restaurant the system confirmed in a booking (own description, no schema description)
+  value type        : unknown (no dev mention)
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 0, system 0 (total 0)
+  mentions dev50b   : user 0, system 0 (total 0)
+  examples          : none
+
+Restaurant confirmed reference
+  TEAR name         : Restaurant confirmed reference
+  MultiWOZ 2.2 slot : restaurant-ref
+  level             : L1
+  description       : reference number of the restaurant booking
+  value type        : id (28 of 28 mentions)
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 0, system 13 (total 13)
+  mentions dev50b   : user 0, system 15 (total 15)
+  examples          : bpe8lvha (1); hxspey9n (1); tiye4f1y (1); oaejmyoi (1); pdelckq (1)
+
+Restaurant food
+  TEAR name         : Restaurant food
+  MultiWOZ 2.2 slot : restaurant-food
+  level             : L1
+  description       : the cuisine of the restaurant you are looking for
+  value type        : text (31 of 31 mentions)
+  role partner      : none
+  database column   : yes (column food)
+  mentions dev50    : user 5, system 9 (total 14)
+  mentions dev50b   : user 6, system 11 (total 17)
+  examples          : chinese (2); danish restaurant (2); lebanese (2); good luck chinese food takeaway (1); turkish food restaurant (1)
+
+Restaurant name
+  TEAR name         : Restaurant name
+  MultiWOZ 2.2 slot : restaurant-name
+  level             : L1
+  description       : name of the restaurant
+  value type        : text (73 of 73 mentions)
+  role partner      : none
+  database column   : yes (column name)
+  mentions dev50    : user 8, system 39 (total 47)
+  mentions dev50b   : user 3, system 23 (total 26)
+  examples          : j restaurant (4); thanh binh (3); anatolia (3); graffiti (3); traveller rest (3)
+
+Restaurant price range
+  TEAR name         : Restaurant price range
+  MultiWOZ 2.2 slot : restaurant-pricerange
+  level             : L1
+  description       : price budget for the restaurant
+  value type        : text (52 of 52 mentions); categorical: cheap, expensive, moderate
+  role partner      : none
+  database column   : yes (column pricerange)
+  mentions dev50    : user 9, system 12 (total 21)
+  mentions dev50b   : user 15, system 16 (total 31)
+  examples          : moderately priced (12); expensive (11); moderate price range (8); expensive price range (7); cheap (3)
+
+Restaurant requested day
+  TEAR name         : Restaurant requested day
+  MultiWOZ 2.2 slot : restaurant-bookday
+  level             : L1
+  description       : day of the restaurant booking
+  value type        : day (35 of 38 mentions); categorical: monday, tuesday, wednesday, thursday, friday, saturday, sunday
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 12, system 5 (total 17)
+  mentions dev50b   : user 18, system 3 (total 21)
+  examples          : friday (10); wednesday (7); thursday (6); sunday (4); monday (3)
+
+Restaurant requested people
+  TEAR name         : Restaurant requested people
+  MultiWOZ 2.2 slot : restaurant-bookpeople
+  level             : L1
+  description       : how many people for the restaurant reservation
+  value type        : number (27 of 27 mentions); categorical: 1, 2, 3, 4, 5, 6, 7, 8
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 11, system 3 (total 14)
+  mentions dev50b   : user 12, system 1 (total 13)
+  examples          : 7 (4); 8 people (4); 2 people (4); 6 people (3); 4 (3)
+
+Restaurant requested time
+  TEAR name         : Restaurant requested time
+  MultiWOZ 2.2 slot : restaurant-booktime
+  level             : L1
+  description       : time of the restaurant booking
+  value type        : time (43 of 43 mentions)
+  role partner      : none
+  database column   : no
+  mentions dev50    : user 18, system 5 (total 23)
+  mentions dev50b   : user 17, system 3 (total 20)
+  examples          : 12:45 (4); 15:15 (3); 18:00 (3); 16:15 (3); 13:15 (3)
+
+Restaurant address
+  TEAR name         : none
+  MultiWOZ 2.2 slot : restaurant-address
+  level             : L2
+  description       : address of the restaurant
+  value type        : text (49 of 49 mentions)
+  role partner      : none
+  database column   : yes (column address)
+  mentions dev50    : user 0, system 36 (total 36)
+  mentions dev50b   : user 0, system 13 (total 13)
+  examples          : city centre (7); chesterton (5); cherry hinton (3); huntingdon road (3); 68 histon road (3)
+
+Restaurant phone
+  TEAR name         : none
+  MultiWOZ 2.2 slot : restaurant-phone
+  level             : L2
+  description       : phone number of the restaurant
+  value type        : number (13 of 16 mentions)
+  role partner      : none
+  database column   : yes (column phone)
+  mentions dev50    : user 0, system 12 (total 12)
+  mentions dev50b   : user 0, system 4 (total 4)
+  examples          : 01223367660 (2); 01223 249955 (1); 01223412299 (1); 01223311911 (1); 01223315232 (1)
+
+Restaurant postcode
+  TEAR name         : none
+  MultiWOZ 2.2 slot : restaurant-postcode
+  level             : L2
+  description       : postal code of the restaurant
+  value type        : id (7 of 12 mentions)
+  role partner      : none
+  database column   : yes (column postcode)
+  mentions dev50    : user 0, system 7 (total 7)
+  mentions dev50b   : user 0, system 5 (total 5)
+  examples          : c.b 2 (2); c.b 1 (1); 9 h.x (1); cb17aa (1); cb12as (1)
+
+==============================================================================
+ENTITY: taxi (6 attributes)
+==============================================================================
+
+Taxi arrive by
+  TEAR name         : Taxi arrive by
+  MultiWOZ 2.2 slot : taxi-arriveby
+  level             : L1
+  description       : arrival time of taxi
+  value type        : time (8 of 9 mentions)
+  role partner      : Taxi leave at
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 2, system 1 (total 3)
+  mentions dev50b   : user 5, system 1 (total 6)
+  examples          : 14:45 (2); 17:15 (1); 17:45 (1); 10:00 (1); 10 o'clock (1)
+
+Taxi departure
+  TEAR name         : Taxi departure
+  MultiWOZ 2.2 slot : taxi-departure
+  level             : L1
+  description       : departure location of taxi
+  value type        : text (14 of 14 mentions)
+  role partner      : Taxi destination
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 3, system 4 (total 7)
+  mentions dev50b   : user 5, system 2 (total 7)
+  examples          : downing college (2); city stop restaurant (1); la margarita (1); college (1); the oak bistro (1)
+
+Taxi destination
+  TEAR name         : Taxi destination
+  MultiWOZ 2.2 slot : taxi-destination
+  level             : L1
+  description       : destination of taxi
+  value type        : text (16 of 16 mentions)
+  role partner      : Taxi departure
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 3, system 1 (total 4)
+  mentions dev50b   : user 8, system 4 (total 12)
+  examples          : rice house (3); midsummer house restaurant (1); riverboat georgina (1); pizza express (1); restaurant alimentum (1)
+
+Taxi leave at
+  TEAR name         : Taxi leave at
+  MultiWOZ 2.2 slot : taxi-leaveat
+  level             : L1
+  description       : leaving time of taxi
+  value type        : time (11 of 11 mentions)
+  role partner      : Taxi arrive by
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 2, system 0 (total 2)
+  mentions dev50b   : user 9, system 0 (total 9)
+  examples          : 19:15 (2); 10:30 (1); 09:15 (1); 16:45 (1); 14:30 (1)
+
+Taxi phone
+  TEAR name         : none
+  MultiWOZ 2.2 slot : taxi-phone
+  level             : L2
+  description       : phone number of the taxi
+  value type        : number (18 of 18 mentions)
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 0, system 5 (total 5)
+  mentions dev50b   : user 0, system 13 (total 13)
+  examples          : 07083984796 (1); 07032807056 (1); 07633256482 (1); 07629102425 (1); 07242149665 (1)
+
+Taxi type
+  TEAR name         : none
+  MultiWOZ 2.2 slot : taxi-type
+  level             : L2
+  description       : car type of the taxi
+  value type        : text (1 of 1 mentions)
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 0, system 0 (total 0)
+  mentions dev50b   : user 0, system 1 (total 1)
+  examples          : white ford (1)
+
+==============================================================================
+ENTITY: attraction (8 attributes)
+==============================================================================
+
+Attraction area
+  TEAR name         : Attraction area
+  MultiWOZ 2.2 slot : attraction-area
+  level             : L1
+  description       : area to search for attractions
+  value type        : text (33 of 33 mentions); categorical: centre, east, north, south, west
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 8, system 8 (total 16)
+  mentions dev50b   : user 6, system 11 (total 17)
+  examples          : centre of town (7); centre (5); centre area (3); east side of town (2); center of town (2)
+
+Attraction name
+  TEAR name         : Attraction name
+  MultiWOZ 2.2 slot : attraction-name
+  level             : L1
+  description       : name of the attraction
+  value type        : text (38 of 38 mentions)
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 5, system 16 (total 21)
+  mentions dev50b   : user 3, system 14 (total 17)
+  examples          : downing college (3); abbey pool (2); the whale of a time (2); cherry hinton water play (2); ballare (2)
+
+Attraction type
+  TEAR name         : Attraction type
+  MultiWOZ 2.2 slot : attraction-type
+  level             : L1
+  description       : type of the attraction
+  value type        : text (32 of 38 mentions)
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 7, system 15 (total 22)
+  mentions dev50b   : user 7, system 9 (total 16)
+  examples          : museum (6); college (5); emmanuel college (4); park (4); 13 college (3)
+
+Attraction address
+  TEAR name         : none
+  MultiWOZ 2.2 slot : attraction-address
+  level             : L2
+  description       : address of the attraction
+  value type        : text (34 of 34 mentions)
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 0, system 20 (total 20)
+  mentions dev50b   : user 0, system 14 (total 14)
+  examples          : regent street (2); cherry hinton road (2); saint andrew's street (2); pool way (1); whitehill road (1)
+
+Attraction entrancefee
+  TEAR name         : none
+  MultiWOZ 2.2 slot : attraction-entrancefee
+  level             : L2
+  description       : how much is the entrance fee
+  value type        : text (7 of 11 mentions)
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 0, system 6 (total 6)
+  mentions dev50b   : user 0, system 5 (total 5)
+  examples          : free admission (3); 2 pound fee (1); 2.50 pound fee (1); entry fee (1); 5 pound (1)
+
+Attraction openhours
+  TEAR name         : none
+  MultiWOZ 2.2 slot : attraction-openhours
+  level             : L2
+  description       : open hours of the attraction
+  value type        : unknown (no dev mention)
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 0, system 0 (total 0)
+  mentions dev50b   : user 0, system 0 (total 0)
+  examples          : none
+
+Attraction phone
+  TEAR name         : none
+  MultiWOZ 2.2 slot : attraction-phone
+  level             : L2
+  description       : phone number of the attraction
+  value type        : number (10 of 10 mentions)
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 0, system 3 (total 3)
+  mentions dev50b   : user 0, system 7 (total 7)
+  examples          : 01223314960 (2); 01223446100 (1); 01223364222 (1); 01223334860 (1); 01223333516 (1)
+
+Attraction postcode
+  TEAR name         : none
+  MultiWOZ 2.2 slot : attraction-postcode
+  level             : L2
+  description       : postal code of the attraction
+  value type        : id (13 of 14 mentions)
+  role partner      : none
+  database column   : n/a (domain not in the L3 database)
+  mentions dev50    : user 0, system 4 (total 4)
+  mentions dev50b   : user 0, system 10 (total 10)
+  examples          : cb23bu (2); cb23ap (1); cb322ad (1); cb11pt (1); cb23pj (1)
+
+==============================================================================
+SECTION 1: TEAR to MultiWOZ map (config/tear_to_mwoz.json)
+==============================================================================
+
+Attraction area: attraction-area
+Attraction name: attraction-name
+Attraction type: attraction-type
+Hotel area: hotel-area
+Hotel confirmed reference: hotel-ref
+Hotel internet: hotel-internet
+Hotel name: hotel-name
+Hotel parking: hotel-parking
+Hotel price range: hotel-pricerange
+Hotel requested day: hotel-bookday
+Hotel requested people: hotel-bookpeople
+Hotel requested stay: hotel-bookstay
+Hotel stars: hotel-stars
+Hotel type: hotel-type
+Restaurant area: restaurant-area
+Restaurant confirmed reference: restaurant-ref
+Restaurant food: restaurant-food
+Restaurant name: restaurant-name
+Restaurant price range: restaurant-pricerange
+Restaurant requested day: restaurant-bookday
+Restaurant requested people: restaurant-bookpeople
+Restaurant requested time: restaurant-booktime
+Taxi arrive by: taxi-arriveby
+Taxi departure: taxi-departure
+Taxi destination: taxi-destination
+Taxi leave at: taxi-leaveat
+Train arrive by: train-arriveby
+Train confirmed reference: train-ref
+Train day: train-day
+Train departure: train-departure
+Train destination: train-destination
+Train leave at: train-leaveat
+Train requested people: train-bookpeople
+
+Reason (_notes): Slot names are MultiWOZ 2.2 schema.json names. 'Train confirmed reference' (train-ref) is the TEAR train attribute with no user-goal slot: the booking reference is generated by the system (Train-OfferBooked ref), so it never appears in the user's goal or in the dialogue-state slot_values (train user-goal slots are only arriveby, day, departure, destination, leaveat, bookpeople). Its span is only in the system turn's act span_info. The same holds for Hotel and Restaurant confirmed reference. Schema train slots trainid, price, duration have no TEAR attribute.
+
+TEAR attributes (levels.json full schema) with no map row: Hotel confirmed name, Restaurant confirmed name
+
+==============================================================================
+SECTION 2: database columns that are not schema slots
+==============================================================================
+
+Columns of MultiWOZ 2.4 <domain>_db.json with no schema.json slot; 'dev mentions' = mentions of dev50 + dev50b with that L3 label. id and location columns are id-like and never used.
+
+train:
+
+hotel:
+  n: label 'Hotel n', 0 dev mentions
+  price: label 'Hotel price', 0 dev mentions (dict of room prices, never matched)
+  takesbookings: label 'Hotel takesbookings', 0 dev mentions
+
+restaurant:
+  introduction: label 'Restaurant introduction', 0 dev mentions
+  signature: label 'Restaurant signature', 0 dev mentions
+  type: label 'Restaurant type', 0 dev mentions
+
+==============================================================================
+SECTION 3: slots used as GT for attribute_cue (request acts, MultiWOZ '*-Request')
+==============================================================================
+
+acts = turns with a request act for the slot (from dialog_acts.json); mentions = dev mentions in such a turn that are the question phrase (is_request in gt_levels.csv). Booking requests belong to the dialogue's entity.
+train-day: dev50 acts 10 (user 0, system 10), mentions 6; dev50b acts 7 (user 0, system 7), mentions 3
+restaurant-food: dev50 acts 12 (user 2, system 10), mentions 0; dev50b acts 11 (user 0, system 11), mentions 0
+booking-bookday: dev50 acts 13 (user 0, system 13), mentions 0; dev50b acts 9 (user 0, system 9), mentions 0
+train-leaveat: dev50 acts 15 (user 1, system 14), mentions 1; dev50b acts 4 (user 0, system 4), mentions 1
+booking-bookstay: dev50 acts 11 (user 0, system 11), mentions 0; dev50b acts 8 (user 0, system 8), mentions 0
+hotel-area: dev50 acts 6 (user 0, system 6), mentions 0; dev50b acts 13 (user 0, system 13), mentions 0
+restaurant-pricerange: dev50 acts 7 (user 3, system 4), mentions 2; dev50b acts 8 (user 1, system 7), mentions 1
+attraction-address: dev50 acts 9 (user 9, system 0), mentions 0; dev50b acts 8 (user 8, system 0), mentions 0
+restaurant-address: dev50 acts 13 (user 13, system 0), mentions 0; dev50b acts 4 (user 4, system 0), mentions 0
+train-bookpeople: dev50 acts 9 (user 0, system 9), mentions 6; dev50b acts 1 (user 0, system 1), mentions 1
+hotel-pricerange: dev50 acts 3 (user 0, system 3), mentions 0; dev50b acts 13 (user 3, system 10), mentions 0
+booking-bookpeople: dev50 acts 9 (user 0, system 9), mentions 0; dev50b acts 6 (user 0, system 6), mentions 0
+train-departure: dev50 acts 10 (user 0, system 10), mentions 1; dev50b acts 4 (user 0, system 4), mentions 0
+attraction-postcode: dev50 acts 6 (user 6, system 0), mentions 0; dev50b acts 8 (user 8, system 0), mentions 0
+attraction-entrancefee: dev50 acts 7 (user 6, system 1), mentions 0; dev50b acts 6 (user 6, system 0), mentions 0
+attraction-type: dev50 acts 8 (user 2, system 6), mentions 0; dev50b acts 5 (user 0, system 5), mentions 0
+restaurant-phone: dev50 acts 10 (user 10, system 0), mentions 0; dev50b acts 3 (user 3, system 0), mentions 0
+train-arriveby: dev50 acts 9 (user 0, system 9), mentions 1; dev50b acts 3 (user 0, system 3), mentions 0
+train-destination: dev50 acts 7 (user 0, system 7), mentions 0; dev50b acts 6 (user 0, system 6), mentions 0
+train-price: dev50 acts 6 (user 6, system 0), mentions 1; dev50b acts 6 (user 6, system 0), mentions 0
+train-ref: dev50 acts 10 (user 10, system 0), mentions 0; dev50b acts 3 (user 3, system 0), mentions 0
+restaurant-area: dev50 acts 2 (user 0, system 2), mentions 0; dev50b acts 9 (user 1, system 8), mentions 0
+train-duration: dev50 acts 7 (user 7, system 0), mentions 1; dev50b acts 3 (user 3, system 0), mentions 0
+restaurant-postcode: dev50 acts 5 (user 5, system 0), mentions 0; dev50b acts 4 (user 4, system 0), mentions 0
+attraction-area: dev50 acts 2 (user 0, system 2), mentions 0; dev50b acts 6 (user 1, system 5), mentions 0
+attraction-phone: dev50 acts 1 (user 1, system 0), mentions 0; dev50b acts 7 (user 7, system 0), mentions 0
+booking-booktime: dev50 acts 4 (user 0, system 4), mentions 0; dev50b acts 4 (user 0, system 4), mentions 0
+hotel-bookday: dev50 acts 0 (user 0, system 0), mentions 5; dev50b acts 0 (user 0, system 0), mentions 2
+taxi-leaveat: dev50 acts 1 (user 0, system 1), mentions 0; dev50b acts 6 (user 0, system 6), mentions 0
+hotel-bookpeople: dev50 acts 0 (user 0, system 0), mentions 3; dev50b acts 0 (user 0, system 0), mentions 3
+restaurant-ref: dev50 acts 5 (user 5, system 0), mentions 0; dev50b acts 1 (user 1, system 0), mentions 0
+attraction-name: dev50 acts 1 (user 1, system 0), mentions 0; dev50b acts 4 (user 4, system 0), mentions 0
+hotel-ref: dev50 acts 3 (user 3, system 0), mentions 0; dev50b acts 2 (user 2, system 0), mentions 0
+hotel-name: dev50 acts 0 (user 0, system 0), mentions 0; dev50b acts 3 (user 3, system 0), mentions 1
+hotel-phone: dev50 acts 1 (user 1, system 0), mentions 0; dev50b acts 3 (user 3, system 0), mentions 0
+restaurant-bookday: dev50 acts 0 (user 0, system 0), mentions 1; dev50b acts 0 (user 0, system 0), mentions 3
+restaurant-name: dev50 acts 2 (user 2, system 0), mentions 0; dev50b acts 2 (user 2, system 0), mentions 0
+taxi-arriveby: dev50 acts 1 (user 0, system 1), mentions 0; dev50b acts 3 (user 0, system 3), mentions 0
+taxi-departure: dev50 acts 1 (user 0, system 1), mentions 0; dev50b acts 3 (user 0, system 3), mentions 0
+taxi-destination: dev50 acts 1 (user 0, system 1), mentions 0; dev50b acts 3 (user 0, system 3), mentions 0
+hotel-postcode: dev50 acts 1 (user 1, system 0), mentions 0; dev50b acts 2 (user 2, system 0), mentions 0
+hotel-stars: dev50 acts 2 (user 0, system 2), mentions 0; dev50b acts 1 (user 0, system 1), mentions 0
+hotel-type: dev50 acts 1 (user 0, system 1), mentions 0; dev50b acts 2 (user 0, system 2), mentions 0
+taxi-phone: dev50 acts 2 (user 2, system 0), mentions 0; dev50b acts 1 (user 1, system 0), mentions 0
+hotel-address: dev50 acts 0 (user 0, system 0), mentions 0; dev50b acts 2 (user 2, system 0), mentions 0
+hotel-bookstay: dev50 acts 0 (user 0, system 0), mentions 2; dev50b acts 0 (user 0, system 0), mentions 0
+hotel-parking: dev50 acts 2 (user 0, system 2), mentions 0; dev50b acts 0 (user 0, system 0), mentions 0
+taxi-type: dev50 acts 1 (user 1, system 0), mentions 0; dev50b acts 1 (user 1, system 0), mentions 0
+train-trainid: dev50 acts 2 (user 2, system 0), mentions 0; dev50b acts 0 (user 0, system 0), mentions 0
+booking-none: dev50 acts 0 (user 0, system 0), mentions 0; dev50b acts 1 (user 0, system 1), mentions 0
+hotel-internet: dev50 acts 1 (user 0, system 1), mentions 0; dev50b acts 0 (user 0, system 0), mentions 0
+
+==============================================================================
+SECTION 4: 'choice' as noise
+==============================================================================
+
+- choice (number of results) is noise at every level, never an attribute. Reason: it is labelled in MultiWOZ but not in the official schema.
+dev50: 21 choice mentions (user 0, system 21) of 963 mentions; of these with a non-empty label: L1 2, L2 2, L3 2 (a TEAR gold label can sit on a choice mention)
+dev50b: 10 choice mentions (user 0, system 10) of 801 mentions; of these with a non-empty label: L1 1, L2 1, L3 1 (a TEAR gold label can sit on a choice mention)
+
+==============================================================================
+SECTION 5: known gaps
+==============================================================================
+
+dev50: unmatched mentions (match == none): 165/963 (0.171); user 76, system 89
+  match failures file (turn text not matched): C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v35\match_failures.csv, 0 rows
+dev50b: unmatched mentions (match == none): 140/801 (0.175); user 86, system 54
+  match failures file (turn text not matched): C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v37\dev50b\gt\match_failures.csv, 0 rows
+
+Unmatched dev50 mentions by kind (C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v36\unmatched_kinds.md), kind: n (share):
+  time: 4 (0.024)
+  number: 7 (0.042)
+  price: 0 (0.000)
+  ref code: 2 (0.012)
+  phone: 0 (0.000)
+  postcode: 1 (0.006)
+  day: 4 (0.024)
+  yes/no/ok/thanks: 0 (0.000)
+  booking word: 5 (0.030)
+  choice word: 5 (0.030)
+  request word: 34 (0.206)
+  pronoun/generic noun: 44 (0.267)
+  other: 59 (0.358)
+  not computed for dev50b.
+
+Label errors found in earlier checks (quoted from C:\Users\nguye\OneDrive\Desktop\Work\TEAR\report\3_main\wf_v3.5\wf_v3.5_report.md):
+  - Label check (T7). 30 random labelled system mentions were rated by 2 blind Haiku raters with a saved rubric. 28/30 are right (0.93). The 2 wrong ones are an area word inside an address span ("City Centre", "Chesterton"). The raters agree on 30/30.
+  - Cases where the GT looks wrong. A mention longer than the span ("east side of town" vs "east") was unlabelled before the span-inside fix; 165 mentions remain unmatched. Booking acts carry the domain "booking", now mapped to the dialogue's entity.
+Unmatched mentions, v3.6 (quoted from C:\Users\nguye\OneDrive\Desktop\Work\TEAR\report\3_main\wf_v3.6\wf_v3.6_report.md):
+  A Haiku pass splits the 59 "other": 50 entity values, 6 generic, 3 request. Most entity values are "Cambridge" (15) and "Cambridge TownInfo centre" (6), city names that MultiWOZ never labels. Files: unmatched_kinds.md, unmatched_other_rated.csv.
+Label check sheet: C:\Users\nguye\repos\attribute-extraction-wf-v3.7\step1a\results\loop1_v35\label_check.csv

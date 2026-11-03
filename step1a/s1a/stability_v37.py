@@ -26,9 +26,15 @@ ORDERS = (0, 1, 2)
 OTHER = "other"
 
 
+def with_seed_labels(ed, labels):
+    """ed with seed_decs {"C s<k>": the decision table of variant labels[k]} (what rules_names.agreement reads); the
+    labels are the three orders of one run, e.g. ("A r1", "A r2", "A s2")."""
+    return replace(ed, seed_decs={f"C s{k}": ed.variants[lab].dec for k, lab in enumerate(labels)})
+
+
 def with_seed_decs(ed, prefix):
     """ed with seed_decs {"C s<k>": the decision table of variant "<prefix> s<k>"} (what rules_names.agreement reads)."""
-    return replace(ed, seed_decs={f"C s{k}": ed.variants[f"{prefix} s{k}"].dec for k in ORDERS})
+    return with_seed_labels(ed, [f"{prefix} s{k}" for k in ORDERS])
 
 
 def agreement(ed, prefix, rules, extra):

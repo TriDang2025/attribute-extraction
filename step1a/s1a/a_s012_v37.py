@@ -17,6 +17,16 @@ from . import v36_data as V36
 A_ORDERS = ("A r1", "A r2", "A s2")
 NAMES_V37_FILES = ("names_l2_v37_rater1.csv", "names_l2_v37_rater2.csv")
 NAMES_V37_KEY = "names_to_rate_l2_v37_key.csv"
+NAMES_T14_ROUNDS = ("", "_2", "_3", "_4")   # a later round of the t14 sheet only holds the names still unrated
+
+
+def t14_files(sfx=""):
+    """(rater files, key file, sheet file) of round `sfx` of the t14 name sheet."""
+    return ((f"names_l2_t14{sfx}_rater1.csv", f"names_l2_t14{sfx}_rater2.csv"), f"names_to_rate_l2_t14{sfx}_key.csv",
+            f"names_to_rate_l2_t14{sfx}.csv")
+
+
+NAMES_T14_FILES, NAMES_T14_KEY = t14_files()[:2]
 
 
 def merge_variants(*bundles):
@@ -54,10 +64,10 @@ def bundle_with_a_s012(shared, v34, v36):
 
 def read_l2_rated(dir36, dir37):
     """DataFrame (JOIN_KEYS + label) of the v3.6 L2 ratings plus the v3.7 ones (names_l2_v37_rater{1,2}.csv with
-    names_to_rate_l2_v37_key.csv in dir37) when they exist; the lower label wins. None when the v3.6 files are absent."""
-    base = RN.read_l2_rated(dir36)
-    new = RN.read_l2_rated(dir37, NAMES_V37_FILES, NAMES_V37_KEY)
-    frames = [f for f in (base, new) if f is not None]
+    names_to_rate_l2_v37_key.csv in dir37) and the t14 ones (names_l2_t14_*) when they exist; the lower label wins. None when the v3.6 files are absent."""
+    frames = [RN.read_l2_rated(dir36), RN.read_l2_rated(dir37, NAMES_V37_FILES, NAMES_V37_KEY),
+              *[RN.read_l2_rated(dir37, *t14_files(r)[:2]) for r in NAMES_T14_ROUNDS]]   # t14: the A runs of the v3.7 batch
+    frames = [f for f in frames if f is not None]
     if not frames:
         return None
     got = RN._rated_by_key(pd.concat(frames, ignore_index=True), RN.L2_LABELS)

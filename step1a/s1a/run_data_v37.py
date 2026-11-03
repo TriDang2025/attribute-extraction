@@ -6,7 +6,8 @@ The run needs spans/{mentions,clusters,instances}.csv, vectors.npz, labels.csv (
 load_a reads the A jobs of the v3.7 Colab batch (results/loop1_v37/colab, scripts/pilot_build_v37.py) for one run the way
 v36_data reads A: `_decisions` with the split pass of the same run (tag r1 as fallback for every order) and the parse
 repair on when `repairs` is a list; variants "A s0" / "A s1" / "A s2" and the 3-order vote "A s012" (PC.vote), each also
-+namemerge (v36_data._add). The ctx examples are the batch's examples.csv rows of that run's A jobs.
++namemerge (v36_data._add). The ctx examples are the batch's examples.csv rows of that run's A and split jobs (the split parts of PV.final_attributes
+resolve the example ids of the split prompts; without them a split cluster stays one unsplit group).
 """
 
 import copy
@@ -98,7 +99,7 @@ def load_a(shared, data, dir37, run, repairs=None):
         a_jobs, split_jobs = batch_jobs(dir37, run, ent)
         split = {ent: {"r1": _objs(dir37, split_jobs, "split")}}
         ctx = copy.copy(ed.ctx_a)
-        ctx.examples = batch_examples(dir37, a_jobs, ed.cids)
+        ctx.examples = batch_examples(dir37, a_jobs + split_jobs, ed.cids)  # split parts name the split prompt's example ids
         tabs = {}
         for job in sorted(a_jobs, key=lambda j: j["run_tag"]):
             path = dir37 / "responses" / f"{job['job']}.jsonl"
