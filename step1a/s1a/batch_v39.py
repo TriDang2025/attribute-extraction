@@ -139,6 +139,13 @@ def apply_reconcile(cols, parts, choices):
             groups[to].append(p["pid"])
             lost.add(p["cid"])
             report.append({**row, "status": "joined"})
+    return assemble_columns(cols, pools, groups, lost), report
+
+
+def assemble_columns(cols, pools, groups, lost):
+    """The columns of `cols` after their pools {cid: {member key: items}} and groups {cid: [attr ids]} were changed: a column in
+    `lost` (it gave a member away) with no pool left is dropped; the rest are sorted by name, numbered 1..n and get their counts
+    and top values recomputed (keys of apply_reconcile)."""
     out = []
     for c in sorted(cols, key=lambda c: c["name"]):
         cid = c["cid"]
@@ -150,7 +157,7 @@ def apply_reconcile(cols, parts, choices):
                     "members": sorted(pools[cid]), "mention_ids": [x[0] for x in rows], "n_mentions": len(rows),
                     "n_dialogues": len({x[1] for x in rows}), "n_values": len({x[2] for x in rows}),
                     "top_values": BT._top_values([x[2] for x in rows]), "pools": ps, "old_cids": [cid]})
-    return out, report
+    return out
 
 
 # ---- T8: A with a cue line
