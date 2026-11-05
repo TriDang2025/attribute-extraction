@@ -2,7 +2,7 @@
 Tests Step 1a of the schema-expansion pipeline (OneDrive `TEAR/source_paper/pipeline.pdf`): cluster units of the Conversation dialogues and score them against TEAR's gold attributes. Reuses `../chunking/` (data, bge-m3 encoder, Chroma chunks from `chunking/results/S_n50`) and `../hdbscan/` (UMAP, HDBSCAN, metrics) by import; gold tables from `../tear/data/conversation/`.
 
 ## Setup and commands
-venv `C:\Users\nguye\venvs\chunking`; `python -m pytest -q tests` (79 tests), then the scripts below. spaCy venv: `C:\Users\nguye\venvs\spacy`.
+venv `C:\Users\nguye\venvs\chunking`; in a fresh checkout first `python -I scripts/get_conversation_data.py` (gitignored `tear/data/conversation` files from HF, or `--src DIR`); `python -m pytest -q tests` (650 tests), then the scripts below. spaCy venv: `C:\Users\nguye\venvs\spacy`.
 Timings on the laptop CPU for n50:
 - `run.py`: about 7 min
 - `rescore.py`: 2 min
