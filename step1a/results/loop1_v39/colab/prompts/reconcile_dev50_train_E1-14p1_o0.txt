@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#14/1: name: number of trains | description: specifies the number of trains available or matching a certain criteria
+Examples:
+- 1 [system] previous turn, user: I'm leaving from Norwich and would like to leave after 12:15, please. | turn: There are [[twelve]] possible trains leaving after 12:15. Should I book you on one of them?
+- 2 [system] previous turn, user: While in Cambridge I want to get a train that leaves on Sunday and goes to stansted airport. | turn: There are [[19 trains]] that day. What time do you need to leave cambridge and/or arrive at the airport?
+- 3 [system] previous turn, user: I also need a train from Cambridge to Stansted Airport. Can you please look that up for me. | turn: i got [[5 choices]]. what time do you want to leave?
+- 4 [system] previous turn, user: I would like to depart from birmingham new street after 14:45. | turn: There are [[9 trains]] that depart from Birmingham new street to Cambridge on Tuesday after 14:45. The earliest is 15:40, does that work?
+- 5 [system] previous turn, user: I am interested in booking a train to cambridge for next tuesday. | turn: There are several trains departing for Cambridge on Tuesday. [[One train]] departs every hour starting at 06:08
+
+Columns (5):
+- name: number of people | examples: 1 child; 2 adult; 3 people
+- name: number of tickets | description: the number of tickets booked | examples: how many ticket; 16; 10
+- name: stay duration days | examples: 2 day
+- name: price per ticket | description: the cost of a single train ticket | examples: 10.10 pound; 12.80 pound; 14.08 pound
+- name: travel date | description: the date of the train journey | examples: saturday; friday; wednesday
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#14/1", "reason": "str", "same_as": "<column name or none>"}

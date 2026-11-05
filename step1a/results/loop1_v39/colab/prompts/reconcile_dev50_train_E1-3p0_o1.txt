@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#3/0: name: destination city | description: destination city in train queries
+Examples:
+- 1 [user] previous turn, system: The postcode is cb21sj and the phone number is 01223359506. | turn: I also need a train from [[Cambridge]] to Stansted Airport. Can you please look that up for me.
+- 2 [user] previous turn, system: Sheep's Green and Lammas Land Park Fen Causeway is located at Fen Causeway, Newnham road, postal code cb322ad. | turn: Thanks! I'm also looking for a train from [[Cambridge]] to Kings Lynn.
+- 3 [system] previous turn, user: I've mixed up my locations. I actually need a train that departs from Cambridge and goes to Stevenage. | turn: I only have two trains that leave from [[Cambridge]] Wednesday. The TR9016 departs at 21:21 and the TR6387 departs 23:21.
+- 4 [system] previous turn, user: I'm looking to book a train that goes to ely and leaves on sunday please. | turn: There are 10 trains leaving from [[Cambridge]] to Ely. Is there a particular departure or arrival time you would prefer?
+- 5 [system] previous turn, user: Maybe. I need to leave Cambridge on Friday. Will that train work? | turn: I recommend TR1110. It will arrive in [[Cambridge]] at 20:08 on Friday. I can book passage for you if you let me know how many tickets you need.
+
+Columns (5):
+- name: departure location | description: the location from which the train departs | examples: ely; norwich; peterborough
+- name: origin city | examples: cambridge; cambidge
+- name: local information center | examples: cambridge towninfo centre
+- name: arrival location | description: the location where the train arrives | examples: stansted airport; leicester; broxbourne
+- name: travel date | description: the date of the train journey | examples: saturday; friday; wednesday
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#3/0", "reason": "str", "same_as": "<column name or none>"}

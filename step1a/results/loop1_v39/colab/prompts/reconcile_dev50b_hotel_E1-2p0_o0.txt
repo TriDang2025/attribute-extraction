@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#2/0: name: number of nights | description: specifies the duration of stay
+Examples:
+- 1 [user] previous turn, system: ok for how long and how many people please | turn: For [[3 days]] and 2 people,I need a confirmation number too
+- 2 [system] previous turn, user: How about four nights instead of five? | turn: I was able to successfully book you for [[four nights]] at the Alexander Bed and Breakfast, and your reference number is HY6O0MQH.
+- 3 [user] previous turn, system: Yes it does, would you like me to make a booking for you? | turn: Yes. Could you make it for [[2 nights]]/ 2 people starting on friday.
+- 4 [system] previous turn, user: How about just 1 night? | turn: Okay, you are booked at the bridge guest house for [[1 night]] (Saturday). Your reference number is NVYYU4ML. Can I help with anything else?
+- 5 [user] previous turn, system: Yes it is. Are you wanting to make a booking. | turn: yes, i want to book it for 8 people and [[3 nights]] starting from wednesday
+
+Columns (5):
+- name: number of accommodations | examples: 3 guesthouse; 29 hotel; 3 hotel
+- name: number of people | examples: 2 people; 8 people; 3 people
+- name: number of options | examples: 3; 2
+- name: accommodation type | description: type of accommodation, such as hotel or guesthouse | examples: alexander bed and breakfast; hobson house; el shaddai
+- name: generic accommodation type | examples: guesthouse; hotel; guest house
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#2/0", "reason": "str", "same_as": "<column name or none>"}

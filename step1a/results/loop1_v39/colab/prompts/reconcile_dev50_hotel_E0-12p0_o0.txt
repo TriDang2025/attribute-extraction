@@ -1,0 +1,22 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#12/0: name: duration | description: asks about the duration of stay
+Examples:
+- 1 [system] previous turn, user: I would also like to book at a guest house named Aylesbray Lodge, starting Monday. | turn: I'm starting to book your reservation at Aylesbray Lodge starting on Monday, [[how many days]] will you be staying?
+- 2 [system] previous turn, user: I would like to book one starting Friday. | turn: I have begun a booking for you at Avalon. [[How many days]] will you be staying?
+- 3 [system] previous turn, user: Maybe. Is either one a 4 star hotel? If so, I'd like to book a room for 4 nights. | turn: Both are 4 stars. [[How many days]] would you be staying, and how many people are in your party? I can see if something is available.
+- 4 [system] previous turn, user: Yes, please. Can you also give me the phone number? | turn: Sure, the phone number is 01223355017. [[How many days]] will you be staying, what day do you need to arrive, and how many people will be staying?
+
+Columns (5):
+- name: start date | description: the start date of the stay | examples: monday; wednesday; friday
+- name: date | examples: what day; same day; another day
+- name: number of nights | examples: 3 night; 4 night; 2 night
+- name: hotel number of nights | description: number of nights for the hotel booking | examples: fewer night
+- name: hotel number of guests | description: number of guests for the hotel booking | examples: 3 people; 5 people; how many people
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#12/0", "reason": "str", "same_as": "<column name or none>"}

@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#3/0: name: departure time | description: departure time of the train
+Examples:
+- 1 [user] previous turn, system: In order to find a train I need to know where you are departing from and which day. | turn: I'm departing from birmingham new street on Saturday and I'd like to leave after [[12:45]].
+- 2 [user] previous turn, system: What day are you traveling? | turn: I'm traveling on tuesday and I want to arrive by [[16:15]]
+- 3 [system] previous turn, user: Sure, for 8 people please. | turn: TR4170 leaves leicester at 9:09 and arrives in cambridge on Friday at [[10:54]]. 8 tickets are booked, reference #: CL4V2583. Do you need further help?
+- 4 [system] previous turn, user: Can I catch a train to Stevenage? | turn: Yes, TR2515 departs on friday at [[05:21]] to stevenage, would you like me to book it?
+- 5 [system] previous turn, user: It might, what time does the train depart? | turn: It leaves at [[17:54]], would you like a booking?
+
+Columns (5):
+- name: total fee | description: the total cost of the tickets | examples: 12.80 pound; 17.90; 17.90 pound
+- name: departure day | description: the day the train departs | examples: sunday; friday; monday
+- name: number of tickets | description: the number of tickets booked | examples: 2 people; 3 seat; 4 ticket
+- name: payment location | description: the location where the ticket is paid for | examples: station
+- name: arrival time | examples: 05:58; 06:01; 06:10
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#3/0", "reason": "str", "same_as": "<column name or none>"}

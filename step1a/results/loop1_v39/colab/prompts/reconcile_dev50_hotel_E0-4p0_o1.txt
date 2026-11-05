@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#4/0: name: number of nights | description: specifies the duration of stay
+Examples:
+- 1 [user] previous turn, system: The hotel is found in the Northern part of town and it is in the moderate price range | turn: Great can you book that for 1 person for [[3 nights]] starting friday?
+- 2 [user] previous turn, system: I have a few that match, do you have a location preference? | turn: The area doesn't matter as long as they have a room available for 3 people staying [[4 nights]].
+- 3 [user] previous turn, system: The Cambridge Belfry fits your requirements, would you like to book a reservation there? | turn: Please book it for 5 people and [[5 nights]] starting from wednesday.
+- 4 [user] previous turn, system: Alright, might I suggest the Alexander Bed and Breakfast then? | turn: That sounds great - I want to book it for 5 people for [[two nights]] starting Monday.
+- 5 [system] previous turn, user: Yes, can you try it for 3 nights, please. | turn: Neither hotel appears to have [[three days]] available starting on Sunday for three people, can I look something else up for you?
+
+Columns (5):
+- name: hotel type | examples: guesthouse; hotel; a guesthouse
+- name: hotel number of nights | description: number of nights for the hotel booking | examples: fewer night
+- name: hotel name | description: the name of the hotel or guesthouse | examples: alexander bed and breakfast; aylesbray lodge; the acorn guest house
+- name: specific price | examples: price per night
+- name: star rating | examples: 4 star; 2 star; 3 star
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#4/0", "reason": "str", "same_as": "<column name or none>"}

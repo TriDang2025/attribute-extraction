@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#3/1: name: origin city | description: origin city in train queries
+Examples:
+- 1 [user] turn: I'm travelling to [[cambridge]] and I need a train leaving after 16:15.
+- 2 [user] turn: I am looking for a train that leaves on Friday and goes to [[cambidge]]
+- 3 [user] turn: I am interested in booking a train to [[cambridge]] for next tuesday.
+- 4 [system] previous turn, user: While in Cambridge I want to get a train that leaves on Sunday and goes to stansted airport. | turn: There are 19 trains that day. What time do you need to leave [[cambridge]] and/or arrive at the airport?
+- 5 [user] previous turn, system: Not a problem. Where are you departing from, and what day would you like to travel? | turn: I want to leave from [[cambridge]] on wednesday.
+
+Columns (5):
+- name: arrival location | description: the location where the train arrives | examples: stansted airport; leicester; broxbourne
+- name: local information center | examples: cambridge towninfo centre
+- name: departure location | description: the location from which the train departs | examples: ely; norwich; peterborough
+- name: number of trains | examples: 1 train; 12; 19 train
+- name: destination city | examples: cambridge
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#3/1", "reason": "str", "same_as": "<column name or none>"}
