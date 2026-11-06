@@ -407,9 +407,10 @@ def table_refs(t):
     return refs
 
 
-def validate_44(a, a41, a42, a43, cols):
+def validate_44(a, a41, a42, a43, cols, strict=True):
     """Errors of a parsed 4.4 answer: tables once each, columns of a table exactly its group's (plus new ones), types,
-    primary key, foreign keys to known tables / columns, every 4.3 relationship implemented by a foreign key."""
+    primary key, foreign keys to known tables / columns, and (strict only) every 4.3 relationship implemented by a foreign key.
+    v2 (2026-11-06): a "new:<x>" column belongs to its own table, so the same new name in two tables is two columns."""
     tables = {t["name"]: t for t in named_tables(a41, a42, a43)}
     errs, got, used = [], {}, {}
     for t in a.get("tables", []):
@@ -424,10 +425,12 @@ def validate_44(a, a41, a42, a43, cols):
         for c in set(listed):
             if listed.count(c) > 1:
                 errs.append(f"table {n!r}: column {c!r} twice")
+            if str(c).startswith("new:"):
+                continue
             if c in used and used[c] != n:
                 errs.append(f"column {c!r} in two tables ({used[c]!r}, {n!r})")
             used[c] = n
-            if not str(c).startswith("new:") and c not in tables[n]["columns"]:
+            if c not in tables[n]["columns"]:
                 errs.append(f"table {n!r}: column {c!r} not in its group")
         errs += [f"table {n!r}: column {c!r} missing" for c in tables[n]["columns"] if c not in listed]
         cn = [str(c.get("name") or "").strip().lower() for c in t.get("columns", [])]
@@ -451,7 +454,15 @@ def validate_44(a, a41, a42, a43, cols):
                 errs.append(f"table {n!r}: foreign key to unknown table {rt!r}")
             elif f.get("ref_column") not in table_refs(got[rt]):
                 errs.append(f"table {n!r}: foreign key to unknown column {f.get('ref_column')!r} of {rt!r}")
-    fks = {(n, f.get("ref_table")) for n, t in got.items() for f in t.get("foreign_keys", [])}
+    if strict:
+        errs += [f"relationship {x!r} -> {y!r} has no foreign key" for x, y in unimplemented_43(a, a43)]
+    return errs
+
+
+def unimplemented_43(a, a43):
+    """[(from, to)] of the 4.3 relationships that no foreign key of the 4.4 answer `a` implements."""
+    fks = {(t.get("name"), f.get("ref_table")) for t in a.get("tables", []) for f in t.get("foreign_keys", [])}
+    out = []
     for r in a43.get("relationships", []):
         a_, b_ = r["from"], r["to"]
         if (a_, b_) in fks:
@@ -459,8 +470,8 @@ def validate_44(a, a41, a42, a43, cols):
         linked = r["kind"] == "many_to_many" and (((b_, a_) in fks) or any(
             set(n.get("between", [])) == {a_, b_} and (n["name"], a_) in fks and (n["name"], b_) in fks for n in a43.get("new_tables", [])))
         if not linked:
-            errs.append(f"relationship {a_!r} -> {b_!r} has no foreign key")
-    return errs
+            out.append((a_, b_))
+    return out
 
 
 # ---------------------------------------------------------------- (e) dialogues only

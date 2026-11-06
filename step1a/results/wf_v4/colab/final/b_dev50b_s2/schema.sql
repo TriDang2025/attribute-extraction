@@ -1,0 +1,60 @@
+CREATE TABLE "train_booking" (
+  "booking_id" INTEGER,
+  "total_fee" NUMERIC(10, 2),
+  "travel_time" INTERVAL,
+  "departure_station" TEXT,
+  "departure_time" TIME,
+  "payment_location" TEXT,
+  "number_of_tickets" INTEGER,
+  "reference_number" INTEGER,
+  "departure_day" TEXT,
+  "train_id" INTEGER,
+  "arrival_time" TIME,
+  "arrival_station" TEXT,
+  PRIMARY KEY ("booking_id")
+);
+
+CREATE TABLE "hotel_booking" (
+  "booking_id" INTEGER,
+  "generic_accommodation_type" TEXT,
+  "phone_number" INTEGER,
+  "start_date" TEXT,
+  "reference_number" INTEGER,
+  "accommodation_type" TEXT,
+  "amenities" TEXT,
+  "hotel_name" TEXT,
+  "number_of_options" INTEGER,
+  "restaurant_name" TEXT,
+  "stars" INTEGER,
+  "number_of_people" INTEGER,
+  "price_adjective" TEXT,
+  "specific_guesthouse" TEXT,
+  "postcode" INTEGER,
+  "number_of_nights" INTEGER,
+  "location" TEXT,
+  "address" TEXT,
+  PRIMARY KEY ("booking_id")
+);
+
+CREATE TABLE "restaurant_booking" (
+  "booking_id" INTEGER,
+  "price_range_question" TEXT,
+  "restaurant_name" TEXT,
+  "postcode" INTEGER,
+  "number_of_people" INTEGER,
+  "price_range_confirmation" TEXT,
+  "specific_address" TEXT,
+  "day_of_week" TEXT,
+  "area" TEXT,
+  "reservation_duration" INTERVAL,
+  "number_of_options" INTEGER,
+  "restaurant_type" TEXT,
+  "restaurant_reservation_time" TIME,
+  "food_type" TEXT,
+  "reference_number" INTEGER,
+  "restaurant_reference_number" INTEGER,
+  "restaurant_postcode" TEXT,
+  "restaurant_phone_number" INTEGER,
+  "restaurant_address" TEXT,
+  PRIMARY KEY ("booking_id")
+);

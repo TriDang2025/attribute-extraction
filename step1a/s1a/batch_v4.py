@@ -9,7 +9,9 @@ writes canonical JSON, SQL and operations per finished chain. All functions are 
 Responses: <out>/responses/<job>.jsonl, last row = the answer (llm_cache rows: raw, parsed, errors). A chain stops at the first call whose
 row is missing, has parse errors or fails the validator (step4_prompts.validate_*); it is listed in chain_status.json.
 Repairs (counted in the status, never silent): 4.1 columns missing from the answer go to `unused` ("not placed by the model"), a column given
-twice keeps its first group; 4.3 relationships / new tables that name unknown tables, relate a table to itself or repeat are dropped.
+twice keeps its first group; 4.3 relationships / new tables that name unknown tables, relate a table to itself or repeat are dropped;
+4.4 repairs v2 (2026-11-06, after the first batch: 19/24 main chains failed the strict check, mostly a new key also listed as a column):
+see `repair_44`. 4.4 is then checked with strict=False (a 4.3 relationship with no foreign key is counted, not a stop).
 """
 import json
 import re
@@ -200,6 +202,71 @@ def repair_43(a43, a41, a42):
     return {**a43, "relationships": rels, "new_tables": new}, n
 
 
+def repair_44(a44, a41, a42, a43, cols):
+    """(a44 fixed, {kind: count}) - 4.4 repairs v2 (2026-11-06), deterministic, every one counted:
+    key_listed: a new primary key also listed as a column is dropped from the list (assemble adds it); refs to it are renamed;
+    dup_listed: a column listed twice in a table keeps its first entry;
+    col_missing: a column of the table's 4.1 group that 4.4 left out is put back (name from the input, type from its value type);
+    fk_col_added: a foreign-key column "new:<x>" not declared in its table is added (type id);
+    fk_ref_to_pk: a foreign key to an unknown column of a known table points to that table's primary key.
+    A 4.3 relationship with no foreign key is not repaired (counted by step4_prompts.unimplemented_43)."""
+    meta = {t["name"]: t for t in SP.named_tables(a41, a42, a43)}
+    cb = {c["id"]: c for c in cols}
+    kinds = {k: 0 for k in ("key_listed", "dup_listed", "col_missing", "fk_col_added", "fk_ref_to_pk")}
+    tables, alias = [], {}
+    for t in a44.get("tables", []):
+        t = {**t, "columns": list(t.get("columns", [])), "foreign_keys": [dict(f) for f in t.get("foreign_keys", [])]}
+        n = t.get("name")
+        if t.get("primary_key") == SP.NEW and str(t.get("new_id_name") or "").strip():
+            key, kname, keep = f"new:{t['new_id_name']}", str(t["new_id_name"]).strip().lower(), []
+            for c in t["columns"]:
+                ref = str(c.get("column"))
+                if ref.startswith("new:") and (ref == key or str(c.get("name") or "").strip().lower() == kname):
+                    alias[(n, ref)] = key
+                    kinds["key_listed"] += 1
+                else:
+                    keep.append(c)
+            t["columns"] = keep
+        seen, keep = set(), []
+        for c in t["columns"]:
+            if c.get("column") in seen:
+                kinds["dup_listed"] += 1
+                continue
+            seen.add(c.get("column"))
+            keep.append(c)
+        t["columns"] = keep
+        if n in meta:
+            names = {str(c.get("name") or "").strip().lower() for c in keep}
+            for cid in meta[n]["columns"]:
+                if cid not in seen and cid in cb:
+                    nm = cb[cid]["name"] if cb[cid]["name"].strip().lower() not in names else f"{cb[cid]['name']} ({cid})"
+                    t["columns"].append({"column": cid, "name": nm, "type": SP.canon_type(cb[cid].get("value_type"))})
+                    names.add(nm.strip().lower())
+                    kinds["col_missing"] += 1
+        tables.append(t)
+    got = {t["name"]: t for t in tables if t.get("name")}
+
+    def pk_ref(t):
+        return f"new:{t['new_id_name']}" if t.get("primary_key") == SP.NEW else t.get("primary_key")
+
+    for t in tables:
+        for f in t["foreign_keys"]:
+            f["column"] = alias.get((t["name"], f.get("column")), f.get("column"))
+            rt = got.get(f.get("ref_table"))
+            if rt is not None:
+                f["ref_column"] = alias.get((rt["name"], f.get("ref_column")), f.get("ref_column"))
+            col = str(f.get("column"))
+            if col not in SP.table_refs(t) and col.startswith("new:"):
+                names = {str(c.get("name") or "").strip().lower() for c in t["columns"]}
+                nm = col[4:] if col[4:].strip().lower() not in names else f"{col[4:]} ({f.get('ref_table')})"
+                t["columns"].append({"column": col, "name": nm, "type": "id"})
+                kinds["fk_col_added"] += 1
+            if rt is not None and f.get("ref_column") not in SP.table_refs(rt) and pk_ref(rt) in SP.table_refs(rt):
+                f["ref_column"] = pk_ref(rt)
+                kinds["fk_ref_to_pk"] += 1
+    return {**a44, "tables": tables}, kinds
+
+
 def replay(out, chain, upto, root=ROOT):
     """Answers of a chain's calls 1..upto: (answers {"41": ..}, repairs, error or None, cols). The first failing call stops the replay."""
     cols = chain_columns(chain, root)
@@ -220,7 +287,8 @@ def replay(out, chain, upto, root=ROOT):
             a, n = repair_43(a, ans["41"], ans["42"])
             errs = SP.validate_43(a, ans["41"], ans["42"])
         else:
-            n, errs = 0, SP.validate_44(a, ans["41"], ans["42"], ans["43"], cols)
+            a, kinds = repair_44(a, ans["41"], ans["42"], ans["43"], cols)
+            n, errs = sum(kinds.values()), SP.validate_44(a, ans["41"], ans["42"], ans["43"], cols, strict=False)
         repairs += n
         if errs:
             return ans, repairs, f"4.{step}: {len(errs)} validation errors, e.g. {errs[:2]}", cols

@@ -1,6 +1,5 @@
 CREATE TABLE "train_information" (
   "train_id" INTEGER,
-  "train id" INTEGER,
   "destination" TEXT,
   "price" NUMERIC(10, 2),
   "trainid" INTEGER,
@@ -8,12 +7,11 @@ CREATE TABLE "train_information" (
   "duration" INTERVAL,
   "day" TEXT,
   "confirmed reference" INTEGER,
-  PRIMARY KEY ("train id")
+  PRIMARY KEY ("train_id")
 );
 
 CREATE TABLE "hotel_information" (
   "hotel_id" INTEGER,
-  "hotel id" INTEGER,
   "type" TEXT,
   "price range" TEXT,
   "confirmed reference" INTEGER,
@@ -25,12 +23,11 @@ CREATE TABLE "hotel_information" (
   "name" TEXT,
   "requested day" TEXT,
   "requested people" INTEGER,
-  PRIMARY KEY ("hotel id")
+  PRIMARY KEY ("hotel_id")
 );
 
 CREATE TABLE "restaurant_information" (
   "restaurant_id" INTEGER,
-  "restaurant id" INTEGER,
   "requested time" TIME,
   "requested day" TEXT,
   "postcode" TEXT,
@@ -42,5 +39,5 @@ CREATE TABLE "restaurant_information" (
   "food" TEXT,
   "name" TEXT,
   "price range" TEXT,
-  PRIMARY KEY ("restaurant id")
+  PRIMARY KEY ("restaurant_id")
 );

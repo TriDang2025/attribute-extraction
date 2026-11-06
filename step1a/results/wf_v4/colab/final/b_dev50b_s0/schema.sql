@@ -1,6 +1,5 @@
 CREATE TABLE "train_journey" (
   "train_journey_id" INTEGER,
-  "train journey id" INTEGER,
   "arrival station" TEXT,
   "arrival time" TIME,
   "departure day" TEXT,
@@ -8,12 +7,11 @@ CREATE TABLE "train_journey" (
   "departure time" TIME,
   "train id" INTEGER,
   "travel time" INTERVAL,
-  PRIMARY KEY ("train journey id")
+  PRIMARY KEY ("train_journey_id")
 );
 
 CREATE TABLE "hotel_booking" (
   "hotel_booking_id" INTEGER,
-  "hotel booking id" INTEGER,
   "generic accommodation type" TEXT,
   "hotel name" TEXT,
   "location" TEXT,
@@ -26,12 +24,11 @@ CREATE TABLE "hotel_booking" (
   "specific guesthouse" TEXT,
   "stars" INTEGER,
   "start date" TEXT,
-  PRIMARY KEY ("hotel booking id")
+  PRIMARY KEY ("hotel_booking_id")
 );
 
 CREATE TABLE "restaurant_booking" (
   "restaurant_booking_id" INTEGER,
-  "restaurant booking id" INTEGER,
   "area" TEXT,
   "day of week" TEXT,
   "food type" TEXT,
@@ -48,5 +45,5 @@ CREATE TABLE "restaurant_booking" (
   "restaurant reservation time" TIME,
   "restaurant type" TEXT,
   "specific address" TEXT,
-  PRIMARY KEY ("restaurant booking id")
+  PRIMARY KEY ("restaurant_booking_id")
 );
