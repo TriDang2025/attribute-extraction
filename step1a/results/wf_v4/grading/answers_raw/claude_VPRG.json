@@ -1,0 +1,17 @@
+{"code": "VPRG",
+ "grouping": {"score": 2, "reason": "train, hotel and restaurant fold their booking columns in (allowed alternative), but the taxi and attraction tables are missing entirely, hotel holds a stray 'restaurant name', and hotel internet/parking are merged into 'amenities'."},
+ "names": {"score": 3, "reason": "train, hotel and restaurant names and row meanings fit the reference (place plus booking alternative); there are no tables for taxi or attraction."},
+ "relationships": {"score": 4, "reason": "With bookings merged into train/hotel/restaurant the reference needs no links, so none are missing, but no foreign keys are declared at all and the stray hotel 'restaurant name' suggests a link that is not modelled."},
+ "keys": {"score": 1, "reason": "No primary key on any table (train id, hotel name and restaurant name are not declared keys) and no foreign keys."},
+ "design_quality": {"score": 2, "reason": "hotel mixes in 'restaurant name' and 'number of options'; 'amenities' mixes internet and parking; restaurant repeats columns ('postcode' vs 'restaurant postcode', 'reference number' vs 'restaurant reference number', 'restaurant address' vs 'specific address') and splits price range into 'price range confirmation'/'price range question'."},
+ "answerability": [
+  {"q": 1, "answer": "yes", "reason": "train.'train id' and train.'number of tickets'."},
+  {"q": 2, "answer": "yes", "reason": "train.'departure time', 'arrival time', 'departure station', 'arrival station'."},
+  {"q": 3, "answer": "yes", "reason": "hotel.'hotel name', 'start date', 'number of nights', 'number of people'."},
+  {"q": 4, "answer": "partly", "reason": "hotel.'location' and 'stars' exist, but parking is buried in the mixed 'amenities' text column."},
+  {"q": 5, "answer": "yes", "reason": "restaurant.'restaurant reference number' (or 'reference number') and 'restaurant phone number' in one table."},
+  {"q": 6, "answer": "partly", "reason": "restaurant.'area' and 'food type' exist, but price range is split across 'price range confirmation' and 'price range question'."},
+  {"q": 7, "answer": "no", "reason": "No taxi table or taxi columns."},
+  {"q": 8, "answer": "no", "reason": "No attraction table; no entrance fee column."}
+ ],
+ "overall": {"score": 2, "reason": "Three of five reference place tables are recognisable via the allowed merged-booking alternative, but taxi and attraction are missing, there are no keys, and hotel/restaurant contain stray and duplicated columns."}}

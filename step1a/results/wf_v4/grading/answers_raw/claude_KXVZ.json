@@ -1,0 +1,17 @@
+{"code": "KXVZ",
+ "grouping": {"score": 2, "reason": "Hotel attributes are split across hotel_hotel_location, hotel_price_range, hotel_hotel_type, hotel_star_rating while hotel booking columns (number of guests, nights, start date, reference) sit in hotel; train times split into train_departure_time and train_destination_city; taxi phone and entry fee land in restaurant tables; no taxi or attraction table."},
+ "names": {"score": 2, "reason": "hotel, train, restaurant roughly match, but restaurant_reference_number mixes booking with entry fee and taxi time, train_reference_number holds departure location, and many tables (hotel_star_rating, train_number_of_tickets, restaurant_taxi_phone_numbers) are single-attribute fragments; taxi and attraction tables missing."},
+ "relationships": {"score": 2, "reason": "Restaurant wrongly links to hotel_hotel_location/hotel_price_range, train links to hotel, hotel links to train_reference_number, and train_destination_city links to hotel/restaurant tables; only restaurant_reference_number->restaurant and train_reference_number->train resemble the reference booking links."},
+ "keys": {"score": 2, "reason": "PKs on hotel name, restaurant name, train id are right, but FKs are typed INTEGER pointing to TEXT names (hotel id -> hotel name, restaurant id -> restaurant name), train_reference_number has duplicate train id columns, and many spurious FKs across domains."},
+ "design_quality": {"score": 1, "reason": "hotel mixes hotel entity and booking; restaurant_reference_number mixes booking, entry fee and taxi time; restaurant_taxi_phone_numbers mixes restaurant, hotel and taxi; train_destination_city mixes train with hotel/restaurant links; train has stay duration days and hotel id."},
+ "answerability": [
+  {"q": 1, "answer": "partly", "reason": "train_reference_number links a booking to train, but people count is in train_number_of_tickets tied to train, not the booking."},
+  {"q": 2, "answer": "partly", "reason": "Arrival time/location in train, departure time in train_departure_time, departure location in train_reference_number; scattered but joinable, destination ambiguous."},
+  {"q": 3, "answer": "partly", "reason": "hotel has number of guests, nights, start date, reference number, but as hotel attributes, not a booking row."},
+  {"q": 4, "answer": "no", "reason": "No parking column; area in hotel_hotel_location and stars in hotel_star_rating only."},
+  {"q": 5, "answer": "yes", "reason": "restaurant_reference_number.reference number joins restaurant.restaurant phone numbers."},
+  {"q": 6, "answer": "partly", "reason": "restaurant has price range and food type; area is in restaurant_restaurant_location, joinable."},
+  {"q": 7, "answer": "no", "reason": "No taxi table; only a taxi phone in restaurant_taxi_phone_numbers, no from/to or car type."},
+  {"q": 8, "answer": "no", "reason": "No attraction table; entry fee sits in restaurant_reference_number."}
+ ],
+ "overall": {"score": 2, "reason": "Only hotel, restaurant and train cores are recognisable; bookings merged or fragmented, taxi and attraction missing, many cross-domain links and fragment tables."}}

@@ -1,0 +1,17 @@
+{"code": "PXBM",
+ "grouping": {"score": 2, "reason": "train split into train_journey and train_timing with day moved to train_booking and price missing; restaurant scattered over restaurant_location/restaurant_reservation/restaurant_booking/restaurant_cuisine with name and phone in a reservation table; hotel_details lacks parking/internet/price range and holds reference_number; taxi and attraction tables missing."},
+ "names": {"score": 2, "reason": "train_booking, hotel_booking, restaurant_booking fit, hotel_details is close to hotel, but train_journey/train_timing, restaurant_location, restaurant_cuisine, restaurant_reservation do not stand for one train or one restaurant per row; no taxi or attraction tables."},
+ "relationships": {"score": 2, "reason": "train_booking->train_journey and hotel_booking->hotel_details match the reference direction, but restaurant bookings link to restaurant_location rather than a restaurant entity, train_timing is an extra one-to-many child, and hotel_booking carries a stray restaurant name."},
+ "keys": {"score": 2, "reason": "surrogate PKs everywhere; train_id is not the train PK, there is no restaurant table keyed by name so restaurant_booking has no proper FK to a restaurant, and taxi/attraction keys are missing."},
+ "design_quality": {"score": 2, "reason": "hotel_details mixes hotel facts with a booking reference_number, hotel_booking holds a restaurant name, restaurant_cuisine has duplicated price_range_confirmation/price_range_question columns, and restaurant_reservation and restaurant_booking duplicate the booking concept."},
+ "answerability": [
+  {"q": 1, "answer": "yes", "reason": "train_booking.number_of_tickets joined to train_journey.train_id."},
+  {"q": 2, "answer": "yes", "reason": "train_journey stations plus train_timing departure/arrival times via train_journey_id."},
+  {"q": 3, "answer": "yes", "reason": "hotel_booking start_date, number_of_nights, number_of_people joined to hotel_details.hotel_name."},
+  {"q": 4, "answer": "partly", "reason": "hotel_details has stars and location (area-like) but no parking column."},
+  {"q": 5, "answer": "partly", "reason": "reference in restaurant_booking, phone in restaurant_reservation; only joinable through restaurant_location_id, which is not a restaurant identity."},
+  {"q": 6, "answer": "partly", "reason": "area in restaurant_location, food_type and price range in restaurant_cuisine, but restaurant name only in restaurant_reservation, so names come via a loose join."},
+  {"q": 7, "answer": "no", "reason": "no taxi table."},
+  {"q": 8, "answer": "no", "reason": "no attraction table."}
+ ],
+ "overall": {"score": 2, "reason": "train and hotel bookings are recognisable, but the train and restaurant entities are fragmented, hotel attributes are missing, and taxi and attraction are absent."}}

@@ -1,0 +1,17 @@
+{"code": "RFFT",
+ "grouping": {"score": 3, "reason": "Place tables (hotel, restaurant, attraction, train, taxi) match, but the three reference booking tables (train_booking, hotel_booking, restaurant_booking) are merged into one reservation table, and hotel stay is missing."},
+ "names": {"score": 3, "reason": "hotel, restaurant, attraction, train and taxi fit, but reservation stands for any booking (hotel, restaurant or train) instead of one booking type per table."},
+ "relationships": {"score": 4, "reason": "reservation links many-to-one to hotel, restaurant and train in the right direction, but through one shared table with nullable foreign keys instead of separate booking tables."},
+ "keys": {"score": 4, "reason": "Surrogate id primary keys are acceptable and reservation has foreign keys to hotel.id, restaurant.id and train.id, but these are mutually exclusive nullable keys rather than one required key per booking table."},
+ "design_quality": {"score": 3, "reason": "reservation mixes three different kinds of booking via reservation_type, with date/time/people columns serving different roles per type."},
+ "answerability": [
+  {"q": 1, "answer": "yes", "reason": "reservation.people joined to train.train_id via reservation.train_id."},
+  {"q": 2, "answer": "yes", "reason": "train.departure_time, arrival_time, departure_station, arrival_station."},
+  {"q": 3, "answer": "partly", "reason": "reservation gives hotel, date and people, but there is no column for number of nights."},
+  {"q": 4, "answer": "yes", "reason": "hotel.area, hotel.free_parking, hotel.stars."},
+  {"q": 5, "answer": "partly", "reason": "reservation.reference_number is available, but restaurant has no phone column."},
+  {"q": 6, "answer": "yes", "reason": "restaurant.price_range, area and cuisine."},
+  {"q": 7, "answer": "yes", "reason": "taxi.departure_location, arrival_location, contact_number, car_type."},
+  {"q": 8, "answer": "yes", "reason": "attraction.address and attraction.entrance_fee."}
+ ],
+ "overall": {"score": 3, "reason": "Place tables mostly match (missing hotel/restaurant/attraction phone, hotel type, openhours), but the merged reservation table replacing three booking tables and the missing hotel stay are big deviations."}}

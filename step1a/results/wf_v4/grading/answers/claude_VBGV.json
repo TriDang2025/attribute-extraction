@@ -1,0 +1,70 @@
+{
+ "code": "VBGV",
+ "grouping": {
+  "score": 2,
+  "reason": "Train/train-booking split roughly matches (train, train_train_id), but departure time is split off into train_departure_time, hotel name and address are split into hotel_hotel_name/hotel_address, stars sit in the booking table hotel_reference_number, restaurant attributes are scattered over restaurant, restaurant_area and restaurant_restaurant_address, and taxi and attraction tables are missing."
+ },
+ "names": {
+  "score": 2,
+  "reason": "train, hotel, restaurant and train_train_id (a train booking) roughly fit, but names like train_train_id, hotel_reference_number, restaurant_area and restaurant_restaurant_address describe a column rather than what a row stands for; no taxi or attraction tables."
+ },
+ "relationships": {
+  "score": 2,
+  "reason": "train_train_id->train and hotel_reference_number->hotel match the reference booking links, but there are many spurious links (hotel->restaurant, train->hotel_reference_number, train->restaurant, restaurant->train_train_id, restaurant_area->train) and attribute fragments linked as one-to-many children."
+ },
+ "keys": {
+  "score": 2,
+  "reason": "Surrogate integer PKs everywhere instead of train id / hotel name / restaurant name; the two booking FKs are right but many FKs are wrong (restaurant.train_train_id id, hotel.restaurant id, train.hotel_reference_number id, restaurant_area.train id) and train_train_id has a redundant 'train id' plus 'train id ref'."
+ },
+ "design_quality": {
+  "score": 1,
+  "reason": "Tables mix things (restaurant holds booking data plus a train-booking FK, hotel holds restaurant name, train links to hotel booking); 'amenities' mixes parking and internet; postcode/reference/number-of-options columns are repeated across restaurant tables; single-attribute tables fragment entities."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "train_train_id join train gives train id and 'number of tickets'."
+  },
+  {
+   "q": 2,
+   "answer": "yes",
+   "reason": "train has departure/arrival station and arrival time; join train_departure_time for departure time."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "hotel_reference_number has start date, number of nights, number of people; join hotel_hotel_name for the name."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "area is hotel.location, parking only inside mixed 'amenities', and stars sit in the booking table hotel_reference_number, so hotels without bookings lose stars."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "restaurant has reference number and name; join restaurant_restaurant_address for restaurant phone number."
+  },
+  {
+   "q": 6,
+   "answer": "partly",
+   "reason": "area and food type are in restaurant_area, but price range exists only as 'price range question'/'price range confirmation' columns of unclear meaning in other tables."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "No taxi table or taxi columns."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "No attraction table or attraction columns."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "Train and hotel booking structure is partly recognisable, but taxi and attraction are missing, hotel and restaurant entities are fragmented, train price is missing and many spurious cross-domain links exist."
+ },
+ "model": "claude-opus-5-5 (Claude Code subagent, fresh context, packet only)"
+}

@@ -1,0 +1,17 @@
+{"code": "MGTK",
+ "grouping": {"score": 2, "reason": "train, hotel, restaurant group most of their columns (bookings merged, allowed), but taxi and attraction tables are missing; taxi columns (taxi phone numbers, time for taxi) and attraction entry fee sit in restaurant, and train holds stray stay duration days / local information center."},
+ "names": {"score": 3, "reason": "train, hotel and restaurant names and row meaning fit the reference (place plus merged booking), but no taxi or attraction table exists."},
+ "relationships": {"score": 4, "reason": "With bookings merged into train/hotel/restaurant the reference needs no foreign keys and the candidate has none; the stray restaurant.hotel column is an unneeded half-link, and missing taxi/attraction tables mean nothing to link anyway."},
+ "keys": {"score": 1, "reason": "No primary key on any table (train id, hotel name, restaurant name are not declared keys), and no keys for taxi or attraction exist."},
+ "design_quality": {"score": 2, "reason": "restaurant mixes restaurant, taxi (taxi phone numbers, time for taxi), attraction (entry fee) and hotel data; repeated/duplicate columns (restaurant phone number vs phone numbers, location vs hotel location vs location description, price adjective/extreme/range); counts like number of results are not entity attributes."},
+ "answerability": [
+  {"q": 1, "answer": "yes", "reason": "train.train id and train.number of tickets in the same row."},
+  {"q": 2, "answer": "yes", "reason": "train.departure time, arrival time, departure location, arrival location."},
+  {"q": 3, "answer": "yes", "reason": "hotel.hotel name, start date, hotel number of nights, hotel number of guests."},
+  {"q": 4, "answer": "partly", "reason": "hotel.location and star rating exist, but there is no parking column."},
+  {"q": 5, "answer": "yes", "reason": "restaurant.reference number and restaurant phone number in the same row."},
+  {"q": 6, "answer": "yes", "reason": "restaurant.price range, restaurant area, restaurant food type."},
+  {"q": 7, "answer": "no", "reason": "No taxi table; only restaurant.taxi phone numbers, no from/to or car type."},
+  {"q": 8, "answer": "no", "reason": "No attraction table or address; only an entry fee column inside restaurant."}
+ ],
+ "overall": {"score": 2, "reason": "Three of five domains are recognisable with merged bookings, but taxi and attraction are missing, no keys are declared and restaurant mixes several entities."}}

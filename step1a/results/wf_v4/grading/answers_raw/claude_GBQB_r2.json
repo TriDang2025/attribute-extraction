@@ -1,0 +1,17 @@
+{"code": "GBQB",
+ "grouping": {"score": 3, "reason": "Train, hotel, restaurant, booking and attraction groupings match, but all taxi columns are merged into attraction (big error) and 'Hotel type' sits in restaurant instead of hotel."},
+ "names": {"score": 3, "reason": "Table names match for train, train_booking, hotel, hotel_booking, restaurant, restaurant_booking, attraction, but there is no taxi table and an attraction row now also stands for a taxi ride."},
+ "relationships": {"score": 4, "reason": "train_booking->train and restaurant_booking->restaurant are right; hotel_booking has 'Hotel confirmed name' but no FK to hotel."},
+ "keys": {"score": 3, "reason": "PKs match for most tables, but 'Taxi ride id' is not a PK (it lives in attraction keyed by 'Attraction name') and the hotel_booking->hotel FK is missing."},
+ "design_quality": {"score": 2, "reason": "attraction mixes attractions with taxi rides (Taxi ride id, departure, destination, phone, type), and restaurant carries 'Hotel type', mixing two things."},
+ "answerability": [
+  {"q": 1, "answer": "yes", "reason": "train_booking joins train via 'Train booking trainid' with 'Train requested people'."},
+  {"q": 2, "answer": "yes", "reason": "train has leave at, arrive by, departure, destination."},
+  {"q": 3, "answer": "yes", "reason": "hotel_booking has confirmed name, requested day, stay, people."},
+  {"q": 4, "answer": "yes", "reason": "hotel has area, parking, stars."},
+  {"q": 5, "answer": "yes", "reason": "restaurant_booking reference joins restaurant phone via the FK."},
+  {"q": 6, "answer": "yes", "reason": "restaurant has price range, area, food."},
+  {"q": 7, "answer": "partly", "reason": "Taxi departure, destination, phone and type exist but only as columns of attraction rows, so taxi rides are not stored as their own entities."},
+  {"q": 8, "answer": "yes", "reason": "attraction has address and entrancefee."}
+ ],
+ "overall": {"score": 3, "reason": "Most tables match the reference, but taxi is merged into attraction, 'Hotel type' is misplaced in restaurant, and the hotel_booking FK is missing."}}

@@ -1,0 +1,70 @@
+{
+ "code": "RPGV",
+ "grouping": {
+  "score": 2,
+  "reason": "hotel_booking and restaurant_booking fold place and booking columns together (allowed), but taxi and attraction tables are missing entirely, and train_booking lacks train departure, destination, arrive by, day and duration; hotel internet and parking are also missing."
+ },
+ "names": {
+  "score": 2,
+  "reason": "train_booking, hotel_booking and restaurant_booking fit the booking/place merge, but no tables stand for taxi rides or attractions, so two reference tables have no counterpart."
+ },
+ "relationships": {
+  "score": 4,
+  "reason": "Under the allowed merge no booking-to-place links are needed; however train_booking.train_trainid has no train table to point to and there are no FKs at all, so the train link is only implied."
+ },
+ "keys": {
+  "score": 3,
+  "reason": "train_booking_id, hotel_booking_id and restaurant_booking_id are reasonable PKs for merged booking tables, but the taxi ride id and attraction name keys are missing with their tables, and trainid is not a key anywhere."
+ },
+ "design_quality": {
+  "score": 3,
+  "reason": "hotel_booking and restaurant_booking repeat place details (address, phone, postcode, stars, area) on every booking row, and train_booking mixes train timetable data (leave_at, price) with booking data; no repeated column groups."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "train_booking.train_trainid and train_requested_people."
+  },
+  {
+   "q": 2,
+   "answer": "partly",
+   "reason": "Only train_leave_at exists; arrive by, departure and destination are missing."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "hotel_booking has hotel_name, hotel_requested_day, hotel_requested_stay, hotel_requested_people."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "hotel_area and hotel_stars exist but there is no parking column, and hotels appear only through bookings."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "restaurant_booking has restaurant_confirmed_reference and restaurant_phone in one row."
+  },
+  {
+   "q": 6,
+   "answer": "partly",
+   "reason": "restaurant_price_range, restaurant_area and restaurant_food exist, but restaurants are listed only if they were booked."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "No taxi table or taxi columns."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "No attraction table or attraction columns."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "Hotel and restaurant match the allowed merged alternative reasonably, but train is incomplete and taxi and attraction are missing entirely, so only about half of the reference is recognisable."
+ },
+ "model": "claude-opus-5-5 (Claude Code subagent, fresh context, packet only)"
+}

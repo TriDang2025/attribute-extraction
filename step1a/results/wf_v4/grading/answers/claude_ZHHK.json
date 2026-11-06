@@ -1,0 +1,70 @@
+{
+ "code": "ZHHK",
+ "grouping": {
+  "score": 3,
+  "reason": "All restaurant columns are merged into the hotel table (no restaurant table), and Hotel parking sits in train_booking instead of hotel; train, train_booking, hotel_booking, restaurant_booking, taxi and attraction otherwise match."
+ },
+ "names": {
+  "score": 3,
+  "reason": "Table names match the reference, but there is no restaurant table and a hotel row now stands for a hotel plus a restaurant."
+ },
+ "relationships": {
+  "score": 3,
+  "reason": "train_booking->train and hotel_booking->hotel are correct many-to-one links, but restaurant_booking has no link to any restaurant table (main link missing)."
+ },
+ "keys": {
+  "score": 3,
+  "reason": "PKs for train, bookings, hotel, taxi, attraction are right, but Restaurant name is no longer a primary key and restaurant_booking lacks its FK on Restaurant confirmed name."
+ },
+ "design_quality": {
+  "score": 2,
+  "reason": "hotel mixes hotels and restaurants (Restaurant name/food/area/phone etc.), and train_booking holds an unrelated Hotel parking column."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "train_booking has Train booking trainid and Train requested people."
+  },
+  {
+   "q": 2,
+   "answer": "yes",
+   "reason": "Join train_booking to train for leave at, arrive by, departure, destination."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "hotel_booking has confirmed name, requested day, stay and people."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "hotel has area and stars, but Hotel parking is in train_booking with no link to hotel."
+  },
+  {
+   "q": 5,
+   "answer": "partly",
+   "reason": "Reference is in restaurant_booking; phone is only in hotel.Restaurant phone, joinable on name without an FK or unique key."
+  },
+  {
+   "q": 6,
+   "answer": "partly",
+   "reason": "Restaurant price range, area and food are queryable but live in the hotel table, mixed with hotel rows."
+  },
+  {
+   "q": 7,
+   "answer": "yes",
+   "reason": "taxi has departure, destination, phone and type."
+  },
+  {
+   "q": 8,
+   "answer": "yes",
+   "reason": "attraction has address and entrancefee."
+  }
+ ],
+ "overall": {
+  "score": 3,
+  "reason": "Train, hotel booking, taxi and attraction match, but the restaurant table is merged into hotel, its booking link is missing, and hotel parking is misplaced in train_booking."
+ },
+ "model": "claude-opus-5-5 (Claude Code subagent, fresh context, packet only)"
+}

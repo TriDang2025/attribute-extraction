@@ -1,0 +1,70 @@
+{
+ "code": "RRSK",
+ "grouping": {
+  "score": 2,
+  "reason": "There is no train place table: times sit in train_time_details and route in train_journey, both hanging off train_booking_details. Hotel attributes are split into hotel_location_price, and the hotel's address, phone, parking and internet are missing. Restaurant food and price are split out into restaurant_price_food. The taxi and attraction tables are missing, and the taxi phone sits in reservation_details."
+ },
+ "names": {
+  "score": 2,
+  "reason": "train_booking_details, hotel_booking, reservation_details and restaurant_details roughly fit the reference booking and place tables. But train_time_details, train_journey, hotel_location_price and restaurant_price_food are attribute fragments, not things, and there are no train, hotel, taxi or attraction place tables."
+ },
+ "relationships": {
+  "score": 2,
+  "reason": "Links are circular and wrong. train_time_details and train_journey reference train_booking_details through their PKs, while it references them back. hotel_booking and hotel_location_price reference each other one-to-one. restaurant_details references reservation_details and restaurant_price_food by its own PK. Only reservation_details.restaurant_id to restaurant_details matches the reference booking-to-place link."
+ },
+ "keys": {
+  "score": 2,
+  "reason": "Several PKs double as FKs to other tables' PKs (time_id, journey_id, hotel_booking.booking_id, restaurant_details.restaurant_id). train_booking_details.train_id references no train table, hotel_booking.hotel_name is not a FK, and there are no keys at all for the missing taxi and attraction tables."
+ },
+ "design_quality": {
+  "score": 2,
+  "reason": "Train trip attributes are split across three tables by the booking key, and hotel and restaurant attributes are spread over arbitrary fragments. reservation_details mixes a taxi phone into a restaurant reservation, and train_journey has overlapping arrival_location and destination_city."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "train_booking_details has train_id and number_of_tickets."
+  },
+  {
+   "q": 2,
+   "answer": "yes",
+   "reason": "Join train_booking_details to train_time_details (departure_time, arrival_time) and train_journey (departure_location, arrival_location)."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "hotel_booking has hotel_name, start_date, hotel_number_of_nights and hotel_number_of_guests."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "hotel_location_price has hotel_location and star_rating, but there is no parking column."
+  },
+  {
+   "q": 5,
+   "answer": "partly",
+   "reason": "restaurant_details has restaurant_phone_number, but reservation_details has no reference number."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "Join restaurant_price_food (price_range, restaurant_food_type) with restaurant_details (restaurant_area)."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "There is no taxi table; only taxi_phone_numbers in reservation_details, with no departure, destination or car type."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "There is no attraction table."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "Only the train, hotel and restaurant booking parts are partly recognisable. Taxi and attraction are missing, the train and hotel place tables are missing, and the keys and links are circular."
+ },
+ "model": "claude-opus-5-5 (Claude Code subagent, fresh context, packet only)"
+}

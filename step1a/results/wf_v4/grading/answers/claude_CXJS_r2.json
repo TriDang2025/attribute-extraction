@@ -1,0 +1,70 @@
+{
+ "code": "CXJS",
+ "grouping": {
+  "score": 2,
+  "reason": "restaurant_booking folding restaurant+booking is an allowed alternative, but train_booking is missing (no people/reference), hotel_booking lacks stay, parking and internet and holds a stray 'restaurant name', and taxi and attraction tables are missing entirely."
+ },
+ "names": {
+  "score": 3,
+  "reason": "train_journey, hotel_booking and restaurant_booking fit their reference tables (a row = a train / a booked hotel / a booked restaurant), but there are no tables for taxi, attraction or train booking."
+ },
+ "relationships": {
+  "score": 2,
+  "reason": "No foreign keys at all; with booking columns folded into the place tables the hotel and restaurant links are not needed, but the train-to-train_booking link is missing because there is no train booking table."
+ },
+ "keys": {
+  "score": 2,
+  "reason": "All three tables use surrogate integer ids; train_journey does not key on 'train id' (the reference PK), hotel and restaurant names are not keys, and there are no FKs."
+ },
+ "design_quality": {
+  "score": 2,
+  "reason": "hotel_booking mixes a restaurant role ('restaurant name') and splits the hotel name across 'hotel name' and 'specific guesthouse'; restaurant_booking repeats postcode/'restaurant postcode', address/'specific address' and price range 'question'/'confirmation'."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "partly",
+   "reason": "train_journey has 'train id' but there is no booking record and no number of people."
+  },
+  {
+   "q": 2,
+   "answer": "yes",
+   "reason": "train_journey has departure/arrival time and departure/arrival station."
+  },
+  {
+   "q": 3,
+   "answer": "partly",
+   "reason": "hotel_booking has hotel name, start date and number of people, but no number of nights."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "hotel_booking has location and stars but no parking column."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "restaurant_booking has 'reference number' and 'restaurant phone number'."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "restaurant_booking has area, food type and price range (split into two confusing columns)."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "No taxi table."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "No attraction table."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "Only the restaurant part matches well; train has no booking, hotel is incomplete and mixed with restaurant data, and taxi and attraction are missing, so 3 of 7 reference tables are partly covered."
+ },
+ "model": "claude-opus-5-5 (Claude Code subagent, fresh context, packet only)"
+}

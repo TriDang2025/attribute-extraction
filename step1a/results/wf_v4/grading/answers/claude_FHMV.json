@@ -1,0 +1,70 @@
+{
+ "code": "FHMV",
+ "grouping": {
+  "score": 5,
+  "reason": "Same 8 tables (train, train_booking, hotel, hotel_booking, restaurant, restaurant_booking, taxi, attraction), each with exactly the reference columns."
+ },
+ "names": {
+  "score": 5,
+  "reason": "Table names and row meaning (one train, one train booking, one hotel, etc.) are identical to the reference."
+ },
+ "relationships": {
+  "score": 5,
+  "reason": "train_booking -> train, hotel_booking -> hotel, restaurant_booking -> restaurant, all many-to-one as in the reference; taxi and attraction standalone."
+ },
+ "keys": {
+  "score": 5,
+  "reason": "PKs (Train trainid, Hotel name, Restaurant name, Attraction name, Taxi ride id, booking ids) and all three FKs match the reference; only data types differ (INTEGER ids)."
+ },
+ "design_quality": {
+  "score": 5,
+  "reason": "No mixed tables or roles, no repeated column groups; only type choices differ (e.g. postcode and reference as INTEGER), which do not affect structure."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "train_booking has Train booking trainid and Train requested people."
+  },
+  {
+   "q": 2,
+   "answer": "yes",
+   "reason": "Join train_booking to train for leave at, arrive by, departure, destination."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "hotel_booking has confirmed name, requested day, stay and people."
+  },
+  {
+   "q": 4,
+   "answer": "yes",
+   "reason": "hotel has area, parking and stars."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "Join restaurant_booking (confirmed reference) to restaurant (phone) on name."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "restaurant has price range, area and food."
+  },
+  {
+   "q": 7,
+   "answer": "yes",
+   "reason": "taxi has departure, destination, phone and type."
+  },
+  {
+   "q": 8,
+   "answer": "yes",
+   "reason": "attraction has address and entrancefee."
+  }
+ ],
+ "overall": {
+  "score": 5,
+  "reason": "Structurally identical to the reference; differences are only in column data types."
+ },
+ "model": "claude-opus-5-5 (Claude Code subagent, fresh context, packet only)"
+}

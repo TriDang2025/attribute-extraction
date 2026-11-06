@@ -1,0 +1,70 @@
+{
+ "code": "VCJR",
+ "grouping": {
+  "score": 2,
+  "reason": "Only 3 tables: train_journey has no booking columns (no train_booking), hotel_booking and restaurant_reservation merge place+booking (allowed alternative), but taxi and attraction are missing entirely and hotel_booking lacks parking, internet, type, address, phone, stay and people."
+ },
+ "names": {
+  "score": 2,
+  "reason": "train_journey, hotel_booking and restaurant_reservation fit train, hotel(+booking) and restaurant(+booking) rows, but there are no tables named or standing for taxi rides, attractions or train bookings."
+ },
+ "relationships": {
+  "score": 2,
+  "reason": "No foreign keys at all; the train to train_booking link cannot exist because train bookings are missing; hotel and restaurant links are absorbed by the allowed merged alternative."
+ },
+ "keys": {
+  "score": 2,
+  "reason": "All PKs are surrogate ids (train_journey_id instead of train id; hotel_booking_id and restaurant_reservation_id acceptable under merged alternative); no FKs and missing tables mean several keys are absent."
+ },
+ "design_quality": {
+  "score": 3,
+  "reason": "restaurant_reservation has overlapping 'restaurant location' and 'restaurant area' columns, hotel_booking mixes 'hotel location' with postcode; merged place+booking tables repeat place data per booking, otherwise no repeated column groups."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "no",
+   "reason": "No train booking table or people column; train_journey has only train id."
+  },
+  {
+   "q": 2,
+   "answer": "partly",
+   "reason": "train_journey has departure location, destination city and departure time but no arrive-by time."
+  },
+  {
+   "q": 3,
+   "answer": "partly",
+   "reason": "hotel_booking has hotel name and start date but no nights (stay) or people."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "hotel_booking has hotel location and star rating but no parking column."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "restaurant_reservation has reference number and restaurant phone number in one row."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "restaurant_reservation has price range, restaurant area and restaurant food type."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "No taxi table."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "No attraction table."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "Recognisable train, hotel and restaurant parts using the merged booking alternative, but taxi, attraction and train_booking are missing, many columns (parking, stay, people, price, arrive time) are absent and there are no links."
+ },
+ "model": "claude-opus-5-5 (Claude Code subagent, fresh context, packet only)"
+}

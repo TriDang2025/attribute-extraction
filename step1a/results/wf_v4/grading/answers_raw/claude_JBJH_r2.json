@@ -1,0 +1,17 @@
+{"code": "JBJH",
+ "grouping": {"score": 5, "reason": "All eight tables (train, train_booking, hotel, hotel_booking, restaurant, restaurant_booking, taxi, attraction) hold exactly the reference columns."},
+ "names": {"score": 5, "reason": "Table and column names are identical to the reference and each row means the same thing (one train, one booking, one hotel, etc.)."},
+ "relationships": {"score": 5, "reason": "train_booking -> train, hotel_booking -> hotel, restaurant_booking -> restaurant are many-to-one as in the reference; taxi and attraction stand alone as in the reference."},
+ "keys": {"score": 5, "reason": "Same primary keys (Train trainid, Hotel name, Restaurant name, Taxi ride id, Attraction name, booking ids) and same foreign keys; only data types differ (INTEGER ids/references/postcodes)."},
+ "design_quality": {"score": 5, "reason": "No table mixes entities, no column mixes roles, no repeated column groups; only minor type choices like INTEGER postcode and reference differ from the reference."},
+ "answerability": [
+  {"q": 1, "answer": "yes", "reason": "train_booking has Train booking trainid and Train requested people."},
+  {"q": 2, "answer": "yes", "reason": "Join train_booking to train for leave at, arrive by, departure, destination."},
+  {"q": 3, "answer": "yes", "reason": "hotel_booking has confirmed name, requested day, stay and people."},
+  {"q": 4, "answer": "yes", "reason": "hotel has area, parking and stars."},
+  {"q": 5, "answer": "yes", "reason": "Join restaurant_booking (confirmed reference) to restaurant (phone) on name."},
+  {"q": 6, "answer": "yes", "reason": "restaurant has price range, area and food."},
+  {"q": 7, "answer": "yes", "reason": "taxi has departure, destination, phone and type."},
+  {"q": 8, "answer": "yes", "reason": "attraction has address and entrancefee."}
+ ],
+ "overall": {"score": 5, "reason": "Structurally identical to the reference; differences are only column data types."}}

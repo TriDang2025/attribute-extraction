@@ -1,0 +1,70 @@
+{
+ "code": "MKNR",
+ "grouping": {
+  "score": 2,
+  "reason": "Booking columns merged into train_information, hotel_information and restaurant_information (allowed), but the taxi and attraction tables are missing entirely, and train lacks departure, leave_at and confirmed reference while hotel lacks parking, internet and postcode."
+ },
+ "names": {
+  "score": 3,
+  "reason": "train_information, hotel_information and restaurant_information fit the reference place-plus-booking rows, but there are no tables for taxi rides or attractions."
+ },
+ "relationships": {
+  "score": 4,
+  "reason": "Under the merged-booking alternative no booking-to-place links are needed, so none are missing among the present tables; the absence of taxi and attraction leaves nothing else to link."
+ },
+ "keys": {
+  "score": 4,
+  "reason": "Surrogate keys train_id, hotel_id, restaurant_id work as per-booking ids under the merged alternative; train_trainid is kept but not declared a key, a minor gap."
+ },
+ "design_quality": {
+  "score": 4,
+  "reason": "No repeated column groups or mixed-role columns; place and booking data share a row, which the reference allows, but train_information stores train_requested_people without a booking reference."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "train_information.train_trainid and train_requested_people."
+  },
+  {
+   "q": 2,
+   "answer": "partly",
+   "reason": "train_arrive_by and train_destination exist, but departure station and leave-at time are missing."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "hotel_information has hotel_name, hotel_requested_day, hotel_requested_stay, hotel_requested_people."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "hotel_area and hotel_stars exist but there is no parking column."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "restaurant_information has restaurant_confirmed_reference and restaurant_phone in the same row."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "restaurant_price_range, restaurant_area and restaurant_food in restaurant_information."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "No taxi table."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "No attraction table."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "Three of seven domains present in the allowed merged form, but taxi and attraction are missing and several key train and hotel columns are absent."
+ },
+ "model": "claude-opus-5-5 (Claude Code subagent, fresh context, packet only)"
+}

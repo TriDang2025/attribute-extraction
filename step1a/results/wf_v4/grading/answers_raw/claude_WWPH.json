@@ -1,0 +1,17 @@
+{"code": "WWPH",
+ "grouping": {"score": 3, "reason": "hotel_booking and restaurant_booking are merged into one reservation table (which also has no stay/nights column); train booking columns (reference_number) sit in train with no people count; area is missing from hotel, restaurant and attraction; hotel type/phone, train day and taxi arrive-by are missing."},
+ "names": {"score": 4, "reason": "attraction, restaurant, hotel, train and taxi match the reference tables row for row; reservation is a generic booking row standing for both a hotel booking and a restaurant booking rather than matching one reference table."},
+ "relationships": {"score": 3, "reason": "reservation links to hotel and restaurant in the right many-to-one direction, but there is no train booking link to train, and an extra reservation-to-attraction link that the reference does not have."},
+ "keys": {"score": 4, "reason": "Surrogate primary keys (hotel_id, restaurant_id, train_id, taxi_id, attraction_id, reservation_id) are fine and the reservation FKs to hotel and restaurant are right; the train booking FK to train is missing."},
+ "design_quality": {"score": 3, "reason": "reservation mixes attraction, restaurant and hotel bookings through three nullable FKs (polymorphic table); train mixes timetable data with a booking reference_number; no repeated column groups."},
+ "answerability": [
+  {"q": 1, "answer": "partly", "reason": "train.reference_number hints which train was booked, but there is no number-of-people column for a train booking."},
+  {"q": 2, "answer": "yes", "reason": "train has departure_time, arrival_time, departure_station and arrival_station."},
+  {"q": 3, "answer": "partly", "reason": "reservation joined to hotel gives hotel, date and number_of_people, but there is no nights/stay column."},
+  {"q": 4, "answer": "partly", "reason": "hotel has free_parking and stars, but no area column."},
+  {"q": 5, "answer": "yes", "reason": "reservation.reference_number joined to restaurant.phone_number via restaurant_id."},
+  {"q": 6, "answer": "partly", "reason": "restaurant has price_range and cuisine, but no area column."},
+  {"q": 7, "answer": "yes", "reason": "taxi has pickup_location, dropoff_location, contact_number and car_type."},
+  {"q": 8, "answer": "yes", "reason": "attraction has address and entrance_fee."}
+ ],
+ "overall": {"score": 3, "reason": "Main entity tables are recognisable, but the two booking tables are merged into one reservation, the train booking table is missing (reference folded into train), and area columns plus hotel stay are missing."}}
