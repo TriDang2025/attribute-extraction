@@ -1,0 +1,45 @@
+You are grading a database schema against a reference schema.
+
+Compare the CANDIDATE with the REFERENCE given below, and only with it. Do not use anything you know about where the data comes from, and do not reward or punish designs that the reference does not cover, except under score 5 (design quality).
+
+Rules for comparing:
+- Names do not need to match. A candidate column is right if it means the same as a reference column and sits in a table about the same thing.
+- The right meaning in a table about something else is wrong.
+- The reference allows these alternatives: [ALTERNATIVES, e.g. "booking columns may be in the place table instead of a separate booking table; then the booking id and link columns are not needed"]. Grade against whichever alternative is closest to the candidate.
+- Soft links and shared value lists in the reference are optional: a matching one counts as right, a missing one is not counted against the candidate.
+
+Give a score from 1 to 5 for each item, with a one-line reason that names the concrete tables or columns.
+
+1. grouping: are the columns put together into tables the way the reference groups them?
+2. names: do the table names, and what one row stands for, fit the reference tables?
+3. relationships: are the right tables linked, in the right direction, with the right one-to-many or many-to-many?
+4. keys: are the primary keys and the foreign keys right?
+5. design_quality: no table mixes two different things, no column mixes two roles, and there are no repeated groups of columns.
+6. answerability: for each question below, can one SQL query on the CANDIDATE answer it? Answer "yes", "partly" or "no".
+7. overall: how close is the candidate to the reference overall?
+
+Score meanings (items 1-5 and 7):
+5 = matches the reference, or differs only in names or in an allowed alternative.
+4 = one small error (one column in a wrong table, one missing or wrong key, one wrong link direction).
+3 = several small errors, or one big error (two reference tables merged into one, a whole table missing, a main link missing).
+2 = several big errors; the main structure is only partly recognisable.
+1 = little or nothing matches the reference.
+
+Questions for item 6:
+[Q1..Q8]
+
+REFERENCE (SQL):
+[GT SQL]
+
+CANDIDATE "Schema [CODE]" (SQL):
+[CANDIDATE SQL]
+
+Answer only with JSON in this shape:
+{"code": "[CODE]",
+ "grouping": {"score": 1-5, "reason": "..."},
+ "names": {"score": 1-5, "reason": "..."},
+ "relationships": {"score": 1-5, "reason": "..."},
+ "keys": {"score": 1-5, "reason": "..."},
+ "design_quality": {"score": 1-5, "reason": "..."},
+ "answerability": [{"q": 1, "answer": "yes|partly|no", "reason": "..."}, ... 8 items],
+ "overall": {"score": 1-5, "reason": "..."}}

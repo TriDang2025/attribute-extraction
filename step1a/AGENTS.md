@@ -77,6 +77,8 @@ Timings on the laptop CPU for n50:
 - wf_v4 Step 4 (contract `WF_V4_CONTRACT.md`, batch `WF_V4_BATCH.md`):
   - Inputs: `scripts/inputs_v4.py` (`s1a/step4_inputs.py`) -> `results/wf_v4/inputs/<set>/{a,b,c1,c2}.columns.json, d.canonical.json, f.canonical.json, e_v<k>.prompt.txt, dialogues_used.json`, `token_counts.{csv,md}`, `results/wf_v4/scores/baselines_df.csv`.
   - Batch: `scripts/batch_build_v4.py` (stage 1; reads the inputs and `config/wf_v4_placement.json`) -> `results/wf_v4/colab/{prompts/, manifest.json, chains.json, placement.json}` -> `colab/S1A_llm_v4_colab.ipynb` (`scripts/batch_stage_v4.py` per stage, `s1a/batch_v4.py`) -> `responses/` -> `scripts/assemble_v4.py [--score]` -> `final/<run>/{canonical.json, schema.sql, operations.json}`; `scripts/dry_run_v4.py` (fake model `s1a/batch_v4_fake.py`) -> `manifest_summary.md`.
+  - Scores and grading: `scripts/errors_v4.py` (`s1a/step4_errors.py`) -> `results/wf_v4/scores/errors_dev50.{md,csv}`; `scripts/packets_v4.py` (`s1a/step4_grading.py`, prompt `config/wf_v4_grading_prompt.txt`) -> `results/wf_v4/grading/{packets/, key.json, README.md}`; answers saved by hand in `grading/answers/` -> `scripts/read_grades_v4.py` (`s1a/step4_grades.py`) -> `grading/{grades.csv, task11.md}`.
+  - Handover: `scripts/handover_v4.py` (`s1a/step4_handover.py`) -> `handover_step4/<set>/{schema.json, schema.sql, operations.json}`, format in `handover_step4/FORMAT.md`.
 
 ## Data links
 - `scripts/export_mentions.py` -> `results/graph_<split>50/{docs.jsonl, gold_values.csv, gold_attrs.txt, cache/}`, `<input>/{mentions,clusters,instances}.csv, vectors.npz` -> `scripts/graph_run.py` stages -> `<input>/{coverage.csv, graphs.pkl, stability.csv, nodes.csv, labels.csv, select/, schema/}`

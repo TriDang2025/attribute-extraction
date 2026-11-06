@@ -1,0 +1,1305 @@
+{
+ "set": "dev50b",
+ "setting": "main (input a, no signals), column order seed 0; run a_dev50b_s0",
+ "tables": [
+  {
+   "name": "train_journey",
+   "description": "Details of a train journey including origin, destination, and train ID.",
+   "row": "one train journey",
+   "columns": [
+    {
+     "name": "train_journey_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "arrival_station",
+     "type": "text",
+     "source": "train:1",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 1,
+      "name": "arrival station",
+      "description": "the station where the train arrives",
+      "n_mentions": 23,
+      "n_dialogues": 13,
+      "value_type": "text",
+      "top_values": [
+       "broxbourne",
+       "stevenage",
+       "birmingham new street"
+      ]
+     }
+    },
+    {
+     "name": "departure_station",
+     "type": "text",
+     "source": "train:4",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 4,
+      "name": "departure station",
+      "description": "the station where the train departs from",
+      "n_mentions": 31,
+      "n_dialogues": 15,
+      "value_type": "text",
+      "top_values": [
+       "cambridge",
+       "peterborough",
+       "leicester"
+      ]
+     }
+    },
+    {
+     "name": "train_id",
+     "type": "id",
+     "source": "train:11",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 11,
+      "name": "train id",
+      "description": "the unique identifier of the train",
+      "n_mentions": 14,
+      "n_dialogues": 13,
+      "value_type": "id",
+      "top_values": [
+       "tr2515",
+       "tr0545",
+       "tr2289"
+      ]
+     }
+    }
+   ],
+   "primary_key": [
+    "train_journey_id"
+   ],
+   "foreign_keys": []
+  },
+  {
+   "name": "train_timing",
+   "description": "Timing details of a train journey including departure and arrival times, and travel duration.",
+   "row": "one train timing",
+   "columns": [
+    {
+     "name": "train_timing_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "arrival_time",
+     "type": "time",
+     "source": "train:2",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 2,
+      "name": "arrival time",
+      "description": "arrival time of the train",
+      "n_mentions": 8,
+      "n_dialogues": 8,
+      "value_type": "time",
+      "top_values": [
+       "05:58",
+       "06:01",
+       "06:10"
+      ]
+     }
+    },
+    {
+     "name": "departure_time",
+     "type": "time",
+     "source": "train:5",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 5,
+      "name": "departure time",
+      "description": "departure time of the train",
+      "n_mentions": 37,
+      "n_dialogues": 17,
+      "value_type": "time",
+      "top_values": [
+       "11:30",
+       "13:06",
+       "16:15"
+      ]
+     }
+    },
+    {
+     "name": "travel_time",
+     "type": "duration",
+     "source": "train:12",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 12,
+      "name": "travel time",
+      "description": "the duration of the train journey",
+      "n_mentions": 3,
+      "n_dialogues": 3,
+      "value_type": "duration",
+      "top_values": [
+       "49 minute",
+       "163 minute"
+      ]
+     }
+    },
+    {
+     "name": "train_journey_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    }
+   ],
+   "primary_key": [
+    "train_timing_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "train_journey_id"
+     ],
+     "ref_table": "train_journey",
+     "ref_columns": [
+      "train_journey_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "train_booking",
+   "description": "Details of a train booking including departure day, number of tickets, reference number, and total fee.",
+   "row": "one train booking",
+   "columns": [
+    {
+     "name": "train_booking_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "departure_day",
+     "type": "day",
+     "source": "train:3",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 3,
+      "name": "departure day",
+      "description": "the day the train departs",
+      "n_mentions": 24,
+      "n_dialogues": 16,
+      "value_type": "day",
+      "top_values": [
+       "sunday",
+       "friday",
+       "monday"
+      ]
+     }
+    },
+    {
+     "name": "number_of_tickets",
+     "type": "integer",
+     "source": "train:7",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 7,
+      "name": "number of tickets",
+      "description": "the number of tickets booked",
+      "n_mentions": 6,
+      "n_dialogues": 6,
+      "value_type": "number",
+      "top_values": [
+       "2 people",
+       "3 seat",
+       "4 ticket"
+      ]
+     }
+    },
+    {
+     "name": "reference_number",
+     "type": "id",
+     "source": "train:9",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 9,
+      "name": "reference number",
+      "description": "the reference number for the booking",
+      "n_mentions": 9,
+      "n_dialogues": 9,
+      "value_type": "id",
+      "top_values": [
+       "0w0bqb8w",
+       "13gq9s3a",
+       "1l0fbgwg"
+      ]
+     }
+    },
+    {
+     "name": "total_fee",
+     "type": "price",
+     "source": "train:10",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "train",
+      "id": 10,
+      "name": "total fee",
+      "description": "the total cost of the tickets",
+      "n_mentions": 10,
+      "n_dialogues": 10,
+      "value_type": "price",
+      "top_values": [
+       "12.80 pound",
+       "17.90",
+       "17.90 pound"
+      ]
+     }
+    },
+    {
+     "name": "train_journey_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    }
+   ],
+   "primary_key": [
+    "train_booking_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "train_journey_id"
+     ],
+     "ref_table": "train_journey",
+     "ref_columns": [
+      "train_journey_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "hotel_details",
+   "description": "Details of a hotel including name, type, location, contact, postcode, reference number, and stars.",
+   "row": "one hotel",
+   "columns": [
+    {
+     "name": "hotel_details_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "hotel_name",
+     "type": "text",
+     "source": "hotel:5",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 5,
+      "name": "hotel name",
+      "description": "Identifies the name of a hotel being discussed or booked.",
+      "n_mentions": 15,
+      "n_dialogues": 7,
+      "value_type": "text",
+      "top_values": [
+       "allenbell",
+       "hotel allenbell",
+       "the allenbell"
+      ]
+     }
+    },
+    {
+     "name": "accommodation_type",
+     "type": "text",
+     "source": "hotel:1",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 1,
+      "name": "accommodation type",
+      "description": "type of accommodation, such as hotel or guesthouse",
+      "n_mentions": 16,
+      "n_dialogues": 11,
+      "value_type": "text",
+      "top_values": [
+       "alexander bed and breakfast",
+       "hobson house",
+       "el shaddai"
+      ]
+     }
+    },
+    {
+     "name": "location",
+     "type": "text",
+     "source": "hotel:6",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 6,
+      "name": "location",
+      "description": "the location of the accommodation",
+      "n_mentions": 33,
+      "n_dialogues": 14,
+      "value_type": "text",
+      "top_values": [
+       "north",
+       "cambridge",
+       "centre of town"
+      ]
+     }
+    },
+    {
+     "name": "phone_number",
+     "type": "integer",
+     "source": "hotel:10",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 10,
+      "name": "phone number",
+      "description": "the phone number of the accommodation",
+      "n_mentions": 4,
+      "n_dialogues": 3,
+      "value_type": "number",
+      "top_values": [
+       "01223247015",
+       "01223334860",
+       "01223353888"
+      ]
+     }
+    },
+    {
+     "name": "postcode",
+     "type": "id",
+     "source": "hotel:11",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 11,
+      "name": "postcode",
+      "description": "postal code for addresses",
+      "n_mentions": 2,
+      "n_dialogues": 2,
+      "value_type": "id",
+      "top_values": [
+       "cb13js",
+       "cb58pa"
+      ]
+     }
+    },
+    {
+     "name": "reference_number",
+     "type": "id",
+     "source": "hotel:13",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 13,
+      "name": "reference number",
+      "description": "confirmation code for reservations",
+      "n_mentions": 16,
+      "n_dialogues": 16,
+      "value_type": "id",
+      "top_values": [
+       "23ekiufo",
+       "7sn0baat",
+       "7v39sm46"
+      ]
+     }
+    },
+    {
+     "name": "stars",
+     "type": "integer",
+     "source": "hotel:16",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 16,
+      "name": "stars",
+      "description": "Rating of the hotel or guesthouse in stars",
+      "n_mentions": 4,
+      "n_dialogues": 2,
+      "value_type": "number",
+      "top_values": [
+       "2 star",
+       "3 star"
+      ]
+     }
+    }
+   ],
+   "primary_key": [
+    "hotel_details_id"
+   ],
+   "foreign_keys": []
+  },
+  {
+   "name": "hotel_booking",
+   "description": "Details of a hotel booking including number of nights, number of people, specific guesthouse, and start date.",
+   "row": "one hotel booking",
+   "columns": [
+    {
+     "name": "hotel_booking_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "number_of_nights",
+     "type": "integer",
+     "source": "hotel:7",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 7,
+      "name": "number of nights",
+      "description": "specifies the duration of stay",
+      "n_mentions": 19,
+      "n_dialogues": 13,
+      "value_type": "number",
+      "top_values": [
+       "2 night",
+       "4 night",
+       "5 night"
+      ]
+     }
+    },
+    {
+     "name": "number_of_people",
+     "type": "integer",
+     "source": "hotel:9",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 9,
+      "name": "number of people",
+      "description": "specifies the number of people for booking",
+      "n_mentions": 13,
+      "n_dialogues": 13,
+      "value_type": "number",
+      "top_values": [
+       "2 people",
+       "8 people",
+       "3 people"
+      ]
+     }
+    },
+    {
+     "name": "specific_guesthouse",
+     "type": "text",
+     "source": "hotel:15",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 15,
+      "name": "specific guesthouse",
+      "description": "names of specific guesthouses or hotels",
+      "n_mentions": 7,
+      "n_dialogues": 5,
+      "value_type": "text",
+      "top_values": [
+       "acorn guest house",
+       "bridge guest house",
+       "a and b guest house"
+      ]
+     }
+    },
+    {
+     "name": "start_date",
+     "type": "day",
+     "source": "hotel:17",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 17,
+      "name": "start date",
+      "description": "the start date of the reservation",
+      "n_mentions": 20,
+      "n_dialogues": 16,
+      "value_type": "day",
+      "top_values": [
+       "wednesday",
+       "friday",
+       "sunday"
+      ]
+     }
+    },
+    {
+     "name": "hotel_details_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "restaurant name",
+     "type": "text",
+     "source": "hotel:14",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "hotel",
+      "id": 14,
+      "name": "restaurant name",
+      "description": "Identifies the name of a restaurant being discussed.",
+      "n_mentions": 1,
+      "n_dialogues": 1,
+      "value_type": "text",
+      "top_values": [
+       "grafton hotel restaurant"
+      ]
+     }
+    }
+   ],
+   "primary_key": [
+    "hotel_booking_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "hotel_details_id"
+     ],
+     "ref_table": "hotel_details",
+     "ref_columns": [
+      "hotel_details_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "restaurant_location",
+   "description": "Location details of a restaurant including area, address, and type.",
+   "row": "one restaurant location",
+   "columns": [
+    {
+     "name": "restaurant_location_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "area",
+     "type": "text",
+     "source": "restaurant:1",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 1,
+      "name": "area",
+      "description": "the area of the city where the restaurant is located",
+      "n_mentions": 22,
+      "n_dialogues": 15,
+      "value_type": "text",
+      "top_values": [
+       "cambridge",
+       "center of town",
+       "centre of town"
+      ]
+     }
+    },
+    {
+     "name": "restaurant_address",
+     "type": "text",
+     "source": "restaurant:11",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 11,
+      "name": "restaurant address",
+      "description": "the address of the restaurant",
+      "n_mentions": 8,
+      "n_dialogues": 8,
+      "value_type": "text",
+      "top_values": [
+       "86 regent street",
+       "40270 king street city",
+       "68 histon road"
+      ]
+     }
+    },
+    {
+     "name": "restaurant_type",
+     "type": "text",
+     "source": "restaurant:17",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 17,
+      "name": "restaurant type",
+      "description": "generic mentions of restaurants",
+      "n_mentions": 21,
+      "n_dialogues": 16,
+      "value_type": "text",
+      "top_values": [
+       "restaurant",
+       "hotel",
+       "chinese restaurant"
+      ]
+     }
+    }
+   ],
+   "primary_key": [
+    "restaurant_location_id"
+   ],
+   "foreign_keys": []
+  },
+  {
+   "name": "restaurant_reservation",
+   "description": "Contact and reservation details of a restaurant including phone number, postcode, reservation time, and reference number.",
+   "row": "one restaurant reservation",
+   "columns": [
+    {
+     "name": "restaurant_reservation_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "restaurant_name",
+     "type": "text",
+     "source": "restaurant:12",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 12,
+      "name": "restaurant name",
+      "description": "the name of the restaurant",
+      "n_mentions": 25,
+      "n_dialogues": 18,
+      "value_type": "text",
+      "top_values": [
+       "j restaurant",
+       "darry cookhouse and wine shop",
+       "jinling noodle bar"
+      ]
+     }
+    },
+    {
+     "name": "restaurant_phone_number",
+     "type": "integer",
+     "source": "restaurant:13",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 13,
+      "name": "restaurant phone number",
+      "description": "the phone number of the restaurant",
+      "n_mentions": 4,
+      "n_dialogues": 3,
+      "value_type": "number",
+      "top_values": [
+       "01223",
+       "01223 308871",
+       "07754509492"
+      ]
+     }
+    },
+    {
+     "name": "restaurant_reference_number",
+     "type": "id",
+     "source": "restaurant:15",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 15,
+      "name": "restaurant reference number",
+      "description": "the reference number for a reservation at the restaurant",
+      "n_mentions": 1,
+      "n_dialogues": 1,
+      "value_type": "id",
+      "top_values": [
+       "suy8vw"
+      ]
+     }
+    },
+    {
+     "name": "restaurant_reservation_time",
+     "type": "time",
+     "source": "restaurant:16",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 16,
+      "name": "restaurant reservation time",
+      "description": "the time at which the reservation is made",
+      "n_mentions": 19,
+      "n_dialogues": 14,
+      "value_type": "time",
+      "top_values": [
+       "12:45",
+       "13:15",
+       "10:30"
+      ]
+     }
+    },
+    {
+     "name": "restaurant_location_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    }
+   ],
+   "primary_key": [
+    "restaurant_reservation_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "restaurant_location_id"
+     ],
+     "ref_table": "restaurant_location",
+     "ref_columns": [
+      "restaurant_location_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "restaurant_booking",
+   "description": "Booking details of a restaurant including day of week, number of people, and reference number.",
+   "row": "one restaurant booking",
+   "columns": [
+    {
+     "name": "restaurant_booking_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "day_of_week",
+     "type": "day",
+     "source": "restaurant:2",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 2,
+      "name": "day of week",
+      "description": "the day of the week for a booking",
+      "n_mentions": 15,
+      "n_dialogues": 12,
+      "value_type": "day",
+      "top_values": [
+       "friday",
+       "tuesday",
+       "wednesday"
+      ]
+     }
+    },
+    {
+     "name": "number_of_people",
+     "type": "integer",
+     "source": "restaurant:5",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 5,
+      "name": "number of people",
+      "description": "the number of people the table can accommodate",
+      "n_mentions": 14,
+      "n_dialogues": 11,
+      "value_type": "number",
+      "top_values": [
+       "8 people",
+       "2",
+       "1"
+      ]
+     }
+    },
+    {
+     "name": "reference_number",
+     "type": "id",
+     "source": "restaurant:9",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 9,
+      "name": "reference number",
+      "description": "uniquely identifies a booking or reservation",
+      "n_mentions": 12,
+      "n_dialogues": 12,
+      "value_type": "id",
+      "top_values": [
+       "4h1drif8",
+       "56ahcple",
+       "97aaf776"
+      ]
+     }
+    },
+    {
+     "name": "restaurant_location_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    }
+   ],
+   "primary_key": [
+    "restaurant_booking_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "restaurant_location_id"
+     ],
+     "ref_table": "restaurant_location",
+     "ref_columns": [
+      "restaurant_location_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "restaurant_cuisine",
+   "description": "Cuisine and price range details of a restaurant including food type, price range confirmation, and price range question.",
+   "row": "one restaurant cuisine detail",
+   "columns": [
+    {
+     "name": "restaurant_cuisine_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    },
+    {
+     "name": "food_type",
+     "type": "text",
+     "source": "restaurant:3",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 3,
+      "name": "food type",
+      "description": "the type of food served by the restaurant",
+      "n_mentions": 12,
+      "n_dialogues": 5,
+      "value_type": "text",
+      "top_values": [
+       "danish restaurant",
+       "lebanese",
+       "british"
+      ]
+     }
+    },
+    {
+     "name": "price_range_confirmation",
+     "type": "text",
+     "source": "restaurant:7",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 7,
+      "name": "price range confirmation",
+      "description": "confirms the price range of a restaurant",
+      "n_mentions": 14,
+      "n_dialogues": 9,
+      "value_type": "text",
+      "top_values": [
+       "moderately priced",
+       "moderate price range",
+       "moderate"
+      ]
+     }
+    },
+    {
+     "name": "price_range_question",
+     "type": "text",
+     "source": "restaurant:8",
+     "new": false,
+     "gt": null,
+     "step3": {
+      "entity": "restaurant",
+      "id": 8,
+      "name": "price range question",
+      "description": "requests the price range of a restaurant or ticket",
+      "n_mentions": 20,
+      "n_dialogues": 15,
+      "value_type": "text",
+      "top_values": [
+       "expensive",
+       "cheap",
+       "expensive price range"
+      ]
+     }
+    },
+    {
+     "name": "restaurant_location_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null,
+     "step3": null
+    }
+   ],
+   "primary_key": [
+    "restaurant_cuisine_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "restaurant_location_id"
+     ],
+     "ref_table": "restaurant_location",
+     "ref_columns": [
+      "restaurant_location_id"
+     ]
+    }
+   ]
+  }
+ ],
+ "relationships": [
+  {
+   "from": "train_booking",
+   "to": "train_journey",
+   "kind": "one_to_many",
+   "reason": "A train journey can have multiple bookings."
+  },
+  {
+   "from": "hotel_booking",
+   "to": "hotel_details",
+   "kind": "one_to_many",
+   "reason": "A hotel can have multiple bookings."
+  },
+  {
+   "from": "restaurant_booking",
+   "to": "restaurant_location",
+   "kind": "one_to_many",
+   "reason": "A restaurant location can have multiple bookings."
+  },
+  {
+   "from": "restaurant_cuisine",
+   "to": "restaurant_location",
+   "kind": "one_to_many",
+   "reason": "A restaurant location can have multiple cuisine details."
+  }
+ ],
+ "unused": [
+  {
+   "source": "train:6",
+   "reason": "Noise; only one mention in the corpus.",
+   "step3": {
+    "entity": "train",
+    "id": 6,
+    "name": "entity name",
+    "description": "name of an entity, such as a town information center",
+    "n_mentions": 1,
+    "n_dialogues": 1,
+    "value_type": "text",
+    "top_values": [
+     "cambridge towninfo centre"
+    ]
+   }
+  },
+  {
+   "source": "train:8",
+   "reason": "Noise; only four mentions in the corpus.",
+   "step3": {
+    "entity": "train",
+    "id": 8,
+    "name": "payment location",
+    "description": "the location where the ticket is paid for",
+    "n_mentions": 4,
+    "n_dialogues": 4,
+    "value_type": "text",
+    "top_values": [
+     "station"
+    ]
+   }
+  },
+  {
+   "source": "hotel:3",
+   "reason": "Noise; only seven mentions in the corpus.",
+   "step3": {
+    "entity": "hotel",
+    "id": 3,
+    "name": "amenities",
+    "description": "amenities provided by the accommodation",
+    "n_mentions": 7,
+    "n_dialogues": 7,
+    "value_type": "text",
+    "top_values": [
+     "room",
+     "city",
+     "cityroomz"
+    ]
+   }
+  },
+  {
+   "source": "hotel:4",
+   "reason": "Too general; overlaps with hotel:5 and hotel:16.",
+   "step3": {
+    "entity": "hotel",
+    "id": 4,
+    "name": "generic accommodation type",
+    "description": "generic types of accommodation",
+    "n_mentions": 38,
+    "n_dialogues": 18,
+    "value_type": "text",
+    "top_values": [
+     "guesthouse",
+     "hotel",
+     "guest house"
+    ]
+   }
+  },
+  {
+   "source": "hotel:12",
+   "reason": "Too general; overlaps with hotel:12.",
+   "step3": {
+    "entity": "hotel",
+    "id": 12,
+    "name": "price adjective",
+    "description": "Refers to the price range as a category or level of pricing.",
+    "n_mentions": 16,
+    "n_dialogues": 11,
+    "value_type": "text",
+    "top_values": [
+     "moderately priced",
+     "cheap",
+     "expensive"
+    ]
+   }
+  },
+  {
+   "source": "restaurant:4",
+   "reason": "Noise; only four mentions in the corpus.",
+   "step3": {
+    "entity": "restaurant",
+    "id": 4,
+    "name": "number of options",
+    "description": "specifies the number of options available",
+    "n_mentions": 4,
+    "n_dialogues": 3,
+    "value_type": "number",
+    "top_values": [
+     "2",
+     "3",
+     "3 option"
+    ]
+   }
+  },
+  {
+   "source": "restaurant:6",
+   "reason": "Noise; only two mentions in the corpus.",
+   "step3": {
+    "entity": "restaurant",
+    "id": 6,
+    "name": "postcode",
+    "description": "provides the postal code for a location",
+    "n_mentions": 2,
+    "n_dialogues": 2,
+    "value_type": "id",
+    "top_values": [
+     "cb21rh",
+     "cb30ad"
+    ]
+   }
+  },
+  {
+   "source": "restaurant:10",
+   "reason": "Noise; only five mentions in the corpus.",
+   "step3": {
+    "entity": "restaurant",
+    "id": 10,
+    "name": "reservation duration",
+    "description": "the duration for which a table is reserved",
+    "n_mentions": 5,
+    "n_dialogues": 4,
+    "value_type": "duration",
+    "top_values": [
+     "15 minute",
+     "15"
+    ]
+   }
+  },
+  {
+   "source": "restaurant:18",
+   "reason": "Noise; only eleven mentions in the corpus.",
+   "step3": {
+    "entity": "restaurant",
+    "id": 18,
+    "name": "specific address",
+    "description": "Refers to a specific address or landmark within the town.",
+    "n_mentions": 11,
+    "n_dialogues": 9,
+    "value_type": "text",
+    "top_values": [
+     "centre",
+     "city centre",
+     "city center"
+    ]
+   }
+  },
+  {
+   "source": "hotel:2",
+   "reason": "not placed by the model",
+   "step3": {
+    "entity": "hotel",
+    "id": 2,
+    "name": "address",
+    "description": "the address of the accommodation",
+    "n_mentions": 7,
+    "n_dialogues": 3,
+    "value_type": "text",
+    "top_values": [
+     "74 chesterton road",
+     "138 perne road",
+     "365 milton road"
+    ]
+   }
+  },
+  {
+   "source": "hotel:8",
+   "reason": "not placed by the model",
+   "step3": {
+    "entity": "hotel",
+    "id": 8,
+    "name": "number of options",
+    "description": "indicates the count of available accommodations",
+    "n_mentions": 8,
+    "n_dialogues": 6,
+    "value_type": "number",
+    "top_values": [
+     "3",
+     "3 guesthouse",
+     "2"
+    ]
+   }
+  },
+  {
+   "source": "restaurant:14",
+   "reason": "not placed by the model",
+   "step3": {
+    "entity": "restaurant",
+    "id": 14,
+    "name": "restaurant postcode",
+    "description": "the postcode of the restaurant",
+    "n_mentions": 3,
+    "n_dialogues": 2,
+    "value_type": "text",
+    "top_values": [
+     "c.b 2",
+     "1 a.w"
+    ]
+   }
+  }
+ ],
+ "duplicate_flags": [
+  {
+   "source": "hotel:13",
+   "duplicate_of": "train:9"
+  }
+ ],
+ "source_to_table": {
+  "train:1": "train_journey",
+  "train:2": "train_timing",
+  "train:3": "train_booking",
+  "train:4": "train_journey",
+  "train:5": "train_timing",
+  "train:6": null,
+  "train:7": "train_booking",
+  "train:8": null,
+  "train:9": "train_booking",
+  "train:10": "train_booking",
+  "train:11": "train_journey",
+  "train:12": "train_timing",
+  "hotel:1": "hotel_details",
+  "hotel:2": null,
+  "hotel:3": null,
+  "hotel:4": null,
+  "hotel:5": "hotel_details",
+  "hotel:6": "hotel_details",
+  "hotel:7": "hotel_booking",
+  "hotel:8": null,
+  "hotel:9": "hotel_booking",
+  "hotel:10": "hotel_details",
+  "hotel:11": "hotel_details",
+  "hotel:12": null,
+  "hotel:13": "hotel_details",
+  "hotel:14": "hotel_booking",
+  "hotel:15": "hotel_booking",
+  "hotel:16": "hotel_details",
+  "hotel:17": "hotel_booking",
+  "restaurant:1": "restaurant_location",
+  "restaurant:2": "restaurant_booking",
+  "restaurant:3": "restaurant_cuisine",
+  "restaurant:4": null,
+  "restaurant:5": "restaurant_booking",
+  "restaurant:6": null,
+  "restaurant:7": "restaurant_cuisine",
+  "restaurant:8": "restaurant_cuisine",
+  "restaurant:9": "restaurant_booking",
+  "restaurant:10": null,
+  "restaurant:11": "restaurant_location",
+  "restaurant:12": "restaurant_reservation",
+  "restaurant:13": "restaurant_reservation",
+  "restaurant:14": null,
+  "restaurant:15": "restaurant_reservation",
+  "restaurant:16": "restaurant_reservation",
+  "restaurant:17": "restaurant_location",
+  "restaurant:18": null
+ }
+}
