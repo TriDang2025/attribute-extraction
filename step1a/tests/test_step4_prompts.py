@@ -171,7 +171,7 @@ def test_validate_e():
 def test_render_columns_headers_and_flag():
     block = sp.render_columns(COLS, max_examples=1)
     assert "== train ==" in block and "== hotel ==" in block
-    assert "[train:3] price" in block and "checker: unsure" in block and "signals: support 3/10" in block
+    assert "[train:3] price" in block and "checker: unsure" in block and "checker evidence: support 3/10" in block
     assert '"ely"' in block and '"leeds"' not in block
 
 

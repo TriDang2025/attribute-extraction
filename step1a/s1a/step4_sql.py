@@ -5,7 +5,9 @@
   {"op": "ADD_ATTR", "entity", "name", "type", "source" (Step-3 column id or None), "is_key" (column is in the primary key)}
   {"op": "CREATE_REL", "from" (referring table), "to", "kind", "fk_columns" (columns of "from" that refer to "to")}
 """
-from .step4_prompts import NEW, named_tables
+import copy
+
+from .step4_prompts import NEW, canon_type, named_tables
 
 SQL_TYPES = {"text": "TEXT", "integer": "INTEGER", "decimal": "REAL", "time": "TIME", "day": "TEXT", "date": "DATE",
              "boolean": "BOOLEAN", "id": "INTEGER", "duration": "INTERVAL", "price": "NUMERIC(10, 2)"}
@@ -116,3 +118,69 @@ def to_operations(canonical):
         fk_cols = [c for fk in tabs.get(r["from"], {}).get("foreign_keys", []) if fk["ref_table"] == r["to"] for c in fk["columns"]]
         ops.append({"op": "CREATE_REL", "from": r["from"], "to": r["to"], "kind": r["kind"], "fk_columns": fk_cols})
     return ops
+
+
+# ---------------------------------------------------------------- placement into an existing schema
+def _ensure_pk(t):
+    """Primary key column name of canonical table `t`; adds a new id column "<table> id" when it has no key."""
+    if not t["primary_key"]:
+        name = f"{t['name']} id"
+        t["columns"].insert(0, _column(name, "id", None))
+        t["primary_key"] = [name]
+    return t["primary_key"][0]
+
+
+def _add_link(c, tabs, frm, to, kind):
+    """Relationship frm -> to (once) and, when `frm` has no foreign key to `to`, a new id column in `frm` that refers to the key of `to`."""
+    if not any(r["from"] == frm and r["to"] == to for r in c["relationships"]):
+        c["relationships"].append({"from": frm, "to": to, "kind": kind, "reason": "placement"})
+    t = tabs[frm]
+    if not any(f["ref_table"] == to for f in t["foreign_keys"]):
+        ref = _ensure_pk(tabs[to])
+        name = f"{to} id"
+        while name in {x["name"] for x in t["columns"]}:
+            name += " ref"
+        t["columns"].append(_column(name, "id", None))
+        t["foreign_keys"].append({"columns": [name], "ref_table": to, "ref_columns": [ref]})
+
+
+def apply_placement(canonical, answer, column):
+    """New canonical schema (the input is not changed) after the placement answer (step4_prompts.build_prompt_place) for `column` (a
+    column dict: id, name, value_type). P1: column added to target_table. P2: added to target_table, or to the new linking table
+    new_table; link (if any) adds the relationship. P3 / P5: new table new_table (new key column) holding the column; link
+    relates it to an existing table (P5 moves no existing column). P4: column added to link.from as a foreign key to the key of link.to
+    and the relationship. Raises ValueError for an answer step4_prompts.validate_place would refuse."""
+    c = copy.deepcopy(canonical)
+    tabs = {t["name"]: t for t in c["tables"]}
+    opt, nt, link, tgt = answer["option"], answer.get("new_table"), answer.get("link"), answer.get("target_table")
+    col = _column(column["name"], canon_type(column.get("value_type")), column["id"])
+    if nt:
+        if nt["name"] in tabs:
+            raise ValueError(f"new table {nt['name']!r} exists")
+        tabs[nt["name"]] = _canon_table(nt["name"], f"Added for the column {column['name']}.", nt.get("row", ""), [], [], [])
+        c["tables"].append(tabs[nt["name"]])
+    if opt == "P4":
+        if not link or link["from"] not in tabs or link["to"] not in tabs:
+            raise ValueError("P4 needs a link between existing tables")
+        host = tabs[link["from"]]
+        host["columns"].append(col)
+        host["foreign_keys"].append({"columns": [col["name"]], "ref_table": link["to"], "ref_columns": [_ensure_pk(tabs[link["to"]])]})
+        _add_link(c, tabs, link["from"], link["to"], link.get("kind", "one_to_many"))
+        return c
+    if opt in ("P3", "P5") or (opt == "P2" and nt):
+        host = tabs[nt["name"]] if nt else None
+        if host is None:
+            raise ValueError(f"{opt} needs new_table")
+    else:
+        host = tabs.get(tgt)
+        if host is None:
+            raise ValueError(f"{opt} needs an existing target_table, got {tgt!r}")
+    if host["primary_key"] == [] and opt != "P1":
+        _ensure_pk(host)
+    host["columns"].append(col)
+    if link:
+        for k in ("from", "to"):
+            if link[k] not in tabs:
+                raise ValueError(f"link table {link[k]!r} unknown")
+        _add_link(c, tabs, link["from"], link["to"], link.get("kind", "one_to_many"))
+    return c

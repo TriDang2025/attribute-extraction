@@ -36,7 +36,7 @@ def norm(s):
 
 def _column(c):
     return {"name": c["name"], "type": c.get("type", "unknown"), "slot": c.get("mwoz22_slot") or "none",
-            "source": c["source"], "level": c.get("level"), "role": c.get("role"),
+            "source": c["source"], "level": c.get("level"), "role": c.get("role"), "description": c.get("description", ""),
             "mentions": {"dev50": c.get("mentions_dev50"), "dev50b": c.get("mentions_dev50b")}}
 
 

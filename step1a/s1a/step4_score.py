@@ -322,3 +322,30 @@ def stability(schemas, mapping=None, gt=None):
 def _identity(schema):
     """Names of the columns that carry a gt field (when no GT is given)."""
     return {norm(c["gt"]): c["gt"] for t in schema["tables"] for c in t["columns"] if c.get("gt")}
+
+
+# ---- placement into an existing schema (diary task 13)
+
+def placement_vs_gt(schemas, answers, attributes, gt, set_name, handover_dir, gt_levels):
+    """One row per held-out attribute: the chosen option and table against the expected ones. `attributes`: [{"gt": GT column name,
+    "kind": expected option P1..P5, "columns": [Step-3 column ids of the attribute]}]; `schemas[i]` = canonical schema right after
+    attribute i was placed; `answers[i]` = its parsed placement answer (None when the call failed). Expected option = the config kind;
+    expected table = the GT table of the attribute (main design). table_ok: the output table that holds the column is matched
+    (match_tables, whole GT) to the attribute's GT table in at least one acceptable design (a booking column in the place table counts)."""
+    names = gt_names(gt)
+    rows = []
+    for attr, schema, ans in zip(attributes, schemas, answers):
+        mapping = map_columns(schema, set_name, handover_dir, gt_levels, gt)
+        out = resolve(schema, names, mapping)
+        holder = next((t["name"] for t in schema["tables"] for c in t["columns"] if c.get("source") in attr["columns"]), None)
+        expected, ok_designs = None, 0
+        for i, d in enumerate(all_designs(gt)):
+            v = view(d, None)
+            want = next((tn for tn, t in v["tables"].items() if attr["gt"] in t["cols"]), None)
+            if i == 0:
+                expected = want
+            ok_designs += want is not None and holder is not None and match_tables(out, v).get(holder) == want
+        rows.append({"gt": attr["gt"], "expected_option": attr["kind"], "option": (ans or {}).get("option"),
+                     "option_ok": bool(ans) and ans.get("option") == attr["kind"], "expected_table": expected, "table": holder,
+                     "table_ok": ok_designs > 0})
+    return rows

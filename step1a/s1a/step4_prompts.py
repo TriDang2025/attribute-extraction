@@ -23,17 +23,20 @@ _TYPE_HELP = ("text = free text or a name, integer = whole number, decimal = num
               "day = day of the week, date = calendar date, boolean = yes/no, id = identifier or reference code, "
               "duration = length of time, price = amount of money")
 _JSON_ONLY = "Return ONLY one JSON object, nothing before or after it."
+DATA_SIGNALS_NOTE = (' Lines labelled "data signals" are automatic counts over the dialogues (for example how often a column has '
+                     'several values in one booking, or appears together with another column); they can be misleading.')
 
 INSTRUCTION_41 = """\
 Below are the columns found by analysing a corpus of dialogues. Each column is a kind of information that people give
-in the dialogues, with a description, the type of its values, a few example values and counts. The columns were found
+in the dialogues, with a description, the type of its values, a few example values (each with a short piece of text
+around it) and counts. The columns were found
 under {n_ent} headings; the id of a column starts with its heading, but a heading may be wrong.
 Design a relational database from these columns. Step 1: put every column into exactly one group; each group will
 become one table of the database. A table may hold columns from several of the headings below. If a column would
 not be stored in any table (noise, a booking word, a value a database would not keep), do not put it in a group; list
 it as unused with a reason. If a column looks like a duplicate of another column, say so in duplicate_flags; this is
-only a flag, the column still goes into a group (or into unused). Lines labelled "checker" and "signals" are automatic
-and can be wrong; decide from the descriptions and examples.
+only a flag, the column still goes into a group (or into unused). Lines labelled "checker" and "checker evidence" are
+automatic and can be wrong; decide from the descriptions and examples.{notes}
 {json_only} Shape (the names and ids here are made up):
 {{"groups": [{{"group": "G1", "columns": ["x:1", "x:4"], "note": "what the columns have in common"}}],
  "unused": [{{"column": "x:2", "reason": "..."}}],
@@ -103,6 +106,35 @@ For every table give a name (lower case), a one-sentence description and what on
 Dialogues:
 """
 
+VALUE_TYPE_TO_TYPE = {"number": "integer"}   # Step-3 value types that are not canonical types; all others (text, time, day, price, ...) are
+OPTIONS = ["P1", "P2", "P3", "P4", "P5"]
+
+INSTRUCTION_PLACE = """Below is a relational database schema (its tables, columns, keys and relationships) and one new column, a kind of
+information found in dialogues. Decide where the new column belongs. Choose exactly one option:
+- P1: the column is one more property of the rows of an existing table; it is stored in that table (target_table).
+- P2: the column describes a relationship between rows of two tables (for example something that is true of a pair, not of
+  either one alone); it is stored in the table that implements that relationship (target_table), or in a new linking table
+  (new_table) between the two tables given in link.
+- P3: the column needs a new table of its own (new_table: its name and what one row stands for); give in link how the new
+  table relates to an existing table.
+- P4: the column creates a new relationship between two tables that exist already: it is the reference that ties rows of
+  the table in link.from to rows of the table in link.to (target_table = link.from).
+- P5: the column and the columns of an existing table (target_table) belong together in a table of their own (new_table).
+Use null for new_table and link when the option needs none. "kind" is one_to_many or many_to_many; "from" is the table that
+refers to the other (the many side).
+{json_only} Shape (the names here are made up):
+{{"reason": "one short sentence", "option": "P1", "target_table": "loan", "new_table": null, "link": null}}
+
+Schema:
+"""
+
+
+def canon_type(value_type):
+    """Canonical column type of a Step-3 value type (dict {dominant, ...}, a string, or None -> text)."""
+    vt = value_type.get("dominant") if isinstance(value_type, dict) else value_type
+    vt = VALUE_TYPE_TO_TYPE.get(vt, vt)
+    return vt if vt in TYPES else "text"
+
 
 # ---------------------------------------------------------------- rendering
 def _vtype(c):
@@ -115,27 +147,39 @@ def _vtype(c):
 
 def render_column(c, max_examples=5):
     """Text block of one column."""
-    ex = ", ".join(f'"{v}"' for v in (c.get("examples") or [])[:max_examples])
+    exs = (c.get("examples") or [])[:max_examples]
     lines = [f"[{c['id']}] {c['name']}"]
     if c.get("description"):
         lines.append(f"  description: {c['description']}")
     if c.get("role"):
         lines.append(f"  role: {c['role']}")
     lines.append(f"  values: {_vtype(c)}; {c.get('n_mentions', 0)} mentions in {c.get('n_dialogues', 0)} dialogues")
-    if ex:
-        lines.append(f"  examples: {ex}")
+    if exs and all(isinstance(e, str) for e in exs):
+        lines.append("  examples: " + ", ".join(f'"{e}"' for e in exs))
+    elif exs:
+        lines.append("  examples:")
+        lines += [f'    "{e}"' if isinstance(e, str) else (f'    "{e[0]}" (in: "{e[1]}")' if e[1] else f'    "{e[0]}"') for e in exs]
+    else:
+        lines.append("  no examples")
     if c.get("signal"):
-        lines.append(f"  signals: {c['signal']}")
+        lines.append(f"  checker evidence: {c['signal']}")
+    if c.get("data_signal"):
+        lines.append(f"  data signals: {c['data_signal']}")
     if c.get("flag"):
         lines.append(f"  checker: {c['flag']}")
     return "\n".join(lines)
+
+
+def _entity(c):
+    """Heading of a column: its `entity` field, else the part of its id before the colon."""
+    return c.get("entity") or c["id"].split(":")[0]
 
 
 def render_columns(cols, max_examples=5):
     """Column block of prompt 4.1 (blocks under an `== entity ==` header, input order kept)."""
     out, last = [], None
     for c in cols:
-        ent = c["id"].split(":")[0]
+        ent = _entity(c)
         if ent != last:
             out.append(f"== {ent} ==")
             last = ent
@@ -197,8 +241,9 @@ def _ref(ids):
 def build_prompt_41(column_block, cols):
     """(prompt, schema) of 4.1. `column_block` is the rendered columns; `cols` gives the ids for the schema enums."""
     ids = [c["id"] for c in cols]
-    ents = list(dict.fromkeys(i.split(":")[0] for i in ids))
-    text = INSTRUCTION_41.format(n_ent=len(ents), n_cols=len(ids), json_only=_JSON_ONLY) + column_block + "\nReturn the JSON object now.\n"
+    ents = list(dict.fromkeys(_entity(c) for c in cols))
+    notes = DATA_SIGNALS_NOTE if any(c.get("data_signal") for c in cols) else ""
+    text = INSTRUCTION_41.format(n_ent=len(ents), n_cols=len(ids), notes=notes, json_only=_JSON_ONLY) + column_block + "\nReturn the JSON object now.\n"
     schema = _obj({
         "groups": _arr(_obj({"group": {"type": "string", "pattern": r"^G[0-9]+$"}, "columns": _arr({"enum": ids}), "note": _S})),
         "unused": _arr(_obj({"column": {"enum": ids}, "reason": _S})),
@@ -392,6 +437,8 @@ def validate_44(a, a41, a42, a43, cols):
         if pk == NEW:
             if not str(t.get("new_id_name") or "").strip():
                 errs.append(f"table {n!r}: new primary key without new_id_name")
+            elif str(t["new_id_name"]).strip().lower() in cn:
+                errs.append(f"table {n!r}: new key name {t['new_id_name']!r} is also a column name")
         elif pk not in listed:
             errs.append(f"table {n!r}: primary key {pk!r} is not one of its columns")
     errs += [f"table {n!r} missing" for n in tables if n not in got]
@@ -453,4 +500,59 @@ def validate_e(a):
         errs += [f"relationships[{i}] unknown table {r.get(k)!r}" for k in ("from", "to") if r.get(k) not in tabs]
         if r.get("kind") not in KINDS:
             errs.append(f"relationships[{i}] bad kind {r.get('kind')!r}")
+    return errs
+
+
+# ---------------------------------------------------------------- placement into an existing schema
+def render_schema(canonical):
+    """Text of a canonical schema for the placement prompt: tables with columns (type, key marks) and the relationships."""
+    out = []
+    for t in canonical["tables"]:
+        out.append(f"Table {t['name']}: {t.get('description', '')} One row = {t.get('row', '')}.")
+        fk = {c: f"refers to {f['ref_table']}.{f['ref_columns'][i]}" for f in t["foreign_keys"] for i, c in enumerate(f["columns"])}
+        for c in t["columns"]:
+            marks = (["primary key"] if c["name"] in t["primary_key"] else []) + ([fk[c["name"]]] if c["name"] in fk else [])
+            out.append(f"  - {c['name']} ({c['type']})" + (f" [{'; '.join(marks)}]" if marks else ""))
+    rels = [f"{r['from']} -> {r['to']} ({r['kind']})" for r in canonical["relationships"]]
+    out.append("Relationships (from = refers to, to = referred to): " + ("; ".join(rels) if rels else "(none)"))
+    return "\n".join(out) + "\n"
+
+
+def build_prompt_place(canonical, column):
+    """(prompt, schema) of one placement question: `canonical` is the current schema, `column` a column dict as for 4.1
+    (a `data_signal` text, when present, is shown as the signal card)."""
+    names = [t["name"] for t in canonical["tables"]]
+    text = (INSTRUCTION_PLACE.format(json_only=_JSON_ONLY) + render_schema(canonical) + "\nNew column:\n" + render_column(column)
+            + "\n\nReturn the JSON object now.\n")
+    new_table = {"anyOf": [{"type": "null"}, _obj({"name": _S, "row": _S})]}
+    link = {"anyOf": [{"type": "null"}, _obj({"from": _S, "to": _S, "kind": {"enum": KINDS}})]}
+    schema = _obj({"reason": _S, "option": {"enum": OPTIONS}, "target_table": {"enum": names + ["none"]}, "new_table": new_table,
+                   "link": link})
+    return text, schema
+
+
+def validate_place(a, canonical):
+    """Errors of a parsed placement answer: option needs its fields, target and link tables exist (or are the new table)."""
+    names = {t["name"] for t in canonical["tables"]}
+    nt, link, opt, tgt = a.get("new_table"), a.get("link"), a.get("option"), a.get("target_table")
+    errs = []
+    if opt not in OPTIONS:
+        return [f"bad option {opt!r}"]
+    if tgt != "none" and tgt not in names:
+        errs.append(f"unknown target_table {tgt!r}")
+    if nt is not None and (not str(nt.get("name") or "").strip() or nt["name"] in names):
+        errs.append(f"new_table name {(nt or {}).get('name')!r} empty or already used")
+    allnames = names | ({nt["name"]} if nt else set())
+    if link is not None:
+        errs += [f"link {k} {link.get(k)!r} unknown" for k in ("from", "to") if link.get(k) not in allnames]
+        if link.get("from") == link.get("to"):
+            errs.append("link relates a table to itself")
+    if opt in ("P1", "P4") and tgt not in names:
+        errs.append(f"{opt} needs an existing target_table")
+    if opt in ("P3", "P5") and nt is None:
+        errs.append(f"{opt} needs new_table")
+    if opt == "P4" and link is None:
+        errs.append("P4 needs link")
+    if opt == "P2" and nt is None and tgt not in names:
+        errs.append("P2 needs target_table or new_table")
     return errs

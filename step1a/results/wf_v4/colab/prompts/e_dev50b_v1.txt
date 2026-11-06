@@ -1,0 +1,809 @@
+Design a relational schema for the information in these dialogues: tables, columns with types, primary keys and foreign keys.
+For every table give a name (lower case), a one-sentence description and what one row stands for. Column types are one of:
+text, integer, decimal, time, day, date, boolean, id, duration, price. Also list the relationships between the tables: "from" is the table that refers to the other (the many side),
+"to" is the table it refers to, "kind" is one_to_many or many_to_many.
+Return ONLY one JSON object, nothing before or after it. Shape (the names here are made up):
+{"tables": [{"name": "loan", "description": "...", "row": "one loan", "primary_key": ["loan id"],
+   "columns": [{"name": "loan id", "type": "id"}, {"name": "book id", "type": "id"}],
+   "foreign_keys": [{"column": "book id", "ref_table": "book", "ref_column": "book id"}]}],
+ "relationships": [{"from": "loan", "to": "book", "kind": "one_to_many", "reason": "..."}]}
+
+Dialogues:
+
+[dialogue 1]
+User: I am going to cambridge and need a hotel
+System: I can help with that. Do you have a preferred price range in mind?
+User: Not really. I like 4 star places that include free parking though.
+System: I have several places. Which area would you prefer to be in.
+User: I'd like to be in the north side of town.
+System: I did not find a hotel that fits your criteria on the north side of town, but there are several guesthouses. Would a guesthouse be okay?
+User: That is great. Can you provide me the phone number and price range of the best guest house?
+System: Yes the phone number to the acorn guest house 01223353888 with a price range of moderate
+User: I am also look for a train on saturday to broxbourne.
+System: There are several trains headed to broxbourne. What time of day would you like to leave?
+User: I would like to leave after 16:15.
+System: Train TR5688 is departing to broxbourne at 17:01 would you like to book this?
+User: Yes, can you please book for 3 seats?
+System: That booking was successful, the total fee is 42.96 GBP and your reference #1l0FBGWG
+User: Thank you. That's everything I needed.
+System: Thank you for contacting us. Have a good day.
+
+[dialogue 2]
+User: Can I catch a train to Stevenage?
+System: Yes, TR2515 departs on friday at 05:21 to stevenage, would you like me to book it?
+User: Yes please when is the arrival time?
+System: TR2515 arrives in Stevenage at 06:10, bright and early!
+User: What's the total travel time for the TR2515 ?
+System: The total travel time is 49 minutes.
+User: Okay, thank you for the information!
+System: Is there anything else I can help you with today?
+User: I am looking for a park in the south. Any available that you could give me the postcode, entrance fee's if any and the address please?
+System: There are two parks that fit your description. Both are free. May I recommend Wandlebury country park located wandlebury ring, gog magog hills, babraham? Postalcode is cb223ae.
+User: Perfect, you've answered all my questions. Thank you!
+System: Your welcome, enjoy your time in Cambridge.
+User: I will. Thanks!
+System: good day to you
+
+[dialogue 3]
+User: I am looking for a restaurant called darrys cookhouse and wine shop.
+System: Darrys cookhouse and wine shop is located in the centre. It is expensive and serves modern european food. Would you like a reservation?
+User: No thanks I'm just looking for information for now.
+System: Darrys Cookhouse is a modern European restaurant in the Centre. It is located at 40270 King Street City and is in the expensive price range.
+User: Okay thanks. I'd like some information about a place to go next.
+System: There are many attractions in town. What type are you looking for - architecture, cinema, or a college perhaps?
+User: I am looking for a museum.
+System: the broughton house gallery is a museum located in the centre.
+User: That sounds good. Could I get their phone number?
+System: Sure thing! Their phone number is 01223314960. Can I help you with anything more today?
+User: No, that's all I need for now. Thanks so much, you've been super!
+System: Thank you for contacting us today. Have a good day.
+
+[dialogue 4]
+User: I am traveling to Cambridge and looking forward to try local restaurants.
+System: We have lots to explore! I can help you find one, if you'd like.
+User: Great! The restaurant should serve scandinavian food and should be in the east.
+System: I'm sorry there are no restaurants serving Scandinavian food. Is there another type of food you might like to try?
+User: How about Indian food?
+System: I have 4 different indian places to eat. Two are moderately priced and two are expensive. Do you have a preference?
+User: I perfer a moderate price range. Whatever you suggest. I need to book a table for 1 at 13:15 on Tuesday.
+System: Okay, I've booked a table at the Curry Prince for you. The reference number is NZ5WKZ9V. The table will be reserved for 15 minutes.
+User: Thank you. Could I also have information on trains that depart from Cambridge on Wednesday?
+System: Where will you be headed?
+User: I need arrive in stevenage by 15:00.
+System: TR2874 train arrives at stevenage at 14:10. Would you like more info or can I book it for you?
+User: I'd like the price and travel time, please?
+System: Sure! The fare is 12.80 pounds and the travel time is 49 minutes. Is there anything else I can help you with today?
+User: No, thank you for your help!
+System: Please feel free to call again if we can assist you in other ways. Thank you for calling. Goodbye.
+
+[dialogue 5]
+User: I'm looking for a cheap place to stay. Can you help?
+System: I have a number of cheap hotels available; do you want to stay in a particular area of town?
+User: I don't care which area the hotel is in.
+System: Ok, would you prefer a guesthouse or a hotel?
+User: any so long as it is a 2star and has wifi
+System: I'm sorry I don't have any matches. Do you want me to check a different price range?
+User: Yes, please try expensive.
+System: I'm sorry, there's not guesthouse fitting THAT description either. Do you want to try a different hotel type or something?
+User: Try either a hotel or guesthouse.
+System: The express by holiday inn cambridge is a 2 star hotel in the east area that is expensive. It has wifi and parking. Would you like to make a reservation?
+User: yes please. book it for 3 people and 3 nights starting from friday.
+System: Booking was successful. Reference number is : DAEY6JJV.
+User: Thank you. I am also looking for a restaurant that serves vegetarian food and that is expensive.
+System: I don't seem to have any vegetarian restaurants. Do you have a second choice for cuisine?
+User: Italian would be fine.
+System: There are 5 expensive Italian restaurants around town is there an area you prefer?
+User: No any area will work. Whatever you recommend. I need a reservation for Friday, 3 people at 13:45. Please include the reference number.
+System: I reserved a table for you at stazione restaurant and coffee bar, you ref # is SUY8VW, anything else for you today?
+User: No, that's it! Thank you for all your help!
+System: ok, have a great day!
+
+[dialogue 6]
+User: I'm looking for a guesthouse to stay at that has a 4 star rating. Can you help?
+System: Sure, we have many. Are you looking for anything else specifically?
+User: Yes, I need internet and free parking.
+System: To help narrow this down, can you tell me what area of town you'd like most?
+User: Yes, I would like to be in the north. Oh and I would like to be in the expensive price range.
+System: unfortunately i don't have anything that meets all those criteria. is there anything you'd like to change?
+User: No I will figure something out
+System: Is there something else I may be able to help you with today?
+User: I lied. I don't need free internet and parking.
+System: One more time let me know exactly what you need by looking at what you wrote down on your right, so we can book you.
+User: i need an expensive hotel in the north
+System: There are no hotels that meet that criteria. Would you like to search for something else?
+
+[dialogue 7]
+User: I'm looking for a 2 star hotel in the north.
+System: I have two hotels meeting your criteria. Ashely Hotel located at 74 Chesterton road and Lovell Lodge located at 365 Milton road.
+User: I would like to book at 74 Chesterton Road.
+System: Great, how many people will be staying? Also, how many days you will be staying?
+User: Wait, before we do that I should probably check on the prices. What sort of room rates am I looking at?
+System: It appears to be in the moderate price range. Would that work for you?
+User: Yes that would work
+System: Okay great, so how many people will be staying and for how many nights?
+User: There will be 5 people for a total of 4 nights starting from Monday.
+System: I was able to book your stay at ashley motel. Your reference number is KJHYRDCA. Is there anything else today?
+User: Okay thank you for everything.
+System: Thank you, enjoy your stay.
+
+[dialogue 8]
+User: Hi there, can you help me find a good Chinese restaurant? I seriously need some egg rolls.
+System: There are 17 Chinese restaurants. Are you looking for any particular area or price range?
+User: I'd like it to be in the north, and expensive would be best.
+System: I would recommend either Hakka or The Hotpot. Would you like for me to book a reservation for one of these restaurants?
+User: Lets try Hakka,can you book a table for 8 people at 16:30 on tuesday?
+System: It is booked! Your table will be reserved for 15 minutes and your reference number is VWDBTAYR.
+User: Thank you! I'm looking for a place to stay in the moderate price range.
+System: A and B guest house might fit your needs. Would you like me to book it?
+User: I'd actually like a hotel instead of guesthouse and in the centre of town.
+System: i'd like to suggest to you cityroomz
+
+[dialogue 9]
+User: I want a train that is leaving from broxbourne.
+System: There is a train leaving from Broxbourne to Cambridge on Friday at 5:32 and will arrive there at 6:32.
+User: That would work well with our schedule. Thank you!
+System: You're welcome. Is there anything else you need help with?
+User: No thats it thankl you
+System: Did you need the train number or price today?
+User: Yes can I please get that?
+System: I am sorry. Do you want info or to book the train? The cost is 17.90 per ticket.
+User: I don't need to book at the moment. However, I was also interested in finding a restaurant for Friday.
+System: What type of food would like to eat?
+User: I don't really care about cuisine, but I would like something expensive in the center of town. What's your favorite high-end place?
+System: I would suggest Loch Fyne. They serve the most amazing selection of seafood in the entire city. It's definitely an experience.
+User: That sounds perfect. Could you book a table for 8 people at 19:30 on Friday?
+System: Ok, your table will be reserved for 15 minutes. Reference number is 56AHCPLE.
+User: awesome. thanks for your help today
+System: You're welcome. Have a great day.
+
+[dialogue 10]
+User: I am looking for a cheap hotel on the east.
+System: I have listings for 3 guesthouses would that be okay?
+User: Can you give me one that has free wifi and free parking?
+System: The 3 guesthouses mentioned all have free wifi and parking. I recommend the Allenbell.
+User: The Allenbell sounds perfect. Can you book it for me for tuesday?
+System: How many days would you like to stay?
+User: I would like to stay for 2 nights please.
+System: How many people would you like to book for?
+User: My party will consist of 5 people. May I please get a reference number?
+System: Your booking at the Allenbell was successful. Your reference number is PV039AJH.
+User: I also need a train from Stevanage to Cambridge.
+System: Okay what day will you be travelling and what time would you like to travel?
+User: Tuesday, I want to arrive at 20:15.
+System: The latest train gets into Cambridge on tuesday is at 18:43. Will that work for you?
+User: It might, what time does the train depart?
+System: It leaves at 17:54, would you like a booking?
+User: No thanks. That was all I needed to know. Goodbye.
+System: Thank you for contacting the Cambridge TownInfo centre. Goodbye
+
+[dialogue 11]
+User: I want help booking a taxi
+System: Okay, what is your destination?
+User: I am going to the Cambridge county fair next to the city tourist museum.
+System: And when would you like to leave?
+User: I want to leave after 16:45
+System: And where will you be leaving from?
+User: Leaving from travelers rest
+System: Booking completed! Booked car type : white ford Contact number : 07267142867
+User: Perfect! Thank you so much for all of your help.
+System: You are more than welcome!
+
+[dialogue 12]
+User: We would like to visit a museum while we are in town.
+System: Okay, that sounds fun! What area are you going to be in?
+User: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address.
+System: I have 11 museums in the Centre. I would recommend Castle Galleries, phone number 01223307402, postal code cb23bj, address unit su43, grande arcade, saint andrews street. It is free.
+User: Do you have any other suggestions?
+System: You should check out Primavera. The phone number is 01223357708. It is at 10 King's Parade and the postcode is cb21sj.
+User: I also need a train going to cambridge.
+System: In order to find a train I need to know where you are departing from and which day.
+User: I'm departing from birmingham new street on Saturday and I'd like to leave after 12:45.
+System: How about TR8390 that leaves birmingham new street at 13:40 on Saturday. It arrives in cambridge at 16:23. The price is 60.08. Shall I book it?
+User: Yes, can I book that for 5 people?
+System: I was able to book it, reference is 0W0BQB8W.
+User: Thank you very much
+System: You're welcome! Can I help you with anything else?
+User: Thank you, that's all I need today.
+System: Please call us back if we can assist you in any other way. Have a great day! Goodbye.
+
+[dialogue 13]
+User: I am looking for a north indian food restaurant in the town centre.
+System: I'm sorry, there are no North Indian restaurants in the centre area. Would you like to check a different area?
+User: What about expensive restaurants?
+System: Unfortunately there are no expensive North Indian restaurants.
+User: What about a restaurant that serves just indian food?
+System: How does the Curry Garden sound?
+User: That sounds good. Please book for 2 people at 11:45 on Saturday.
+System: Thanks, booking has been completed.
+User: Thank you. Can you give me a reference number? Also, I need to book a 4 star guesthouse.
+System: Your reference number is FNEQ6E1A. And alright, any other preferences regarding the guesthouse?
+User: I need it to include free wifi.
+System: There are 18 guesthouses matching your criteria. What area and price range would you prefer?
+User: I trust your opinion, just please let me know the price range and postcode.
+System: Finches Bed and Breakfast is a cheap 4-star guesthouse on the west side. Its postcode is cb30nd. Can I help you with anything else today?
+User: No thank you. You have been very helpful.
+System: Have we fulfilled all of your requests today?
+User: What is the price range for the hotel?
+System: Finches Bed and Breakfast is a cheap guesthouse. Do you need anything more?
+User: No, that is it. Thank you.
+System: You're very welcome, enjoy your visit!
+
+[dialogue 14]
+User: I'm looking for a family friendly restaurant that is reasonably price and located in the center of town near attractions, hotels and easy access to transportation such as buses and taxis.
+System: Ok, to be clear, which price range do you prefer-- cheap, moderate or expensive?
+User: I am looking for a moderately priced restaurant
+System: Do you prefer a specific type of food?
+User: I prefer Chinese food
+System: great, i have three options for you to choose from!
+User: Oh, I have no idea. Can you just reserve tell me your favorite one? I'll need a postcode for it.
+System: Jinling noodle bar, postcode cb23pp. Is there any more info I can give you?
+User: I would like to visit a college in the same area as the noodle bar, can you find me one?
+System: There are 13 colleges in the centre of town. Most are free, but some do charge an entrance fee. Any preference?
+User: How about choosing a famous one and give me the address, postcode and entrance fee.
+System: corpus christi is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is 2 pounds.
+User: Great, thanks! Also, will you please book me a taxi from the attraction to the restaurant, leaving the attraction at 05:45?
+System: I was able to book a taxi it will be a red volvo and the contact number is 07754509492. Is there anything else I can help with?
+User: No, that's it. Thank you very much.
+System: thanks for using our services
+User: Thanks again. That was all I needed.
+System: You are welcome. Thank you for using Cambridge TownInfo centre. Goodbye.
+
+[dialogue 15]
+User: I live in the centre of town and want to see if I can find a reasonable room for my parents to stay while they are visiting.
+System: How about the Alexander bed and breakfast in the centre? It is a cheap 4 star guesthouse with free internet and wifi.
+User: That sounds like it might work. Could you check availability for two people this weekend?
+System: What day are they arriving, and how many nights are they staying?
+User: I am unsure at this time.
+System: Okay, would you like some more information about that hotel?
+User: Can you tell me what the address is?
+System: The address is 56 saint barnabas road.
+User: Does this place include free parking?
+System: The alexander bed and breakfast is a cheap, 4 star guesthouse in the centre area, It has wifi and parking. Does this fit your needs?
+User: You have been very helpful. I have everything I need, thanks. Bye
+System: I am glad to help. Have a nice day. Bye.
+
+[dialogue 16]
+User: Hello, could you tell me if Downing College is still operating?
+System: Yes, Downing College is still operating in the centre. They're located on regent street , post code cb21dq. You can visit them for free! Anything else you need?
+User: Just the phone number please?
+System: The phone of Downing College is 01223334860. Do you need a place to stay?
+User: How did you know?! Yes I do! You must be a mind reader! I'd like to find 3-star lodgings, and I definitely DON'T want a guesthouse. Only a real hotel, please!
+System: There are two that might suit you. The Gonville Hotel is in the centre and The Lensfield Hotel is in the south part of town. Do either of those sound good?
+User: I would like a hotel in the north, please.
+System: I have no hotels in the north that meet those specification. May I try something else?
+User: I just need a 3 star hotel in the north center.
+System: There are no 3 star hotels in the North. You sure a guesthouse won't work?
+User: Let's try the guesthouse, could you provide me with their telephone number?
+System: The Hamilton Lodge is a guesthouse. Their phone number is 01223365664. Can I book a room for you there?
+User: No, thank you. However, could you book me a taxi to commute between the two places?
+System: No problem. What time would you like to leave and arrive?
+User: I would like to leave and 2:30 p.m and arrive at 3:23 p.m.
+System: I have a taxi, a red skoda, booked for you. Your contact number is 07481840729. Can I help you with anything else?
+User: No, that will be everything today. Thank you.
+System: You're all set with your booking with the taxi. Would you like a restaurant in the area for you as well?
+User: No, but you know what? We should probably have the car pick me up at the college at 2:15 p.m. instead.
+System: Sure. Please look for a yellow Ford. The contact number is 07901807088 if you need it. Is there anything else today?
+User: Thank you very much. That's all.
+System: You are welcome. Glad I could help. Have a nice day.
+User: I hope you have a great day as well. Goodbye.
+System: Please let us know if we can do anything else for you.
+
+[dialogue 17]
+User: Can you tell me what theatres are in cambridge please?
+System: We have four theatre's in the centre of town and one theatre on the south side. Do you have a preference on location?
+User: I'm interested in the one on the south side of town. Please provide me their postcode and phone number.
+System: Phone number is 01223511511, and postcode is cb17gx
+User: Thank you. Are there any trains leaving for cambridge from leicester that would get me there by 11:30?
+System: Several, do you have a day you're interested in travelling on?
+User: Yes I'd like to travel on Friday.
+System: There are 5 trains that fit your needs. May I book one of them for you?
+User: Sure, for 8 people please.
+System: TR4170 leaves leicester at 9:09 and arrives in cambridge on Friday at 10:54. 8 tickets are booked, reference #: CL4V2583. Do you need further help?
+User: No, that is it, thanks!
+System: Your welcome, have a great day
+
+[dialogue 18]
+User: I'm looking for a train. The train should depart from cambridge and should go to broxbourne
+System: What day are you traveling?
+User: I'm traveling on tuesday and I want to arrive by 16:15
+System: TR6357 leaves at 05:01 and arrives at 06:01. Would you like me to book a ticket for you?
+User: No, but I do need the price.
+System: Alright. The price for TR 6357 is 17.90 pounds. Anything else?
+User: Nope, that's all I needed. Thanks!
+System: I hope you have a wonderful day - goodbye!
+
+[dialogue 19]
+User: I am looking for a restaurant.
+System: What type of food are you looking for?
+User: I'm looking for unusual food. And I want a place in the centre of town.
+System: I don't have anything matching unusual but I do have an African restaurant in the center of town as well as some gastropubs. Would either interest you?
+User: I'll take something that is cheap.
+System: There are a total of 15 restaurants that are cheap in the centre. Is there another type you would like to try?
+User: Do you recommend a restaurant that is a little more different then the rest?
+System: I would recommend golden house
+User: Is that Italian? I would like an Italian restaurant, please.
+System: Okay, how about the pizza hut city centre? I heard it's pretty good.
+User: Okay, that sounds good. I need to make a reservation for 2 people on Tuesday.
+System: What time would you like to visit?
+User: How about 13:15?
+System: I was able to book the table for you. It will be reserved for 15 minutes. The reference number is 97AAF776.
+User: That's great, thank you.
+System: Awesome. Have a good day!
+
+[dialogue 20]
+User: I need a restaurant. Something expensive and italian.
+System: I was able to get a couple of options for you, is there a certain area you would like to go to?
+User: I would like to go to the centre, please.
+System: How about stazione restaurant and coffee bar?
+User: Okay, that sounds good. I need a table for 7 at 11:30 on Thursday.
+System: Booking was unfortunately unsuccessful. Let's try another day or time slot.
+User: Okay, will you try 10:30 instead?
+System: You are booked for 10:30. Your reference number is 4H1DRIF8. Is there anything else I can assist you with?
+User: That's all, thanks. Goodbye.
+System: Enjoy your meal! Goodbye!
+
+[dialogue 21]
+User: I will be visiting Cambridge soon and need a place to stay. I am looking for a guesthouse with at least a star 3 rating.
+System: 4 guesthouses match your request and they're all moderately priced. Do you want to be in the north, south, or west side of town?
+User: What are my options on the west side of town?
+System: Just one, the Hobsons House is available.
+User: Ok, let's go with that. ould you book it for 8 people starting wednesday? I need 5 nights.
+System: You booking for Hobsons House was successful, the confirmation number is BBSBEY5B. Can I help with anything else?
+User: No that will be all. Thank you
+System: Thank you goodbye
+
+[dialogue 22]
+User: Can you help me out with finding a restaurant that serves british food in the east?
+System: I have located the grafton hotel restaurant, would you like more info or a booking?
+User: Please book reservation for 2 people at 16:00 on Friday. Send me the reference number.
+System: Ok, I made your reservations. Your reference number is 23EKIUFO. Is there anything else I can help you with?
+User: give me the address and postcode.
+System: Sure, the address is Grafton Hotel 619 Newmarket Road Fen Ditton and the post code is cb58pa. Can I do anything else for you today?
+User: yeah, i'm also looking for a place to stay.
+System: I'll be glad to find you a place, first is there an area or price range you recommend?
+User: The price range doesn't matter.
+System: Well what area are you interested in?
+User: I need a guesthouse, including free parking. It should have a 4 star rating on Friday. Can I get the phone number and address?
+System: I recommend Carolina Bed and Breakfast. It's located close to where you'll be dining and is moderately priced. Their address is 138 Perne Road and their phone number is 01223247015.
+User: I also need a taxi from the restaurant to the hotel, please. I need to leave the restaurant by 19:00.
+System: I have booked that taxi for you. Be expecting a grey Toyota. Should you need to contact the taxi company, you can call 07048450899.
+User: Thank you very much. I think that is all I need.
+System: Have a nice day!
+
+[dialogue 23]
+User: I need a taxi please to express by holiday inn cambridge
+System: Okay, I will need to know where you are leaving from and what time you would like to leave.
+User: I will be leaving from leverton house arriving by 06:45.
+System: Booking is complete. Your car is a white tesla and contact number is 07609996919.
+User: Thank you that is all I need
+System: Perfect! Have an excellent day!.
+
+[dialogue 24]
+User: Hi, I am planning my upcoming trip and am looking for a place to stay. Can you recommend something for me?
+System: Sure, I am fond of the acorn guest house personally. Did you have a price range that you'd like to stick to?
+User: I'm not too concerned about price. Is the Acorn Guest House in the north section of Cambridge?
+System: Yes it is. Are you wanting to make a booking.
+User: yes, i want to book it for 8 people and 3 nights starting from wednesday
+System: Sure thing, will you be needing a reference number?
+User: Yes please. I will need that.
+System: Booking was successful. Reference number is : AOJGD8XG. Is there anything else I can help you with today?
+User: Yes, I am looking for a multiple sports attraction in the centre.
+System: I'm sorry, but there are no multiple sports type attractions in the centre. Would you like to try a different area?
+User: How about a type of college? Could you provide me with the postcode, entrance fee and address?
+System: Yes, Christ's College is on Saint Andrew's Street and the post code is cb23bu. It's free admission.
+User: Thank you! I also need a taxi please.
+System: Certainly. What is your intended destination and travel time?
+User: I need to leave the attraction by 21:00 please.
+System: Okay, you're all set. I booked a blue honda and the contact number is 07846176365
+User: Thanks so much. You took care of everything I needed. Thanks. Goodbye.
+System: It's been a pleasure. Have a good day.
+
+[dialogue 25]
+User: I'm looking for a Chinese restaurant in the centre of Cambridge.
+System: There are quite a few Chinese restaurants in the area! Do you have a price range you'd like to stay within?
+User: No, anything is fine. Can you suggest a great one?
+System: Jinling noodle bar looks like a good place.
+User: Can I have their phone number and address? Also, are there any trains that go from Peterborough to Cambridge?
+System: sure no problem. Address is 11 Peas Hill City Centre and phone number is 01223566188. Would you like to book a reservation?
+User: What is the price range of the restaurant?
+System: This restaurant is of the moderate price range. Would you like to book a table?
+User: No thanks, but I do need some train info. I'll be leaving from Peterborough on Tuesday, sometime after 15:15.
+System: The TR5933 leaves peterborough at 15:19.
+User: Could you book that for me for 2 people?
+System: Sure thing. I've booked two tickets on TR5933. The total fee is 33 GBP and your reference number is TL4R46YS. Is there anything else I can help you with?
+User: That is all. Thank you.
+System: You are welcome. Have a nice day. Bye.
+
+[dialogue 26]
+User: I am looking for a restaurant to book a reservation. I want asian oriental in the expensive price range
+System: I have two choices for you. One on the north side of town and one in the city center. Any preferences?
+User: Let's try the one on the north side of town. I'd like to make reservations, if possible.
+System: I can try to make that reservation for you. What day are you looking to eat on, how many are in your party, and what time would you like?
+User: I would like the reservation for 5 people at 18:45 on Friday.
+System: I have made those reservations your reference number is WK0CPIFS
+User: Thanks so much. Can you also help me look for a train?
+System: I sure can. Which stations will you be using?
+User: I need to get to Cambridge from Peterborough by 13:15 on the the same day as my reservation.
+System: The TR7877 arrives by 13:09. Would you like to book that one?
+User: Yes please. I need 5 tickets.
+System: The Booking was successful, the total fee is 82.5 GBP payable at the station. Reference number is : JU3L0EZL. Is there anything else you need?
+User: No, that is all for today. Thank you so much for your help!
+System: I'm happy I could help you. Enjoy your trip. Good bye.
+
+[dialogue 27]
+User: Is there any good Jamaican food in Cambridge?
+System: No, I'm sorry. I didn't pull up any matches. Any other types of food you would like me to look into?
+User: Something in the moderate price range. Also, in the centre of town.
+System: What food type could you like?
+User: Let's try Lebanese.
+System: I have one listing for ali baba. Would you like any other information?
+User: book for me a table for 1 person at 14:45 on saturday
+System: I have made those reservations and the reference number is XOMI0TBU.
+User: Thank you. I am also interested in visiting colleges nearby.
+System: I have 13 colleges available in the centre. Did yo have one particular in mind?
+User: What types of college are they?
+System: May I recommend Hughes Hall. It is in the centre of town and has free entrance?
+User: Do you have there address?
+System: The address of hughes hall is wollaston road.
+User: I also need a taxi to get from college to the restaurant. I need to arrive by 14:45.
+System: A white audi will pick you up at hughes hall at 14:45. The contact number is 07128258422.
+User: Thank you have a nice day.
+System: Thank you. You as well!
+
+[dialogue 28]
+User: I am looking for a hotel that can offer me both free wifi and free parking.
+System: There are 29 hotels that meet your criteria. Do you have a preferred location in the city so we can narrow down your choices?
+User: The location does not matter but I need a 3 star hotel.
+System: bridge guest house is a 3 star and a nice place.Do you want the address ?
+
+[dialogue 29]
+User: Yes, I was wondering if you could help me find a train leaving from Cambridge.
+System: No problem! Where will you be going to and on what day?
+User: I'd like to go to london liverpool street on Sunday. I need to get there by 21:00.
+System: I have train TR7713 that departs at 17:59 and arrives at 19:27. Would that work for you or would you like something earlier?
+User: That one would be great. Can I get 2 tickets on that train, and the reference number once it's booked?
+System: Certainly. I have now reserved two tickets for you, which you can pay for at the station. Your reference number is 13GQ9S3A.
+User: I'm also looking for a place to stay in the centre of town that includes free parking.
+System: What is your price range?
+User: I am looking for a cheap place to stay.
+System: Can I recommend el shaddia guesthouse?
+User: Does this location include free wifi?
+System: Yes, El Shaddai includes free parking. Would you like to book a stay, or perhaps you would like directions?
+User: Does the El Shaddai include free wifi?
+System: Yes it does, would you like me to make a booking for you?
+User: Yes. Could you make it for 2 nights/ 2 people starting on friday.
+System: I'm sorry, that reservation wasn't available. Perhaps you could book another day, or a different length of stay?
+User: That's okay, see if you can make the booking for one night instead.
+System: The booking was successful! Your reference number is 7V39SM46.
+User: Thank you very much for all your help.
+System: need any other help?
+User: No. Thank you for your help.
+System: Great! Enjoy your stay!
+
+[dialogue 30]
+User: I'd like to book a taxi from Ask, departing after 19:15.
+System: Could you tell me where your destination will be?
+User: I need to go to rice house.
+System: Could you tell me when you would like to arrive at Rice House?
+User: It doesn't matter when I arrive at Rice House as long as the taxi leaves after 19:15.
+System: You will be picked up by a black ford and the contact number is 07635928440. Anything else?
+User: Nothing else. Thanks so much for your help. Bye.
+System: Glad to be of help. Goodbye!
+
+[dialogue 31]
+User: I want to book a taxi to pick me up Travellers Rest to take me to Finches Bed and Breakfast.
+System: Sure! when would you like to arrive?
+User: I would like to arrive at the restaurant no later than ten o'clock a.m.
+System: I have confirmed a taxi booking for you, a red tesla will be picking you up.
+User: Ok great, can I have the contact number?
+System: Sure its 07915006170. Is there anything else I can do for you?
+User: No, thank you. Great service. Goodbye.
+System: Please contact us again if there's anything else you need during your stay.
+
+[dialogue 32]
+User: I am looking to stay at a guesthouse that has a 3 star rating.
+System: There are four three star guest houses. Is there an area of town that interests you the most?
+User: I would like it to be in the west. It doesn't matter if it has free parking or not. Thank you!
+System: There is the hobsons house. Would you like me to book it?
+User: Yes. Let's book it.
+System: ok for how long and how many people please
+User: For 3 days and 2 people,I need a confirmation number too
+System: and what day do you need the reservation for?
+User: I need it for Sunday.
+System: Your booking was successful! Your reference number is EV4ADBI9.
+User: I want a train that goes to peterborough and leaves after 13:00
+System: The next train is the TR0545 leaving cambridge at 13:06. Would you like me to book it or more information?
+User: Does it leave on Monday?
+System: Train TR3154 leaves cambridge at 13:06 and will arrive at peterborough at 13:56 on Monday. Would you like me to book a ticket?
+
+[dialogue 33]
+User: I am looking for some places to go in town. I'm so excited about seeing some of the local attractions.
+System: There are many to choose from! Almost 80. Can you tell me if you have a certain type of place you want to visit?
+User: What do you recommend? I will be need the address, entrance fee, and postcode for what you recommend please.
+System: I honestly recommend visiting a famous college such as Christs or Magdalene.
+User: Could I have the address, entrance fee, and postcode.
+System: Christ's College is on Saint Andrew's Street and postcode CB23BU. There is no entrance fee. Can I help you with anything else?
+User: Yes, I'm also looking for a place to stay. The hotel doesn't need to include internet.
+System: There are about 33 hotels that meet your needs. Can you narrow it down to a certain area of town and price range?
+User: I'm sorry,was Christ's College in the centre? I did need something in that area.
+System: Yes it is in the centre.
+User: Is there one in the centre with free parking
+System: Sorry, parking isn't something that is mentioned for attractions.
+User: Okay. I'd like a hotel that includes free parking then.
+System: alexander bed and breakfast would meet those needs. could i look for something else? or can i book a stay here at this one?
+User: Please book it for 7 people for 5 nights starting Thursday.
+System: I have your rooms booked. The reference number is : OGBAZ8XW. KIs there anything else i can assist you with today?
+User: Great I also need a taxi to commute between the two places.
+System: Where will you be leaving from? What time would you like to leave?
+User: i want to leave by 10:45
+System: I've got a ride for you. A yellow Skoda. Their phone number is 07546403281
+User: Great, thanks! That's everything I needed.
+System: Perfect. I hope you have a wonderful stay. Goodbye.
+
+[dialogue 34]
+User: Hi, I need a guest house please.
+System: Do you have a specific location you want to be?
+User: No, but I need free wifi and I would like a 2 star guesthouse please.
+System: There isn't a guesthouse with 2 stars and free internet available. Is there another type of hotel I can look up for you?
+User: Yes, how about a guesthouse with 3 stars and free wifi instead?
+System: I have 3 guesthouses all in the moderate price range. Would you like me to choose one for you?
+User: I'm sorry. I changed my mind. I don't want a guesthouse. Are there any hotels with 2 stars?
+System: Is there a particular area you would like to stay in?
+User: No, just any 2-star hotel with free wifi will do.
+System: I found 3 for you all in the expensive price range. Can you please give me the details so that I may book it for you?
+User: I would like it for 6 people for 2 nights starting on Wednesday.
+System: I have you booked in the Ashley hotel. Your reference number is CW6YMT0B. Is there anything else I can do for you today?
+User: Great that was all I needed today, thank you.
+System: Great Glad I could be of help to you.
+
+[dialogue 35]
+User: I'm looking for a restaurant that serves indian food.
+System: Hello, I have a bunch of options for you. Do you have a specific area or price range you are interested in?
+User: I am looking for an Indian restaurant in the west.
+System: What price range are you interested in?
+User: The restaurant should be in the expensive price range
+System: Maharajah tandoori restaurant on 41518 Castle Street City Centre is a good fit for you.
+
+[dialogue 36]
+User: What entertainment attractions are there in the east side of town?
+System: The Cherry Hinton Hall and Grounds is located on Cherry Hinton Road and is always a fun place. Does that interest you?
+User: That sounds great. Can you give me their phone number?
+System: Sure. Their number is 01223446104. Is there anything else I can help you with?
+User: Do you have any information on their entrance fees?
+System: Unfortunately, they haven't listed their entrance fees.
+User: That's ok. I'll call them. Can you help me find a moderately priced place to stay?
+System: Are you looking to stay in the east? There are three moderately priced, 4 star guesthouses there.
+User: What about 3 star places? And i need free parking.
+System: I'm sorry there are no matching results.
+User: Can you try a guesthouse withouth free parking?
+System: I'm not finding any guesthouses that meet your criteria. Would you like to try a different area, price range, or stars?
+User: So you can't find a moderately priced guesthouse with 3 stars and free parking anywhere in cambridge at all? Area doesn't matter. Please try again?
+System: i cant find it anywhere. can we change the price range?
+User: I know I have found places with those requirements before. I just don't remember the name. I really want to stay moderately priced with the 3 stars and parking.
+System: There are no hotels matching your criteria in the East, but there are 3 hotels in the south, north, and west. Would you like to try one of those?
+User: Ok,thanks anyway for your help
+System: Are you sure you don't want me to check another area for you to stay?
+User: Any moderately price guesthouse will work
+System: I have the hamilton lodge located in the north.
+User: Does it offer free parking? If yes, please book a room for 2 for 2 nights. We'll be checking in on Wednesday
+System: your all set confirmation is EAD5DHHC. Anything else for you today?
+User: No thank you that will be all
+System: thank you for using this service good bye
+
+[dialogue 37]
+User: I would like to find a danish restaurant this is moderately priced.
+System: There are no Danish restaurants in the moderate price range. Would you like me to check for restaurants serving a different type of food?
+User: Go for it.
+System: Some options are Lebanese, Turkish, international, British, European, and Chinese. Do any of these interest you?
+User: No. How about gastropub type food? May I please have the address, phone number, and area?
+System: The cow pizza kitchen and bar serves gastropub food, is located in the centre part of town and is in the moderate price range. Their phone number is 01223 308871. The address is Corn Exchange Street and the postcode is C.B 2, 3QF
+User: Thank you.
+System: Is there anything else we can help you with today?
+User: no, thank you
+System: Thank you for using our system. Good bye
+
+[dialogue 38]
+User: I need to get train ticket leaving cambridge after 14:45 please.
+System: Ok I have a total of 1,365 entries that leave after that time. Do you have a specific day or destination you would like to select ?
+User: I need to go to Birmingham new street on Monday.
+System: I would recommend train ID TR5435 which leaves Cambridge at 15:02 and arrives at Birmingham New Street at 17:44.
+User: What is the exact travel time on the TR5435?
+System: The total travel time will be 163 minutes. Is there anything else I can help you with today?
+User: I could use some help finding a restaurant that is moderately priced.
+System: We have many options that are moderately priced. Is there a specific area or type of cuisine you are looking for?
+User: I don't care about the cuisine but I want it to be in the west.
+System: We have prezzo. It is an italian restaurant located in the west. It is moderately priced. Would you like me to book it for you?
+User: That won't be necessary. What is the postcode?
+System: prezzo's postcode is cb30ad.
+User: Thanks for all your help.
+System: You're welcome, have a lovely day!
+
+[dialogue 39]
+User: I need a train out of Cambridge, to arrive by 20:00.
+System: Just to clarify a train from Cambridge, correct? Where will it be to and what date & time?
+User: I'm going to London's Kings Cross on Monday.
+System: I have TR2289 leaving at 7:00 and arriving at 7:51. Would you like reservations?
+User: What is the price of a ticket?
+System: One ticket to London Kings Cross will cost 23.60 pounds. Would you like me to book the ticket for you?
+User: Yes. Can you also find a place to dine in the centre. I would like a restaurant in the moderate price range.
+System: ok, i have 21 options for you! any particular cuisine?
+User: Italian would be nice thank you
+System: Okay. Pizza Express would suite your needs, would you like me to make you a reservation?
+User: Yes. I need a table for 8 people at 16:15 on the same day.
+System: I have you booked for 8 people at 16:15 on Monday. Your reference number is K4PZHB51.
+User: Excellent. Thank you very much for all of your help!
+System: You're very welcome! Is there anything else I can help you with?
+User: No thank you!
+System: Great! Have a wonderful time!
+
+[dialogue 40]
+User: Hello, I am looking for a moderately priced restaurant that serves gastropub food.
+System: The Cow Pizza Kitchen and Bar serves Gastropub food and is in the moderate price range.
+User: May I please have the phone number?
+System: 01223 308871 Will that be all?
+User: Thank You that's all
+System: You're welcome!
+
+[dialogue 41]
+User: Please find a place to eat that serves Indian food.
+System: There are several is there a price range or area you prefer?
+User: Yes, I would like it to be in the west.
+System: There are 6 results. Is there a certain pricerange you'd like?
+User: Thank you! I would like to go to an expensive restaurant, please.
+System: I would recommend Tandoori Palace at 68 Histon Road Chesterton. The food there is great. Would you like for me to book a reservation for you?
+User: Yes 4 people on 18:15 on friday. Should be a fin way to start the weekend.
+System: Your booking was successful. Your reference number is OPAF3JMB. Is there anything else I can do for you today?
+User: Yes, I'm also looking for a nightclub to go to in the same area.
+System: There are no nightclubs in the west, would you like me to do another searchby area or attraction type?
+User: How about a museum then?
+System: There are 7 museums in the west. Would you prefer one with free admission?
+User: Yes please.
+System: The cafe jello gallery has free admission and is located at 13 magdalene street, postcode cb30af. Would you like information on any others?
+User: No, that is all the information I need. Thank you.
+System: You're welcome, have a great day!
+
+[dialogue 42]
+User: Can you find me a place to stay that is moderately priced and includes free parking?
+System: I found 5 guesthouses for you. What part of the towns do you prefer to stay?
+User: Any area would be fine. But do any of the guesthouses have a 3 star rating?
+System: Yes. Does it matter what part of town? There is one on the south, one on the north, and one on the west.
+User: The area doesn't matter, I just need to make sure I have a place to stay for 4 nights starting Saturday.
+System: All right, I can make a reservation at the Bridge Guest House if you tell me how many people are in your group.
+User: 3 people.
+System: I do not have that hotel at that time, should I try for a shorter stay?
+User: How about just 1 night?
+System: Okay, you are booked at the bridge guest house for 1 night (Saturday). Your reference number is NVYYU4ML. Can I help with anything else?
+User: Thanks so much, I can't wait. Bye.
+System: Don't mention it. I hope you guys have a blast.
+
+[dialogue 43]
+User: Hello I am looking for a restaurant called J restaurant
+System: J restaurant is an asian oriental restaurant in the centre of town. It is cheap and located at 86 Regent Street City Centre.
+User: That sounds great. Can you reserve a table for 2 for Sunday at 13:15?
+System: Absolutely, your reservation's been made. Your reference number is YAHBIZR5. Can I help you with something else?
+User: I am also looking for a place to stay in the east that includes free wifi.
+System: There are several hotels of that nature. What is your price range?
+User: I'm looking for something cheap with free parking.
+System: Hotel allenbell is what I found that is cheap and has parking.
+User: Could you get the postcode for Hotel Allenbell for me?
+System: The postcode is cb13js. Would you like to get a room reserved?
+User: Yes, please reserve the room.
+System: What day will you be checking in, and how many will you stay for? I assume it is for 2 people?
+User: Actually, on second thought. I should book it later. But, can you book me a taxi from Allenbell to J Restaurant. I need to be there by 13:15.
+System: Your taxi was booked! The car type will be blue ford and the contact number is 07646890093.
+User: Thanks, I think that's all I need. Could you just confirm whether the Allenbell is a Hotel or a Guest House?
+System: Allenbell is a guesthouse.
+User: Thank you. That will be everything today. Goodbye.
+System: You're welcome. Have a great day. Goodbye.
+
+[dialogue 44]
+User: hello. I'm trying to get to kings lynn on sunday. can you help?
+System: Of course. To be of better service can I ask your departure location and what time you would like to arrive on Sunday?
+User: Depart from cambridge and arriving by 0930 please
+System: TR8042 will depart cambridge Sunday at 8:11 and arrive in Kings Lynn at 8:58. How many tickets would you like to book?
+User: That will work, I just need 1 ticket please and also the reference number.
+System: I've booked it. Your reference number is 6UPAI5J3. What else can I do for you today?
+User: what attractions do you have in the centre of town?
+System: There are multiple types of attractions in the centre of town. What are you interested in so I can better help you?
+User: Something located in the city centre. Also may I have their phone number?
+System: We have 44 entries in the area. What type would you like?
+User: I am not entirely sure. What would you recommend?
+System: Are you interested in archaeology? Our Museum of Archaelogy and Anthropology might interest you. Or if you want to exercise, Parkside Pools would be a fun venue.
+User: The Museum of Archaelogy and Anthropology sounds good. Can I get the phone number?
+System: Their phone number is 01223333516
+User: Great, that's all I need, thank you!
+System: Awesome, have a great day!
+
+[dialogue 45]
+User: I would like a moderately priced restaurant that serves creative food.
+System: There are no results matching your query. Would you like to change your query?
+User: Yes. How about a restaurant that serves European food?
+System: De Luca Cucina and Bar is moderately priced and serves modern European food.
+User: That sounds good, can I have the address and postcode please.
+System: the address is 83 Regent Street, postcode is C.B 2, 1 A.W.
+
+[dialogue 46]
+User: I'm looking for a restaurant that serves asian oriental food in cheap range.
+System: I'd suggest dojo noodle bar on 40210 Millers Yard City Centre. Would you like a reservation?
+User: Sure! This is exactly what I need!
+System: Can you give me more information about the booking the table?
+User: What do you mean. Would you like me to book it?
+System: I can reserve a table for you and give you a reservation number
+
+[dialogue 47]
+User: I'm looking for a place to stay in Cambridge that has free wifi and free parking.
+System: Alexander bed and breakfast can acommodate your request.
+User: Is it also a guesthouse type of hotel?
+System: Yes, that's correct. Would you like to book a room?
+User: Yes, please book it for 5 nights starting on Wednesday for 2 people total.
+System: I wasn't able to complete your booking for that time frame. Would you be able to stay a different amount of nights?
+User: How about four nights instead of five?
+System: I was able to successfully book you for four nights at the Alexander Bed and Breakfast, and your reference number is HY6O0MQH.
+User: Thank you! Do you have the reviews and address for the J Restaurant near there?
+System: Here is the address for the J restaurant, 86 Regent Street City Centre. I currently do not have reviews of the restaurant avialable.
+User: I would like a reservation for 2 at 12:45 please.
+System: No problem. And what day will that be for?
+User: That will be on Friday for 2 please.
+System: I am sorry, but they do not have an available spot at that time, would you like me to book a reservation for any day or time?
+User: No thank you, I'll try for something else.
+System: Is there a different date or time you'd like me to check for you?
+User: No that is the only date and time I have available. Are you sure you don't have anything for Wednesday at 12:45?
+System: Yes i was able to make your reservation for 2 for Wednesday at 12:45. Your reference number is X3QCMWY3.
+User: Thank you very much. That's all I need today. Goodbye.
+System: Thank you for calling.
+
+[dialogue 48]
+User: I need to find a train out of King's Lynn that will arrive by 17:45.
+System: Can you please provide me with destination of the train so I can better assist you?
+User: Cambridge, and it will be on sunday.
+System: I have train TR6003 leaving cambridge at 5:11 and arriving at 5:58 on sunday.
+User: That sounds great. Can you book me 4 tickets on that train please?
+System: Booking was successful, the total fee is 31.36 GBP payable at the station . Reference number is : 8K88DU7K.
+User: Awesome! I also need help finding a place to stay in the South. Not driving so don't need parking.
+System: I have 4 options available. Do you have a preference of guesthouse or hotel and price range?
+User: I would like a hotel and my only preference, besides being in the south, is I would like it to have a 3 star rating please.
+System: The Lensfield Hotel meets your criteria. Would you like me to book it?
+User: Yes I'll need it for Sunday for 2 nights and 4 people.
+System: You are booked for 2 night for 4 people starting Sunday at the Lensfield Hotel. Your reference # is ICM07YWC. Can I help you with anything else today?
+User: That takes care of everything for me, thank you! Bye!
+System: You are very welcome! Have a wonderful day, goodbye!
+
+[dialogue 49]
+User: Hello. I really need to find a cheap place to stay in the east. Is there anything like that?
+System: I've found three, all of them are guesthouses and all of them have free internet and parking. Would you like me to give your their information?
+User: Sure, that sounds great.
+System: Okay I will give you the information I have on them.
+User: Can you book it for 8 people for 4 nights starting on thursday?
+System: Ok I have you booked at The Allenbell for 4 nights for 8 people. Your reference number 7SN0BAAT. Do you need anything else?
+User: I would like an indian restaurant in the same price range as the hotel please.
+System: There are four cheap Indian places, three in city centre, and one on the north end.
+User: Whichever one is fine, surprise me!
+System: I would recommend Royal Spice in the north end. Would you like me to make a reservation there for you?
+User: Yes I need it booked for the same group of people at 12:45 on the same day.
+System: That booking was successful. The reference number is KAY2S45O. Is there anything else I can do for you?
+User: Yes, I would like a reserve a taxi to commute between The Allenbell and Royal Spice. I really want to be on time for our dinner reservation.
+System: What time would you like to be picked up?
+User: I'd like the arrival time to be 12:45, please.
+System: I have that booked for you, contact number 07340953955. Do you need anyhting else?
+User: I need the car type please.
+System: Yes it is a grey skoda. Can I assist you further?
+User: No that is all, bye.
+System: You're welcome. Enjoy your trip!
+
+[dialogue 50]
+User: Do you know of any places I can go for entertainment?
+System: We have several options for you. Is there a specific area you will be in?
+User: No specific area. Just the first thing that pops up.
+System: Cherry Hinton hall and grounds is on the east part of town.
+User: Okay how much does it cost? And where the postal code?
+System: The price is uknown at this time, and the postcode is cb18dw.
+User: I am also looking for a train for Thursday departing from Stevenage.
+System: There are many train departure options on Thursday. When do you want to leave and arrive by?
+User: I would like to arrive in cambridge by 11:30.
+System: TR3330 will arrive at 10:43, would that work for you?
+User: That sounds good. I need tickets for 4 people. Can I get a reference number?
+System: Booking was successful, the total fee is 51.2 GBP payable at the station. Reference number is : XX5DNFKS.
+User: Great, that's all I need. You can end this conversation now. Thanks!
+System: Thank you and enjoy your visit. Have a great day.
+
+Return the JSON object now.

@@ -374,11 +374,24 @@ S4_SHAPES = {   # wf_v4 Step 4 answers: structure only (the deeper checks are st
                                     "columns": [{"name": str, "type": str}],
                                     "foreign_keys": [{"column": str, "ref_table": str, "ref_column": str}]}],
                         "relationships": [{"from": str, "to": str, "kind": str, "reason": str}]}),
+    "s4_place": ("option", {"reason": str, "option": str, "target_table": str,
+                            "new_table": (type(None), {"name": str, "row": str}),
+                            "link": (type(None), {"from": str, "to": str, "kind": str})}),
 }
 
 
 def _shape_errors(val, shape, path, errors):
     """Append to `errors` where `val` does not have `shape`: a type, [shape] (list of), or {key: shape} (all keys required)."""
+    if isinstance(shape, tuple):    # alternatives: val must fit one of them
+        alt = []
+        for sh in shape:
+            sub = []
+            _shape_errors(val, sh, path, sub)
+            if not sub:
+                return
+            alt.append(sub)
+        errors.extend(alt[-1])
+        return
     if isinstance(shape, dict):
         if not isinstance(val, dict):
             errors.append(f"{path} not an object")
@@ -405,7 +418,7 @@ def parse_step4(raw, fmt, schema):
 
     def extra(obj, errors):
         _shape_errors(obj, shape, "$", errors)
-        for key in ("kind", "type"):
+        for key in ("kind", "type", "option"):
             allowed = schema_enum(schema, key)
             if allowed is not None:
                 for a in _find_values(obj, key):
@@ -427,7 +440,7 @@ def _find_values(obj, key):
 
 
 def parse_job(raw, fmt, schema):
-    """(parsed, errors, n_objects) for a manifest job of format v1 | v2 | v3 | split | noise | gate | reconcile | baseline | dupcheck | evidence | s4_41 | s4_42 | s4_43 | s4_44 | s4_e;
+    """(parsed, errors, n_objects) for a manifest job of format v1 | v2 | v3 | split | noise | gate | reconcile | baseline | dupcheck | evidence | s4_41 | s4_42 | s4_43 | s4_44 | s4_e | s4_place;
     enums come from the job's schema."""
     if fmt == "v1":
         parsed, errs = parse_v1_enum(raw, schema_enum(schema, "cluster_id"), schema_enum(schema, "placement"))
@@ -438,7 +451,8 @@ def parse_job(raw, fmt, schema):
         return parsed, errs, len(parsed.get("clusters") or [])
     if fmt in S4_SHAPES:
         parsed, errs = parse_step4(raw, fmt, schema)
-        return parsed, errs, len(parsed.get(S4_SHAPES[fmt][0]) or []) if isinstance(parsed, dict) else 0
+        n = parsed.get(S4_SHAPES[fmt][0]) if isinstance(parsed, dict) else None
+        return parsed, errs, len(n) if isinstance(n, list) else int(bool(n))
     if fmt == "baseline":
         parsed, errs = parse_baseline(raw)
         return parsed, errs, len(parsed.get("attributes") or [])

@@ -74,6 +74,10 @@ Timings on the laptop CPU for n50:
   - Phase 1 (no LLM): `scripts/dashboard_v38.py` (`s1a/dashboard_v38.py`, `s1a/nosplit_v38.py`) -> `results/loop1_v38/dash/`; `scripts/merges_v38.py` (`s1a/merges_v38.py`) -> `results/loop1_v38/merges/`; `scripts/noise_cases_v38.py` (`s1a/noise_cases_v38.py`) -> `results/loop1_v38/noise/`.
   - Colab batch (tasks 7-9, one stage): `scripts/batch_build_v38.py` (`s1a/batch_v38.py`; needs the gitignored `vectors.npz` of graph_v22_dev50/dev50b) -> `results/loop1_v38/colab/{prompts/, manifest.json, columns.csv, examples.csv, prompt_stats.md}` -> `colab/S1A_llm_v38_colab.ipynb` (`llm_cache` formats dupcheck / evidence) -> `colab/responses/`.
 
+- wf_v4 Step 4 (contract `WF_V4_CONTRACT.md`, batch `WF_V4_BATCH.md`):
+  - Inputs: `scripts/inputs_v4.py` (`s1a/step4_inputs.py`) -> `results/wf_v4/inputs/<set>/{a,b,c1,c2}.columns.json, d.canonical.json, f.canonical.json, e_v<k>.prompt.txt, dialogues_used.json`, `token_counts.{csv,md}`, `results/wf_v4/scores/baselines_df.csv`.
+  - Batch: `scripts/batch_build_v4.py` (stage 1; reads the inputs and `config/wf_v4_placement.json`) -> `results/wf_v4/colab/{prompts/, manifest.json, chains.json, placement.json}` -> `colab/S1A_llm_v4_colab.ipynb` (`scripts/batch_stage_v4.py` per stage, `s1a/batch_v4.py`) -> `responses/` -> `scripts/assemble_v4.py [--score]` -> `final/<run>/{canonical.json, schema.sql, operations.json}`; `scripts/dry_run_v4.py` (fake model `s1a/batch_v4_fake.py`) -> `manifest_summary.md`.
+
 ## Data links
 - `scripts/export_mentions.py` -> `results/graph_<split>50/{docs.jsonl, gold_values.csv, gold_attrs.txt, cache/}`, `<input>/{mentions,clusters,instances}.csv, vectors.npz` -> `scripts/graph_run.py` stages -> `<input>/{coverage.csv, graphs.pkl, stability.csv, nodes.csv, labels.csv, select/, schema/}`
 - `../chunking/results/S_n50/chunks/chroma_bge-m3.jsonl` -> `s1a/paths.py` `CHROMA_CHUNKS` -> `scripts/run.py`, `scripts/plug_in.py` (size 50/400)
