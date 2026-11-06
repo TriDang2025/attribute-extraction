@@ -1,0 +1,45 @@
+# schema GT v1 check
+
+Designs: 1 main + 7 alternatives. Tables (main): 8, columns 56, FKs 3.
+
+## Problems
+
+none
+
+## Reachable on dev50 (fallback method, see the method note; label share >= 0.6)
+
+- train: 6/8 attribute columns reachable (+0 added)
+- train_booking: 2/2 attribute columns reachable (+2 added)
+- hotel: 8/10 attribute columns reachable (+0 added)
+- hotel_booking: 4/5 attribute columns reachable (+1 added)
+- restaurant: 7/7 attribute columns reachable (+0 added)
+- restaurant_booking: 4/5 attribute columns reachable (+1 added)
+- taxi: 0/6 attribute columns reachable (+1 added)
+- attraction: 0/8 attribute columns reachable (+0 added)
+
+Per entity (sum of the tables): {'train': 8, 'hotel': 12, 'restaurant': 11, 'taxi': 0, 'attraction': 0}; all: 31/51
+final_rows.csv (Final v3.9, rules v1.3): train 8, hotel 12, restaurant 11, total 31/40.
+This method, same three entities (table counts of an entity summed): {'train': 8, 'hotel': 12, 'restaurant': 11}, total 31. Counts match.
+Handover columns with a label on >= 0.6 of their labelled mentions: {'train': 13, 'hotel': 17, 'restaurant': 16} of 55.
+gt_L2 values that are not GT column names (after case/space normalisation): none.
+
+## Reachable on dev50b (fallback method, see the method note; label share >= 0.6)
+
+- train: 6/8 attribute columns reachable (+0 added)
+- train_booking: 2/2 attribute columns reachable (+2 added)
+- hotel: 7/10 attribute columns reachable (+0 added)
+- hotel_booking: 4/5 attribute columns reachable (+1 added)
+- restaurant: 7/7 attribute columns reachable (+0 added)
+- restaurant_booking: 4/5 attribute columns reachable (+1 added)
+- taxi: 0/6 attribute columns reachable (+1 added)
+- attraction: 0/8 attribute columns reachable (+0 added)
+
+Per entity (sum of the tables): {'train': 8, 'hotel': 11, 'restaurant': 11, 'taxi': 0, 'attraction': 0}; all: 30/51
+final_rows.csv (Final v3.9, rules v1.3): train 8, hotel 10, restaurant 11, total 29/41.
+This method, same three entities (table counts of an entity summed): {'train': 8, 'hotel': 11, 'restaurant': 11}, total 30. Counts do NOT match (see the method note).
+Handover columns with a label on >= 0.6 of their labelled mentions: {'train': 9, 'hotel': 16, 'restaurant': 15} of 47.
+gt_L2 values that are not GT column names (after case/space normalisation): none.
+
+## Method note
+
+final_v39.py needs the v3.3/v3.2 run directories, Colab responses and models (it rebuilds every group), so it was not reused. Fallback used: a GT column is reachable when some handover column of the same entity has that gt_L2 label (multi-label, split on ';') on >= 0.6 of its LABELLED mentions (mentions with a non-empty gt_L2). It reproduces final_rows.csv found_* on dev50 and is one hotel column higher on dev50b; the exact rule (rules_groups.found, v1.3) counts mentions by label class.

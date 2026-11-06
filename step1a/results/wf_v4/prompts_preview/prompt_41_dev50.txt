@@ -1,0 +1,379 @@
+Below are the columns found by analysing a corpus of dialogues. Each column is a kind of information that people give
+in the dialogues, with a description, the type of its values, a few example values and counts. The columns were found
+under 3 headings; the id of a column starts with its heading, but a heading may be wrong.
+Design a relational database from these columns. Step 1: put every column into exactly one group; each group will
+become one table of the database. A table may hold columns from several of the headings below. If a column would
+not be stored in any table (noise, a booking word, a value a database would not keep), do not put it in a group; list
+it as unused with a reason. If a column looks like a duplicate of another column, say so in duplicate_flags; this is
+only a flag, the column still goes into a group (or into unused). Lines labelled "checker" and "signals" are automatic
+and can be wrong; decide from the descriptions and examples.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up):
+{"groups": [{"group": "G1", "columns": ["x:1", "x:4"], "note": "what the columns have in common"}],
+ "unused": [{"column": "x:2", "reason": "..."}],
+ "duplicate_flags": [{"column": "x:4", "duplicate_of": "x:1"}]}
+Use the group names G1, G2, ... .
+
+Columns (55):
+== train ==
+[train:1] arrival location
+  description: the location where the train arrives
+  role: end of the journey
+  values: text (share 1.00); 23 mentions in 16 dialogues
+  examples: "stansted airport", "leicester", "broxbourne"
+  signals: support 1/10; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+[train:2] arrival time
+  description: specifies the time a train is expected to arrive at the destination
+  role: end of the journey
+  values: time (share 1.00); 28 mentions in 16 dialogues
+  examples: "19:30", "18:15", "18:24"
+  signals: support 1/10; fits a neighbouring column 1/8
+  checker: noise; flags: noise
+[train:3] departure location
+  description: the location from which the train departs
+  role: start of the journey
+  values: text (share 1.00); 28 mentions in 17 dialogues
+  examples: "cambridge", "ely", "norwich"
+  signals: support 10/20; fits a neighbouring column 2/10
+  checker: unsure
+[train:4] departure time
+  description: the time at which the train departs
+  role: start of the journey
+  values: time (share 1.00); 62 mentions in 23 dialogues
+  examples: "12:00", "13:15", "15:45"
+  signals: support 4/10; fits a neighbouring column 2/8
+  checker: unsure
+[train:5] destination city
+  description: destination city in train queries
+  role: destination city in train queries
+  values: text (share 1.00); 34 mentions in 23 dialogues
+  examples: "cambridge"
+  signals: support 7/10; fits a neighbouring column 3/6; answers suggest mixed roles
+  checker: unsure; flags: mixed roles
+[train:6] local information center
+  description: local information center in a city
+  role: local information center in a city
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples: "cambridge towninfo centre"
+  signals: support 1/1; fits a neighbouring column 0/10
+[train:7] number of tickets
+  description: the number of tickets booked
+  role: quantity
+  values: number (share 0.67); 18 mentions in 10 dialogues
+  examples: "how many ticket", "16", "1 child"
+  signals: support 8/17; fits a neighbouring column 0/5
+  checker: unsure
+[train:8] number of trains
+  description: specifies the number of trains available or matching a certain criteria
+  role: specifies the number of trains available or matching a certain criteria
+  values: number (share 1.00); 5 mentions in 4 dialogues
+  examples: "1 train", "12", "19 train"
+  signals: support 4/5; fits a neighbouring column 1/10
+[train:9] price per ticket
+  description: the cost of a single train ticket
+  role: cost
+  values: price (share 0.89); 9 mentions in 9 dialogues
+  examples: "10.10 pound", "12.80 pound", "14.08 pound"
+  signals: support 7/9; fits a neighbouring column 2/10
+[train:10] reference number
+  description: the reference number for the booking
+  role: identifier
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples: "1r61po9r", "64uq7m3g", "698re4w1"
+  signals: support 10/10; fits a neighbouring column 0/10
+[train:11] stay duration days
+  description: Indicates the number of days a user will be staying.
+  role: Indicates the number of days a user will be staying.
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples: "2 day"
+  signals: support 1/1; fits a neighbouring column 0/10
+[train:12] time query
+  description: Asking about the time of departure or arrival.
+  role: Asking about the time of departure or arrival.
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples: "what time"
+  signals: support 2/3; fits a neighbouring column 2/10
+  checker: unsure
+[train:13] total fee
+  description: Indicates the total cost for multiple tickets.
+  role: cost
+  values: price (share 1.00); 7 mentions in 7 dialogues
+  examples: "66 gbp", "10.56 gbp", "40.4 gbp"
+  signals: support 1/7; fits a neighbouring column 3/10
+  checker: noise; flags: noise
+[train:14] train id
+  description: the unique identifier for the train
+  role: identifier
+  values: id (share 1.00); 31 mentions in 18 dialogues
+  examples: "tr9016", "tr5713", "tr5921"
+  signals: support 10/10; fits a neighbouring column 0/10
+[train:15] travel date
+  description: the date of the train journey
+  role: date
+  values: day (share 0.87); 47 mentions in 28 dialogues
+  examples: "saturday", "friday", "wednesday"
+  signals: support 15/16; fits a neighbouring column 0/3
+[train:16] travel time
+  description: the duration of the train journey
+  role: duration
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples: "105 minute", "49 minute", "28-minute"
+  signals: support 8/8; fits a neighbouring column 0/1
+== hotel ==
+[hotel:1] entity
+  description: refers to a specific entity or organization
+  role: refers to a specific entity or organization
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples: "cambridge towninfo centre"
+  signals: support 1/1; fits a neighbouring column 10/10
+  checker: too general; flags: too general
+[hotel:2] hotel address
+  description: address of the hotel or guesthouse
+  role: location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples: "156 chesterton road"
+  signals: support 1/1; fits a neighbouring column 0/10
+[hotel:3] hotel location
+  description: location or area of the hotel or guesthouse
+  role: location
+  values: text (share 1.00); 15 mentions in 11 dialogues
+  examples: "centre", "south part of town", "any area"
+  signals: support 10/15; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[hotel:4] hotel name
+  description: the name of the hotel or guesthouse
+  role: identifier
+  values: text (share 1.00); 29 mentions in 16 dialogues
+  examples: "alexander bed and breakfast", "ashley hotel", "aylesbray lodge"
+  signals: support 16/16; fits a neighbouring column 0/5
+[hotel:5] hotel number of guests
+  description: number of guests for the hotel booking
+  role: quantity
+  values: number (share 0.71); 17 mentions in 13 dialogues
+  examples: "3 people", "5 people", "how many people"
+  signals: support 6/10; fits a neighbouring column 0/10
+  checker: unsure
+[hotel:6] hotel number of nights
+  description: number of nights for the hotel booking
+  role: duration
+  values: number (share 0.79); 24 mentions in 14 dialogues
+  examples: "3 night", "4 night", "2 night"
+  signals: support 11/15; fits a neighbouring column 0/6
+[hotel:7] hotel phone number
+  description: phone number of the hotel or guesthouse
+  role: contact information
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples: "01223355017"
+  signals: support 1/1; fits a neighbouring column 0/6
+[hotel:8] hotel type
+  description: types of hotels or guesthouses
+  role: types of hotels or guesthouses
+  values: text (share 1.00); 14 mentions in 9 dialogues
+  examples: "guesthouse", "hotel", "a guesthouse"
+  signals: support 5/10; fits a neighbouring column 10/10
+  checker: too general; flags: too general
+[hotel:9] location
+  description: specifies the city or area where the hotel or information is sought
+  role: location
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples: "cambridge"
+  signals: support 8/8; fits a neighbouring column 5/6
+  checker: too general; flags: too general
+[hotel:10] location description
+  description: Refers to a specific location or area within the dialogue.
+  role: Refers to a specific location or area within the dialogue.
+  values: text (share 1.00); 8 mentions in 3 dialogues
+  examples: "north", "city centre north b and b", "north part of cambridge"
+  signals: support 7/8; fits a neighbouring column 7/10
+  checker: too general; flags: too general
+[hotel:11] postcode
+  description: Postcode of the hotel
+  role: Postcode of the hotel
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples: "cb41er"
+  signals: support 1/1; fits a neighbouring column 0/6
+[hotel:12] price adjective
+  description: Uses adjectives to describe the cost of a hotel or accommodation.
+  role: Uses adjectives to describe the cost of a hotel or accommodation.
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples: "cheap", "cheap price range", "reasonable price"
+  signals: support 4/5; fits a neighbouring column 7/8
+  checker: too general; flags: too general
+[hotel:13] price extreme
+  description: Refers to the cost category at the extreme ends, such as expensive or cheap.
+  role: Refers to the cost category at the extreme ends, such as expensive or cheap.
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples: "expensive hotel", "expensive price range", "something expensive"
+  signals: support 3/3; fits a neighbouring column 4/6
+  checker: too general; flags: too general
+[hotel:14] price range
+  description: Describes the cost category of a hotel or accommodation.
+  role: price range
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples: "moderate price range", "cheaper price range", "moderate price"
+  signals: support 9/10; fits a neighbouring column 4/8
+  checker: unsure
+[hotel:15] reference number
+  description: Reference number for bookings
+  role: booking identifier
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples: "e6uvd9ol", "72ycmlxx", "cul9vz04"
+  signals: support 10/10; fits a neighbouring column 1/2
+  checker: unsure
+[hotel:16] specific hotel name
+  description: names a specific hotel that matches the user's criteria
+  role: names a specific hotel that matches the user's criteria
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples: "the cambridge belfry"
+  signals: support 10/10; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[hotel:17] specific price
+  description: Refers to a particular price point, such as price per night.
+  role: Refers to a particular price point, such as price per night.
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples: "price per night"
+  signals: support 0/1; fits a neighbouring column 0/8
+  checker: noise; flags: noise
+[hotel:18] star rating
+  description: specifies the star rating of the hotel
+  role: rating
+  values: number (share 0.56); 9 mentions in 4 dialogues
+  examples: "4 star", "2 star", "3 star"
+  signals: support 8/9; fits a neighbouring column 0/10
+[hotel:19] start date
+  description: the start date of the stay
+  role: start date
+  values: day (share 0.75); 28 mentions in 16 dialogues
+  examples: "monday", "wednesday", "friday"
+  signals: support 8/17; fits a neighbouring column 0/4
+  checker: unsure
+== restaurant ==
+[restaurant:1] entry fee
+  description: Describes the cost of entering a location, such as a college.
+  role: Describes the cost of entering a location, such as a college.
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples: "entry fee"
+  signals: support 0/1; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+[restaurant:2] hotel
+  description: references to hotels
+  role: references to hotels
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples: "hotel"
+  signals: support 3/3; fits a neighbouring column 0/10
+[restaurant:3] number of options
+  description: indicates the number of people for a reservation
+  role: indicates the number of people for a reservation
+  values: number (share 1.00); 7 mentions in 6 dialogues
+  examples: "6 people", "2 people", "4 people"
+  signals: support 9/10; fits a neighbouring column 1/7
+[restaurant:4] number of people
+  description: specifies the number of people for a reservation
+  role: specifies the number of people for a reservation
+  values: number (share 1.00); 6 mentions in 4 dialogues
+  examples: "4", "7"
+  signals: support 9/10; fits a neighbouring column 1/7
+[restaurant:5] number of results
+  description: indicates the number of search results
+  role: indicates the number of search results
+  values: number (share 1.00); 7 mentions in 6 dialogues
+  examples: "3", "2", "10 choice"
+  signals: support 4/7; fits a neighbouring column 0/10
+  checker: unsure
+[restaurant:6] postcode
+  description: the postcode of the restaurant
+  role: identifies a location's postal code
+  values: id (share 0.71); 7 mentions in 6 dialogues
+  examples: "9 h.x", "c.b 1", "cb12as"
+  signals: support 5/7; fits a neighbouring column 0/9
+[restaurant:7] price range
+  description: Describes the cost level of a restaurant.
+  role: Describes the cost level of a restaurant.
+  values: text (share 1.00); 24 mentions in 17 dialogues
+  examples: "expensive", "moderately priced", "expensive price range"
+  signals: support 8/10; fits a neighbouring column 2/6
+  checker: unsure
+[restaurant:8] reference number
+  description: uniquely identifies a reservation
+  role: uniquely identifies a reservation
+  values: id (share 1.00); 12 mentions in 11 dialogues
+  examples: "42xedgdf", "bpe8lvha", "cul9vz04"
+  signals: support 10/10; fits a neighbouring column 2/9
+[restaurant:9] reservation date
+  description: the date of the reservation
+  role: reservation date
+  values: day (share 0.80); 20 mentions in 13 dialogues
+  examples: "thursday", "wednesday", "sunday"
+  signals: support 8/10; fits a neighbouring column 0/10
+[restaurant:10] reservation time
+  description: the time of the reservation
+  role: reservation time
+  values: time (share 0.71); 28 mentions in 12 dialogues
+  examples: "15 minute", "15:15", "18:00"
+  signals: support 10/18; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[restaurant:11] restaurant address
+  description: the address of the restaurant
+  role: address
+  values: text (share 1.00); 17 mentions in 17 dialogues
+  examples: "17 magdalene street", "30 bridge street", "68 histon road"
+  signals: support 9/10; fits a neighbouring column 0/10
+[restaurant:12] restaurant area
+  description: the area or part of the city where the restaurant is located
+  role: area
+  values: text (share 1.00); 4 mentions in 2 dialogues
+  examples: "cherry hinton", "64 cherry hinton road"
+  signals: support 3/4; fits a neighbouring column 3/10
+[restaurant:13] restaurant food type
+  description: the type of food served by the restaurant
+  role: food type
+  values: text (share 1.00); 26 mentions in 14 dialogues
+  examples: "restaurant", "restaurant alimentum", "the restaurant"
+  signals: support 8/19; fits a neighbouring column 2/8
+  checker: unsure
+[restaurant:14] restaurant location
+  description: general location of the restaurant
+  role: location
+  values: text (share 1.00); 54 mentions in 26 dialogues
+  examples: "city centre", "centre", "chesterton"
+  signals: support 14/20; fits a neighbouring column 0/5
+[restaurant:15] restaurant name
+  description: the name of the restaurant
+  role: name
+  values: text (share 1.00); 58 mentions in 28 dialogues
+  examples: "anatolia", "graffiti", "thanh binh"
+  signals: support 5/10; fits a neighbouring column 1/10
+  checker: unsure
+[restaurant:16] restaurant phone number
+  description: the phone number of the restaurant
+  role: phone number
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples: "01223 249955", "01223 360966", "taxi contact number"
+  signals: support 2/4; fits a neighbouring column 2/10
+  checker: unsure
+[restaurant:17] restaurant phone numbers
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  checker: unsure
+[restaurant:18] taxi phone numbers
+  description: provides phone numbers for taxis
+  role: provides phone numbers for taxis
+  values: number (share 1.00); 15 mentions in 14 dialogues
+  examples: "01223367660", "01223276182", "01223311911"
+  signals: support 4/10; fits a neighbouring column 1/9
+  checker: unsure
+[restaurant:19] time for taxi
+  description: time requested for taxi pickup or drop-off
+  role: time requested for taxi pickup or drop-off
+  values: time (share 1.00); 8 mentions in 6 dialogues
+  examples: "10:00", "17:45", "09:15"
+  signals: support 3/8; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+[restaurant:20] time of day
+  description: specifies the time of day for dining
+  role: specifies the time of day for dining
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples: "night"
+  signals: support 0/1; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+
+Return the JSON object now.

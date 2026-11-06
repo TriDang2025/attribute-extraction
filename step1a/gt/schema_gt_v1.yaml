@@ -1,0 +1,146 @@
+# =====================================================================
+# Schema Ground Truth (GT) — TEAR Conversation dataset (MultiWOZ), dev50 + dev50b
+# version 5. Built by build_schema_gt.py from attribute_gt_2026-11-02.txt
+#
+# Every column field is copied from the attribute GT file.
+# Added by hand: the place/booking table split, 5 key/link columns (source: added),
+# soft links (taxi -> places) and shared value sets.
+# =====================================================================
+
+meta:
+  attribute_gt_file: attribute_gt_2026-11-02.txt
+  dataset: TEAR Conversation (MultiWOZ)
+  dev_sets: [dev50, dev50b]
+  pipeline_output: SQL (CREATE TABLE ...)
+
+matching:
+  - "A predicted column is correct if it means the same as a GT column and is in a table of the same entity."
+  - "The name does not need to match: same, close or different names are all fine."
+  - "Right meaning in the wrong entity is wrong."
+  - "Booking columns may be in the place table or in a booking table. If they are in the place table, the booking id and link columns are not needed."
+  - "Links (foreign keys) are required. Soft links and shared values are not required: a predicted link or lookup table that matches one is correct, a missing one is not counted."
+
+not_columns:   # from the attribute GT file, Sections 2 and 4
+  - "Database columns with no schema slot and 0 dev mentions: Hotel n, Hotel price, Hotel takesbookings, Restaurant introduction, Restaurant signature, Restaurant type"
+  - "id and location database columns (id-like)"
+  - "choice (number of results): noise, not in the official schema"
+
+shared_values:   # same list of values in several tables; no link (a lookup table would be optional)
+  - {values_of: "area", columns: ["Hotel area", "Restaurant area", "Attraction area"], values: ["centre", "east", "north", "south", "west"]}
+  - {values_of: "price range", columns: ["Hotel price range", "Restaurant price range"], values: ["cheap", "expensive", "moderate"]}
+  - {values_of: "day", columns: ["Train day", "Hotel requested day", "Restaurant requested day"], values: ["friday", "monday", "saturday", "sunday", "thursday", "tuesday", "wednesday"]}
+
+not_connected:
+  - "train has no link to hotel, restaurant, taxi or attraction: its departure/destination are cities and stations, which no other table has."
+
+tables:
+
+  - name: train
+    entity: train
+    key: ["Train trainid"]
+    columns:
+      - {name: "Train arrive by", level: "L1", source: "tear", mwoz22_slot: "train-arriveby", description: "arrival time of the train", type: "time", role_partner: "Train leave at", database_column: "yes (column arriveBy)", mentions_dev50: 32, mentions_dev50b: 25}
+      - {name: "Train day", level: "L1", source: "tear", mwoz22_slot: "train-day", description: "day of the train", type: "day", categorical: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"], database_column: "yes (column day)", mentions_dev50: 41, mentions_dev50b: 23}
+      - {name: "Train departure", level: "L1", source: "tear", mwoz22_slot: "train-departure", description: "departure location of the train", type: "text", role_partner: "Train destination", database_column: "yes (column departure)", mentions_dev50: 48, mentions_dev50b: 25}
+      - {name: "Train destination", level: "L1", source: "tear", mwoz22_slot: "train-destination", description: "destination of the train", type: "text", role_partner: "Train departure", database_column: "yes (column destination)", mentions_dev50: 41, mentions_dev50b: 33}
+      - {name: "Train leave at", level: "L1", source: "tear", mwoz22_slot: "train-leaveat", description: "leaving time for the train", type: "time", role_partner: "Train arrive by", database_column: "yes (column leaveAt)", mentions_dev50: 58, mentions_dev50b: 20}
+      - {name: "Train duration", level: "L2", source: "schema_slot", mwoz22_slot: "train-duration", description: "duration of the travel", type: "duration", database_column: "yes (column duration)", mentions_dev50: 8, mentions_dev50b: 3}
+      - {name: "Train price", level: "L2", source: "schema_slot", mwoz22_slot: "train-price", description: "price of the train", type: "price", database_column: "yes (column price)", mentions_dev50: 14, mentions_dev50b: 9}
+      - {name: "Train trainid", level: "L2", source: "schema_slot", mwoz22_slot: "train-trainid", description: "id of the train", type: "id", database_column: "yes (column trainID)", mentions_dev50: 32, mentions_dev50b: 16, role: "primary_key"}
+    links: []
+
+  - name: train_booking
+    entity: train
+    key: ["Train booking id"]
+    columns:
+      - {name: "Train booking id", level: null, source: "added", description: "id of the train booking", type: "id", role: "primary_key"}
+      - {name: "Train booking trainid", level: null, source: "added", description: "the train that was booked", type: "id", role: "foreign_key"}
+      - {name: "Train confirmed reference", level: "L1", source: "tear", mwoz22_slot: "train-ref", description: "reference number of the train booking", type: "id", database_column: "no", mentions_dev50: 18, mentions_dev50b: 8}
+      - {name: "Train requested people", level: "L1", source: "tear", mwoz22_slot: "train-bookpeople", description: "how many train tickets you need", type: "number", database_column: "no", mentions_dev50: 11, mentions_dev50b: 7}
+    links:
+      - {from: "Train booking trainid", to: "train.Train trainid"}
+
+  - name: hotel
+    entity: hotel
+    key: ["Hotel name"]
+    columns:
+      - {name: "Hotel area", level: "L1", source: "tear", mwoz22_slot: "hotel-area", description: "area or place of the hotel", type: "text", categorical: ["centre", "east", "north", "south", "west"], database_column: "yes (column area)", mentions_dev50: 22, mentions_dev50b: 30}
+      - {name: "Hotel internet", level: "L1", source: "tear", mwoz22_slot: "hotel-internet", description: "whether the hotel has internet", type: "unknown", categorical: ["free", "no", "yes"], database_column: "yes (column internet)", mentions_dev50: 0, mentions_dev50b: 0}
+      - {name: "Hotel name", level: "L1", source: "tear", mwoz22_slot: "hotel-name", description: "name of the hotel", type: "text", database_column: "yes (column name)", mentions_dev50: 30, mentions_dev50b: 38, role: "primary_key"}
+      - {name: "Hotel parking", level: "L1", source: "tear", mwoz22_slot: "hotel-parking", description: "whether the hotel has parking", type: "unknown", categorical: ["free", "no", "yes"], database_column: "yes (column parking)", mentions_dev50: 0, mentions_dev50b: 0}
+      - {name: "Hotel price range", level: "L1", source: "tear", mwoz22_slot: "hotel-pricerange", description: "price budget of the hotel", type: "text", categorical: ["expensive", "cheap", "moderate"], database_column: "yes (column pricerange)", mentions_dev50: 14, mentions_dev50b: 16}
+      - {name: "Hotel stars", level: "L1", source: "tear", mwoz22_slot: "hotel-stars", description: "star rating of the hotel", type: "number", categorical: ["0", "1", "2", "3", "4", "5"], database_column: "yes (column stars)", mentions_dev50: 12, mentions_dev50b: 14}
+      - {name: "Hotel type", level: "L1", source: "tear", mwoz22_slot: "hotel-type", description: "what is the type of the hotel", type: "text", categorical: ["guesthouse", "hotel"], database_column: "yes (column type)", mentions_dev50: 14, mentions_dev50b: 31}
+      - {name: "Hotel address", level: "L2", source: "schema_slot", mwoz22_slot: "hotel-address", description: "address of the hotel", type: "text", database_column: "yes (column address)", mentions_dev50: 2, mentions_dev50b: 5}
+      - {name: "Hotel phone", level: "L2", source: "schema_slot", mwoz22_slot: "hotel-phone", description: "phone number of the hotel", type: "number", database_column: "yes (column phone)", mentions_dev50: 1, mentions_dev50b: 3}
+      - {name: "Hotel postcode", level: "L2", source: "schema_slot", mwoz22_slot: "hotel-postcode", description: "postal code of the hotel", type: "id", database_column: "yes (column postcode)", mentions_dev50: 1, mentions_dev50b: 1}
+    links: []
+
+  - name: hotel_booking
+    entity: hotel
+    key: ["Hotel booking id"]
+    columns:
+      - {name: "Hotel booking id", level: null, source: "added", description: "id of the hotel booking", type: "id", role: "primary_key"}
+      - {name: "Hotel confirmed name", level: "L1", source: "tear", mwoz22_slot: null, description: "name of the hotel the system confirmed in a booking (own description, no schema description)", type: "unknown", database_column: "no", mentions_dev50: 0, mentions_dev50b: 0, role: "foreign_key"}
+      - {name: "Hotel confirmed reference", level: "L1", source: "tear", mwoz22_slot: "hotel-ref", description: "reference number of the hotel booking", type: "id", database_column: "no", mentions_dev50: 16, mentions_dev50b: 14}
+      - {name: "Hotel requested day", level: "L1", source: "tear", mwoz22_slot: "hotel-bookday", description: "day of the hotel booking", type: "day", categorical: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"], database_column: "no", mentions_dev50: 23, mentions_dev50b: 16}
+      - {name: "Hotel requested people", level: "L1", source: "tear", mwoz22_slot: "hotel-bookpeople", description: "number of people for the hotel booking", type: "number", categorical: ["1", "2", "3", "4", "5", "6", "7", "8"], database_column: "no", mentions_dev50: 17, mentions_dev50b: 16}
+      - {name: "Hotel requested stay", level: "L1", source: "tear", mwoz22_slot: "hotel-bookstay", description: "length of stay at the hotel", type: "number", categorical: ["1", "2", "3", "4", "5", "6", "7", "8"], database_column: "no", mentions_dev50: 20, mentions_dev50b: 24}
+    links:
+      - {from: "Hotel confirmed name", to: "hotel.Hotel name"}
+
+  - name: restaurant
+    entity: restaurant
+    key: ["Restaurant name"]
+    columns:
+      - {name: "Restaurant area", level: "L1", source: "tear", mwoz22_slot: "restaurant-area", description: "area or place of the restaurant", type: "text", categorical: ["centre", "east", "north", "south", "west"], database_column: "yes (column area)", mentions_dev50: 39, mentions_dev50b: 22}
+      - {name: "Restaurant food", level: "L1", source: "tear", mwoz22_slot: "restaurant-food", description: "the cuisine of the restaurant you are looking for", type: "text", database_column: "yes (column food)", mentions_dev50: 14, mentions_dev50b: 17}
+      - {name: "Restaurant name", level: "L1", source: "tear", mwoz22_slot: "restaurant-name", description: "name of the restaurant", type: "text", database_column: "yes (column name)", mentions_dev50: 47, mentions_dev50b: 26, role: "primary_key"}
+      - {name: "Restaurant price range", level: "L1", source: "tear", mwoz22_slot: "restaurant-pricerange", description: "price budget for the restaurant", type: "text", categorical: ["cheap", "expensive", "moderate"], database_column: "yes (column pricerange)", mentions_dev50: 21, mentions_dev50b: 31}
+      - {name: "Restaurant address", level: "L2", source: "schema_slot", mwoz22_slot: "restaurant-address", description: "address of the restaurant", type: "text", database_column: "yes (column address)", mentions_dev50: 36, mentions_dev50b: 13}
+      - {name: "Restaurant phone", level: "L2", source: "schema_slot", mwoz22_slot: "restaurant-phone", description: "phone number of the restaurant", type: "number", database_column: "yes (column phone)", mentions_dev50: 12, mentions_dev50b: 4}
+      - {name: "Restaurant postcode", level: "L2", source: "schema_slot", mwoz22_slot: "restaurant-postcode", description: "postal code of the restaurant", type: "id", database_column: "yes (column postcode)", mentions_dev50: 7, mentions_dev50b: 5}
+    links: []
+
+  - name: restaurant_booking
+    entity: restaurant
+    key: ["Restaurant booking id"]
+    columns:
+      - {name: "Restaurant booking id", level: null, source: "added", description: "id of the restaurant booking", type: "id", role: "primary_key"}
+      - {name: "Restaurant confirmed name", level: "L1", source: "tear", mwoz22_slot: null, description: "name of the restaurant the system confirmed in a booking (own description, no schema description)", type: "unknown", database_column: "no", mentions_dev50: 0, mentions_dev50b: 0, role: "foreign_key"}
+      - {name: "Restaurant confirmed reference", level: "L1", source: "tear", mwoz22_slot: "restaurant-ref", description: "reference number of the restaurant booking", type: "id", database_column: "no", mentions_dev50: 13, mentions_dev50b: 15}
+      - {name: "Restaurant requested day", level: "L1", source: "tear", mwoz22_slot: "restaurant-bookday", description: "day of the restaurant booking", type: "day", categorical: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"], database_column: "no", mentions_dev50: 17, mentions_dev50b: 21}
+      - {name: "Restaurant requested people", level: "L1", source: "tear", mwoz22_slot: "restaurant-bookpeople", description: "how many people for the restaurant reservation", type: "number", categorical: ["1", "2", "3", "4", "5", "6", "7", "8"], database_column: "no", mentions_dev50: 14, mentions_dev50b: 13}
+      - {name: "Restaurant requested time", level: "L1", source: "tear", mwoz22_slot: "restaurant-booktime", description: "time of the restaurant booking", type: "time", database_column: "no", mentions_dev50: 23, mentions_dev50b: 20}
+    links:
+      - {from: "Restaurant confirmed name", to: "restaurant.Restaurant name"}
+
+  - name: taxi
+    entity: taxi
+    key: ["Taxi ride id"]
+    columns:
+      - {name: "Taxi ride id", level: null, source: "added", description: "id of the taxi ride", type: "id", role: "primary_key"}
+      - {name: "Taxi arrive by", level: "L1", source: "tear", mwoz22_slot: "taxi-arriveby", description: "arrival time of taxi", type: "time", role_partner: "Taxi leave at", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 3, mentions_dev50b: 6}
+      - {name: "Taxi departure", level: "L1", source: "tear", mwoz22_slot: "taxi-departure", description: "departure location of taxi", type: "text", role_partner: "Taxi destination", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 7, mentions_dev50b: 7}
+      - {name: "Taxi destination", level: "L1", source: "tear", mwoz22_slot: "taxi-destination", description: "destination of taxi", type: "text", role_partner: "Taxi departure", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 4, mentions_dev50b: 12}
+      - {name: "Taxi leave at", level: "L1", source: "tear", mwoz22_slot: "taxi-leaveat", description: "leaving time of taxi", type: "time", role_partner: "Taxi arrive by", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 2, mentions_dev50b: 9}
+      - {name: "Taxi phone", level: "L2", source: "schema_slot", mwoz22_slot: "taxi-phone", description: "phone number of the taxi", type: "number", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 5, mentions_dev50b: 13}
+      - {name: "Taxi type", level: "L2", source: "schema_slot", mwoz22_slot: "taxi-type", description: "car type of the taxi", type: "text", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 0, mentions_dev50b: 1}
+    links: []
+    soft_links:
+      - {from: "Taxi departure", to: ["hotel.Hotel name", "restaurant.Restaurant name", "attraction.Attraction name"], kind: "many : 0..1", note: "value is often a place name, but not always; examples in the attribute GT: downing college (2); city stop restaurant (1); la margarita (1); college (1); the oak bistro (1)"}
+      - {from: "Taxi destination", to: ["hotel.Hotel name", "restaurant.Restaurant name", "attraction.Attraction name"], kind: "many : 0..1", note: "value is often a place name, but not always; examples in the attribute GT: rice house (3); midsummer house restaurant (1); riverboat georgina (1); pizza express (1); restaurant alimentum (1)"}
+
+  - name: attraction
+    entity: attraction
+    key: ["Attraction name"]
+    columns:
+      - {name: "Attraction area", level: "L1", source: "tear", mwoz22_slot: "attraction-area", description: "area to search for attractions", type: "text", categorical: ["centre", "east", "north", "south", "west"], database_column: "n/a (domain not in the L3 database)", mentions_dev50: 16, mentions_dev50b: 17}
+      - {name: "Attraction name", level: "L1", source: "tear", mwoz22_slot: "attraction-name", description: "name of the attraction", type: "text", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 21, mentions_dev50b: 17, role: "primary_key"}
+      - {name: "Attraction type", level: "L1", source: "tear", mwoz22_slot: "attraction-type", description: "type of the attraction", type: "text", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 22, mentions_dev50b: 16}
+      - {name: "Attraction address", level: "L2", source: "schema_slot", mwoz22_slot: "attraction-address", description: "address of the attraction", type: "text", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 20, mentions_dev50b: 14}
+      - {name: "Attraction entrancefee", level: "L2", source: "schema_slot", mwoz22_slot: "attraction-entrancefee", description: "how much is the entrance fee", type: "text", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 6, mentions_dev50b: 5}
+      - {name: "Attraction openhours", level: "L2", source: "schema_slot", mwoz22_slot: "attraction-openhours", description: "open hours of the attraction", type: "unknown", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 0, mentions_dev50b: 0}
+      - {name: "Attraction phone", level: "L2", source: "schema_slot", mwoz22_slot: "attraction-phone", description: "phone number of the attraction", type: "number", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 3, mentions_dev50b: 7}
+      - {name: "Attraction postcode", level: "L2", source: "schema_slot", mwoz22_slot: "attraction-postcode", description: "postal code of the attraction", type: "id", database_column: "n/a (domain not in the L3 database)", mentions_dev50: 4, mentions_dev50b: 10}
+    links: []

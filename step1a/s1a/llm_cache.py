@@ -360,8 +360,74 @@ def parse_evidence(raw, example_ids=None):
     return _obj_errors(raw, [], extra)
 
 
+S4_SHAPES = {   # wf_v4 Step 4 answers: structure only (the deeper checks are step4_prompts.validate_*)
+    "s4_41": ("groups", {"groups": [{"group": str, "columns": [str], "note": str}],
+                         "unused": [{"column": str, "reason": str}],
+                         "duplicate_flags": [{"column": str, "duplicate_of": str}]}),
+    "s4_42": ("tables", {"tables": [{"group": str, "name": str, "description": str, "row": str}]}),
+    "s4_43": ("relationships", {"relationships": [{"from": str, "to": str, "kind": str, "reason": str}],
+                                "new_tables": [{"name": str, "description": str, "row": str, "between": [str]}]}),
+    "s4_44": ("tables", {"tables": [{"name": str, "primary_key": str, "new_id_name": str,
+                                     "columns": [{"column": str, "name": str, "type": str}],
+                                     "foreign_keys": [{"column": str, "ref_table": str, "ref_column": str}]}]}),
+    "s4_e": ("tables", {"tables": [{"name": str, "description": str, "row": str, "primary_key": [str],
+                                    "columns": [{"name": str, "type": str}],
+                                    "foreign_keys": [{"column": str, "ref_table": str, "ref_column": str}]}],
+                        "relationships": [{"from": str, "to": str, "kind": str, "reason": str}]}),
+}
+
+
+def _shape_errors(val, shape, path, errors):
+    """Append to `errors` where `val` does not have `shape`: a type, [shape] (list of), or {key: shape} (all keys required)."""
+    if isinstance(shape, dict):
+        if not isinstance(val, dict):
+            errors.append(f"{path} not an object")
+            return
+        for k, sub in shape.items():
+            if k not in val:
+                errors.append(f"{path}.{k} missing")
+            else:
+                _shape_errors(val[k], sub, f"{path}.{k}", errors)
+    elif isinstance(shape, list):
+        if not isinstance(val, list):
+            errors.append(f"{path} not a list")
+            return
+        for i, v in enumerate(val):
+            _shape_errors(v, shape[0], f"{path}[{i}]", errors)
+    elif not isinstance(val, shape):
+        errors.append(f"{path} not a {shape.__name__}")
+
+
+def parse_step4(raw, fmt, schema):
+    """(obj, errors) for a wf_v4 Step-4 format (s4_41 .. s4_44, s4_e): one JSON object of the shape in S4_SHAPES; `kind` and
+    `type` values are checked against the job schema's enums."""
+    shape = S4_SHAPES[fmt][1]
+
+    def extra(obj, errors):
+        _shape_errors(obj, shape, "$", errors)
+        for key in ("kind", "type"):
+            allowed = schema_enum(schema, key)
+            if allowed is not None:
+                for a in _find_values(obj, key):
+                    if a not in allowed:
+                        errors.append(f"bad {key} {a!r}")
+    return _obj_errors(raw, [], extra)
+
+
+def _find_values(obj, key):
+    """Values of `key` in every dict nested anywhere in `obj`."""
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k == key:
+                yield v
+            yield from _find_values(v, key)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from _find_values(v, key)
+
+
 def parse_job(raw, fmt, schema):
-    """(parsed, errors, n_objects) for a manifest job of format v1 | v2 | v3 | split | noise | gate | reconcile | baseline | dupcheck | evidence;
+    """(parsed, errors, n_objects) for a manifest job of format v1 | v2 | v3 | split | noise | gate | reconcile | baseline | dupcheck | evidence | s4_41 | s4_42 | s4_43 | s4_44 | s4_e;
     enums come from the job's schema."""
     if fmt == "v1":
         parsed, errs = parse_v1_enum(raw, schema_enum(schema, "cluster_id"), schema_enum(schema, "placement"))
@@ -370,6 +436,9 @@ def parse_job(raw, fmt, schema):
         parse = parse_response_v2 if fmt == "v2" else parse_response_v3
         parsed, errs = parse(raw, schema_enum(schema, "cluster_id") or [])
         return parsed, errs, len(parsed.get("clusters") or [])
+    if fmt in S4_SHAPES:
+        parsed, errs = parse_step4(raw, fmt, schema)
+        return parsed, errs, len(parsed.get(S4_SHAPES[fmt][0]) or []) if isinstance(parsed, dict) else 0
     if fmt == "baseline":
         parsed, errs = parse_baseline(raw)
         return parsed, errs, len(parsed.get("attributes") or [])

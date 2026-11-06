@@ -1,0 +1,43 @@
+Below are the tables of a relational database design, each with its columns. Decide how the tables relate to each other.
+For each pair of tables that are related, give one relationship: "from" is the table that refers to the other (the
+many side, whose rows carry the reference), "to" is the table it refers to, "kind" is one_to_many or many_to_many, and
+"reason" is one short sentence. If two tables are related many-to-many, or a relationship needs a table of its own,
+add a new linking table in new_tables (name, description, what one row stands for, and the two tables it sits
+between); the relationships of a new table are listed like any other. Do not invent a relationship that the columns do
+not support.
+Return ONLY one JSON object, nothing before or after it. Shape (the names here are made up):
+{"relationships": [{"from": "loan", "to": "book", "kind": "one_to_many", "reason": "A book is lent many times."}],
+ "new_tables": [{"name": "loan_item", "description": "...", "row": "one book on one loan", "between": ["loan", "book"]}]}
+Give empty lists when there is nothing to add.
+
+Tables:
+Table train: A train. One row = one train.
+[train:1] leave at
+  description: the leave at
+  values: time; 10 mentions in 5 dialogues
+  examples: "5pm", "6pm"
+[train:2] destination
+  description: the destination
+  values: text; 10 mentions in 5 dialogues
+  examples: "ely", "leeds"
+[train:3] price
+  description: the price
+  values: number; 10 mentions in 5 dialogues
+  examples: "10 pounds"
+  signals: support 3/10
+  checker: unsure
+Table hotel: A hotel. One row = one hotel.
+[hotel:1] hotel name
+  description: the hotel name
+  values: text; 10 mentions in 5 dialogues
+  examples: "alpha", "beta"
+[hotel:2] stars
+  description: the stars
+  values: number; 10 mentions in 5 dialogues
+  examples: "3", "4"
+[hotel:3] name of the hotel
+  description: the name of the hotel
+  values: text; 10 mentions in 5 dialogues
+  examples: "alpha"
+
+Return the JSON object now.

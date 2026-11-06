@@ -1,0 +1,51 @@
+Below are the tables of a relational database design with their columns, and the relationships between the tables.
+Finish the design: for every table (the new linking tables too) give
+- the primary key: the id of one of the table's columns, or "new" when no column can identify a row (then give the name
+  of the new key column in new_id_name, and do not list that key column again in columns);
+- the columns of the table, each with its id (or "new:<name>" for a column you add, for example a reference column of a
+  linking table), the column name to use, and its type, one of: text = free text or a name, integer = whole number, decimal = number with a fraction, time = clock time, day = day of the week, date = calendar date, boolean = yes/no, id = identifier or reference code, duration = length of time, price = amount of money;
+- the foreign keys: the column of this table, the table it refers to and the column of that table (an id, or
+  "new:<name>" for a new column or a new key; for a new key use "new:" plus its new_id_name).
+Every relationship below must be implemented by a foreign key in the table on its "from" side (a linking table
+implements its own relationships). Every column listed under a table must appear in that table, exactly once.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up):
+{"tables": [{"name": "loan", "primary_key": "new", "new_id_name": "loan id",
+   "columns": [{"column": "x:3", "name": "due date", "type": "date"}, {"column": "new:book id", "name": "book id", "type": "id"}],
+   "foreign_keys": [{"column": "new:book id", "ref_table": "book", "ref_column": "x:7"}]}]}
+Use "" as new_id_name when the primary key is an existing column.
+
+Table train: A train. One row = one train.
+[train:1] leave at
+  description: the leave at
+  values: time; 10 mentions in 5 dialogues
+  examples: "5pm", "6pm"
+[train:2] destination
+  description: the destination
+  values: text; 10 mentions in 5 dialogues
+  examples: "ely", "leeds"
+[train:3] price
+  description: the price
+  values: number; 10 mentions in 5 dialogues
+  examples: "10 pounds"
+  signals: support 3/10
+  checker: unsure
+Table hotel: A hotel. One row = one hotel.
+[hotel:1] hotel name
+  description: the hotel name
+  values: text; 10 mentions in 5 dialogues
+  examples: "alpha", "beta"
+[hotel:2] stars
+  description: the stars
+  values: number; 10 mentions in 5 dialogues
+  examples: "3", "4"
+[hotel:3] name of the hotel
+  description: the name of the hotel
+  values: text; 10 mentions in 5 dialogues
+  examples: "alpha"
+Table trip: A trip. One row = one trip. (new linking table)
+
+Relationships (from = refers to, to = referred to):
+- trip -> train (one_to_many): r
+- trip -> hotel (one_to_many): r
+
+Return the JSON object now.
