@@ -1,0 +1,70 @@
+{
+ "code": "ZHHK",
+ "grouping": {
+  "score": 2,
+  "reason": "Restaurant columns are merged into the hotel table, and the hotel parking column is placed in the train_booking table."
+ },
+ "names": {
+  "score": 3,
+  "reason": "Most table names and row meanings match, but the restaurant table is missing and its concept is mixed into the hotel table."
+ },
+ "relationships": {
+  "score": 3,
+  "reason": "The foreign key link from restaurant_booking to the restaurant data is missing."
+ },
+ "keys": {
+  "score": 4,
+  "reason": "All primary keys are correct, but the foreign key for restaurant_booking is missing due to the missing restaurant table."
+ },
+ "design_quality": {
+  "score": 2,
+  "reason": "The hotel table mixes two entirely different entities (hotels and restaurants), and train_booking improperly includes a hotel attribute."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "The train_booking table contains the requested people and train booking details."
+  },
+  {
+   "q": 2,
+   "answer": "yes",
+   "reason": "The train table contains the departure, arrival, and destination columns."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "The hotel_booking table has the requested day, nights (stay), and people."
+  },
+  {
+   "q": 4,
+   "answer": "no",
+   "reason": "The hotel parking column is in the train_booking table without any link to the hotel table, making it impossible to query parking per hotel."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "Can be answered by joining restaurant_booking with the hotel table on the restaurant name."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "The hotel table contains the necessary restaurant columns (area, price range, food) to filter this."
+  },
+  {
+   "q": 7,
+   "answer": "yes",
+   "reason": "The taxi table has departure, destination, phone, and type columns."
+  },
+  {
+   "q": 8,
+   "answer": "yes",
+   "reason": "The attraction table contains the address and entrance fee columns."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "The schema has several major errors, most notably combining hotels and restaurants into a single table and misplacing a hotel column into a train booking table."
+ },
+ "model": "Gemini 3.1 Pro (gemini.google.com web app, Syracuse Edu account, mode 'Pro', temporary chat, default settings) (Gemini web app, by hand) (Gemini API, temperature 1.0, packet only)"
+}

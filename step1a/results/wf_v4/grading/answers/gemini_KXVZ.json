@@ -1,0 +1,70 @@
+{
+ "code": "KXVZ",
+ "grouping": {
+  "score": 1,
+  "reason": "The schema fragments attributes across many bizarrely named tables (e.g., train_destination_city, hotel_star_rating) and merges unrelated entities (taxi and attraction details into restaurant tables)."
+ },
+ "names": {
+  "score": 1,
+  "reason": "Table names do not reflect the reference entities but rather specific attributes or random combinations of entities, making rows unrecognizable."
+ },
+ "relationships": {
+  "score": 1,
+  "reason": "Relationships are chaotic and nonsensical, such as restaurants linking to hotel locations and train destination cities linking to everything."
+ },
+ "keys": {
+  "score": 1,
+  "reason": "Keys are arbitrarily assigned, often using synthetic IDs for fragmented tables while creating circular or tangled dependencies."
+ },
+ "design_quality": {
+  "score": 1,
+  "reason": "Abysmal design with mixed concepts (e.g., 'entry fee' and 'time for taxi' in restaurant_reference_number) and heavily repeated/fragmented data."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "partly",
+   "reason": "The user could query train_number_of_tickets and train_reference_number, but the booking structure is poorly defined."
+  },
+  {
+   "q": 2,
+   "answer": "partly",
+   "reason": "Can piece together departure time, arrival time, and locations from train, train_departure_time, train_reference_number, and train_destination_city."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "The hotel table contains start date, number of nights, and number of guests."
+  },
+  {
+   "q": 4,
+   "answer": "no",
+   "reason": "There is no column for hotel parking in any of the hotel-related tables."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "restaurant_reference_number has the reference number and restaurant has phone numbers."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "restaurant has price range and food type, and its location can be found through linked tables."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "Missing taxi departure, destination, and car type (only taxi phone numbers are in a restaurant table)."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "There is no attraction table or attraction address; only 'entry fee' appears randomly in a restaurant table."
+  }
+ ],
+ "overall": {
+  "score": 1,
+  "reason": "The candidate is a highly fragmented, nonsensically linked mess that fails to capture the core entities and relationships of the reference."
+ },
+ "model": "Gemini 3.1 Pro (gemini.google.com web app, Syracuse Edu account, mode 'Pro', temporary chat, default settings) (Gemini web app, by hand) (Gemini API, temperature 1.0, packet only)"
+}

@@ -1,0 +1,347 @@
+Below are the tables of a relational database design, each with its columns. Decide how the tables relate to each other.
+For each pair of tables that are related, give one relationship: "from" is the table that refers to the other (the
+many side, whose rows carry the reference), "to" is the table it refers to, "kind" is one_to_many or many_to_many, and
+"reason" is one short sentence. If two tables are related many-to-many, or a relationship needs a table of its own,
+add a new linking table in new_tables (name, description, what one row stands for, and the two tables it sits
+between); the relationships of a new table are listed like any other. Do not invent a relationship that the columns do
+not support.
+Return ONLY one JSON object, nothing before or after it. Shape (the names here are made up):
+{"relationships": [{"from": "loan", "to": "book", "kind": "one_to_many", "reason": "A book is lent many times."}],
+ "new_tables": [{"name": "loan_item", "description": "...", "row": "one book on one loan", "between": ["loan", "book"]}]}
+Give empty lists when there is nothing to add.
+
+Tables:
+Table train_journey: Details of a train journey including departure and arrival locations and dates. One row = one train journey.
+[train:1] arrival location
+  description: the location where the train arrives
+  role: end of the journey
+  values: text (share 1.00); 23 mentions in 16 dialogues
+  examples:
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+    "leicester" (in: "I'll be leaving Leicester and I want to be in Cambridge by 11:30, please.")
+    "broxbourne" (in: "I'd like to go to Cambridge via Broxbourne. I'd like to leave on Thursday and...")
+  checker evidence: support 1/10; fits a neighbouring column 0/10
+  data signals: 23 mentions in 16 dialogues; 5 distinct values; usually one value per booking (15/16); values often repeat (4/5); mentioned first in 2/16 bookings; fixes 'destination city' in 13/13 bookings (+1 more).
+  checker: noise; flags: noise
+[train:3] departure location
+  description: the location from which the train departs
+  role: start of the journey
+  values: text (share 1.00); 28 mentions in 17 dialogues
+  examples:
+    "cambridge" (in: "need a train that leaves at 20:45 from stevenage to cambridge")
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+    "norwich" (in: "I am looking for a train that will depart from Norwich on Sunday")
+  checker evidence: support 10/20; fits a neighbouring column 2/10
+  data signals: 28 mentions in 17 dialogues; 9 distinct values; sometimes several values per booking (4/18); values sometimes repeat (4/9); mentioned first in 8/18 bookings; fixes 'destination city' in 14/14 bookings (+1 more).
+  checker: unsure
+[train:5] destination city
+  description: destination city in train queries
+  role: destination city in train queries
+  values: text (share 1.00); 34 mentions in 23 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+  checker evidence: support 7/10; fits a neighbouring column 3/6; answers suggest mixed roles
+  data signals: 34 mentions in 23 dialogues; 1 distinct values; usually one value per booking (24/24); values often repeat (1/1); mentioned first in 9/24 bookings; fixes 'time query' in 3/3 bookings.
+  checker: unsure; flags: mixed roles
+[train:15] travel date
+  description: the date of the train journey
+  role: date
+  values: day (share 0.87); 47 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "wednesday" (in: "I would like to leave on Wednesday.")
+  checker evidence: support 15/16; fits a neighbouring column 0/3
+  data signals: 47 mentions in 28 dialogues; 9 distinct values; sometimes several values per booking (7/28); values often repeat (8/9); mentioned first in 6/28 bookings; fixes 'destination city' in 23/23 bookings.
+Table train_time_details: Time-related details of a train journey including departure and arrival times and travel duration. One row = one train time detail.
+[train:2] arrival time
+  description: specifies the time a train is expected to arrive at the destination
+  role: end of the journey
+  values: time (share 1.00); 28 mentions in 16 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "18:15" (in: "just need to leave on Wednesday and should arrive by 18:15.")
+    "18:24" (in: "TR5921 departs the airport at 18:24 and arrives by 18:52, does this suit your...")
+  checker evidence: support 1/10; fits a neighbouring column 1/8
+  data signals: 28 mentions in 16 dialogues; 16 distinct values; sometimes several values per booking (6/16); values sometimes repeat (6/16); mentioned first in 0/16 bookings; fixes 'destination city' in 11/11 bookings (+1 more).
+  checker: noise; flags: noise
+[train:4] departure time
+  description: the time at which the train departs
+  role: start of the journey
+  values: time (share 1.00); 62 mentions in 23 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+    "15:45" (in: "I would like to leave Cambridge after 15:45.")
+  checker evidence: support 4/10; fits a neighbouring column 2/8
+  data signals: 62 mentions in 23 dialogues; 47 distinct values; often several values per booking (18/23); values rarely repeat (6/47); mentioned first in 2/23 bookings; fixes 'destination city' in 19/19 bookings (+3 more).
+  checker: unsure
+[train:12] time query
+  description: Asking about the time of departure or arrival.
+  role: Asking about the time of departure or arrival.
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "what time" (in: "There are 19 trains that day. What time do you need to leave cambridge and/or...")
+  checker evidence: support 2/3; fits a neighbouring column 2/10
+  data signals: 3 mentions in 3 dialogues; 1 distinct values; usually one value per booking (3/3); values often repeat (1/1); mentioned first in 0/3 bookings; often with 'number of trains' in the same booking (NPMI 0.59, 2 times); fixes 'destination city' in 3/3 bookings.
+  checker: unsure
+[train:16] travel time
+  description: the duration of the train journey
+  role: duration
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+    "28-minute" (in: "...TR6193, leaving at 13:40. It's a 28-minute trip, and each ticket is 8.08GB...")
+  checker evidence: support 8/8; fits a neighbouring column 0/1
+  data signals: 8 mentions in 7 dialogues; 4 distinct values; usually one value per booking (7/7); values sometimes repeat (1/4); mentioned first in 0/7 bookings; often with 'price per ticket' in the same booking (NPMI 0.31, 4 times); fixes 'destination city' in 6/6 bookings (+2 more).
+Table train_booking_details: Details of a train booking including number of tickets, price per ticket, and total fee. One row = one train booking detail.
+[train:7] number of tickets
+  description: the number of tickets booked
+  role: quantity
+  values: number (share 0.67); 18 mentions in 10 dialogues
+  examples:
+    "how many ticket" (in: "...he tr1393 which leaves the station at 09:19, how many tickets would you like?")
+    "16" (in: "There are trains every hour on the :16 that will get you there by noon, begin...")
+    "1 child" (in: "I need 2 adult and 1 child. Thank you.")
+  checker evidence: support 8/17; fits a neighbouring column 0/5
+  data signals: 18 mentions in 10 dialogues; 15 distinct values; often several values per booking (5/10); values rarely repeat (1/15); mentioned first in 0/10 bookings; often with 'reference number' in the same booking (NPMI 0.32, 9 times).
+  checker: unsure
+[train:9] price per ticket
+  description: the cost of a single train ticket
+  role: cost
+  values: price (share 0.89); 9 mentions in 9 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "12.80 pound" (in: "Both options are 12.80 pounds. Would you like to book one of these options?")
+    "14.08 pound" (in: "...at leaves at 7:16 and it costs 14.08 pounds per ticket. Would you like me ...")
+  checker evidence: support 7/9; fits a neighbouring column 2/10
+  data signals: 9 mentions in 9 dialogues; 7 distinct values; usually one value per booking (9/9); values rarely repeat (1/7); mentioned first in 0/9 bookings; often with 'travel time' in the same booking (NPMI 0.31, 4 times); fixes 'destination city' in 8/8 bookings (+1 more).
+[train:10] reference number
+  description: the reference number for the booking
+  role: identifier
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+    "698re4w1" (in: "...cessful! The reference number is 698RE4W1. The total fee of 17.89 is payab...")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+  data signals: 19 mentions in 18 dialogues; 19 distinct values; usually one value per booking (17/18); values rarely repeat (0/19); mentioned first in 1/18 bookings; often with 'total fee' in the same booking (NPMI 0.34, 7 times).
+[train:13] total fee
+  description: Indicates the total cost for multiple tickets.
+  role: cost
+  values: price (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+    "10.56 gbp" (in: "...ful for TR5713, the total fee is 10.56 GBP payable at the station. Your re...")
+    "40.4 gbp" (in: "...was successful, the total fee is 40.4 GBP payable at the station. Referenc...")
+  checker evidence: support 1/7; fits a neighbouring column 3/10
+  data signals: 7 mentions in 7 dialogues; 6 distinct values; usually one value per booking (7/7); values rarely repeat (1/6); mentioned first in 0/7 bookings; often with 'reference number' in the same booking (NPMI 0.34, 7 times); fixes 'departure location' in 6/6 bookings (+1 more).
+  checker: noise; flags: noise
+[train:14] train id
+  description: the unique identifier for the train
+  role: identifier
+  values: id (share 1.00); 31 mentions in 18 dialogues
+  examples:
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+    "tr5921" (in: "TR5921 departs the airport at 18:24 and arrives by 18:52, does")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+  data signals: 31 mentions in 18 dialogues; 22 distinct values; usually one value per booking (15/18); values rarely repeat (0/22); mentioned first in 0/18 bookings.
+Table hotel_booking: Details of a hotel booking including hotel name, number of guests, and nights. One row = one hotel booking.
+[hotel:4] hotel name
+  description: the name of the hotel or guesthouse
+  role: identifier
+  values: text (share 1.00); 29 mentions in 16 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+    "aylesbray lodge" (in: "would also like to book at a guest house named Aylesbray Lodge, starting Monday.")
+  checker evidence: support 16/16; fits a neighbouring column 0/5
+  data signals: 29 mentions in 16 dialogues; 22 distinct values; sometimes several values per booking (8/18); values sometimes repeat (5/22); mentioned first in 4/18 bookings; often with 'start date' in the same booking (NPMI 0.36, 15 times); fixes 'reference number' in 13/13 bookings (+1 more).
+[hotel:5] hotel number of guests
+  description: number of guests for the hotel booking
+  role: quantity
+  values: number (share 0.71); 17 mentions in 13 dialogues
+  examples:
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+    "how many people" (in: "OK, and how many people will be staying in the room?")
+  checker evidence: support 6/10; fits a neighbouring column 0/10
+  data signals: 17 mentions in 13 dialogues; 9 distinct values; sometimes several values per booking (3/13); values sometimes repeat (3/9); mentioned first in 2/13 bookings; often with 'hotel number of nights' in the same booking (NPMI 0.41, 11 times); fixes 'location' in 5/5 bookings (+1 more).
+  checker: unsure
+[hotel:6] hotel number of nights
+  description: number of nights for the hotel booking
+  role: duration
+  values: number (share 0.79); 24 mentions in 14 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+    "2 night" (in: "I will arrive Friday and be there for 2 nights.")
+  checker evidence: support 11/15; fits a neighbouring column 0/6
+  data signals: 24 mentions in 14 dialogues; 7 distinct values; sometimes several values per booking (4/14); values often repeat (4/7); mentioned first in 0/14 bookings; often with 'start date' in the same booking (NPMI 0.70, 14 times); fixes 'location' in 6/6 bookings (+1 more).
+[hotel:15] reference number
+  description: Reference number for bookings
+  role: booking identifier
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples:
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+    "72ycmlxx" (in: "...fectly. Your reference number is 72YCMLXX. Is there anything else I can he...")
+    "cul9vz04" (in: "...ches Bed and Breakfast. Reference number is CUL9VZ04. Is there anything else?")
+  checker evidence: support 10/10; fits a neighbouring column 1/2
+  data signals: 15 mentions in 13 dialogues; 14 distinct values; usually one value per booking (13/14); values rarely repeat (1/14); mentioned first in 1/14 bookings; often with 'start date' in the same booking (NPMI 0.46, 13 times); fixes 'hotel name' in 13/13 bookings (+1 more).
+  checker: unsure
+[hotel:19] start date
+  description: the start date of the stay
+  role: start date
+  values: day (share 0.75); 28 mentions in 16 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+    "friday" (in: "I would like to book one starting Friday.")
+  checker evidence: support 8/17; fits a neighbouring column 0/4
+  data signals: 28 mentions in 16 dialogues; 10 distinct values; sometimes several values per booking (5/16); values often repeat (6/10); mentioned first in 0/16 bookings; often with 'hotel number of nights' in the same booking (NPMI 0.70, 14 times); fixes 'location' in 6/6 bookings (+1 more).
+  checker: unsure
+Table hotel_location_price: Location and price range details of a hotel. One row = one hotel location and price range.
+[hotel:3] hotel location
+  description: location or area of the hotel or guesthouse
+  role: location
+  values: text (share 1.00); 15 mentions in 11 dialogues
+  examples:
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+    "any area" (in: "have any 4 stars in the moderate price range in any area?")
+  checker evidence: support 10/15; fits a neighbouring column 5/5
+  data signals: 15 mentions in 11 dialogues; 12 distinct values; sometimes several values per booking (3/11); values rarely repeat (2/12); mentioned first in 3/11 bookings; often with 'location' in the same booking (NPMI 0.53, 6 times).
+  checker: too general; flags: too general
+[hotel:14] price range
+  description: Describes the cost category of a hotel or accommodation.
+  role: price range
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "cheaper price range" (in: "...also like a guesthouse in the cheaper price range. Can you help me with that?")
+    "moderate price" (in: "...commodations of any kind with moderate price and wifi in all of Cambridge?...")
+  checker evidence: support 9/10; fits a neighbouring column 4/8
+  data signals: 10 mentions in 6 dialogues; 5 distinct values; usually one value per booking (6/7); values sometimes repeat (1/5); mentioned first in 0/7 bookings; fixes 'start date' in 5/5 bookings.
+  checker: unsure
+[hotel:18] star rating
+  description: specifies the star rating of the hotel
+  role: rating
+  values: number (share 0.56); 9 mentions in 4 dialogues
+  examples:
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+    "2 star" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+    "3 star" (in: "...ere are two expensive hotels with 3 stars and parking. Do you prefer the c...")
+  checker evidence: support 8/9; fits a neighbouring column 0/10
+  data signals: 9 mentions in 4 dialogues; 8 distinct values; often several values per booking (3/4); values rarely repeat (1/8); mentioned first in 1/4 bookings; often with 'location' in the same booking (NPMI 0.51, 3 times); fixes 'hotel number of guests' in 3/3 bookings (+1 more).
+Table restaurant_details: Details of a restaurant including name, location, and address. One row = one restaurant detail.
+[restaurant:15] restaurant name
+  description: the name of the restaurant
+  role: name
+  values: text (share 1.00); 58 mentions in 28 dialogues
+  examples:
+    "anatolia" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "graffiti" (in: "I'm also looking to eat at a restaurant called graffiti.")
+    "thanh binh" (in: "Thanh binh is located in the west part of town and is")
+  checker evidence: support 5/10; fits a neighbouring column 1/10
+  data signals: 58 mentions in 28 dialogues; 37 distinct values; sometimes several values per booking (12/29); values sometimes repeat (9/37); mentioned first in 5/29 bookings; fixes 'restaurant location' in 23/25 bookings (+4 more).
+  checker: unsure
+[restaurant:14] restaurant location
+  description: general location of the restaurant
+  role: location
+  values: text (share 1.00); 54 mentions in 26 dialogues
+  examples:
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+    "chesterton" (in: "...alace located at 68 Histon Road Chesterton. Would you like a reservation a...")
+  checker evidence: support 14/20; fits a neighbouring column 0/5
+  data signals: 54 mentions in 26 dialogues; 22 distinct values; often several values per booking (14/28); values sometimes repeat (9/22); mentioned first in 13/28 bookings; often with 'restaurant address' in the same booking (NPMI 0.31, 17 times).
+[restaurant:11] restaurant address
+  description: the address of the restaurant
+  role: address
+  values: text (share 1.00); 17 mentions in 17 dialogues
+  examples:
+    "17 magdalene street" (in: "thanh binh is located at 17 magdalene street city centre and its phone number...")
+    "30 bridge street" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "68 histon road" (in: "...is tandoori palace located at 68 Histon Road Chesterton. Would you like a ...")
+  checker evidence: support 9/10; fits a neighbouring column 0/10
+  data signals: 17 mentions in 17 dialogues; 14 distinct values; usually one value per booking (17/17); values sometimes repeat (3/14); mentioned first in 0/17 bookings; often with 'restaurant location' in the same booking (NPMI 0.31, 17 times); fixes 'restaurant location' in 16/17 bookings (+3 more).
+[restaurant:12] restaurant area
+  description: the area or part of the city where the restaurant is located
+  role: area
+  values: text (share 1.00); 4 mentions in 2 dialogues
+  examples:
+    "cherry hinton" (in: "...It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode...")
+    "64 cherry hinton road" (in: "...ndoori which is located on 64 Cherry Hinton Road. Would you like me to boo...")
+  checker evidence: support 3/4; fits a neighbouring column 3/10
+  data signals: 4 mentions in 2 dialogues; 2 distinct values; often several values per booking (1/2); values often repeat (1/2); mentioned first in 0/2 bookings; often with 'postcode' in the same booking (NPMI 0.62, 2 times).
+[restaurant:16] restaurant phone number
+  description: the phone number of the restaurant
+  role: phone number
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "01223 249955" (in: "is C.B 1, 9 H.X, and their phone number is 01223 249955.")
+    "01223 360966" (in: "...phone number for the Nirala is 01223 360966. Is there anything else I can ...")
+    "taxi contact number" (in: "...or your 10:00 reservations. Taxi contact number is 07242149665. Anything e...")
+  checker evidence: support 2/4; fits a neighbouring column 2/10
+  data signals: 4 mentions in 4 dialogues; 4 distinct values; usually one value per booking (4/4); values rarely repeat (0/4); mentioned first in 0/4 bookings.
+  checker: unsure
+Table reservation_details: Details of a restaurant reservation including date and time. One row = one reservation detail.
+[restaurant:9] reservation date
+  description: the date of the reservation
+  role: reservation date
+  values: day (share 0.80); 20 mentions in 13 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+    "sunday" (in: "they would have a table for 7 at 17:45 on Sunday?")
+  checker evidence: support 8/10; fits a neighbouring column 0/10
+  data signals: 20 mentions in 13 dialogues; 8 distinct values; usually one value per booking (12/13); values often repeat (4/8); mentioned first in 1/13 bookings; often with 'reservation time' in the same booking (NPMI 0.78, 11 times).
+[restaurant:10] reservation time
+  description: the time of the reservation
+  role: reservation time
+  values: time (share 0.71); 28 mentions in 12 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+    "18:00" (in: "I be able to get a table there Thursday at 18:00 for 7?")
+  checker evidence: support 10/18; fits a neighbouring column 5/5
+  data signals: 28 mentions in 12 dialogues; 17 distinct values; often several values per booking (8/12); values sometimes repeat (4/17); mentioned first in 1/12 bookings; often with 'reservation date' in the same booking (NPMI 0.78, 11 times); fixes 'reservation date' in 10/11 bookings (+2 more).
+  checker: too general; flags: too general
+[restaurant:18] taxi phone numbers
+  description: provides phone numbers for taxis
+  role: provides phone numbers for taxis
+  values: number (share 1.00); 15 mentions in 14 dialogues
+  examples:
+    "01223367660" (in: "...xpensive. Their phone number is 01223367660. Would you like me to book for...")
+    "01223276182" (in: "... in city centre, the phone # is 01223276182, and the postcode is cb30df. w...")
+    "01223311911" (in: "...t asian oriental food! Phone is 01223311911 postcode is cb12as and they ar...")
+  checker evidence: support 4/10; fits a neighbouring column 1/9
+  data signals: 15 mentions in 14 dialogues; 14 distinct values; usually one value per booking (14/14); values rarely repeat (0/14); mentioned first in 0/14 bookings.
+  checker: unsure
+Table restaurant_price_food: Price range and food type details of a restaurant. One row = one restaurant price and food type.
+[restaurant:7] price range
+  description: Describes the cost level of a restaurant.
+  role: Describes the cost level of a restaurant.
+  values: text (share 1.00); 24 mentions in 17 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "expensive price range" (in: "is in the centre of town and is in the expensive price range.")
+  checker evidence: support 8/10; fits a neighbouring column 2/6
+  data signals: 24 mentions in 17 dialogues; 10 distinct values; sometimes several values per booking (4/17); values sometimes repeat (3/10); mentioned first in 3/17 bookings; often with 'restaurant location' in the same booking (NPMI 0.31, 17 times).
+  checker: unsure
+[restaurant:13] restaurant food type
+  description: the type of food served by the restaurant
+  role: food type
+  values: text (share 1.00); 26 mentions in 14 dialogues
+  examples:
+    "restaurant" (in: "what is the food type of that restaurant ?")
+    "restaurant alimentum" (in: "I was able to book restaurant alimentum reference number is HCY10A2Z")
+    "the restaurant" (in: "... looking for a place to dine. The restaurant should serve african food and...")
+  checker evidence: support 8/19; fits a neighbouring column 2/8
+  data signals: 26 mentions in 14 dialogues; 17 distinct values; sometimes several values per booking (7/16); values rarely repeat (3/17); mentioned first in 8/16 bookings; often with 'number of options' in the same booking (NPMI 0.31, 5 times).
+  checker: unsure
+
+Return the JSON object now.

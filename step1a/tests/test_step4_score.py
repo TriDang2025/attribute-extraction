@@ -210,3 +210,20 @@ def test_flat(gt):
     row = S.flat(S.score(G.to_canonical(gt), gt, "dev50"))
     assert row["table_recall_k"] == 8 and row["table_recall_n"] == 8 and row["table_recall"] == 1.0 and row["design"] == "main"
     assert "match" in row and row["grouping_f1"] == 1.0
+
+
+def test_gt_columns_placed_and_key_rule_b(gt):
+    c = G.to_canonical(gt)
+    by = {t["name"]: t for t in c["tables"]}
+    by["hotel"]["columns"].append({"name": "hotel id", "type": "id", "source": None, "new": True, "gt": None})
+    by["hotel"]["primary_key"] = ["hotel id"]  # surrogate id while "Hotel name" stays in the table
+    gone = by["restaurant"]["columns"].pop(0)  # one GT column not placed
+    m = S.score(c, gt, "dev50")["metrics"]
+    n_gt = sum(len(t["columns"]) for t in G.to_canonical(gt)["tables"])
+    assert m["gt_columns_placed"]["n"] == n_gt and m["gt_columns_placed"]["k"] == n_gt - 1, gone
+    assert m["pk_right"]["k"] == m["pk_right"]["n"] - 1  # rule (a): the new id is wrong
+    assert m["pk_right_b"]["k"] == m["pk_right_b"]["n"]  # rule (b): right, the name column is in the table
+    by["hotel"]["columns"] = [x for x in by["hotel"]["columns"] if x["name"] != "Hotel name"]
+    m = S.score(c, gt, "dev50")["metrics"]
+    # no name column: credit_new gives the new id the GT PK, so it is right under (a) and (b) alike
+    assert m["pk_right"]["k"] == m["pk_right"]["n"] and m["pk_right_b"]["k"] == m["pk_right_b"]["n"]

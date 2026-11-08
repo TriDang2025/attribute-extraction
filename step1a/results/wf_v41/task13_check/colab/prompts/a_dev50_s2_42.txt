@@ -1,0 +1,219 @@
+Below are the groups of columns of a relational database design. Each group will become one table. For every group give
+the table a name (lower case, words separated by "_"), a one-sentence description, and what one row of the table stands
+for (for example "one lecture" or "one library loan").
+Return ONLY one JSON object, nothing before or after it. Shape (the names here are made up):
+{"tables": [{"group": "G1", "name": "lecture", "description": "A lecture given in a course.", "row": "one lecture"}]}
+Every group must appear exactly once.
+
+Groups:
+G1 (Train booking details including cost, train ID, reference number, and travel information):
+[train:13] total fee
+  description: Indicates the total cost for multiple tickets.
+  role: cost
+  values: price (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+    "10.56 gbp" (in: "...ful for TR5713, the total fee is 10.56 GBP payable at the station. Your re...")
+    "40.4 gbp" (in: "...was successful, the total fee is 40.4 GBP payable at the station. Referenc...")
+  checker evidence: support 1/7; fits a neighbouring column 3/10
+  checker: noise; flags: noise
+[train:9] price per ticket
+  description: the cost of a single train ticket
+  role: cost
+  values: price (share 0.89); 9 mentions in 9 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "12.80 pound" (in: "Both options are 12.80 pounds. Would you like to book one of these options?")
+    "14.08 pound" (in: "...at leaves at 7:16 and it costs 14.08 pounds per ticket. Would you like me ...")
+  checker evidence: support 7/9; fits a neighbouring column 2/10
+[train:14] train id
+  description: the unique identifier for the train
+  role: identifier
+  values: id (share 1.00); 31 mentions in 18 dialogues
+  examples:
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+    "tr5921" (in: "TR5921 departs the airport at 18:24 and arrives by 18:52, does")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+[train:10] reference number
+  description: the reference number for the booking
+  role: identifier
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+    "698re4w1" (in: "...cessful! The reference number is 698RE4W1. The total fee of 17.89 is payab...")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+[train:15] travel date
+  description: the date of the train journey
+  role: date
+  values: day (share 0.87); 47 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "wednesday" (in: "I would like to leave on Wednesday.")
+  checker evidence: support 15/16; fits a neighbouring column 0/3
+[train:16] travel time
+  description: the duration of the train journey
+  role: duration
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+    "28-minute" (in: "...TR6193, leaving at 13:40. It's a 28-minute trip, and each ticket is 8.08GB...")
+  checker evidence: support 8/8; fits a neighbouring column 0/1
+G2 (Hotel booking details including name, star rating, number of nights, price range, and reference number):
+[hotel:4] hotel name
+  description: the name of the hotel or guesthouse
+  role: identifier
+  values: text (share 1.00); 29 mentions in 16 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+    "aylesbray lodge" (in: "would also like to book at a guest house named Aylesbray Lodge, starting Monday.")
+  checker evidence: support 16/16; fits a neighbouring column 0/5
+[hotel:13] price extreme
+  description: Refers to the cost category at the extreme ends, such as expensive or cheap.
+  role: Refers to the cost category at the extreme ends, such as expensive or cheap.
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "expensive hotel" (in: "...ld you try and book a 4 star, expensive hotel for 3 nights, starting on Sa...")
+    "expensive price range" (in: "... finding any hotels in the expensive price range in the North. Would you l...")
+    "something expensive" (in: "I'm looking for something expensive in the north.")
+  checker evidence: support 3/3; fits a neighbouring column 4/6
+  checker: too general; flags: too general
+[hotel:16] specific hotel name
+  description: names a specific hotel that matches the user's criteria
+  role: names a specific hotel that matches the user's criteria
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "the cambridge belfry" (in: "The Cambridge Belfry fits your requirements, would you like to book a reserva...")
+  checker evidence: support 10/10; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[hotel:18] star rating
+  description: specifies the star rating of the hotel
+  role: rating
+  values: number (share 0.56); 9 mentions in 4 dialogues
+  examples:
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+    "2 star" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+    "3 star" (in: "...ere are two expensive hotels with 3 stars and parking. Do you prefer the c...")
+  checker evidence: support 8/9; fits a neighbouring column 0/10
+[hotel:6] hotel number of nights
+  description: number of nights for the hotel booking
+  role: duration
+  values: number (share 0.79); 24 mentions in 14 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+    "2 night" (in: "I will arrive Friday and be there for 2 nights.")
+  checker evidence: support 11/15; fits a neighbouring column 0/6
+[hotel:14] price range
+  description: Describes the cost category of a hotel or accommodation.
+  role: price range
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "cheaper price range" (in: "...also like a guesthouse in the cheaper price range. Can you help me with that?")
+    "moderate price" (in: "...commodations of any kind with moderate price and wifi in all of Cambridge?...")
+  checker evidence: support 9/10; fits a neighbouring column 4/8
+  checker: unsure
+[hotel:19] start date
+  description: the start date of the stay
+  role: start date
+  values: day (share 0.75); 28 mentions in 16 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+    "friday" (in: "I would like to book one starting Friday.")
+  checker evidence: support 8/17; fits a neighbouring column 0/4
+  checker: unsure
+[hotel:15] reference number
+  description: Reference number for bookings
+  role: booking identifier
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples:
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+    "72ycmlxx" (in: "...fectly. Your reference number is 72YCMLXX. Is there anything else I can he...")
+    "cul9vz04" (in: "...ches Bed and Breakfast. Reference number is CUL9VZ04. Is there anything else?")
+  checker evidence: support 10/10; fits a neighbouring column 1/2
+  checker: unsure
+G3 (Restaurant booking details including name, food type, location, address, phone number, reservation date, and time):
+[restaurant:15] restaurant name
+  description: the name of the restaurant
+  role: name
+  values: text (share 1.00); 58 mentions in 28 dialogues
+  examples:
+    "anatolia" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "graffiti" (in: "I'm also looking to eat at a restaurant called graffiti.")
+    "thanh binh" (in: "Thanh binh is located in the west part of town and is")
+  checker evidence: support 5/10; fits a neighbouring column 1/10
+  checker: unsure
+[restaurant:13] restaurant food type
+  description: the type of food served by the restaurant
+  role: food type
+  values: text (share 1.00); 26 mentions in 14 dialogues
+  examples:
+    "restaurant" (in: "what is the food type of that restaurant ?")
+    "restaurant alimentum" (in: "I was able to book restaurant alimentum reference number is HCY10A2Z")
+    "the restaurant" (in: "... looking for a place to dine. The restaurant should serve african food and...")
+  checker evidence: support 8/19; fits a neighbouring column 2/8
+  checker: unsure
+[restaurant:14] restaurant location
+  description: general location of the restaurant
+  role: location
+  values: text (share 1.00); 54 mentions in 26 dialogues
+  examples:
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+    "chesterton" (in: "...alace located at 68 Histon Road Chesterton. Would you like a reservation a...")
+  checker evidence: support 14/20; fits a neighbouring column 0/5
+[restaurant:11] restaurant address
+  description: the address of the restaurant
+  role: address
+  values: text (share 1.00); 17 mentions in 17 dialogues
+  examples:
+    "17 magdalene street" (in: "thanh binh is located at 17 magdalene street city centre and its phone number...")
+    "30 bridge street" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "68 histon road" (in: "...is tandoori palace located at 68 Histon Road Chesterton. Would you like a ...")
+  checker evidence: support 9/10; fits a neighbouring column 0/10
+[restaurant:16] restaurant phone number
+  description: the phone number of the restaurant
+  role: phone number
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "01223 249955" (in: "is C.B 1, 9 H.X, and their phone number is 01223 249955.")
+    "01223 360966" (in: "...phone number for the Nirala is 01223 360966. Is there anything else I can ...")
+    "taxi contact number" (in: "...or your 10:00 reservations. Taxi contact number is 07242149665. Anything e...")
+  checker evidence: support 2/4; fits a neighbouring column 2/10
+  checker: unsure
+[restaurant:8] reference number
+  description: uniquely identifies a reservation
+  role: uniquely identifies a reservation
+  values: id (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "42xedgdf" (in: "...booked. Your reference number is 42XEDGDF. Is there anything else I can he...")
+    "bpe8lvha" (in: "Cocum restaurant on Monday at 15:00. The reference number is BPE8LVHA.")
+    "cul9vz04" (in: "...ble, and the reference number is CUL9VZ04. Is there anything else I can he...")
+  checker evidence: support 10/10; fits a neighbouring column 2/9
+[restaurant:9] reservation date
+  description: the date of the reservation
+  role: reservation date
+  values: day (share 0.80); 20 mentions in 13 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+    "sunday" (in: "they would have a table for 7 at 17:45 on Sunday?")
+  checker evidence: support 8/10; fits a neighbouring column 0/10
+[restaurant:10] reservation time
+  description: the time of the reservation
+  role: reservation time
+  values: time (share 0.71); 28 mentions in 12 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+    "18:00" (in: "I be able to get a table there Thursday at 18:00 for 7?")
+  checker evidence: support 10/18; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+
+Return the JSON object now.

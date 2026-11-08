@@ -136,18 +136,26 @@ def build_stage1(root=ROOT, out=None):
     plc = build_placement(root)
     chains = main_chains() + [{"id": chain_id("base", BASE_SET, 0), "kind": "base", "input": "a", "set": BASE_SET, "seed": 0,
                                "exclude": plc["hold_out"]}]
-    write_json(out / "chains.json", chains)
     write_json(out / "placement.json", plc)
-    jobs = Jobs(out, 1)
-    for ch in chains:
-        cols = chain_columns(ch, root)
-        text, schema = SP.build_prompt_41(SP.render_columns(cols), cols)
-        jobs.emit(f"{ch['id']}_41", "s4_41", text, schema, ch["id"], ch["set"], ent=ch["input"], chain=ch["id"], step=1, n_columns=len(cols))
+    jobs = build_chains_stage1(out, chains, root)
     for s in SETS:
         for v in E_VERSIONS:
             text = (root / INPUT_DIR / s / f"e_{v}.prompt.txt").read_text(encoding="utf-8")
             jobs.emit(f"e_{s}_{v}", "s4_e", text, SP.build_prompt_e("")[1], f"e_{v}", s, ent="e", chain=f"e_{s}_{v}", step=1)
     return jobs.save()
+
+
+def build_chains_stage1(out, chains, root=ROOT):
+    """Write chains.json and the 4.1 prompts of `chains` under `out`; returns the Jobs (not saved). wf_v4.1 dry runs call it with their own
+    chains (a chain may carry "prompt_version", default "v0")."""
+    out = Path(out)
+    write_json(out / "chains.json", chains)
+    jobs = Jobs(out, 1)
+    for ch in chains:
+        cols = chain_columns(ch, root)
+        text, schema = SP.build_prompt_41(SP.render_columns(cols), cols, ch.get("prompt_version", "v0"))
+        jobs.emit(f"{ch['id']}_41", "s4_41", text, schema, ch["id"], ch["set"], ent=ch["input"], chain=ch["id"], step=1, n_columns=len(cols))
+    return jobs
 
 
 # ---------------------------------------------------------------- repairs
@@ -347,8 +355,9 @@ def build_stage(out, k, root=ROOT):
             status.append({"chain": ch["id"], "ok": err is None, "reached": k - 1 if err is None else len(ans), "repairs": rep, "error": err})
             if err:
                 continue
-            build = {2: lambda: SP.build_prompt_42(ans["41"], cols), 3: lambda: SP.build_prompt_43(ans["41"], ans["42"], cols),
-                     4: lambda: SP.build_prompt_44(ans["41"], ans["42"], ans["43"], cols)}[k]
+            v = ch.get("prompt_version", "v0")  # wf_v4.1 chains carry "v41"
+            build = {2: lambda: SP.build_prompt_42(ans["41"], cols), 3: lambda: SP.build_prompt_43(ans["41"], ans["42"], cols, v),
+                     4: lambda: SP.build_prompt_44(ans["41"], ans["42"], ans["43"], cols, v)}[k]
             text, schema = build()
             jobs.emit(f"{ch['id']}_4{k}", STEP_FAMILY[k], text, schema, ch["id"], ch["set"], ent=ch["input"], chain=ch["id"], step=k)
     else:

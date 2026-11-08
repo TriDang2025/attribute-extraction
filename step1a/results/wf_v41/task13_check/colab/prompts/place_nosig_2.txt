@@ -1,0 +1,87 @@
+Below is a relational database schema (its tables, columns, keys and relationships) and one new column, a kind of
+information found in dialogues. Decide where the new column belongs. Choose exactly one option:
+- P1: the column is one more property of the rows of an existing table; it is stored in that table (target_table).
+- P2: the column describes a relationship between rows of two tables (for example something that is true of a pair, not of
+  either one alone); it is stored in the table that implements that relationship (target_table), or in a new linking table
+  (new_table) between the two tables given in link.
+- P3: the column needs a new table of its own (new_table: its name and what one row stands for); give in link how the new
+  table relates to an existing table.
+- P4: the column creates a new relationship between two tables that exist already: it is the reference that ties rows of
+  the table in link.from to rows of the table in link.to (target_table = link.from).
+- P5: the column and the columns of an existing table (target_table) belong together in a table of their own (new_table).
+Use null for new_table and link when the option needs none. "kind" is one_to_many or many_to_many; "from" is the table that
+refers to the other (the many side).
+Return ONLY one JSON object, nothing before or after it. Shape (the names here are made up):
+{"reason": "one short sentence", "option": "P1", "target_table": "loan", "new_table": null, "link": null}
+
+Schema:
+Table train_journey_details: Details of a train journey including locations and dates. One row = one train journey.
+  - train_journey_id (id) [primary key]
+  - arrival_location (text)
+  - departure_location (text)
+  - destination_city (text)
+  - travel_date (day)
+  - star rating (integer)
+  - reservation time (time)
+Table train_journey_times: Times related to a train journey including departure, arrival, and duration. One row = one train journey time.
+  - train_journey_time_id (id) [primary key]
+  - arrival_time (time)
+  - departure_time (time)
+  - time_query (text)
+  - travel_time (duration)
+  - train_journey_id (id) [refers to train_journey_details.train_journey_id]
+Table train_ticket_pricing: Pricing details for train tickets. One row = one train ticket price.
+  - train_ticket_pricing_id (id) [primary key]
+  - price_per_ticket (price)
+  - total_fee (price)
+  - train_journey_id (id) [refers to train_journey_details.train_journey_id]
+Table hotel_booking_details: Details of a hotel booking including location, name, price range, and reference number. One row = one hotel booking.
+  - hotel_booking_id (id) [primary key]
+  - hotel_location (text)
+  - hotel_name (text)
+  - location (text)
+  - location_description (text)
+  - price_range (text)
+  - reference_number (id)
+  - specific_hotel_name (text)
+  - start_date (day)
+Table hotel_booking_duration: Duration and number of guests for a hotel booking. One row = one hotel booking duration.
+  - hotel_booking_duration_id (id) [primary key]
+  - hotel_number_of_guests (integer)
+  - hotel_number_of_nights (integer)
+  - hotel_booking_id (id) [refers to hotel_booking_details.hotel_booking_id]
+Table restaurant_reservation_details: Details of a restaurant reservation including number of people, date, address, food type, and name. One row = one restaurant reservation.
+  - restaurant_reservation_id (id) [primary key]
+  - number_of_options (integer)
+  - number_of_people (integer)
+  - number_of_results (integer)
+  - reference_number (id)
+  - reservation_date (day)
+  - restaurant_address (text)
+  - restaurant_area (text)
+  - restaurant_food_type (text)
+  - restaurant_location (text)
+  - restaurant_name (text)
+  - restaurant_phone_number (text)
+Table postal_codes_and_taxi_numbers: Postal codes and taxi phone numbers. One row = one postal code or taxi number.
+  - postal_code_taxi_number_id (id) [primary key]
+  - postcode (id)
+  - taxi_phone_numbers (text)
+  - restaurant_reservation_id (id) [refers to restaurant_reservation_details.restaurant_reservation_id]
+Relationships (from = refers to, to = referred to): train_journey_details -> train_journey_times (one_to_many); train_journey_details -> train_ticket_pricing (one_to_many); hotel_booking_details -> hotel_booking_duration (one_to_many); restaurant_reservation_details -> postal_codes_and_taxi_numbers (one_to_many)
+
+New column:
+[train:7] number of tickets
+  description: the number of tickets booked
+  role: quantity
+  values: number (share 0.67); 18 mentions in 10 dialogues
+  examples:
+    "how many ticket" (in: "...he tr1393 which leaves the station at 09:19, how many tickets would you like?")
+    "16" (in: "There are trains every hour on the :16 that will get you there by noon, begin...")
+    "1 child" (in: "I need 2 adult and 1 child. Thank you.")
+    "10" (in: "There are 10 trains leaving from Cambridge to Ely. Is there a particular")
+    "2" (in: "2 please and I need a ref. number.")
+  checker evidence: support 8/17; fits a neighbouring column 0/5
+  checker: unsure
+
+Return the JSON object now.

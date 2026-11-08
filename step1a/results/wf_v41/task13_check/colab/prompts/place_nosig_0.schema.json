@@ -1,0 +1,87 @@
+{
+ "type": "object",
+ "properties": {
+  "reason": {
+   "type": "string"
+  },
+  "option": {
+   "enum": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+   ]
+  },
+  "target_table": {
+   "enum": [
+    "train_journey_details",
+    "train_journey_times",
+    "train_ticket_pricing",
+    "hotel_booking_details",
+    "hotel_booking_duration",
+    "restaurant_reservation_details",
+    "postal_codes_and_taxi_numbers",
+    "none"
+   ]
+  },
+  "new_table": {
+   "anyOf": [
+    {
+     "type": "null"
+    },
+    {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "row": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "name",
+      "row"
+     ]
+    }
+   ]
+  },
+  "link": {
+   "anyOf": [
+    {
+     "type": "null"
+    },
+    {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string"
+      },
+      "to": {
+       "type": "string"
+      },
+      "kind": {
+       "enum": [
+        "one_to_many",
+        "many_to_many"
+       ]
+      }
+     },
+     "required": [
+      "from",
+      "to",
+      "kind"
+     ]
+    }
+   ]
+  }
+ },
+ "required": [
+  "reason",
+  "option",
+  "target_table",
+  "new_table",
+  "link"
+ ]
+}

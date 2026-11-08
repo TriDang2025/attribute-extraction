@@ -1,0 +1,562 @@
+{
+ "tables": [
+  {
+   "name": "train_journey_details",
+   "description": "Details of a train journey including locations and dates.",
+   "row": "one train journey",
+   "columns": [
+    {
+     "name": "train_journey_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    },
+    {
+     "name": "arrival_location",
+     "type": "text",
+     "source": "train:1",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "departure_location",
+     "type": "text",
+     "source": "train:3",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "destination_city",
+     "type": "text",
+     "source": "train:5",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "travel_date",
+     "type": "day",
+     "source": "train:15",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "star rating",
+     "type": "integer",
+     "source": "hotel:18",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "reservation time",
+     "type": "time",
+     "source": "restaurant:10",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "number of tickets",
+     "type": "integer",
+     "source": "train:7",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "number of trains",
+     "type": "integer",
+     "source": "train:8",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "train id",
+     "type": "id",
+     "source": "train:14",
+     "new": false,
+     "gt": null
+    }
+   ],
+   "primary_key": [
+    "train_journey_id"
+   ],
+   "foreign_keys": []
+  },
+  {
+   "name": "train_journey_times",
+   "description": "Times related to a train journey including departure, arrival, and duration.",
+   "row": "one train journey time",
+   "columns": [
+    {
+     "name": "train_journey_time_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    },
+    {
+     "name": "arrival_time",
+     "type": "time",
+     "source": "train:2",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "departure_time",
+     "type": "time",
+     "source": "train:4",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "time_query",
+     "type": "text",
+     "source": "train:12",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "travel_time",
+     "type": "duration",
+     "source": "train:16",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "train_journey_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    }
+   ],
+   "primary_key": [
+    "train_journey_time_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "train_journey_id"
+     ],
+     "ref_table": "train_journey_details",
+     "ref_columns": [
+      "train_journey_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "train_ticket_pricing",
+   "description": "Pricing details for train tickets.",
+   "row": "one train ticket price",
+   "columns": [
+    {
+     "name": "train_ticket_pricing_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    },
+    {
+     "name": "price_per_ticket",
+     "type": "price",
+     "source": "train:9",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "total_fee",
+     "type": "price",
+     "source": "train:13",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "train_journey_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    }
+   ],
+   "primary_key": [
+    "train_ticket_pricing_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "train_journey_id"
+     ],
+     "ref_table": "train_journey_details",
+     "ref_columns": [
+      "train_journey_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "hotel_booking_details",
+   "description": "Details of a hotel booking including location, name, price range, and reference number.",
+   "row": "one hotel booking",
+   "columns": [
+    {
+     "name": "hotel_booking_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    },
+    {
+     "name": "hotel_location",
+     "type": "text",
+     "source": "hotel:3",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "hotel_name",
+     "type": "text",
+     "source": "hotel:4",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "location",
+     "type": "text",
+     "source": "hotel:9",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "location_description",
+     "type": "text",
+     "source": "hotel:10",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "price_range",
+     "type": "text",
+     "source": "hotel:14",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "reference_number",
+     "type": "id",
+     "source": "hotel:15",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "specific_hotel_name",
+     "type": "text",
+     "source": "hotel:16",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "start_date",
+     "type": "day",
+     "source": "hotel:19",
+     "new": false,
+     "gt": null
+    }
+   ],
+   "primary_key": [
+    "hotel_booking_id"
+   ],
+   "foreign_keys": []
+  },
+  {
+   "name": "hotel_booking_duration",
+   "description": "Duration and number of guests for a hotel booking.",
+   "row": "one hotel booking duration",
+   "columns": [
+    {
+     "name": "hotel_booking_duration_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    },
+    {
+     "name": "hotel_number_of_guests",
+     "type": "integer",
+     "source": "hotel:5",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "hotel_number_of_nights",
+     "type": "integer",
+     "source": "hotel:6",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "hotel_booking_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    }
+   ],
+   "primary_key": [
+    "hotel_booking_duration_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "hotel_booking_id"
+     ],
+     "ref_table": "hotel_booking_details",
+     "ref_columns": [
+      "hotel_booking_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "restaurant_reservation_details",
+   "description": "Details of a restaurant reservation including number of people, date, address, food type, and name.",
+   "row": "one restaurant reservation",
+   "columns": [
+    {
+     "name": "restaurant_reservation_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    },
+    {
+     "name": "number_of_options",
+     "type": "integer",
+     "source": "restaurant:3",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "number_of_people",
+     "type": "integer",
+     "source": "restaurant:4",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "number_of_results",
+     "type": "integer",
+     "source": "restaurant:5",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "reference_number",
+     "type": "id",
+     "source": "restaurant:8",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "reservation_date",
+     "type": "day",
+     "source": "restaurant:9",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "restaurant_address",
+     "type": "text",
+     "source": "restaurant:11",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "restaurant_area",
+     "type": "text",
+     "source": "restaurant:12",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "restaurant_food_type",
+     "type": "text",
+     "source": "restaurant:13",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "restaurant_location",
+     "type": "text",
+     "source": "restaurant:14",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "restaurant_name",
+     "type": "text",
+     "source": "restaurant:15",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "restaurant_phone_number",
+     "type": "text",
+     "source": "restaurant:16",
+     "new": false,
+     "gt": null
+    }
+   ],
+   "primary_key": [
+    "restaurant_reservation_id"
+   ],
+   "foreign_keys": []
+  },
+  {
+   "name": "postal_codes_and_taxi_numbers",
+   "description": "Postal codes and taxi phone numbers.",
+   "row": "one postal code or taxi number",
+   "columns": [
+    {
+     "name": "postal_code_taxi_number_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    },
+    {
+     "name": "postcode",
+     "type": "id",
+     "source": "restaurant:6",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "taxi_phone_numbers",
+     "type": "text",
+     "source": "restaurant:18",
+     "new": false,
+     "gt": null
+    },
+    {
+     "name": "restaurant_reservation_id",
+     "type": "id",
+     "source": null,
+     "new": true,
+     "gt": null
+    }
+   ],
+   "primary_key": [
+    "postal_code_taxi_number_id"
+   ],
+   "foreign_keys": [
+    {
+     "columns": [
+      "restaurant_reservation_id"
+     ],
+     "ref_table": "restaurant_reservation_details",
+     "ref_columns": [
+      "restaurant_reservation_id"
+     ]
+    }
+   ]
+  }
+ ],
+ "relationships": [
+  {
+   "from": "train_journey_details",
+   "to": "train_journey_times",
+   "kind": "one_to_many",
+   "reason": "A train journey can have multiple time-related details."
+  },
+  {
+   "from": "train_journey_details",
+   "to": "train_ticket_pricing",
+   "kind": "one_to_many",
+   "reason": "A train journey can have multiple pricing details."
+  },
+  {
+   "from": "hotel_booking_details",
+   "to": "hotel_booking_duration",
+   "kind": "one_to_many",
+   "reason": "A hotel booking can have multiple duration details."
+  },
+  {
+   "from": "restaurant_reservation_details",
+   "to": "postal_codes_and_taxi_numbers",
+   "kind": "one_to_many",
+   "reason": "A restaurant reservation can have multiple postal codes or taxi numbers."
+  }
+ ],
+ "unused": [
+  {
+   "source": "train:6",
+   "reason": "Local information center is too specific and not relevant to the database"
+  },
+  {
+   "source": "train:11",
+   "reason": "Stay duration is too specific and not relevant to the database"
+  },
+  {
+   "source": "hotel:1",
+   "reason": "Too general and not specific to a particular entity"
+  },
+  {
+   "source": "hotel:7",
+   "reason": "Hotel phone number is too specific and not relevant to the database"
+  },
+  {
+   "source": "hotel:8",
+   "reason": "Too general and not specific to a particular entity"
+  },
+  {
+   "source": "hotel:11",
+   "reason": "Postcode is too specific and not relevant to the database"
+  },
+  {
+   "source": "hotel:12",
+   "reason": "Price adjective is too general and not specific to a particular entity"
+  },
+  {
+   "source": "hotel:13",
+   "reason": "Price extreme is too general and not specific to a particular entity"
+  },
+  {
+   "source": "restaurant:1",
+   "reason": "Entry fee is too specific and not relevant to the database"
+  },
+  {
+   "source": "restaurant:2",
+   "reason": "Hotel references are not relevant to the restaurant database"
+  },
+  {
+   "source": "restaurant:17",
+   "reason": "No data provided"
+  },
+  {
+   "source": "restaurant:19",
+   "reason": "Time for taxi is too specific and not relevant to the database"
+  },
+  {
+   "source": "restaurant:20",
+   "reason": "Time of day is too general and not specific to a particular entity"
+  },
+  {
+   "source": "hotel:2",
+   "reason": "not placed by the model"
+  },
+  {
+   "source": "hotel:17",
+   "reason": "not placed by the model"
+  },
+  {
+   "source": "restaurant:7",
+   "reason": "not placed by the model"
+  }
+ ],
+ "duplicate_flags": [
+  {
+   "source": "hotel:4",
+   "duplicate_of": "restaurant:15"
+  }
+ ]
+}

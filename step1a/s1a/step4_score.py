@@ -188,12 +188,24 @@ def score_design(out, gt, v):
                 where[c["gt"]].append(t["name"])
     chosen = {g: sorted(ts, key=lambda o: (match.get(o) != gt_tab[g], o))[0] for g, ts in where.items()}
     m["placement"] = share(sum(match.get(o) == gt_tab[g] for g, o in chosen.items()), len(chosen))
+    m["gt_columns_placed"] = share(len(chosen), len(gt_tab))  # wf_v4.1 task 7: report next to grouping F1
     m["grouping_precision"], m["grouping_recall"], m["grouping_f1"] = grouping(list(chosen), chosen, gt_tab)
-    # primary keys
+    # primary keys: rule (a) = PK maps to the GT PK; rule (b) = (a), or the PK is one new id and every GT PK column is in the table
     colmap = {t["name"]: {c["name"]: c["gt"] for c in t["cols"]} for t in tables}
-    right = sum({colmap[o].get(k) for k in t["pk"]} == set(v["tables"][match[o]]["pk"])
-                for t in tables for o in [t["name"]] if o in match and t["pk"])
+    right = right_b = 0
+    for t in tables:
+        o = t["name"]
+        if o not in match or not t["pk"]:
+            continue
+        want = set(v["tables"][match[o]]["pk"])
+        ok = {colmap[o].get(k) for k in t["pk"]} == want
+        cols = {c["name"]: c for c in t["cols"]}
+        new_id = len(t["pk"]) == 1 and t["pk"][0] in cols and cols[t["pk"][0]]["new"] and not cols[t["pk"][0]]["direct"] \
+            and cols[t["pk"][0]]["type"] == "id"
+        right += ok
+        right_b += ok or (new_id and want <= set(colmap[o].values()))
     m["pk_right"] = share(right, n_m)
+    m["pk_right_b"] = share(right_b, n_m)
     # relationships
     soft = soft_pairs(gt, v)
     seen, outpairs = set(), []

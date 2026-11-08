@@ -1,0 +1,598 @@
+{
+ "note": "DRY RUN, not a result",
+ "model": "Gemini 3.1 Pro (gemini.google.com web app, Syracuse Edu account, mode 'Pro', temporary chat, default settings) (Gemini web app, by hand)",
+ "prompt": "results/wf_v41/step1b/prompts/step1b_dev50.txt",
+ "guided": false,
+ "prompt_tokens": 8588,
+ "output_tokens": 4326,
+ "raw": "{\n\"headings\": [\n{\n\"heading\": \"train\",\n\"summary\": \"Dialogues about finding train schedules, routes, and booking train tickets for travel.\",\n\"decisions\": [\n{\"id\": \"train:1\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"A good attribute representing the final destination of the train journey.\"},\n{\"id\": \"train:2\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Clearly defines the time the train reaches its destination.\"},\n{\"id\": \"train:3\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"A good attribute representing the origin station.\"},\n{\"id\": \"train:4\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Clearly defines the time the train departs.\"},\n{\"id\": \"train:5\", \"action\": \"merge\", \"new_name\": \"\", \"merge_into\": \"train:1\", \"reason\": \"Destination city provides the same information as arrival location in this context.\"},\n{\"id\": \"train:6\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Noise; a local information center is generally unrelated to booking a train.\"},\n{\"id\": \"train:7\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Accurately captures the quantity of tickets required.\"},\n{\"id\": \"train:8\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Useful for capturing the number of available train options returned to the user.\"},\n{\"id\": \"train:9\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the monetary cost of a single ticket.\"},\n{\"id\": \"train:10\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the unique identifier for a successful booking.\"},\n{\"id\": \"train:11\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Under the wrong heading; stay duration applies to hotels, not the train journey itself.\"},\n{\"id\": \"train:12\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Noise; 'what time' represents a user intent/question rather than a concrete attribute value.\"},\n{\"id\": \"train:13\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the total price for the entire train booking.\"},\n{\"id\": \"train:14\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the specific identifier/code for the train.\"},\n{\"id\": \"train:15\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Accurately represents the day of the journey.\"},\n{\"id\": \"train:16\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures how long the train journey takes.\"}\n],\n\"new_attributes\": [\n{\"name\": \"ticket class\", \"description\": \"The class of service requested for the train.\", \"type\": \"text\", \"label\": \"ticket class\", \"reason\": \"Passengers frequently request first class or standard class tickets.\"},\n{\"name\": \"seating preference\", \"description\": \"The passenger's preference for seating location on the train.\", \"type\": \"text\", \"label\": \"seating preference\", \"reason\": \"Users often ask for window or aisle seats when booking.\"},\n{\"name\": \"train operator\", \"description\": \"The company operating the train service.\", \"type\": \"text\", \"label\": \"train operator\", \"reason\": \"Different companies run different routes, and users may have a preference.\"},\n{\"name\": \"return date\", \"description\": \"The date for the return journey on a round-trip ticket.\", \"type\": \"date\", \"label\": \"return date\", \"reason\": \"Many travelers book round trips and need to specify when they are coming back.\"},\n{\"name\": \"return time\", \"description\": \"The requested time for the return journey.\", \"type\": \"time\", \"label\": \"return time\", \"reason\": \"Passengers booking a round trip need to specify their return time.\"},\n{\"name\": \"ticket type\", \"description\": \"The fare category of the ticket, such as advance, off-peak, or anytime.\", \"type\": \"text\", \"label\": \"ticket type\", \"reason\": \"Fares in train travel depend heavily on the flexibility of the ticket.\"},\n{\"name\": \"passenger type\", \"description\": \"The demographic category of the passenger, such as adult, child, or senior.\", \"type\": \"text\", \"label\": \"passenger type\", \"reason\": \"Ticket prices vary significantly based on whether the passenger is a child, adult, or senior.\"},\n{\"name\": \"discount card\", \"description\": \"Whether the passenger is using a discount railcard.\", \"type\": \"boolean\", \"label\": \"discount card\", \"reason\": \"Railcards provide percentage discounts and are frequently mentioned in UK train bookings.\"},\n{\"name\": \"route type\", \"description\": \"Whether the train is direct or requires connections.\", \"type\": \"text\", \"label\": \"route type\", \"reason\": \"Travelers often explicitly ask for direct trains without changes.\"}\n]\n},\n{\n\"heading\": \"hotel\",\n\"summary\": \"Dialogues focused on finding, filtering, and booking hotel or guesthouse accommodations.\",\n\"decisions\": [\n{\"id\": \"hotel:1\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Too general and noisy; 'entity' with a value like 'towninfo centre' is unrelated to standard hotel properties.\"},\n{\"id\": \"hotel:2\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Accurately represents the physical street address of the hotel.\"},\n{\"id\": \"hotel:3\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the neighborhood or area of the city where the hotel is located.\"},\n{\"id\": \"hotel:4\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Identifies the specific name of the hotel.\"},\n{\"id\": \"hotel:5\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Defines the number of people the room needs to accommodate.\"},\n{\"id\": \"hotel:6\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Specifies the duration of the hotel stay.\"},\n{\"id\": \"hotel:7\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Provides the contact phone number for the hotel.\"},\n{\"id\": \"hotel:8\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the category of accommodation, such as a hotel or guesthouse.\"},\n{\"id\": \"hotel:9\", \"action\": \"merge\", \"new_name\": \"\", \"merge_into\": \"hotel:3\", \"reason\": \"Overlaps with 'hotel location' as it specifies the geographic area or city.\"},\n{\"id\": \"hotel:10\", \"action\": \"merge\", \"new_name\": \"\", \"merge_into\": \"hotel:3\", \"reason\": \"Values like 'north part of cambridge' are the exact same concept as 'hotel location'.\"},\n{\"id\": \"hotel:11\", \"action\": \"rename\", \"new_name\": \"hotel postcode\", \"merge_into\": \"\", \"reason\": \"Good attribute, but renaming to include 'hotel' matches the naming convention of other attributes.\"},\n{\"id\": \"hotel:12\", \"action\": \"merge\", \"new_name\": \"\", \"merge_into\": \"hotel:14\", \"reason\": \"Words like 'cheap' describe the price range; this should be unified under 'price range'.\"},\n{\"id\": \"hotel:13\", \"action\": \"merge\", \"new_name\": \"\", \"merge_into\": \"hotel:14\", \"reason\": \"Words like 'expensive' describe the price range; this should be unified under 'price range'.\"},\n{\"id\": \"hotel:14\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Accurately describes the cost tier (e.g., cheap, moderate, expensive).\"},\n{\"id\": \"hotel:15\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Stores the unique identifier for a successful hotel booking.\"},\n{\"id\": \"hotel:16\", \"action\": \"merge\", \"new_name\": \"\", \"merge_into\": \"hotel:4\", \"reason\": \"Represents the exact same information as 'hotel name'.\"},\n{\"id\": \"hotel:17\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Noise; 'price per night' is a user question phrase, not a specific value extracted from the text.\"},\n{\"id\": \"hotel:18\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the official quality rating of the hotel.\"},\n{\"id\": \"hotel:19\", \"action\": \"rename\", \"new_name\": \"checkin date\", \"merge_into\": \"\", \"reason\": \"A good attribute, but 'checkin date' is more standard and descriptive than 'start date'.\"}\n],\n\"new_attributes\": [\n{\"name\": \"room type\", \"description\": \"The specific type of room requested, such as single, double, or suite.\", \"type\": \"text\", \"label\": \"room type\", \"reason\": \"Users commonly specify the layout or size of the room they want.\"},\n{\"name\": \"bed type\", \"description\": \"The requested bed configuration, such as twin, queen, or king.\", \"type\": \"text\", \"label\": \"bed type\", \"reason\": \"Bed size and arrangement are standard preferences in hotel bookings.\"},\n{\"name\": \"internet access\", \"description\": \"Indicates whether free Wi-Fi or internet is required.\", \"type\": \"boolean\", \"label\": \"internet access\", \"reason\": \"Internet availability is one of the most common filtering criteria for hotels.\"},\n{\"name\": \"parking available\", \"description\": \"Indicates whether the hotel provides parking for guests.\", \"type\": \"boolean\", \"label\": \"parking available\", \"reason\": \"Travelers with cars frequently ask if the accommodation includes parking facilities.\"},\n{\"name\": \"breakfast included\", \"description\": \"Indicates whether breakfast is provided with the room.\", \"type\": \"boolean\", \"label\": \"breakfast included\", \"reason\": \"Users often prefer rates that include a morning meal.\"},\n{\"name\": \"pet friendly\", \"description\": \"Indicates if the accommodation allows pets.\", \"type\": \"boolean\", \"label\": \"pet friendly\", \"reason\": \"Travelers with animals need to know if the hotel accepts pets.\"},\n{\"name\": \"wheelchair accessible\", \"description\": \"Indicates if the hotel caters to individuals with mobility restrictions.\", \"type\": \"boolean\", \"label\": \"wheelchair accessible\", \"reason\": \"Accessibility is a critical requirement for some travelers.\"},\n{\"name\": \"smoking allowed\", \"description\": \"Indicates if smoking is permitted in the room.\", \"type\": \"boolean\", \"label\": \"smoking allowed\", \"reason\": \"Guests often have strict preferences for smoking or non-smoking rooms.\"}\n]\n},\n{\n\"heading\": \"restaurant\",\n\"summary\": \"Dialogues about searching for dining options and making table reservations at restaurants.\",\n\"decisions\": [\n{\"id\": \"restaurant:1\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Noise; 'entry fee' applies to attractions or clubs, not typically a restaurant attribute.\"},\n{\"id\": \"restaurant:2\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Under the wrong heading; the word 'hotel' belongs in the hotel domain.\"},\n{\"id\": \"restaurant:3\", \"action\": \"merge\", \"new_name\": \"\", \"merge_into\": \"restaurant:4\", \"reason\": \"The examples and description clearly show this is measuring party size, just like 'number of people'.\"},\n{\"id\": \"restaurant:4\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Accurately captures the party size for a table reservation.\"},\n{\"id\": \"restaurant:5\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the count of database results returned to the user.\"},\n{\"id\": \"restaurant:6\", \"action\": \"rename\", \"new_name\": \"restaurant postcode\", \"merge_into\": \"\", \"reason\": \"Good attribute, but appending 'restaurant' matches the naming convention in this domain.\"},\n{\"id\": \"restaurant:7\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Describes the pricing tier of the restaurant.\"},\n{\"id\": \"restaurant:8\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Stores the unique booking identifier for a successful table reservation.\"},\n{\"id\": \"restaurant:9\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the day the user wants to dine.\"},\n{\"id\": \"restaurant:10\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Captures the specific clock time for the table reservation.\"},\n{\"id\": \"restaurant:11\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Identifies the physical street address of the dining establishment.\"},\n{\"id\": \"restaurant:12\", \"action\": \"merge\", \"new_name\": \"\", \"merge_into\": \"restaurant:14\", \"reason\": \"Restaurant area conveys the exact same geographic concept as restaurant location.\"},\n{\"id\": \"restaurant:13\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Despite noisy examples, 'food type' or cuisine is a vital attribute for restaurant searches.\"},\n{\"id\": \"restaurant:14\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Represents the neighborhood or part of town the restaurant is in.\"},\n{\"id\": \"restaurant:15\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Identifies the specific name of the dining establishment.\"},\n{\"id\": \"restaurant:16\", \"action\": \"keep\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Provides the contact phone number for the restaurant.\"},\n{\"id\": \"restaurant:17\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Doubtful attribute; it has 0 mentions and duplicates an existing attribute.\"},\n{\"id\": \"restaurant:18\", \"action\": \"merge\", \"new_name\": \"\", \"merge_into\": \"restaurant:16\", \"reason\": \"The examples in the text clearly show these are restaurant phone numbers mislabeled as taxi numbers.\"},\n{\"id\": \"restaurant:19\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Mixed meanings; it combines restaurant reservation times and taxi pickup times arbitrarily.\"},\n{\"id\": \"restaurant:20\", \"action\": \"flag\", \"new_name\": \"\", \"merge_into\": \"\", \"reason\": \"Too general and noisy; 'night' is a broad term better served by specific reservation times.\"}\n],\n\"new_attributes\": [\n{\"name\": \"dietary restriction\", \"description\": \"Specific dietary accommodations provided, such as vegan, gluten-free, or halal.\", \"type\": \"text\", \"label\": \"dietary restriction\", \"reason\": \"Diners frequently filter restaurants based on their dietary needs.\"},\n{\"name\": \"outdoor seating\", \"description\": \"Indicates if the restaurant offers seating outside on a patio or terrace.\", \"type\": \"boolean\", \"label\": \"outdoor seating\", \"reason\": \"Many users prefer al fresco dining when the weather is nice.\"},\n{\"name\": \"alcohol served\", \"description\": \"Indicates if the restaurant serves beer, wine, or liquor.\", \"type\": \"boolean\", \"label\": \"alcohol served\", \"reason\": \"People often want to know if they can order drinks with their meal.\"},\n{\"name\": \"dress code\", \"description\": \"The required attire for dining at the establishment.\", \"type\": \"text\", \"label\": \"dress code\", \"reason\": \"Fine dining establishments often enforce dress codes that guests need to know.\"},\n{\"name\": \"wheelchair accessible\", \"description\": \"Indicates if the restaurant's entrance, dining room, and restrooms are accessible.\", \"type\": \"boolean\", \"label\": \"wheelchair accessible\", \"reason\": \"Accessibility is a frequent and necessary filter for guests with disabilities.\"},\n{\"name\": \"kid friendly\", \"description\": \"Indicates whether the restaurant has a children's menu or highchairs.\", \"type\": \"boolean\", \"label\": \"kid friendly\", \"reason\": \"Families looking for a place to eat often require child-friendly amenities.\"},\n{\"name\": \"takeout available\", \"description\": \"Indicates if the restaurant allows customers to pick up food to go.\", \"type\": \"boolean\", \"label\": \"takeout available\", \"reason\": \"Sometimes users want to grab food rather than dining in.\"},\n{\"name\": \"accepted payment\", \"description\": \"The types of payment methods the restaurant accepts.\", \"type\": \"text\", \"label\": \"accepted payment\", \"reason\": \"Some restaurants are cash-only, which is critical information for diners.\"}\n]\n}\n]\n}",
+ "parsed": {
+  "headings": [
+   {
+    "heading": "train",
+    "summary": "Dialogues about finding train schedules, routes, and booking train tickets for travel.",
+    "decisions": [
+     {
+      "id": "train:1",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "A good attribute representing the final destination of the train journey."
+     },
+     {
+      "id": "train:2",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Clearly defines the time the train reaches its destination."
+     },
+     {
+      "id": "train:3",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "A good attribute representing the origin station."
+     },
+     {
+      "id": "train:4",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Clearly defines the time the train departs."
+     },
+     {
+      "id": "train:5",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "train:1",
+      "reason": "Destination city provides the same information as arrival location in this context."
+     },
+     {
+      "id": "train:6",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Noise; a local information center is generally unrelated to booking a train."
+     },
+     {
+      "id": "train:7",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Accurately captures the quantity of tickets required."
+     },
+     {
+      "id": "train:8",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Useful for capturing the number of available train options returned to the user."
+     },
+     {
+      "id": "train:9",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the monetary cost of a single ticket."
+     },
+     {
+      "id": "train:10",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the unique identifier for a successful booking."
+     },
+     {
+      "id": "train:11",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Under the wrong heading; stay duration applies to hotels, not the train journey itself."
+     },
+     {
+      "id": "train:12",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Noise; 'what time' represents a user intent/question rather than a concrete attribute value."
+     },
+     {
+      "id": "train:13",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the total price for the entire train booking."
+     },
+     {
+      "id": "train:14",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the specific identifier/code for the train."
+     },
+     {
+      "id": "train:15",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Accurately represents the day of the journey."
+     },
+     {
+      "id": "train:16",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures how long the train journey takes."
+     }
+    ],
+    "new_attributes": [
+     {
+      "name": "ticket class",
+      "description": "The class of service requested for the train.",
+      "type": "text",
+      "label": "ticket class",
+      "reason": "Passengers frequently request first class or standard class tickets."
+     },
+     {
+      "name": "seating preference",
+      "description": "The passenger's preference for seating location on the train.",
+      "type": "text",
+      "label": "seating preference",
+      "reason": "Users often ask for window or aisle seats when booking."
+     },
+     {
+      "name": "train operator",
+      "description": "The company operating the train service.",
+      "type": "text",
+      "label": "train operator",
+      "reason": "Different companies run different routes, and users may have a preference."
+     },
+     {
+      "name": "return date",
+      "description": "The date for the return journey on a round-trip ticket.",
+      "type": "date",
+      "label": "return date",
+      "reason": "Many travelers book round trips and need to specify when they are coming back."
+     },
+     {
+      "name": "return time",
+      "description": "The requested time for the return journey.",
+      "type": "time",
+      "label": "return time",
+      "reason": "Passengers booking a round trip need to specify their return time."
+     },
+     {
+      "name": "ticket type",
+      "description": "The fare category of the ticket, such as advance, off-peak, or anytime.",
+      "type": "text",
+      "label": "ticket type",
+      "reason": "Fares in train travel depend heavily on the flexibility of the ticket."
+     },
+     {
+      "name": "passenger type",
+      "description": "The demographic category of the passenger, such as adult, child, or senior.",
+      "type": "text",
+      "label": "passenger type",
+      "reason": "Ticket prices vary significantly based on whether the passenger is a child, adult, or senior."
+     },
+     {
+      "name": "discount card",
+      "description": "Whether the passenger is using a discount railcard.",
+      "type": "boolean",
+      "label": "discount card",
+      "reason": "Railcards provide percentage discounts and are frequently mentioned in UK train bookings."
+     },
+     {
+      "name": "route type",
+      "description": "Whether the train is direct or requires connections.",
+      "type": "text",
+      "label": "route type",
+      "reason": "Travelers often explicitly ask for direct trains without changes."
+     }
+    ]
+   },
+   {
+    "heading": "hotel",
+    "summary": "Dialogues focused on finding, filtering, and booking hotel or guesthouse accommodations.",
+    "decisions": [
+     {
+      "id": "hotel:1",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Too general and noisy; 'entity' with a value like 'towninfo centre' is unrelated to standard hotel properties."
+     },
+     {
+      "id": "hotel:2",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Accurately represents the physical street address of the hotel."
+     },
+     {
+      "id": "hotel:3",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the neighborhood or area of the city where the hotel is located."
+     },
+     {
+      "id": "hotel:4",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Identifies the specific name of the hotel."
+     },
+     {
+      "id": "hotel:5",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Defines the number of people the room needs to accommodate."
+     },
+     {
+      "id": "hotel:6",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Specifies the duration of the hotel stay."
+     },
+     {
+      "id": "hotel:7",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Provides the contact phone number for the hotel."
+     },
+     {
+      "id": "hotel:8",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the category of accommodation, such as a hotel or guesthouse."
+     },
+     {
+      "id": "hotel:9",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "hotel:3",
+      "reason": "Overlaps with 'hotel location' as it specifies the geographic area or city."
+     },
+     {
+      "id": "hotel:10",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "hotel:3",
+      "reason": "Values like 'north part of cambridge' are the exact same concept as 'hotel location'."
+     },
+     {
+      "id": "hotel:11",
+      "action": "rename",
+      "new_name": "hotel postcode",
+      "merge_into": "",
+      "reason": "Good attribute, but renaming to include 'hotel' matches the naming convention of other attributes."
+     },
+     {
+      "id": "hotel:12",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "hotel:14",
+      "reason": "Words like 'cheap' describe the price range; this should be unified under 'price range'."
+     },
+     {
+      "id": "hotel:13",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "hotel:14",
+      "reason": "Words like 'expensive' describe the price range; this should be unified under 'price range'."
+     },
+     {
+      "id": "hotel:14",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Accurately describes the cost tier (e.g., cheap, moderate, expensive)."
+     },
+     {
+      "id": "hotel:15",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Stores the unique identifier for a successful hotel booking."
+     },
+     {
+      "id": "hotel:16",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "hotel:4",
+      "reason": "Represents the exact same information as 'hotel name'."
+     },
+     {
+      "id": "hotel:17",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Noise; 'price per night' is a user question phrase, not a specific value extracted from the text."
+     },
+     {
+      "id": "hotel:18",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the official quality rating of the hotel."
+     },
+     {
+      "id": "hotel:19",
+      "action": "rename",
+      "new_name": "checkin date",
+      "merge_into": "",
+      "reason": "A good attribute, but 'checkin date' is more standard and descriptive than 'start date'."
+     }
+    ],
+    "new_attributes": [
+     {
+      "name": "room type",
+      "description": "The specific type of room requested, such as single, double, or suite.",
+      "type": "text",
+      "label": "room type",
+      "reason": "Users commonly specify the layout or size of the room they want."
+     },
+     {
+      "name": "bed type",
+      "description": "The requested bed configuration, such as twin, queen, or king.",
+      "type": "text",
+      "label": "bed type",
+      "reason": "Bed size and arrangement are standard preferences in hotel bookings."
+     },
+     {
+      "name": "internet access",
+      "description": "Indicates whether free Wi-Fi or internet is required.",
+      "type": "boolean",
+      "label": "internet access",
+      "reason": "Internet availability is one of the most common filtering criteria for hotels."
+     },
+     {
+      "name": "parking available",
+      "description": "Indicates whether the hotel provides parking for guests.",
+      "type": "boolean",
+      "label": "parking available",
+      "reason": "Travelers with cars frequently ask if the accommodation includes parking facilities."
+     },
+     {
+      "name": "breakfast included",
+      "description": "Indicates whether breakfast is provided with the room.",
+      "type": "boolean",
+      "label": "breakfast included",
+      "reason": "Users often prefer rates that include a morning meal."
+     },
+     {
+      "name": "pet friendly",
+      "description": "Indicates if the accommodation allows pets.",
+      "type": "boolean",
+      "label": "pet friendly",
+      "reason": "Travelers with animals need to know if the hotel accepts pets."
+     },
+     {
+      "name": "wheelchair accessible",
+      "description": "Indicates if the hotel caters to individuals with mobility restrictions.",
+      "type": "boolean",
+      "label": "wheelchair accessible",
+      "reason": "Accessibility is a critical requirement for some travelers."
+     },
+     {
+      "name": "smoking allowed",
+      "description": "Indicates if smoking is permitted in the room.",
+      "type": "boolean",
+      "label": "smoking allowed",
+      "reason": "Guests often have strict preferences for smoking or non-smoking rooms."
+     }
+    ]
+   },
+   {
+    "heading": "restaurant",
+    "summary": "Dialogues about searching for dining options and making table reservations at restaurants.",
+    "decisions": [
+     {
+      "id": "restaurant:1",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Noise; 'entry fee' applies to attractions or clubs, not typically a restaurant attribute."
+     },
+     {
+      "id": "restaurant:2",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Under the wrong heading; the word 'hotel' belongs in the hotel domain."
+     },
+     {
+      "id": "restaurant:3",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "restaurant:4",
+      "reason": "The examples and description clearly show this is measuring party size, just like 'number of people'."
+     },
+     {
+      "id": "restaurant:4",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Accurately captures the party size for a table reservation."
+     },
+     {
+      "id": "restaurant:5",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the count of database results returned to the user."
+     },
+     {
+      "id": "restaurant:6",
+      "action": "rename",
+      "new_name": "restaurant postcode",
+      "merge_into": "",
+      "reason": "Good attribute, but appending 'restaurant' matches the naming convention in this domain."
+     },
+     {
+      "id": "restaurant:7",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Describes the pricing tier of the restaurant."
+     },
+     {
+      "id": "restaurant:8",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Stores the unique booking identifier for a successful table reservation."
+     },
+     {
+      "id": "restaurant:9",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the day the user wants to dine."
+     },
+     {
+      "id": "restaurant:10",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Captures the specific clock time for the table reservation."
+     },
+     {
+      "id": "restaurant:11",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Identifies the physical street address of the dining establishment."
+     },
+     {
+      "id": "restaurant:12",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "restaurant:14",
+      "reason": "Restaurant area conveys the exact same geographic concept as restaurant location."
+     },
+     {
+      "id": "restaurant:13",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Despite noisy examples, 'food type' or cuisine is a vital attribute for restaurant searches."
+     },
+     {
+      "id": "restaurant:14",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Represents the neighborhood or part of town the restaurant is in."
+     },
+     {
+      "id": "restaurant:15",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Identifies the specific name of the dining establishment."
+     },
+     {
+      "id": "restaurant:16",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Provides the contact phone number for the restaurant."
+     },
+     {
+      "id": "restaurant:17",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Doubtful attribute; it has 0 mentions and duplicates an existing attribute."
+     },
+     {
+      "id": "restaurant:18",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "restaurant:16",
+      "reason": "The examples in the text clearly show these are restaurant phone numbers mislabeled as taxi numbers."
+     },
+     {
+      "id": "restaurant:19",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Mixed meanings; it combines restaurant reservation times and taxi pickup times arbitrarily."
+     },
+     {
+      "id": "restaurant:20",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Too general and noisy; 'night' is a broad term better served by specific reservation times."
+     }
+    ],
+    "new_attributes": [
+     {
+      "name": "dietary restriction",
+      "description": "Specific dietary accommodations provided, such as vegan, gluten-free, or halal.",
+      "type": "text",
+      "label": "dietary restriction",
+      "reason": "Diners frequently filter restaurants based on their dietary needs."
+     },
+     {
+      "name": "outdoor seating",
+      "description": "Indicates if the restaurant offers seating outside on a patio or terrace.",
+      "type": "boolean",
+      "label": "outdoor seating",
+      "reason": "Many users prefer al fresco dining when the weather is nice."
+     },
+     {
+      "name": "alcohol served",
+      "description": "Indicates if the restaurant serves beer, wine, or liquor.",
+      "type": "boolean",
+      "label": "alcohol served",
+      "reason": "People often want to know if they can order drinks with their meal."
+     },
+     {
+      "name": "dress code",
+      "description": "The required attire for dining at the establishment.",
+      "type": "text",
+      "label": "dress code",
+      "reason": "Fine dining establishments often enforce dress codes that guests need to know."
+     },
+     {
+      "name": "wheelchair accessible",
+      "description": "Indicates if the restaurant's entrance, dining room, and restrooms are accessible.",
+      "type": "boolean",
+      "label": "wheelchair accessible",
+      "reason": "Accessibility is a frequent and necessary filter for guests with disabilities."
+     },
+     {
+      "name": "kid friendly",
+      "description": "Indicates whether the restaurant has a children's menu or highchairs.",
+      "type": "boolean",
+      "label": "kid friendly",
+      "reason": "Families looking for a place to eat often require child-friendly amenities."
+     },
+     {
+      "name": "takeout available",
+      "description": "Indicates if the restaurant allows customers to pick up food to go.",
+      "type": "boolean",
+      "label": "takeout available",
+      "reason": "Sometimes users want to grab food rather than dining in."
+     },
+     {
+      "name": "accepted payment",
+      "description": "The types of payment methods the restaurant accepts.",
+      "type": "text",
+      "label": "accepted payment",
+      "reason": "Some restaurants are cash-only, which is critical information for diners."
+     }
+    ]
+   }
+  ]
+ },
+ "errors": []
+}

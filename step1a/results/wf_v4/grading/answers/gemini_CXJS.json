@@ -1,0 +1,70 @@
+{
+ "code": "CXJS",
+ "grouping": {
+  "score": 2,
+  "reason": "Merging booking tables is allowed, but taxi and attraction tables are completely missing, and train booking details are absent."
+ },
+ "names": {
+  "score": 3,
+  "reason": "Table names broadly represent the domains, but row meanings are corrupted by bizarre columns like 'restaurant name' in hotel_booking."
+ },
+ "relationships": {
+  "score": 2,
+  "reason": "No foreign keys or relationships are defined anywhere in the candidate schema."
+ },
+ "keys": {
+  "score": 3,
+  "reason": "Primary keys are properly defined, but there are absolutely no foreign keys used."
+ },
+ "design_quality": {
+  "score": 1,
+  "reason": "Repeated columns (postcode, address in restaurant_booking) and domain mixing (restaurant name in hotel_booking)."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "no",
+   "reason": "The train_journey table lacks booking reference and requested people columns."
+  },
+  {
+   "q": 2,
+   "answer": "yes",
+   "reason": "The train_journey table contains departure/arrival times and stations."
+  },
+  {
+   "q": 3,
+   "answer": "partly",
+   "reason": "Can answer hotel, day, and people, but the length of stay (nights) is missing from hotel_booking."
+  },
+  {
+   "q": 4,
+   "answer": "no",
+   "reason": "The hotel_booking table is missing a parking column entirely."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "The restaurant_booking table contains both reference number and restaurant phone number."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "The restaurant_booking table contains area, food type, and price range columns."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "There is no taxi table in the candidate schema."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "There is no attraction table in the candidate schema."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "The candidate has severe omissions (missing two domains entirely), bad design choices within the tables it does have, and no relationship constraints."
+ },
+ "model": "Gemini 3.1 Pro (gemini.google.com web app, Syracuse Edu account, mode 'Pro', temporary chat, default settings) (Gemini web app, by hand) (Gemini API, temperature 1.0, packet only)"
+}

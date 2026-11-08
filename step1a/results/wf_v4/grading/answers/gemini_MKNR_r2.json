@@ -1,0 +1,70 @@
+{
+ "code": "MKNR",
+ "grouping": {
+  "score": 3,
+  "reason": "The candidate embeds booking details into main entities (allowed alternative), but completely misses the taxi and attraction tables."
+ },
+ "names": {
+  "score": 3,
+  "reason": "Table names add an '_information' suffix which matches main concepts, but taxi and attraction entities are completely missing."
+ },
+ "relationships": {
+  "score": 3,
+  "reason": "By merging bookings into the main entity tables, relationships are implicitly represented, but links to taxi and attraction entities are absent."
+ },
+ "keys": {
+  "score": 4,
+  "reason": "Primary keys are properly defined using surrogate integer IDs on existing tables, though no foreign keys exist."
+ },
+ "design_quality": {
+  "score": 4,
+  "reason": "Embedding booking details into domain tables is an allowed alternative, but missing taxi and attraction domains limits scope."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "train_trainid and train_requested_people are present in train_information."
+  },
+  {
+   "q": 2,
+   "answer": "partly",
+   "reason": "Arrival time, day, and destination are present, but departure time and departure location are missing from train_information."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "hotel_name, hotel_requested_day, hotel_requested_stay, and hotel_requested_people are present in hotel_information."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "hotel_area and hotel_stars are present, but hotel_parking (and internet) was omitted from hotel_information."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "restaurant_confirmed_reference and restaurant_phone are present in restaurant_information."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "restaurant_price_range, restaurant_area, and restaurant_food are all present in restaurant_information."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "The taxi table and all taxi-related fields are completely missing from the schema."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "The attraction table and all attraction-related fields are completely missing from the schema."
+  }
+ ],
+ "overall": {
+  "score": 3,
+  "reason": "Uses the allowed alternative of merging bookings into main entities, but omits the taxi and attraction domains entirely."
+ },
+ "model": "Gemini 3.1 Pro (gemini.google.com web app, Syracuse Edu account, mode 'Pro', temporary chat, default settings) (Gemini web app, by hand) (Gemini API, temperature 1.0, packet only)"
+}

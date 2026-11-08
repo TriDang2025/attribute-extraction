@@ -1,0 +1,120 @@
+{
+ "type": "object",
+ "properties": {
+  "tables": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "row": {
+      "type": "string"
+     },
+     "primary_key": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "columns": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "name": {
+         "type": "string"
+        },
+        "type": {
+         "enum": [
+          "text",
+          "integer",
+          "decimal",
+          "time",
+          "day",
+          "date",
+          "boolean",
+          "id",
+          "duration",
+          "price"
+         ]
+        }
+       },
+       "required": [
+        "name",
+        "type"
+       ]
+      }
+     },
+     "foreign_keys": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "column": {
+         "type": "string"
+        },
+        "ref_table": {
+         "type": "string"
+        },
+        "ref_column": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "column",
+        "ref_table",
+        "ref_column"
+       ]
+      }
+     }
+    },
+    "required": [
+     "name",
+     "description",
+     "row",
+     "primary_key",
+     "columns",
+     "foreign_keys"
+    ]
+   }
+  },
+  "relationships": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "from": {
+      "type": "string"
+     },
+     "to": {
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "one_to_many",
+       "many_to_many"
+      ]
+     },
+     "reason": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "from",
+     "to",
+     "kind",
+     "reason"
+    ]
+   }
+  }
+ },
+ "required": [
+  "tables",
+  "relationships"
+ ]
+}

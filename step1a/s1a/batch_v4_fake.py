@@ -60,16 +60,22 @@ def respond(job, prompt, schema):
     raise ValueError(f"unknown family {fam!r}")
 
 
-def run_jobs(out, jobs, root=None):
-    """Write one response row per job under <out>/responses (the notebook's row fields); returns the number of parse errors."""
+def run_jobs(out, jobs, root=None, model=respond, parse=None):
+    """Write one response row per job under <out>/responses (the notebook's row fields); returns the number of parse errors.
+    `model(job, prompt, schema) -> raw` is this fake by default (wf_v4.1: gemini_v41.responder for the dry runs; its `.last` metadata goes
+    into the row, marked DRY RUN); `parse(raw, job, schema) -> (parsed, errors)` defaults to llm_cache.parse_job."""
     out, bad = Path(out), 0
     for job in jobs:
         prompt = (out / job["prompt"]).read_text(encoding="utf-8")
         schema = json.loads((out / job["schema"]).read_text(encoding="utf-8"))
-        raw = respond(job, prompt, schema)
-        parsed, errors, _ = LC.parse_job(raw, job["format"], schema)
+        raw = model(job, prompt, schema)
+        parsed, errors = parse(raw, job, schema) if parse else LC.parse_job(raw, job["format"], schema)[:2]
         bad += bool(errors)
-        LC.put(out / "responses" / f"{job['job']}.jsonl", job["job"] + job["run_tag"],
-               {"job": job["job"], "format": job["format"], "run_tag": job["run_tag"], "guided": True, "finish_reason": "stop", "raw": raw,
-                "parsed": parsed, "errors": errors, "prompt_tokens": est_tokens(prompt), "output_tokens": est_tokens(raw)})
+        meta = getattr(model, "last", None) or {}
+        row = {"job": job["job"], "format": job["format"], "run_tag": job["run_tag"], "guided": meta.get("guided", True),
+               "finish_reason": meta.get("finish_reason", "stop"), "raw": raw, "parsed": parsed, "errors": errors,
+               "prompt_tokens": meta.get("prompt_tokens") or est_tokens(prompt), "output_tokens": meta.get("output_tokens") or est_tokens(raw)}
+        if meta:
+            row.update(model=meta.get("model"), dry_run="DRY RUN, not a result", thinking_tokens=meta.get("thinking_tokens"))
+        LC.put(out / "responses" / f"{job['job']}.jsonl", job["job"] + job["run_tag"], row)
     return bad

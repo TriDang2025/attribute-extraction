@@ -1,0 +1,70 @@
+{
+ "code": "WWPH",
+ "grouping": {
+  "score": 3,
+  "reason": "Bookings for hotel, restaurant, and attraction are merged into a single 'reservation' table, and train bookings are completely missing or merged into the 'train' schedule table."
+ },
+ "names": {
+  "score": 4,
+  "reason": "Table and column names generally match the domain well, though 'reservation' represents a mixed entity rather than specific booking types."
+ },
+ "relationships": {
+  "score": 3,
+  "reason": "Missing the relationship between train bookings and trains entirely, and inappropriately combines multiple domain relationships into the single reservation table."
+ },
+ "keys": {
+  "score": 4,
+  "reason": "Primary keys and existing foreign keys are correctly defined, but a foreign key for train bookings is missing due to the missing table."
+ },
+ "design_quality": {
+  "score": 3,
+  "reason": "The 'reservation' table mixes three different roles (hotel, restaurant, attraction) resulting in nulls, and the 'train' table mixes schedule data with booking reference numbers."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "no",
+   "reason": "There is no train booking table or column for the number of people booked on a train."
+  },
+  {
+   "q": 2,
+   "answer": "yes",
+   "reason": "The 'train' table contains departure and arrival stations and times."
+  },
+  {
+   "q": 3,
+   "answer": "partly",
+   "reason": "Can find the hotel, day, and number of people in 'reservation', but missing the number of nights (requested stay)."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "Can check free parking and stars, but the 'hotel' table is missing an 'area' column."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "Can join 'reservation' and 'restaurant' on restaurant_id to get the reference number and phone number."
+  },
+  {
+   "q": 6,
+   "answer": "partly",
+   "reason": "Can filter by price_range and cuisine (food), but the 'restaurant' table is missing an 'area' column to check for 'the centre'."
+  },
+  {
+   "q": 7,
+   "answer": "yes",
+   "reason": "The 'taxi' table has pickup/dropoff locations, contact_number, and car_type."
+  },
+  {
+   "q": 8,
+   "answer": "yes",
+   "reason": "The 'attraction' table has address and entrance_fee columns."
+  }
+ ],
+ "overall": {
+  "score": 3,
+  "reason": "The schema captures most of the entities but fails significantly by omitting train bookings, missing 'area' attributes across multiple tables, and improperly merging other bookings."
+ },
+ "model": "Gemini 3.1 Pro (gemini.google.com web app, Syracuse Edu account, mode 'Pro', temporary chat, default settings) (Gemini web app, by hand) (Gemini API, temperature 1.0, packet only)"
+}

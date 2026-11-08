@@ -1,0 +1,70 @@
+{
+ "code": "VBGV",
+ "grouping": {
+  "score": 2,
+  "reason": "Taxi and attraction are missing entirely; hotel, restaurant, and train details are excessively fragmented into multiple tables."
+ },
+ "names": {
+  "score": 2,
+  "reason": "Table names are very poor (e.g., 'train_train_id' for bookings, 'hotel_hotel_name' for names)."
+ },
+ "relationships": {
+  "score": 1,
+  "reason": "Completely illogical foreign keys connecting domains that shouldn't be linked (e.g., train references hotel_reference_number and restaurant)."
+ },
+ "keys": {
+  "score": 2,
+  "reason": "Primary keys are standard integer IDs, but foreign keys are chaotic and link completely unrelated domains."
+ },
+ "design_quality": {
+  "score": 2,
+  "reason": "Excessive fragmentation (e.g., single columns pulled into separate tables) and mixed domains (e.g., stars is in the hotel booking table)."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "Can join 'train_train_id' ('number of tickets') with 'train'."
+  },
+  {
+   "q": 2,
+   "answer": "yes",
+   "reason": "Can join 'train' (stations, arrival) with 'train_departure_time'."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "Can join 'hotel_reference_number' (nights, people, date) with 'hotel_hotel_name'."
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "Hotel stars are wrongly placed in the booking table ('hotel_reference_number'), so they can only be queried for booked hotels."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "Can join 'restaurant' ('reference number') with 'restaurant_restaurant_address' ('restaurant phone number')."
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": "Can query 'restaurant_area' for area, food type, and price range, joining with 'restaurant' for the name."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "There is no taxi table or related columns."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "There is no attraction table or related columns."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "The main entities for hotel, train, and restaurant are partly recognizable, but severely mangled by arbitrary fragmentation, missing domains (taxi, attraction), and nonsensical relationships."
+ },
+ "model": "Gemini 3.1 Pro (gemini.google.com web app, Syracuse Edu account, mode 'Pro', temporary chat, default settings) (Gemini web app, by hand) (Gemini API, temperature 1.0, packet only)"
+}

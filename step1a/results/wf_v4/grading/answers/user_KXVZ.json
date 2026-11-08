@@ -1,0 +1,70 @@
+{
+ "code": "KXVZ",
+ "grouping": {
+  "score": 2,
+  "reason": "Taxi and attraction tables missing; hotel and train split over many one-attribute tables; several columns in tables about other things. Core restaurant table and hotel+booking match."
+ },
+ "names": {
+  "score": 5,
+  "reason": "hotel, train, restaurant and the two booking tables (train_reference_number, restaurant_reference_number) are recognisable."
+ },
+ "relationships": {
+  "score": 2,
+  "reason": "train_reference_number → train and restaurant_reference_number → restaurant are right; many wrong links (hotel → train booking, train → hotel, restaurant → hotel tables, train_destination_city → 6 tables)."
+ },
+ "keys": {
+  "score": 3,
+  "reason": "Existing PKs are fine (hotel name, restaurant name, train id, booking ids); no PKs for taxi/attraction; INTEGER FKs point at TEXT names; duplicate train id columns."
+ },
+ "design_quality": {
+  "score": 1,
+  "reason": "restaurant_taxi_phone_numbers mixes restaurant, taxi and hotel; restaurant booking holds attraction \"entry fee\" and \"time for taxi\"; duplicated columns; entities split into 9 one-attribute tables."
+ },
+ "overall": {
+  "score": 2,
+  "reason": "Several big errors (two tables missing, split entities, mixed tables, wrong links); only hotel, restaurant and the booking links are partly recognisable."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "no",
+   "reason": "people only per train, not per booking"
+  },
+  {
+   "q": 2,
+   "answer": "partly",
+   "reason": "leave time in a 1:N side table, origin on the booking"
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": ""
+  },
+  {
+   "q": 4,
+   "answer": "partly",
+   "reason": "no parking column"
+  },
+  {
+   "q": 5,
+   "answer": "partly",
+   "reason": ""
+  },
+  {
+   "q": 6,
+   "answer": "yes",
+   "reason": ""
+  },
+  {
+   "q": 7,
+   "answer": "partly",
+   "reason": "only a taxi phone, no from/to/car type"
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "no attraction table"
+  }
+ ],
+ "model": "human (user), packet U2; from Overleaf reports/wf_v4/task12/Ans.text, 2026-11-07"
+}

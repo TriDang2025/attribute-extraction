@@ -1,0 +1,63 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+
+Entity E1: 2 clusters.
+
+Placement options (copy one exactly into "placement"):
+- current entity E1: the attribute belongs to E1
+- sub-entity of E1: a part of E1 that has attributes of its own
+- other entity E0: the attribute belongs to E0
+- other entity E2: the attribute belongs to E2
+- other entity E3: the attribute belongs to E3
+- other entity E4: the attribute belongs to E4
+- relationship(E1, E0): links E1 and E0
+- relationship(E1, E2): links E1 and E2
+- relationship(E1, E3): links E1 and E3
+- relationship(E1, E4): links E1 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 11:30, 13:06, 16:15; sunday, friday, monday; cambridge, cambridge towninfo centre
+- E2: centre, centre of town, centre area; cb23bu, cb17gx, cb18dw; 01223307402, 01223314960, 01223333516
+- E3: moderately priced, moderate price range, expensive; restaurant, j restaurant, danish restaurant; centre, city centre, center of town
+- E4: 14:45, 19:15, 06:45; 07048450899, 07128258422, 07267142867; restaurant, hotel, j restaurant
+
+### L2:hotel#0  (mentions 21, distinct values 3)
+Examples:
+- L2:hotel#0:0 [user] previous turn, system: I'm not finding any guesthouses that meet your criteria. Would you like to try a different area, price range, or stars? | turn: So you can't find a moderately priced guesthouse with 3 stars and [[free parking]] anywhere in cambridge at all? Area doesn't matter. Please try again?
+- L2:hotel#0:1 [system] previous turn, user: Can you give me one that has free wifi and free parking? | turn: The 3 guesthouses mentioned all have free wifi and [[parking]]. I recommend the Allenbell.
+- L2:hotel#0:2 [system] previous turn, user: Hello. I really need to find a cheap place to stay in the east. Is there anything like that? | turn: I've found three, all of them are guesthouses and all of them have [[free internet and parking]]. Would you like me to give your their information?
+- L2:hotel#0:3 [system] previous turn, user: Does this location include free wifi? | turn: Yes, El Shaddai includes [[free parking]]. Would you like to book a stay, or perhaps you would like directions?
+- L2:hotel#0:4 [system] previous turn, user: Does this place include free parking? | turn: The alexander bed and breakfast is a cheap, 4 star guesthouse in the centre area, It has wifi and [[parking]]. Does this fit your needs?
+- L2:hotel#0:5 [user] previous turn, system: There are four three star guest houses. Is there an area of town that interests you the most? | turn: I would like it to be in the west. It doesn't matter if it has [[free parking]] or not. Thank you!
+- L2:hotel#0:6 [user] previous turn, system: i cant find it anywhere. can we change the price range? | turn: I know I have found places with those requirements before. I just don't remember the name. I really want to stay moderately priced with the 3 stars and [[parking]].
+- L2:hotel#0:7 [user] previous turn, system: Sure, we have many. Are you looking for anything else specifically? | turn: Yes, I need internet and [[free parking]].
+
+### L2:hotel#1  (mentions 17, distinct values 3)
+Examples:
+- L2:hotel#1:0 [user] turn: I'm looking for a place to stay in Cambridge that has [[free wifi]] and free parking.
+- L2:hotel#1:1 [system] previous turn, user: Does this place include free parking? | turn: The alexander bed and breakfast is a cheap, 4 star guesthouse in the centre area, It has [[wifi]] and parking. Does this fit your needs?
+- L2:hotel#1:2 [system] previous turn, user: No, but I need free wifi and I would like a 2 star guesthouse please. | turn: There isn't a guesthouse with 2 stars and [[free internet]] available. Is there another type of hotel I can look up for you?
+- L2:hotel#1:3 [user] previous turn, system: Absolutely, your reservation's been made. Your reference number is YAHBIZR5. Can I help you with something else? | turn: I am also looking for a place to stay in the east that includes [[free wifi]].
+- L2:hotel#1:4 [system] previous turn, user: Try either a hotel or guesthouse. | turn: The express by holiday inn cambridge is a 2 star hotel in the east area that is expensive. It has [[wifi]] and parking. Would you like to make a reservation?
+- L2:hotel#1:5 [system] previous turn, user: Hello. I really need to find a cheap place to stay in the east. Is there anything like that? | turn: I've found three, all of them are guesthouses and all of them have [[free internet]] and parking. Would you like me to give your their information?
+- L2:hotel#1:6 [user] previous turn, system: I have listings for 3 guesthouses would that be okay? | turn: Can you give me one that has [[free wifi]] and free parking?
+- L2:hotel#1:7 [system] previous turn, user: I live in the centre of town and want to see if I can find a reasonable room for my parents to stay while they are visiting. | turn: How about the Alexander bed and breakfast in the centre? It is a cheap 4 star guesthouse with free internet and [[wifi]].
+
+Return the JSON object now.

@@ -1,0 +1,402 @@
+{
+ "note": "DRY RUN, not a result",
+ "model": "Gemini 3.1 Pro (gemini.google.com web app, Syracuse Edu account, mode 'Pro', temporary chat, default settings) (Gemini web app, by hand)",
+ "prompt": "results/wf_v41/step1b/prompts/step1b_dev50b.txt",
+ "guided": false,
+ "prompt_tokens": 7618,
+ "output_tokens": 2492,
+ "raw": "{\n\"headings\": [\n{\n\"heading\": \"train\",\n\"summary\": \"Information and details for scheduling, routing, and booking train journeys.\",\n\"decisions\": [\n{\n\"id\": \"train:1\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute for the train's destination station.\"\n},\n{\n\"id\": \"train:2\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute for the train's scheduled arrival time.\"\n},\n{\n\"id\": \"train:3\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute for the day the train departs.\"\n},\n{\n\"id\": \"train:4\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute for the train's origin station.\"\n},\n{\n\"id\": \"train:5\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute for the train's scheduled departure time.\"\n},\n{\n\"id\": \"train:6\",\n\"action\": \"flag\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Too general and includes noise values like town information centers instead of train details.\"\n},\n{\n\"id\": \"train:7\",\n\"action\": \"rename\",\n\"new_name\": \"number of passengers\",\n\"merge_into\": \"\",\n\"reason\": \"More accurately reflects the booking size rather than just the tickets.\"\n},\n{\n\"id\": \"train:8\",\n\"action\": \"flag\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Usually a fixed system instruction (payable at station) rather than a searchable user attribute.\"\n},\n{\n\"id\": \"train:9\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard identifier used to retrieve bookings.\"\n},\n{\n\"id\": \"train:10\",\n\"action\": \"rename\",\n\"new_name\": \"ticket price\",\n\"merge_into\": \"\",\n\"reason\": \"Clearer terminology for the cost of the journey.\"\n},\n{\n\"id\": \"train:11\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard unique identifier for a specific train.\"\n},\n{\n\"id\": \"train:12\",\n\"action\": \"rename\",\n\"new_name\": \"journey duration\",\n\"merge_into\": \"\",\n\"reason\": \"More standard phrasing for the length of a train trip.\"\n}\n],\n\"new_attributes\": [\n{\n\"name\": \"ticket class\",\n\"description\": \"the class of the seat being booked\",\n\"type\": \"text\",\n\"label\": \"ticket class\",\n\"reason\": \"Passengers frequently request specific seating like first class or standard.\"\n},\n{\n\"name\": \"round trip\",\n\"description\": \"whether the journey includes a return ticket\",\n\"type\": \"boolean\",\n\"label\": \"return ticket\",\n\"reason\": \"Users often need to book both outbound and return journeys at once.\"\n}\n]\n},\n{\n\"heading\": \"hotel\",\n\"summary\": \"Information for searching, comparing, and booking overnight accommodations.\",\n\"decisions\": [\n{\n\"id\": \"hotel:1\",\n\"action\": \"merge\",\n\"new_name\": \"\",\n\"merge_into\": \"hotel:5\",\n\"reason\": \"The examples are specific names of establishments, not generic accommodation types.\"\n},\n{\n\"id\": \"hotel:2\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute for a physical location.\"\n},\n{\n\"id\": \"hotel:3\",\n\"action\": \"flag\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Values like 'room' and 'city' do not describe actual amenities and represent noise.\"\n},\n{\n\"id\": \"hotel:4\",\n\"action\": \"rename\",\n\"new_name\": \"accommodation type\",\n\"merge_into\": \"\",\n\"reason\": \"A better name to represent categories like guesthouse or hotel.\"\n},\n{\n\"id\": \"hotel:5\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard identifier for the specific property.\"\n},\n{\n\"id\": \"hotel:6\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute for defining a general area.\"\n},\n{\n\"id\": \"hotel:7\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute defining the length of the stay.\"\n},\n{\n\"id\": \"hotel:8\",\n\"action\": \"flag\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Reflects the system's count of search results, not a property of the hotel itself.\"\n},\n{\n\"id\": \"hotel:9\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute for room occupancy.\"\n},\n{\n\"id\": \"hotel:10\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard contact information.\"\n},\n{\n\"id\": \"hotel:11\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard postal identifier.\"\n},\n{\n\"id\": \"hotel:12\",\n\"action\": \"rename\",\n\"new_name\": \"price range\",\n\"merge_into\": \"\",\n\"reason\": \"More common terminology for a cost tier.\"\n},\n{\n\"id\": \"hotel:13\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard identifier for a confirmed reservation.\"\n},\n{\n\"id\": \"hotel:14\",\n\"action\": \"flag\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Belongs under the restaurant heading, not hotel.\"\n},\n{\n\"id\": \"hotel:15\",\n\"action\": \"merge\",\n\"new_name\": \"\",\n\"merge_into\": \"hotel:5\",\n\"reason\": \"Represents the specific names of accommodations, which belongs with hotel name.\"\n},\n{\n\"id\": \"hotel:16\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard quality rating for hospitality.\"\n},\n{\n\"id\": \"hotel:17\",\n\"action\": \"rename\",\n\"new_name\": \"check-in day\",\n\"merge_into\": \"\",\n\"reason\": \"Industry standard terminology for the start date of a hotel stay.\"\n}\n],\n\"new_attributes\": [\n{\n\"name\": \"has parking\",\n\"description\": \"whether the accommodation provides a place to park\",\n\"type\": \"boolean\",\n\"label\": \"free parking\",\n\"reason\": \"Guests traveling by car heavily filter accommodations by parking availability.\"\n},\n{\n\"name\": \"has wifi\",\n\"description\": \"whether the accommodation provides internet access\",\n\"type\": \"boolean\",\n\"label\": \"free wifi\",\n\"reason\": \"Internet access is a primary requirement for most modern travelers.\"\n}\n]\n},\n{\n\"heading\": \"restaurant\",\n\"summary\": \"Information for finding, comparing, and reserving tables at dining establishments.\",\n\"decisions\": [\n{\n\"id\": \"restaurant:1\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard attribute for a general neighborhood or location.\"\n},\n{\n\"id\": \"restaurant:2\",\n\"action\": \"rename\",\n\"new_name\": \"reservation day\",\n\"merge_into\": \"\",\n\"reason\": \"More specific naming for the day of a booking.\"\n},\n{\n\"id\": \"restaurant:3\",\n\"action\": \"rename\",\n\"new_name\": \"cuisine\",\n\"merge_into\": \"\",\n\"reason\": \"Standard terminology for food type.\"\n},\n{\n\"id\": \"restaurant:4\",\n\"action\": \"flag\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Refers to the system's search results count, not a restaurant property.\"\n},\n{\n\"id\": \"restaurant:5\",\n\"action\": \"rename\",\n\"new_name\": \"party size\",\n\"merge_into\": \"\",\n\"reason\": \"Industry standard term for the number of guests in a dining reservation.\"\n},\n{\n\"id\": \"restaurant:6\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard postal identifier.\"\n},\n{\n\"id\": \"restaurant:7\",\n\"action\": \"merge\",\n\"new_name\": \"\",\n\"merge_into\": \"restaurant:8\",\n\"reason\": \"Duplicate concept that represents the exact same price range information.\"\n},\n{\n\"id\": \"restaurant:8\",\n\"action\": \"rename\",\n\"new_name\": \"price range\",\n\"merge_into\": \"\",\n\"reason\": \"Clear, direct name for cost tier.\"\n},\n{\n\"id\": \"restaurant:9\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard identifier for a confirmed table booking.\"\n},\n{\n\"id\": \"restaurant:10\",\n\"action\": \"flag\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Reflects the system's 15-minute temporary hold rather than a user booking property.\"\n},\n{\n\"id\": \"restaurant:11\",\n\"action\": \"rename\",\n\"new_name\": \"address\",\n\"merge_into\": \"\",\n\"reason\": \"Removed redundant 'restaurant' prefix for a standard attribute.\"\n},\n{\n\"id\": \"restaurant:12\",\n\"action\": \"keep\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Standard identifier for the dining establishment.\"\n},\n{\n\"id\": \"restaurant:13\",\n\"action\": \"rename\",\n\"new_name\": \"phone number\",\n\"merge_into\": \"\",\n\"reason\": \"Removed redundant 'restaurant' prefix for a standard attribute.\"\n},\n{\n\"id\": \"restaurant:14\",\n\"action\": \"merge\",\n\"new_name\": \"\",\n\"merge_into\": \"restaurant:6\",\n\"reason\": \"Exact duplicate of the postcode attribute.\"\n},\n{\n\"id\": \"restaurant:15\",\n\"action\": \"merge\",\n\"new_name\": \"\",\n\"merge_into\": \"restaurant:9\",\n\"reason\": \"Exact duplicate of the reference number attribute.\"\n},\n{\n\"id\": \"restaurant:16\",\n\"action\": \"rename\",\n\"new_name\": \"reservation time\",\n\"merge_into\": \"\",\n\"reason\": \"Removed redundant 'restaurant' prefix.\"\n},\n{\n\"id\": \"restaurant:17\",\n\"action\": \"flag\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Mixes broad generic mentions like hotel and restaurant, providing no distinct search value.\"\n},\n{\n\"id\": \"restaurant:18\",\n\"action\": \"flag\",\n\"new_name\": \"\",\n\"merge_into\": \"\",\n\"reason\": \"Values like 'centre' describe a general area, overlapping completely with the area attribute.\"\n}\n],\n\"new_attributes\": [\n{\n\"name\": \"vegetarian options\",\n\"description\": \"whether the restaurant offers vegetarian-friendly meals\",\n\"type\": \"boolean\",\n\"label\": \"vegetarian options\",\n\"reason\": \"Dietary restrictions are a key factor in choosing a dining venue.\"\n}\n]\n}\n]\n}",
+ "parsed": {
+  "headings": [
+   {
+    "heading": "train",
+    "summary": "Information and details for scheduling, routing, and booking train journeys.",
+    "decisions": [
+     {
+      "id": "train:1",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute for the train's destination station."
+     },
+     {
+      "id": "train:2",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute for the train's scheduled arrival time."
+     },
+     {
+      "id": "train:3",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute for the day the train departs."
+     },
+     {
+      "id": "train:4",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute for the train's origin station."
+     },
+     {
+      "id": "train:5",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute for the train's scheduled departure time."
+     },
+     {
+      "id": "train:6",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Too general and includes noise values like town information centers instead of train details."
+     },
+     {
+      "id": "train:7",
+      "action": "rename",
+      "new_name": "number of passengers",
+      "merge_into": "",
+      "reason": "More accurately reflects the booking size rather than just the tickets."
+     },
+     {
+      "id": "train:8",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Usually a fixed system instruction (payable at station) rather than a searchable user attribute."
+     },
+     {
+      "id": "train:9",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard identifier used to retrieve bookings."
+     },
+     {
+      "id": "train:10",
+      "action": "rename",
+      "new_name": "ticket price",
+      "merge_into": "",
+      "reason": "Clearer terminology for the cost of the journey."
+     },
+     {
+      "id": "train:11",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard unique identifier for a specific train."
+     },
+     {
+      "id": "train:12",
+      "action": "rename",
+      "new_name": "journey duration",
+      "merge_into": "",
+      "reason": "More standard phrasing for the length of a train trip."
+     }
+    ],
+    "new_attributes": [
+     {
+      "name": "ticket class",
+      "description": "the class of the seat being booked",
+      "type": "text",
+      "label": "ticket class",
+      "reason": "Passengers frequently request specific seating like first class or standard."
+     },
+     {
+      "name": "round trip",
+      "description": "whether the journey includes a return ticket",
+      "type": "boolean",
+      "label": "return ticket",
+      "reason": "Users often need to book both outbound and return journeys at once."
+     }
+    ]
+   },
+   {
+    "heading": "hotel",
+    "summary": "Information for searching, comparing, and booking overnight accommodations.",
+    "decisions": [
+     {
+      "id": "hotel:1",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "hotel:5",
+      "reason": "The examples are specific names of establishments, not generic accommodation types."
+     },
+     {
+      "id": "hotel:2",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute for a physical location."
+     },
+     {
+      "id": "hotel:3",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Values like 'room' and 'city' do not describe actual amenities and represent noise."
+     },
+     {
+      "id": "hotel:4",
+      "action": "rename",
+      "new_name": "accommodation type",
+      "merge_into": "",
+      "reason": "A better name to represent categories like guesthouse or hotel."
+     },
+     {
+      "id": "hotel:5",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard identifier for the specific property."
+     },
+     {
+      "id": "hotel:6",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute for defining a general area."
+     },
+     {
+      "id": "hotel:7",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute defining the length of the stay."
+     },
+     {
+      "id": "hotel:8",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Reflects the system's count of search results, not a property of the hotel itself."
+     },
+     {
+      "id": "hotel:9",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute for room occupancy."
+     },
+     {
+      "id": "hotel:10",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard contact information."
+     },
+     {
+      "id": "hotel:11",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard postal identifier."
+     },
+     {
+      "id": "hotel:12",
+      "action": "rename",
+      "new_name": "price range",
+      "merge_into": "",
+      "reason": "More common terminology for a cost tier."
+     },
+     {
+      "id": "hotel:13",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard identifier for a confirmed reservation."
+     },
+     {
+      "id": "hotel:14",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Belongs under the restaurant heading, not hotel."
+     },
+     {
+      "id": "hotel:15",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "hotel:5",
+      "reason": "Represents the specific names of accommodations, which belongs with hotel name."
+     },
+     {
+      "id": "hotel:16",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard quality rating for hospitality."
+     },
+     {
+      "id": "hotel:17",
+      "action": "rename",
+      "new_name": "check-in day",
+      "merge_into": "",
+      "reason": "Industry standard terminology for the start date of a hotel stay."
+     }
+    ],
+    "new_attributes": [
+     {
+      "name": "has parking",
+      "description": "whether the accommodation provides a place to park",
+      "type": "boolean",
+      "label": "free parking",
+      "reason": "Guests traveling by car heavily filter accommodations by parking availability."
+     },
+     {
+      "name": "has wifi",
+      "description": "whether the accommodation provides internet access",
+      "type": "boolean",
+      "label": "free wifi",
+      "reason": "Internet access is a primary requirement for most modern travelers."
+     }
+    ]
+   },
+   {
+    "heading": "restaurant",
+    "summary": "Information for finding, comparing, and reserving tables at dining establishments.",
+    "decisions": [
+     {
+      "id": "restaurant:1",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard attribute for a general neighborhood or location."
+     },
+     {
+      "id": "restaurant:2",
+      "action": "rename",
+      "new_name": "reservation day",
+      "merge_into": "",
+      "reason": "More specific naming for the day of a booking."
+     },
+     {
+      "id": "restaurant:3",
+      "action": "rename",
+      "new_name": "cuisine",
+      "merge_into": "",
+      "reason": "Standard terminology for food type."
+     },
+     {
+      "id": "restaurant:4",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Refers to the system's search results count, not a restaurant property."
+     },
+     {
+      "id": "restaurant:5",
+      "action": "rename",
+      "new_name": "party size",
+      "merge_into": "",
+      "reason": "Industry standard term for the number of guests in a dining reservation."
+     },
+     {
+      "id": "restaurant:6",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard postal identifier."
+     },
+     {
+      "id": "restaurant:7",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "restaurant:8",
+      "reason": "Duplicate concept that represents the exact same price range information."
+     },
+     {
+      "id": "restaurant:8",
+      "action": "rename",
+      "new_name": "price range",
+      "merge_into": "",
+      "reason": "Clear, direct name for cost tier."
+     },
+     {
+      "id": "restaurant:9",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard identifier for a confirmed table booking."
+     },
+     {
+      "id": "restaurant:10",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Reflects the system's 15-minute temporary hold rather than a user booking property."
+     },
+     {
+      "id": "restaurant:11",
+      "action": "rename",
+      "new_name": "address",
+      "merge_into": "",
+      "reason": "Removed redundant 'restaurant' prefix for a standard attribute."
+     },
+     {
+      "id": "restaurant:12",
+      "action": "keep",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Standard identifier for the dining establishment."
+     },
+     {
+      "id": "restaurant:13",
+      "action": "rename",
+      "new_name": "phone number",
+      "merge_into": "",
+      "reason": "Removed redundant 'restaurant' prefix for a standard attribute."
+     },
+     {
+      "id": "restaurant:14",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "restaurant:6",
+      "reason": "Exact duplicate of the postcode attribute."
+     },
+     {
+      "id": "restaurant:15",
+      "action": "merge",
+      "new_name": "",
+      "merge_into": "restaurant:9",
+      "reason": "Exact duplicate of the reference number attribute."
+     },
+     {
+      "id": "restaurant:16",
+      "action": "rename",
+      "new_name": "reservation time",
+      "merge_into": "",
+      "reason": "Removed redundant 'restaurant' prefix."
+     },
+     {
+      "id": "restaurant:17",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Mixes broad generic mentions like hotel and restaurant, providing no distinct search value."
+     },
+     {
+      "id": "restaurant:18",
+      "action": "flag",
+      "new_name": "",
+      "merge_into": "",
+      "reason": "Values like 'centre' describe a general area, overlapping completely with the area attribute."
+     }
+    ],
+    "new_attributes": [
+     {
+      "name": "vegetarian options",
+      "description": "whether the restaurant offers vegetarian-friendly meals",
+      "type": "boolean",
+      "label": "vegetarian options",
+      "reason": "Dietary restrictions are a key factor in choosing a dining venue."
+     }
+    ]
+   }
+  ]
+ },
+ "errors": []
+}

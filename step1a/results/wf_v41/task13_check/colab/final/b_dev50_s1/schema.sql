@@ -1,0 +1,60 @@
+CREATE TABLE "train_journey" (
+  "train_journey_id" INTEGER,
+  "departure location" TEXT,
+  "arrival location" TEXT,
+  "departure time" TIME,
+  "price per ticket" NUMERIC(10, 2),
+  "number of trains" INTEGER,
+  "time query" TEXT,
+  "travel time" INTERVAL,
+  "arrival time" TIME,
+  "total fee" NUMERIC(10, 2),
+  "train id" INTEGER,
+  "reference number" INTEGER,
+  PRIMARY KEY ("train_journey_id")
+);
+
+CREATE TABLE "hotel_booking" (
+  "hotel_booking_id" INTEGER,
+  "hotel location" TEXT,
+  "location" TEXT,
+  "star rating" INTEGER,
+  "specific price" TEXT,
+  "hotel phone number" INTEGER,
+  "specific hotel name" TEXT,
+  "hotel number of nights" INTEGER,
+  "hotel address" TEXT,
+  "location description" TEXT,
+  "hotel name" TEXT,
+  "reference number" INTEGER,
+  "hotel number of guests" INTEGER,
+  "hotel type" TEXT,
+  "price adjective" TEXT,
+  "start date" TEXT,
+  "price range" TEXT,
+  "price extreme" TEXT,
+  PRIMARY KEY ("hotel_booking_id")
+);
+
+CREATE TABLE "restaurant_reservation" (
+  "restaurant_reservation_id" INTEGER,
+  "number of options" INTEGER,
+  "restaurant area" TEXT,
+  "price range" TEXT,
+  "reservation time" TIME,
+  "time for taxi" TIME,
+  "number of results" INTEGER,
+  "restaurant phone number" TEXT,
+  "restaurant address" TEXT,
+  "restaurant food type" TEXT,
+  "postcode" INTEGER,
+  "number of people" INTEGER,
+  "reservation date" TEXT,
+  "taxi phone numbers" INTEGER,
+  "restaurant name" TEXT,
+  "reference number" INTEGER,
+  "restaurant phone numbers" TEXT,
+  "entry fee" TEXT,
+  "restaurant location" TEXT,
+  PRIMARY KEY ("restaurant_reservation_id")
+);

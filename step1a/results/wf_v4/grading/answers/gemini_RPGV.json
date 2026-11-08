@@ -1,0 +1,70 @@
+{
+ "code": "RPGV",
+ "grouping": {
+  "score": 2,
+  "reason": "Missing taxi and attraction tables completely, and merged train columns are missing important fields like departure and destination."
+ },
+ "names": {
+  "score": 3,
+  "reason": "Tables are named as booking tables but contain base entity columns, which is confusing."
+ },
+ "relationships": {
+  "score": 5,
+  "reason": "Tables are merged as per the allowed alternative, so no foreign keys are needed between place and booking."
+ },
+ "keys": {
+  "score": 4,
+  "reason": "Primary keys are correctly defined for the booking tables, though foreign keys are omitted due to merging."
+ },
+ "design_quality": {
+  "score": 2,
+  "reason": "Merging places with bookings using the booking ID as the primary key means unbooked places cannot be stored, and place data is duplicated for multiple bookings."
+ },
+ "answerability": [
+  {
+   "q": 1,
+   "answer": "yes",
+   "reason": "train_trainid and train_requested_people are in train_booking."
+  },
+  {
+   "q": 2,
+   "answer": "no",
+   "reason": "train_leave_at is present, but arrive by, departure, and destination are missing."
+  },
+  {
+   "q": 3,
+   "answer": "yes",
+   "reason": "hotel_name, hotel_requested_day, hotel_requested_stay, and hotel_requested_people are in hotel_booking."
+  },
+  {
+   "q": 4,
+   "answer": "no",
+   "reason": "hotel_parking is missing from the schema."
+  },
+  {
+   "q": 5,
+   "answer": "yes",
+   "reason": "restaurant_confirmed_reference and restaurant_phone are in restaurant_booking."
+  },
+  {
+   "q": 6,
+   "answer": "partly",
+   "reason": "Can query restaurant_booking for area, food, and price range, but only if they have been booked."
+  },
+  {
+   "q": 7,
+   "answer": "no",
+   "reason": "The taxi table is completely missing."
+  },
+  {
+   "q": 8,
+   "answer": "no",
+   "reason": "The attraction table is completely missing."
+  }
+ ],
+ "overall": {
+  "score": 2,
+  "reason": "Several big errors: two entire domains (taxi, attraction) are missing, train data is heavily truncated, and merging base entities with bookings under a booking PK is poor design."
+ },
+ "model": "Gemini 3.1 Pro (gemini.google.com web app, Syracuse Edu account, mode 'Pro', temporary chat, default settings) (Gemini web app, by hand) (Gemini API, temperature 1.0, packet only)"
+}

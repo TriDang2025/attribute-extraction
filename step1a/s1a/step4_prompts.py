@@ -64,7 +64,7 @@ many side, whose rows carry the reference), "to" is the table it refers to, "kin
 "reason" is one short sentence. If two tables are related many-to-many, or a relationship needs a table of its own,
 add a new linking table in new_tables (name, description, what one row stands for, and the two tables it sits
 between); the relationships of a new table are listed like any other. Do not invent a relationship that the columns do
-not support.
+not support.{notes}
 {json_only} Shape (the names here are made up):
 {{"relationships": [{{"from": "loan", "to": "book", "kind": "one_to_many", "reason": "A book is lent many times."}}],
  "new_tables": [{{"name": "loan_item", "description": "...", "row": "one book on one loan", "between": ["loan", "book"]}}]}}
@@ -83,7 +83,7 @@ Finish the design: for every table (the new linking tables too) give
 - the foreign keys: the column of this table, the table it refers to and the column of that table (an id, or
   "new:<name>" for a new column or a new key; for a new key use "new:" plus its new_id_name).
 Every relationship below must be implemented by a foreign key in the table on its "from" side (a linking table
-implements its own relationships). Every column listed under a table must appear in that table, exactly once.
+implements its own relationships). Every column listed under a table must appear in that table, exactly once.{notes}
 {json_only} Shape (the names and ids here are made up):
 {{"tables": [{{"name": "loan", "primary_key": "new", "new_id_name": "loan id",
    "columns": [{{"column": "x:3", "name": "due date", "type": "date"}}, {{"column": "new:book id", "name": "book id", "type": "id"}}],
@@ -105,6 +105,27 @@ For every table give a name (lower case), a one-sentence description and what on
 
 Dialogues:
 """
+
+# wf_v4.1 (diary 6 Nov, task 4; approved changes): (1) keep flagged duplicates, do not drop them; (2) consider booking tables and links
+# between tables; (3) a natural key when one exists, else a new id. Version "v0" gives the frozen wf_v4 text exactly.
+VERSIONS = ("v0", "v41")
+V41_NOTE_41 = (
+    "\nKeep every column that holds real information in a group, also when it is flagged as a possible duplicate or the checker doubts it; "
+    "list a column as unused only when it clearly holds nothing a database would store. Some columns describe a thing itself (its "
+    "lasting properties, such as its name or size); others describe an event or a transaction that involves the thing (such as a "
+    "request, a reservation, an order or a loan, with its own time, quantity or reference code). Put such columns in separate groups, one "
+    "per kind of event or transaction, apart from the columns of the thing it involves.")
+V41_NOTE_43 = ("\nA table of events or transactions (for example loans) usually refers to the table of the thing they involve (for example "
+               "books); check every such pair of tables.")
+V41_NOTE_44 = ("\nFor the primary key use a natural key when one exists: a column whose value is different for every row, such as a "
+               "unique name or code of the thing. Use \"new\" only when no column can do this.")
+
+
+def _note(version, v41_text):
+    if version not in VERSIONS:
+        raise ValueError(f"unknown prompt version {version!r}")
+    return v41_text if version == "v41" else ""
+
 
 VALUE_TYPE_TO_TYPE = {"number": "integer"}   # Step-3 value types that are not canonical types; all others (text, time, day, price, ...) are
 OPTIONS = ["P1", "P2", "P3", "P4", "P5"]
@@ -238,11 +259,11 @@ def _ref(ids):
 
 
 # ---------------------------------------------------------------- 4.1 group
-def build_prompt_41(column_block, cols):
+def build_prompt_41(column_block, cols, version="v0"):
     """(prompt, schema) of 4.1. `column_block` is the rendered columns; `cols` gives the ids for the schema enums."""
     ids = [c["id"] for c in cols]
     ents = list(dict.fromkeys(_entity(c) for c in cols))
-    notes = DATA_SIGNALS_NOTE if any(c.get("data_signal") for c in cols) else ""
+    notes = (DATA_SIGNALS_NOTE if any(c.get("data_signal") for c in cols) else "") + _note(version, V41_NOTE_41)
     text = INSTRUCTION_41.format(n_ent=len(ents), n_cols=len(ids), notes=notes, json_only=_JSON_ONLY) + column_block + "\nReturn the JSON object now.\n"
     schema = _obj({
         "groups": _arr(_obj({"group": {"type": "string", "pattern": r"^G[0-9]+$"}, "columns": _arr({"enum": ids}), "note": _S})),
@@ -346,11 +367,11 @@ def _render_tables(tables, cb):
 
 
 # ---------------------------------------------------------------- 4.3 relationships
-def build_prompt_43(a41, a42, cols):
+def build_prompt_43(a41, a42, cols, version="v0"):
     """(prompt, schema) of 4.3 from the 4.1 and 4.2 answers."""
     tables = named_tables(a41, a42)
     names = [t["name"] for t in tables]
-    text = INSTRUCTION_43.format(json_only=_JSON_ONLY) + _render_tables(tables, _by_id(cols)) + "\nReturn the JSON object now.\n"
+    text = INSTRUCTION_43.format(json_only=_JSON_ONLY, notes=_note(version, V41_NOTE_43)) + _render_tables(tables, _by_id(cols)) + "\nReturn the JSON object now.\n"
     schema = _obj({
         "relationships": _arr(_obj({"from": _S, "to": _S, "kind": {"enum": KINDS}, "reason": _S})),
         "new_tables": _arr(_obj({"name": _S, **_TABLE_TEXT, "between": {"type": "array", "items": {"enum": names}, "minItems": 2, "maxItems": 2}}))})
@@ -384,13 +405,13 @@ def validate_43(a, a41, a42):
 
 
 # ---------------------------------------------------------------- 4.4 keys and types
-def build_prompt_44(a41, a42, a43, cols):
+def build_prompt_44(a41, a42, a43, cols, version="v0"):
     """(prompt, schema) of 4.4 from the answers of 4.1 to 4.3."""
     tables = named_tables(a41, a42, a43)
     names = [t["name"] for t in tables]
     ids = [c["id"] for c in cols]
     rels = "\n".join(f"- {r['from']} -> {r['to']} ({r['kind']}): {r['reason']}" for r in a43.get("relationships", [])) or "(none)"
-    text = (INSTRUCTION_44.format(types=_TYPE_HELP, json_only=_JSON_ONLY) + _render_tables(tables, _by_id(cols))
+    text = (INSTRUCTION_44.format(types=_TYPE_HELP, json_only=_JSON_ONLY, notes=_note(version, V41_NOTE_44)) + _render_tables(tables, _by_id(cols))
             + "\nRelationships (from = refers to, to = referred to):\n" + rels + "\n\nReturn the JSON object now.\n")
     col = _obj({"column": _ref(ids), "name": _S, "type": {"enum": TYPES}})
     fk = _obj({"column": _ref(ids), "ref_table": {"enum": names}, "ref_column": _ref(ids)})

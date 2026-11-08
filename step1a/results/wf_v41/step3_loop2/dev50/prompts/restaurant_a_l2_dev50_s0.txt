@@ -1,0 +1,85 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+
+Entity E2: 4 clusters.
+
+Placement options (copy one exactly into "placement"):
+- current entity E2: the attribute belongs to E2
+- sub-entity of E2: a part of E2 that has attributes of its own
+- other entity E0: the attribute belongs to E0
+- other entity E1: the attribute belongs to E1
+- other entity E3: the attribute belongs to E3
+- other entity E4: the attribute belongs to E4
+- relationship(E2, E0): links E2 and E0
+- relationship(E2, E1): links E2 and E1
+- relationship(E2, E3): links E2 and E3
+- relationship(E2, E4): links E2 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### L2:restaurant#0  (mentions 23, distinct values 17)
+Examples:
+- L2:restaurant#0:0 [user] previous turn, system: i've pulled up their info, what would you like to know? | turn: I need reservations for 5 people at 15:15 on Sunday. I'll need the [[reference number]] as well.
+- L2:restaurant#0:1 [user] previous turn, system: La raza is a spanish restaurant in the centre area. It is considered cheap | turn: Can I get their address and [[phone number]], please?
+- L2:restaurant#0:2 [system] previous turn, user: I am looking for a place to dine. The restaurant should serve african food and should be in the centre | turn: There is one African restuarant in the Center. It is named Bedouin, and is expensive. Their phone number is [[01223367660]]. Would you like me to book for you?
+- L2:restaurant#0:3 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is [[01223 249955]].
+- L2:restaurant#0:4 [system] previous turn, user: What is the phone number? | turn: The phone number for the Nirala is [[01223 360966]]. Is there anything else I can help you with?
+- L2:restaurant#0:5 [system] previous turn, user: Not really, no. What's the address, postcode, and phone number for your favorite? | turn: Oh well if your letting me decide then kymmoy serves the best asian oriental food! Phone is [[01223311911]] postcode is cb12as and they are at 100 Mill Rd City Centre
+- L2:restaurant#0:6 [system] previous turn, user: I don't need a reservation, but could you give me their phone number? | turn: Their phone number is [[01223354755]].
+- L2:restaurant#0:7 [system] previous turn, user: Sounds great. Can I get their location and phone number? | turn: Sure thing! It is located at 30 Bridge Street City Centre and the phone number is [[01223362372]]
+
+### L2:restaurant#1  (mentions 23, distinct values 19)
+Examples:
+- L2:restaurant#1:0 [user] previous turn, system: There is Taj Tandoori which is located on 64 Cherry Hinton Road. Would you like me to book a table for you? | turn: No, but can you give me the phone number and [[postcode]]? Thanks!
+- L2:restaurant#1:1 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is [[01223 249955]].
+- L2:restaurant#1:2 [system] previous turn, user: Thanks, what's the price range and phone number? | turn: It's an expensive restaurant and the number is [[01223367660]].
+- L2:restaurant#1:3 [system] previous turn, user: Not really, no. What's the address, postcode, and phone number for your favorite? | turn: Oh well if your letting me decide then kymmoy serves the best asian oriental food! Phone is 01223311911 postcode is cb12as and they are at [[100 Mill Rd]] City Centre
+- L2:restaurant#1:4 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is [[43 High Street]] Cherry Hinton Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is 01223 249955.
+- L2:restaurant#1:5 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is C.B 1, [[9 H.X]], and their phone number is 01223 249955.
+- L2:restaurant#1:6 [user] previous turn, system: I have 21 different choices- did you have a type of food in mind? | turn: No, I don't, actually. Surprise me with the type of food and give me the restaurant's [[address]].
+- L2:restaurant#1:7 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is [[C.B 1]], 9 H.X, and their phone number is 01223 249955.
+
+### L2:restaurant#2  (mentions 26, distinct values 17)
+Examples:
+- L2:restaurant#2:0 [user] previous turn, system: One of them is cheap and the other is moderately price. | turn: Tell me the [[address]] of the moderately priced one.
+- L2:restaurant#2:1 [user] turn: I am craving Turkish food in the [[centre]]. Is there a restaurant available?
+- L2:restaurant#2:2 [user] previous turn, system: What is the food type you would prefer? | turn: I don't care. I just need to know the address, phone number, and [[postcode]] of the venue please.
+- L2:restaurant#2:3 [system] previous turn, user: Thanks, what's the price range and phone number? | turn: It's an expensive restaurant and the number is [[01223367660]].
+- L2:restaurant#2:4 [system] previous turn, user: No, I don't, actually. Surprise me with the type of food and give me the restaurant's address. | turn: The oak bistro is an excellent choice for british food. The address is [[6 Lensfield Road]].
+- L2:restaurant#2:5 [user] turn: I want to find an expensive restaurant in the [[centre of town]].
+- L2:restaurant#2:6 [user] turn: I'm looking for somewhere to eat, that's moderately priced and in the [[city centre]].
+- L2:restaurant#2:7 [user] previous turn, system: Okay! What is your departure site? | turn: I'm coming from [[city stop restaurant]].
+
+### L2:restaurant#3  (mentions 29, distinct values 21)
+Examples:
+- L2:restaurant#3:0 [user] previous turn, system: i've pulled up their info, what would you like to know? | turn: I need reservations for 5 people at 15:15 on Sunday. I'll need the [[reference number]] as well.
+- L2:restaurant#3:1 [system] previous turn, user: I am looking for a place to dine. The restaurant should serve african food and should be in the centre | turn: There is one African restuarant in the Center. It is named Bedouin, and is expensive. Their phone number is [[01223367660]]. Would you like me to book for you?
+- L2:restaurant#3:2 [system] previous turn, user: Would you know what type of car will pick me up? May I please have a contact number for the taxi? | turn: Booked car type red volkswagen [[Contact number]] 07633256482
+- L2:restaurant#3:3 [system] previous turn, user: I would like to arrive by 17:15. | turn: I have a white tesla booked. The contact number is [[07032807056]]. Anything else today?
+- L2:restaurant#3:4 [system] previous turn, user: I want to leave the restaurant by 09:15. Please get me the contact number and car type. | turn: Booking completed! The booked car type is a blue ford, and your contact number is [[07629102425]]. Can I help you with anything else?
+- L2:restaurant#3:5 [system] previous turn, user: Would you know what type of car will pick me up? May I please have a contact number for the taxi? | turn: Booked car type red volkswagen Contact number [[07633256482]]
+- L2:restaurant#3:6 [user] previous turn, system: The tandoori palace meets your criteria. It is located at 68 Histon Road Chesterton. | turn: Please book a table for [[4]] at 15:15 on wednesday.
+- L2:restaurant#3:7 [system] previous turn, user: I want a reservation for 2 people at 17:30 on thursday. Sorry, I don't know why I said the other thing before that. I must be going crazy. | turn: Your table was booked. Your reference number is [[42XEDGDF]]. Is there anything else I can help you with?
+
+Return the JSON object now.

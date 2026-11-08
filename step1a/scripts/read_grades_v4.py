@@ -1,8 +1,8 @@
 """wf_v4 task 11: read results/wf_v4/grading/answers/<judge>_<code>[_r2].json -> grades.csv and task11.md (agreement, controls, Spearman).
 
 python scripts/read_grades_v4.py [--dir results/wf_v4/grading] [--no-auto]
-Needs key.json (written by packets_v4.py). The automatic scores come from results/wf_v4/colab/final/scores.csv (a, b, c2, e),
-results/wf_v4/scores/baselines_df.csv (d, f; full GT) and the scorer for the GT and the planted GT (--no-auto skips them).
+Needs key.json (written by packets_v4.py). The automatic scores come from results/wf_v4/colab/final/scores.csv (a, b, c2),
+results/wf_v4/scores/baselines_df.csv (d, f; full GT), results/wf_v4/scores/e_scores.csv (e, rated columns) and the scorer for the GT and the planted GT (--no-auto skips them).
 """
 import argparse
 import csv
@@ -45,7 +45,8 @@ def auto_scores(key):
     from s1a import step4_score as S
     gt = SC.load(ROOT / "gt" / "schema_gt_v1.yaml", RES / "gt", P.SETS)
     final = {}
-    for f in (RES / "colab" / "final" / "scores.csv", RES / "scores" / "baselines_df.csv"):
+    # e_scores.csv last: its rated e rows replace the unrated e rows of final/scores.csv (wf_v4.1 fix; before, e scored 0)
+    for f in (RES / "colab" / "final" / "scores.csv", RES / "scores" / "baselines_df.csv", RES / "scores" / "e_scores.csv"):
         with open(f, encoding="utf-8") as fh:
             final.update({(r["schema"], r["set"]): r for r in csv.DictReader(fh) if r["reachable_only"] == "False"})
     out = {}

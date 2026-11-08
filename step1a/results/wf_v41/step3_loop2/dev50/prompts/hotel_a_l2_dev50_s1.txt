@@ -1,0 +1,63 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+
+Entity E0: 2 clusters.
+
+Placement options (copy one exactly into "placement"):
+- current entity E0: the attribute belongs to E0
+- sub-entity of E0: a part of E0 that has attributes of its own
+- other entity E1: the attribute belongs to E1
+- other entity E2: the attribute belongs to E2
+- other entity E3: the attribute belongs to E3
+- other entity E4: the attribute belongs to E4
+- relationship(E0, E1): links E0 and E1
+- relationship(E0, E2): links E0 and E2
+- relationship(E0, E3): links E0 and E3
+- relationship(E0, E4): links E0 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### L2:hotel#2  (mentions 16, distinct values 4)
+Examples:
+- L2:hotel#2:0 [user] previous turn, system: What kind of information were you looking for? | turn: I would like a 4 star luxury place to stay. It must include [[free wifi]]. But I'm cheap as all get out, so nothing too pricey.
+- L2:hotel#2:1 [system] previous turn, user: Hello. I'm hoping to find a guesthouse in the north part of Cambridge. Are there any? | turn: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with [[free internet]] and free parking, Worth House is a good choice.
+- L2:hotel#2:2 [user] previous turn, system: I was able to book you a room for seven people for three nights, starting Monday, at Finches Bed and Breakfast. Reference number is CUL9VZ04. Is there anything else? | turn: Can you please confirm that the hotel you've booked for us offers [[free wi-fi]]? I need to be able to work while I'm there.
+- L2:hotel#2:3 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a 4 star, expensive hotel for 3 nights, starting on Saturday? 3 people. [[Wifi]] please.
+- L2:hotel#2:4 [system] previous turn, user: Can you check for moderate price range instead? | turn: The Acorn Guest House is moderately-priced, in the north. They offer [[free wifi]] as well. Would you like me to book you a room?
+- L2:hotel#2:5 [system] previous turn, user: I am also looking for a hotel in the north please. | turn: The acorn guest house is available in your selected region. It's moderately priced and includes [[free internet]] and parking.
+- L2:hotel#2:6 [user] previous turn, system: There are no 5 star hotels, do you want to choose something else | turn: Yes, can you find a place for me with [[free wifi]] in the moderate price range?
+- L2:hotel#2:7 [system] previous turn, user: how about the north? | turn: How about the Ashley Hotel? They have [[free internet]] and parking, though.
+
+### L2:hotel#3  (mentions 10, distinct values 2)
+Examples:
+- L2:hotel#3:0 [user] previous turn, system: Your booking was successful, the total fee is 66 GBP payable at the station . Your reference number is : P6G0S9IT. Is there anything else I can help you with? | turn: I need a hotel in the west with [[free parking]] please.
+- L2:hotel#3:1 [system] previous turn, user: I am also looking for a hotel in the north please. | turn: The acorn guest house is available in your selected region. It's moderately priced and includes free internet and [[parking]].
+- L2:hotel#3:2 [user] previous turn, system: We have several hotels that meet your requirements. Would you prefer a hotel that is cheap or moderate in price? | turn: Oh, I really don't worry about the price, so long as it has four stars and [[free parking]].
+- L2:hotel#3:3 [system] previous turn, user: how about the north? | turn: How about the Ashley Hotel? They have free internet and [[parking]], though.
+- L2:hotel#3:4 [user] previous turn, system: I do not have 4 or 5 star hotels in that area. Can I try something else? | turn: I want to stay at a 3 star hotel with [[free parking]].
+- L2:hotel#3:5 [system] previous turn, user: Hello. I'm hoping to find a guesthouse in the north part of Cambridge. Are there any? | turn: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with free internet and [[free parking]], Worth House is a good choice.
+- L2:hotel#3:6 [system] previous turn, user: I'd like more information about the Ashley Hotel, can you help? | turn: The ashley hotel is a moderately priced 2-star hotel in the north part of town. It offers free wifi and [[free parking]].
+- L2:hotel#3:7 [user] previous turn, system: TR7610 we have booked your train sir ! thank you ! | turn: Thank you very much! Also, can you recommend a hotel in the South part of town? I don't need internet or [[free parking]].
+
+Return the JSON object now.
