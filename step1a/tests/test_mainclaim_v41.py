@@ -12,6 +12,7 @@ from s1a import mainclaim_v41 as M  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 GOLD = {"train": ["Train day", "Train leave at"], "hotel": ["Hotel name"], "restaurant": ["Restaurant food"]}
+CFG = json.loads(M.NAME_MATCH.read_text(encoding="utf-8"))
 
 
 def test_top_label_and_found_rule():
@@ -106,10 +107,10 @@ def test_summaries_compare_and_blind_sheet():
     rows = {(r["source"], r["entity"]): r for r in M.compare_rows("dev50", gold, [s1, s2])}
     assert (rows["loop1", "all"]["found_k"], rows["loop1", "all"]["gold_n"]) == (1, 3)
     assert (rows["loop2", "all"]["found_k"], rows["loop2", "all"]["new_items"], rows["loop2", "all"]["new_mentions"]) == (2, 1, 3)
-    sheet, key = M.sheet_rows([s1, s2], gold_all)
-    assert len(sheet) == 1 and list(sheet.columns) == M.SHEET_COLS   # the loop-1 item is listed once; no GT label column
+    sheet, key = M.sheet_rows([s1, s2], gold, CFG)
+    assert len(sheet) == 1 and list(sheet.columns) == M.SHEET_COLS   # the loop-1 item is listed once; no method, no GT label column
     assert sheet.iloc[0]["example_values"] == "x | y" and sheet.iloc[0]["real"] == ""
-    assert key.iloc[0]["majority_gt_L2"] == "" and key.iloc[0]["item_id"] == "hotel:1"
+    assert key.iloc[0]["majority_gt_L2"] == "" and key.iloc[0]["item_id"] == "hotel:1" and key.iloc[0]["source"] == "loop1"
     md = M.compare_md("dev50", gold, [s1, s2], list(rows.values()), ["a note"])
     assert "1/3 (0.333)" in md and "- a note" in md
 
@@ -147,3 +148,68 @@ def test_cli_loop1_and_fake_loop2(tmp_path):
     for f in ("human_check_sheet.csv", "human_check_key.csv"):
         assert (out / "dev50" / f).exists()
     assert "gt" not in " ".join(pd.read_csv(out / "dev50" / "human_check_sheet.csv").columns).lower()
+
+
+def test_name_match():
+    gold = {"hotel": ["Hotel internet", "Hotel parking", "Hotel type", "Hotel price range"],
+            "restaurant": ["Restaurant phone", "Taxi phone", "Taxi type", "Restaurant food"]}
+    nm = lambda n, e="hotel": M.name_match(n, e, gold, CFG)   # noqa: E731
+    assert [nm(n) for n in ("internet access", "has wifi", "free wi-fi", "Hotel internet", "parking available", "hotel_parking")] ==         ["Hotel internet"] * 4 + ["Hotel parking"] * 2
+    assert nm("room type") == "" and nm("price") == "" and nm("price range") == "Hotel price range" and nm("internet") == "Hotel internet"
+    assert nm("internet", "restaurant") == ""                                  # same entity only
+    assert nm("restaurant type", "restaurant") == ""                           # a prefix word must be the gold's own
+    assert nm("phone", "restaurant") == "Restaurant phone" and nm("taxi phone", "restaurant") == "Taxi phone"
+    assert M.blind_name("Hotel pets", "hotel", gold) == "pets" and M.blind_name("hotel", "hotel", gold) == "hotel"
+
+
+def test_parse_real_and_merge_answers():
+    assert [M.parse_real(v) for v in ("yes", " Y ", "no", "0", "", None, float("nan"))] == [True, True, False, False, None, None, None]
+    with pytest.raises(ValueError):
+        M.parse_real("maybe")
+    new = pd.DataFrame({"id": [1, 2], "entity": ["hotel"] * 2, "attribute": ["a", "b"], "example_values": ["x", ""], "real": ["", ""]})
+    assert M.merge_answers(new, None) is new and M.merge_answers(new, new.copy()) is new          # nothing filled: the new sheet
+    old = new.assign(real=["yes", ""])
+    assert list(M.merge_answers(new, old)["real"]) == ["yes", ""]
+    with pytest.raises(ValueError, match="does not match"):
+        M.merge_answers(new.assign(attribute=["a", "c"]), old)
+
+
+def test_blind_shuffled_sheet_and_human_found():
+    gold = {"train": [], "hotel": ["Hotel internet", "Hotel parking"], "restaurant": []}
+    l1 = [M.item("loop1", "hotel", f"col {i}", f"hotel:{i}", [[[]]], ["v"]) for i in range(6)]
+    l2 = [M.item("loop2", "hotel", "internet access", "L2:hotel#0", [[[], []]], ["free wifi", "wifi"]),
+          M.item("loop2", "hotel", "parking available", "L2:hotel#1", [[[]]], ["parking"])]
+    s1 = {"source": "loop1", "found": {}, "new": l1, "n_items": {}}
+    s2 = {"source": "loop2", "found": {"hotel": set()}, "new": l1 + l2, "n_items": {}}
+    tear = {"source": "tear", "found": {}, "new": [M.item("tear", "hotel", "Hotel internet", "Hotel internet", [[[]]], ["yes"])], "n_items": {}}
+    sheet, key = M.sheet_rows([s1, s2, tear], gold, CFG)
+    assert len(sheet) == 9 and list(sheet["id"]) == list(range(1, 10))
+    assert list(key["source"]) != sorted(key["source"], key=M.SOURCES.index)                # shuffled, not grouped by method
+    assert M.sheet_rows([s1, s2, tear], gold, CFG)[1].equals(key)                           # fixed seed
+    assert "tear" not in sheet.to_csv() and "loop" not in sheet.to_csv()
+    by_item = dict(zip(key["item_id"], key["id"]))
+    answers = {i: None for i in key["id"]} | {by_item["L2:hotel#0"]: True, by_item["L2:hotel#1"]: False, by_item["Hotel internet"]: True}
+    fh = M.human_found([s1, s2, tear], key, answers)
+    assert fh == {"loop1": {}, "loop2": {"hotel": {"Hotel internet"}}, "tear": {"hotel": {"Hotel internet"}}}
+    rows = {(r["source"], r["entity"]): r for r in M.compare_rows("dev50", gold, [s1, s2, tear], fh)}
+    assert (rows["loop2", "all"]["found_k"], rows["loop2", "all"]["found_human_k"], rows["tear", "all"]["found_human_k"]) == (0, 1, 1)
+    md = M.compare_md("dev50", gold, [s1, s2, tear], list(rows.values()), [], fh, (3, 9))
+    assert "1/2 (0.500)" in md and "3/9 rows checked" in md and "| hotel | Hotel internet | no | check | check |" in md
+
+
+def test_cli_keeps_filled_answers(tmp_path):
+    p = tmp_path / "clusters.json"
+    p.write_text(json.dumps([{"id": "L2_hotel#0", "entity": "hotel", "keep": True, "name": "internet access",
+                              "mentions": [{"dialogue_id": "XX0001", "turn": 1, "text": "free wifi"}]}]), encoding="utf-8")
+    args = [sys.executable, "-I", str(ROOT / "scripts" / "mainclaim_v41.py"), "--set", "dev50", "--loop2", str(p), "--spans", "--out", str(tmp_path / "out")]
+    assert subprocess.run(args, capture_output=True, text=True).returncode == 0
+    d = tmp_path / "out" / "dev50"
+    key = pd.read_csv(d / "human_check_key.csv", keep_default_na=False)
+    sheet = pd.read_csv(d / "human_check_sheet.csv", keep_default_na=False)
+    sheet.loc[sheet["id"] == key.loc[key["item_id"] == "L2_hotel#0", "id"].iloc[0], "real"] = "yes"
+    sheet.to_csv(d / "human_check_sheet.csv", index=False)
+    r = subprocess.run(args, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    allrow = pd.read_csv(d / "compare.csv").query("entity == 'all'").set_index("source")
+    assert allrow.loc["loop2", "found_k"] == 31 and allrow.loc["loop2", "found_human_k"] == 32 and allrow.loc["loop1", "found_human_k"] == 31
+    assert "yes" in pd.read_csv(d / "human_check_sheet.csv", keep_default_na=False)["real"].tolist()   # the answer survived the rerun

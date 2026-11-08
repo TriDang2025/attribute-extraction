@@ -28,7 +28,7 @@ def chains(inp="c1", sets=("dev50",), seed=0):
 
 CHAINS = chains()
 V0_SCORES = ROOT / "results" / "wf_v4" / "colab" / "final" / "scores.csv"
-SHOW = ["table_f1", "grouping_f1", "gt_columns_placed", "placement", "pk_right", "pk_right_b", "rel_recall", "rel_precision", "types_right",
+SHOW = ["table_f1", "grouping_f1", "gt_columns_placed", "placement", "pk_right_b", "pk_right", "rel_recall", "rel_precision", "types_right",
         "unused_real", "duplicates"]
 
 

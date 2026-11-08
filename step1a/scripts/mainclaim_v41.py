@@ -5,7 +5,9 @@ python scripts/mainclaim_v41.py --set dev50 [--loop2 results/wf_v41/loop2/dev50/
 Loop 1 = the handover columns (handover/<set>/). Loop 2 = loop 1 + the kept clusters of clusters.json. TEAR = the columns of a TEAR run
 (score_tear_v36 / tear_cols; needs the 2.2 spans, `--spans`, default: data/mwoz22_spans.csv and the dev50b span file when they exist). A missing
 loop-2 or TEAR file is skipped with a note. Writes <out>/<set>/{compare.md, compare.csv, human_check_sheet.csv, human_check_key.csv}.
-The sheet is blind (no GT label); the key holds the majority GT label. Rules: s1a/mainclaim_v41.py.
+The sheet is blind and shuffled (id, entity, attribute, 3 example values, real): no method, no GT label. Fill `real` with yes/no and rerun
+to get "found (span + human check)"; a rerun keeps the answers (and fails if the rows changed). The key maps id -> method, item, name match,
+majority GT label. Rules: s1a/mainclaim_v41.py; name match: config/wf_v41_namematch.json.
 """
 import argparse
 import json
@@ -80,13 +82,19 @@ def run(set_name, loop2, tear, spans_paths, out):
     else:
         notes.append(f"TEAR: skipped ({'no --tear given' if not tear else f'{tear} not found'}).")
     notes.append("Spans read: " + (", ".join(str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else str(p) for p in read) or "none") + ".")
-    rows = M.compare_rows(set_name, gold, summaries)
-    sheet, key = M.sheet_rows(summaries, gold_all)
     d = Path(out) / set_name
     d.mkdir(parents=True, exist_ok=True)
+    sheet, key = M.sheet_rows(summaries, gold, json.loads(M.NAME_MATCH.read_text(encoding="utf-8")))
+    old = d / "human_check_sheet.csv"
+    sheet = M.merge_answers(sheet, pd.read_csv(old, dtype=str, keep_default_na=False) if old.exists() else None)   # keeps filled answers
+    answers = dict(zip(sheet["id"], sheet["real"].map(M.parse_real)))
+    found_human = M.human_found(summaries, key, answers)
+    cand = sorted({f"{r['name_match']} ({r['source']})" for r in key.to_dict("records") if r["name_match"]})
+    notes.append(f"Name-match candidates (count only when marked real): {', '.join(cand) or 'none'}.")
+    rows = M.compare_rows(set_name, gold, summaries, found_human)
     for name, df in (("compare.csv", pd.DataFrame(rows)), ("human_check_sheet.csv", sheet), ("human_check_key.csv", key)):
         df.to_csv(d / name, index=False, encoding="utf-8", lineterminator="\n")
-    md = M.compare_md(set_name, gold, summaries, rows, notes)
+    md = M.compare_md(set_name, gold, summaries, rows, notes, found_human, (sum(v is not None for v in answers.values()), len(answers)))
     (d / "compare.md").write_text(md, encoding="utf-8", newline="\n")
     return md, d
 

@@ -1,13 +1,15 @@
 # wf_v4.1 main claim: attribute lists on dev50 (gold = L2, rules v1.3)
 
-Found = gold attributes found (rules_groups.found: purity 0.6, coverage 0.10); new = items whose majority label is empty or no gold attribute (to be checked by hand, `human_check_sheet.csv`).
+Found (span) = gold attributes found by the mention labels (rules_groups.found: purity 0.6, coverage 0.10). Found (span + human check) also counts a new item whose name matches a gold attribute of its entity and that is marked real in `human_check_sheet.csv` (blind, shuffled; 0/15 rows checked). New = items whose majority label is empty or no gold attribute.
 
-| source | train found | hotel found | restaurant found | all found | new items | new mentions |
-|---|---|---|---|---|---|---|
-| loop1 | 8/10 (0.800) | 12/14 (0.857) | 11/16 (0.688) | 31/40 (0.775) | 12 | 52 |
-| loop2 | 8/10 (0.800) | 12/14 (0.857) | 11/16 (0.688) | 31/40 (0.775) | 15 | 81 |
+| source | train found (span) | hotel found (span) | restaurant found (span) | all found (span) | all found (span + human check) | new items | new mentions |
+|---|---|---|---|---|---|---|---|
+| loop1 | 8/10 (0.800) | 12/14 (0.857) | 11/16 (0.688) | 31/40 (0.775) | 31/40 (0.775) | 12 | 52 |
+| loop2 | 8/10 (0.800) | 12/14 (0.857) | 11/16 (0.688) | 31/40 (0.775) | 31/40 (0.775) | 15 | 81 |
 
 ## Gold attributes found by source
+
+yes = by span; check = only by name match + human check.
 
 | entity | gold attribute | loop1 | loop2 |
 |---|---|---|---|
@@ -59,3 +61,4 @@ Found = gold attributes found (rules_groups.found: purity 0.6, coverage 0.10); n
 - Loop 2: 25 clusters, 3 kept; 44 loop-2 mentions have no GT label, 0 of them in dialogues missing from the spans file (dev50 needs data/mwoz22_spans.csv, not in git: copy it from the wf-v3.6 worktree). Loop 2 = loop 1 + kept clusters.
 - TEAR: skipped (no --tear given).
 - Spans read: data\mwoz22_spans.csv, results\loop1_v37\dev50b\gt\mwoz22_spans.csv.
+- Name-match candidates (count only when marked real): Hotel internet (loop2), Hotel parking (loop2).

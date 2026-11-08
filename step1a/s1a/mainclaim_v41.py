@@ -14,11 +14,16 @@ Units: an *item* is one column (loop 1 handover column, TEAR header) or one kept
 - Gold list per entity: v34_data.level_attrs over gt_L2 (the L1 attributes of the entity plus the L2 attributes with their entity in
   GOLD_ENTS), as ctx.train of the L2 scoring.
 - New attribute: an item whose most common label (an empty label counts; ties by name) is empty or is no gold attribute of any entity.
+- Found (span + human check), diary Nov 7 task 5: found (span) plus the gold attribute that a new item's name matches (name_match, same
+  entity) when the blind human-check sheet marks the item real; for yes/no attributes (internet, parking) whose values are never spans.
+  The sheet (id, entity, attribute, 3 example values, real) hides the method and the GT label and is shuffled (seed 0); the key file maps
+  id -> method. Same sheet and rule for loop 1, loop 2 and TEAR.
 - Loop-2 mention labels: the gt_L2 of the loop-1 mention with the same (dialogue, turn, normalised value), else the (domain, slot) of a
   MultiWOZ 2.2 span with that value in the same dialogue (the cluster's domain first; slot `choice` = none), named as TEAR's attributes
   (gt_ext.slot_name); [] without a spans table.
 """
 import json
+import random
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -37,8 +42,11 @@ COVERAGE = 0.10   # rules v1.1 "cov10"
 STEP3_FOUND = {"dev50": (31, 40), "dev50b": (29, 41)}   # STEP3.md, the exit-bar table of the frozen handover
 DOMAIN_ENTITY = {"train": "train", "hotel": "hotel", "restaurant": "restaurant", "taxi": "restaurant"}
 SOURCES = ("loop1", "loop2", "tear")
-SHEET_COLS = ["row_id", "attribute", "entity", "source", "example_values", "n_mentions", "real"]
-KEY_COLS = ["row_id", "source", "entity", "attribute", "majority_gt_L2", "purity", "item_id"]
+SHEET_COLS = ["id", "entity", "attribute", "example_values", "real"]
+KEY_COLS = ["id", "source", "entity", "attribute", "item_id", "name_match", "majority_gt_L2", "purity", "n_mentions"]
+N_EXAMPLES = 3
+NAME_MATCH = ROOT / "config" / "wf_v41_namematch.json"
+YES, NO = {"yes", "y", "1", "true"}, {"no", "n", "0", "false"}
 
 
 # ---------------------------------------------------------------- label helpers (pure)
@@ -251,25 +259,86 @@ def tear_values(rows):
     return dict(out)
 
 
+# ---------------------------------------------------------------- name match + human check (diary Nov 7 task 5)
+def _tokens(text, synonyms):
+    """Lower-case word tokens of a name; `synonyms` phrases ("wi-fi" -> "internet") are replaced first, "_" read as a space."""
+    t = " " + re.sub(r"[_\s]+", " ", str(text).lower()) + " "
+    for a, b in sorted(synonyms.items(), key=lambda kv: -len(kv[0])):
+        t = t.replace(f" {a} ", f" {b} ")
+    return re.findall(r"[a-z0-9]+", t)
+
+
+def name_match(name, entity, gold_by_ent, cfg):
+    """The gold attribute of `entity` whose name matches `name`, or "". A gold name = prefix word + content words ("Hotel internet",
+    "Taxi phone"). Match: every content word is in the name, and every other word of the name is the gold
+    attribute's own prefix or a filler word (cfg["filler"], e.g. "available", "free"); so "restaurant type" does not match "Taxi type".
+    Several matches: the one whose prefix is the entity, then the most content words, then by name. cfg = config/wf_v41_namematch.json."""
+    toks = set(_tokens(name, cfg["synonyms"]))
+    hits = []
+    for g in gold_by_ent.get(entity, []):
+        pre, *content = _tokens(g, {})
+        if content and set(content) <= toks and toks - set(content) <= {pre} | set(cfg["filler"]):
+            hits.append((pre != entity, -len(content), g))
+    return min(hits)[2] if hits else ""
+
+
+def blind_name(name, entity, gold_by_ent):
+    """The name as shown on the sheet: lower case, "_" as a space, a leading prefix word of the entity's gold names dropped, so TEAR
+    headers ("Hotel pets") look like loop names ("pets")."""
+    words = re.sub(r"[_\s]+", " ", str(name)).strip().lower().split()
+    prefixes = {g.split()[0].lower() for g in gold_by_ent.get(entity, [])}
+    return " ".join(words[1:] if len(words) > 1 and words[0] in prefixes else words)
+
+
+def parse_real(v):
+    """True / False / None (not checked yet) of a `real` cell; anything else raises ValueError."""
+    t = "" if v is None else str(v).strip().lower()
+    if t in ("", "nan"):
+        return None
+    if t in YES or t in NO:
+        return t in YES
+    raise ValueError(f"real must be yes or no, got {v!r}")
+
+
+def human_found(summaries, key, answers):
+    """{source: {entity: set of gold attributes}} found by the name-match path: a sheet row whose item is new in the source's summary
+    (the loop-2 summary holds the loop-1 items too), has a name match, and is marked real (answers = {id: True/False/None})."""
+    out = {}
+    for s in summaries:
+        mine = {(it["source"], it["entity"], it["id"]) for it in s["new"]}
+        got = defaultdict(set)
+        for r in key.to_dict("records"):
+            if r["name_match"] and answers.get(r["id"]) and (r["source"], r["entity"], r["item_id"]) in mine:
+                got[r["entity"]].add(r["name_match"])
+        out[s["source"]] = dict(got)
+    return out
+
+
 # ---------------------------------------------------------------- compare
-def compare_rows(set_name, gold_by_ent, summaries):
-    """Rows (list of dicts) of compare.csv: per source and entity (and "all") the found count k/n and the new attributes."""
+def compare_rows(set_name, gold_by_ent, summaries, found_human=None):
+    """Rows (list of dicts) of compare.csv: per source and entity (and "all") the found count k/n by span (found_k) and by span + human
+    check (found_human_k: plus the name-match finds of `found_human`), and the new attributes."""
     rows = []
     for s in summaries:
-        tot = Counter()
+        extra = (found_human or {}).get(s["source"], {})
         for ent in [*gold_by_ent, "all"]:
             ents = list(gold_by_ent) if ent == "all" else [ent]
             k = sum(len(s["found"].get(e, set()) & set(gold_by_ent[e])) for e in ents)
+            kh = sum(len((s["found"].get(e, set()) | extra.get(e, set())) & set(gold_by_ent[e])) for e in ents)
             n = sum(len(gold_by_ent[e]) for e in ents)
             new = [it for it in s["new"] if it["entity"] in ents]
-            rows.append({"set": set_name, "source": s["source"], "entity": ent, "found_k": k, "gold_n": n, "found_share": k / n if n else None,
+            rows.append({"set": set_name, "source": s["source"], "entity": ent, "found_k": k, "found_human_k": kh, "gold_n": n,
+                         "found_share": k / n if n else None, "found_human_share": kh / n if n else None,
                          "items": sum(s["n_items"].get(e, 0) for e in ents), "new_items": len(new),
                          "new_mentions": sum(len(item_labels(it)) for it in new)})
     return rows
 
 
-def sheet_rows(summaries, gold_all):
-    """(sheet DataFrame, key DataFrame) of the new attributes of every source. The sheet has no GT label; the key has the majority label."""
+def sheet_rows(summaries, gold_by_ent, cfg, seed=0):
+    """(sheet DataFrame, key DataFrame) of the new attributes of every source, one row per item. The sheet is blind: no method, no GT label,
+    the name as blind_name, the N_EXAMPLES most common values; rows shuffled with `seed`, id = shuffled row number. The key (separate file)
+    maps the id to the source, item, name match and majority GT label."""
+    gold_all = {a for g in gold_by_ent.values() for a in g}
     rows, seen = [], set()
     for s in summaries:
         for it in s["new"]:
@@ -277,38 +346,59 @@ def sheet_rows(summaries, gold_all):
                 continue
             seen.add((it["source"], it["entity"], it["id"]))
             _, lab, share = is_new(it, gold_all)
-            top = [v for v, _ in sorted(Counter(v for v in it["values"] if v).items(), key=lambda kv: (-kv[1], kv[0]))[:5]]
-            rows.append({"attribute": it["name"], "entity": it["entity"], "source": it["source"], "example_values": " | ".join(top),
-                         "n_mentions": len(item_labels(it)), "real": "", "_lab": lab, "_share": share, "_id": it["id"]})
-    rows.sort(key=lambda r: (r["entity"], SOURCES.index(r["source"]), r["attribute"], r["_id"]))
+            top = [v for v, _ in sorted(Counter(v for v in it["values"] if v).items(), key=lambda kv: (-kv[1], kv[0]))[:N_EXAMPLES]]
+            rows.append({"entity": it["entity"], "shown": blind_name(it["name"], it["entity"], gold_by_ent), "example_values": " | ".join(top),
+                         "real": "", "source": it["source"], "item_id": it["id"], "attribute": it["name"],
+                         "name_match": name_match(it["name"], it["entity"], gold_by_ent, cfg),
+                         "majority_gt_L2": lab, "purity": share, "n_mentions": len(item_labels(it))})
+    rows.sort(key=lambda r: (r["entity"], SOURCES.index(r["source"]), r["attribute"], r["item_id"]))   # fixed order before the shuffle
+    random.Random(seed).shuffle(rows)
     for i, r in enumerate(rows, 1):
-        r["row_id"] = i
-    sheet = pd.DataFrame(rows, columns=SHEET_COLS)
-    key = pd.DataFrame([{"row_id": r["row_id"], "source": r["source"], "entity": r["entity"], "attribute": r["attribute"],
-                         "majority_gt_L2": r["_lab"], "purity": r["_share"], "item_id": r["_id"]} for r in rows], columns=KEY_COLS)
+        r["id"] = i
+    sheet = pd.DataFrame([{**r, "attribute": r["shown"]} for r in rows], columns=SHEET_COLS)
+    key = pd.DataFrame(rows, columns=KEY_COLS)
     return sheet, key
+
+
+def merge_answers(sheet, old):
+    """The new sheet with the `real` answers of an older sheet (DataFrame or None). Fails fast when the old sheet has answers but other rows,
+    so a rerun never drops or misplaces a filled answer."""
+    if old is None or not old["real"].map(parse_real).notna().any():
+        return sheet
+    cols = [c for c in SHEET_COLS if c != "real"]
+    same = len(old) == len(sheet) and old[cols].astype(str).reset_index(drop=True).equals(sheet[cols].astype(str).reset_index(drop=True))
+    if not same:
+        raise ValueError("the filled human-check sheet does not match the new rows (inputs changed); move it away or re-check by hand")
+    return sheet.assign(real=old["real"].fillna("").astype(str).values)
 
 
 def _fmt(k, n):
     return f"{k}/{n} ({k / n:.3f})" if n else f"{k}/0"
 
 
-def compare_md(set_name, gold_by_ent, summaries, rows, notes):
-    """compare.md: the found / new table, the per-attribute matrix and the notes."""
+def compare_md(set_name, gold_by_ent, summaries, rows, notes, found_human=None, checked=(0, 0)):
+    """compare.md: found by span and by span + human check, the per-attribute matrix and the notes. checked = (rows answered, rows)."""
     srcs = [s["source"] for s in summaries]
     by = {(r["source"], r["entity"]): r for r in rows}
     ents = [*gold_by_ent, "all"]
+    fh = found_human or {}
     lines = [f"# wf_v4.1 main claim: attribute lists on {set_name} (gold = L2, rules v1.3)", "",
-             "Found = gold attributes found (rules_groups.found: purity 0.6, coverage 0.10); new = items whose majority label is empty or no gold "
-             "attribute (to be checked by hand, `human_check_sheet.csv`).", "",
-             "| source | " + " | ".join(f"{e} found" for e in ents) + " | new items | new mentions |",
-             "|---|" + "---|" * (len(ents) + 2)]
+             "Found (span) = gold attributes found by the mention labels (rules_groups.found: purity 0.6, coverage 0.10). Found (span + human "
+             "check) also counts a new item whose name matches a gold attribute of its entity and that is marked real in "
+             f"`human_check_sheet.csv` (blind, shuffled; {checked[0]}/{checked[1]} rows checked). New = items whose majority label is empty "
+             "or no gold attribute.", "",
+             "| source | " + " | ".join(f"{e} found (span)" for e in ents) + " | all found (span + human check) | new items | new mentions |",
+             "|---|" + "---|" * (len(ents) + 3)]
     for s in srcs:
         a = by[(s, "all")]
-        lines.append(f"| {s} | " + " | ".join(_fmt(by[(s, e)]["found_k"], by[(s, e)]["gold_n"]) for e in ents) + f" | {a['new_items']} | {a['new_mentions']} |")
-    lines += ["", "## Gold attributes found by source", "", "| entity | gold attribute | " + " | ".join(srcs) + " |", "|---|---|" + "---|" * len(srcs)]
+        lines.append(f"| {s} | " + " | ".join(_fmt(by[(s, e)]["found_k"], by[(s, e)]["gold_n"]) for e in ents)
+                     + f" | {_fmt(a['found_human_k'], a['gold_n'])} | {a['new_items']} | {a['new_mentions']} |")
+    lines += ["", "## Gold attributes found by source", "", "yes = by span; check = only by name match + human check.", "",
+              "| entity | gold attribute | " + " | ".join(srcs) + " |", "|---|---|" + "---|" * len(srcs)]
     for e, attrs in gold_by_ent.items():
         for a in attrs:
-            lines.append(f"| {e} | {a} | " + " | ".join("yes" if a in s["found"].get(e, set()) else "no" for s in summaries) + " |")
+            marks = ["yes" if a in s["found"].get(e, set()) else "check" if a in fh.get(s["source"], {}).get(e, set()) else "no"
+                     for s in summaries]
+            lines.append(f"| {e} | {a} | " + " | ".join(marks) + " |")
     lines += ["", "## Notes", ""] + [f"- {n}" for n in notes]
     return "\n".join(lines) + "\n"

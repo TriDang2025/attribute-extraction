@@ -134,7 +134,7 @@ def report_md(sc):
              f"- GT columns named: {_fmt(sc['columns_named'])} (GT columns without the added ids); the answer has {sc['n_answer_columns']} columns",
              f"- Grouping F1 (named columns in the right table): {'n/a (no GT column named)' if m['grouping_f1'] is None else format(m['grouping_f1'], '.3f')} (precision {_fmt(m['grouping_precision'])}, "
              f"recall {_fmt(m['grouping_recall'])}; {_fmt(m['gt_columns_placed'])} GT columns placed)",
-             f"- Primary keys right: {_fmt(m['pk_right'])}",
+             f"- Primary keys right (rule b, the default since diary Nov 7 task 5): {_fmt(m['pk_right_b'])}; rule (a): {_fmt(m['pk_right'])}",
              f"- Relationships: precision {_fmt(m['rel_precision'])}, recall {_fmt(m['rel_recall'])}, direction {_fmt(m['rel_direction'])}",
              f"- Types right: {_fmt(m['types_right'])}", ""]
     if sc["errors"]:
