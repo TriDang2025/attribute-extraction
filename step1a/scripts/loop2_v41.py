@@ -74,27 +74,31 @@ def main():
     args = ap.parse_args()
     cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
     cfg |= {k: v for k, v in (("k", args.k), ("threshold", args.threshold)) if v is not None}
-    labels_path = Path(args.labels)
-    labels = L2.check_labels(json.loads(labels_path.read_text(encoding="utf-8")))
     from run import encoder as make_encoder
-    t0 = time.time()
     enc = make_encoder()
-    clusters, notes, n_docs, n_items = run(args.set, labels, cfg, enc, GlinerPredictor(SP.load()))
+    probe(args.set, Path(args.labels), cfg, enc, GlinerPredictor(SP.load()), paths.RESULTS / "wf_v41" / "loop2" / args.set)
     enc.save()
+
+
+def probe(set_name, labels_path, cfg, enc, predict, out):
+    """Run loop 2 on one set and write <out>/{clusters.json, evidence.csv, summary.md, run_info.json}; returns the clusters."""
+    labels = L2.check_labels(json.loads(Path(labels_path).read_text(encoding="utf-8")))
+    t0 = time.time()
+    clusters, notes, n_docs, n_items = run(set_name, labels, cfg, enc, predict)
     secs = time.time() - t0
-    out = paths.RESULTS / "wf_v41" / "loop2" / args.set
     out.mkdir(parents=True, exist_ok=True)
     (out / "clusters.json").write_text(json.dumps(clusters, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
     pd.DataFrame(L2.evidence_rows(clusters)).to_csv(out / "evidence.csv", index=False, encoding="utf-8", lineterminator="\n")
-    (out / "summary.md").write_text(L2.summary_md(clusters, args.set, cfg, labels_path.as_posix(), secs), encoding="utf-8", newline="\n")
+    (out / "summary.md").write_text(L2.summary_md(clusters, set_name, cfg, Path(labels_path).as_posix(), secs), encoding="utf-8", newline="\n")
     per_entity = {e: dict(kept=sum(c["keep"] for c in clusters if c["entity"] == e),
                           dropped=sum(not c["keep"] for c in clusters if c["entity"] == e))
                   for e in dict.fromkeys(c["entity"] for c in clusters)}
-    info = dict(set=args.set, seconds=round(secs, 1), config=cfg, labels_file=labels_path.as_posix(), n_labels=len(labels),
+    info = dict(set=set_name, seconds=round(secs, 1), config=cfg, labels_file=Path(labels_path).as_posix(), n_labels=len(labels),
                 n_dialogues=n_docs, n_turn_items=n_items, counts=per_entity, notes=notes,
                 gliner_model=str(SP.MODEL))
     (out / "run_info.json").write_text(json.dumps(info, indent=1), encoding="utf-8", newline="\n")
     print(f"done in {secs:.0f}s -> {out}")
+    return clusters
 
 
 if __name__ == "__main__":

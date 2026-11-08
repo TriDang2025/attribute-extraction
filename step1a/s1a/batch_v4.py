@@ -92,8 +92,9 @@ def main_chains():
 
 
 def chain_columns(chain, root=ROOT):
-    """Ordered column dicts of a chain (input file minus the excluded ids, then the seed order)."""
-    cols = read_json(Path(root) / INPUT_DIR / chain["set"] / f"{chain['input']}.columns.json")
+    """Ordered column dicts of a chain (input file minus the excluded ids, then the seed order). A chain may name its own input file
+    (`columns_file`, relative to root; wf_v4.1 input a2 of the Nov 16 run)."""
+    cols = read_json(Path(root) / (chain.get("columns_file") or f"{INPUT_DIR}/{chain['set']}/{chain['input']}.columns.json"))
     return I.order_columns([c for c in cols if c["id"] not in chain["exclude"]], chain["seed"])
 
 

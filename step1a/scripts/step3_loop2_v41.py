@@ -39,8 +39,15 @@ SEEDS = ORDERS
 DUP_MAX_TOKENS = 1024   # STEP3.md, duplicate check
 
 
+RUN_ROOT = None   # the Nov 16 run (scripts/nov16_v41.py) sets its run folder; default results/wf_v41
+
+
+def run_root():
+    return RUN_ROOT or paths.RESULTS / "wf_v41"
+
+
 def out_dir(set_name):
-    return paths.RESULTS / "wf_v41" / "step3_loop2" / set_name
+    return run_root() / "step3_loop2" / set_name
 
 
 def job_name(ent, set_name, s):
@@ -71,7 +78,7 @@ def check_md(set_name, include_dropped, stat_rows, cluster_rows, notes):
 
 def build(a):
     set_name, odir = a.set, out_dir(a.set)
-    clusters = json.loads((paths.RESULTS / "wf_v41" / "loop2" / set_name / "clusters.json").read_text(encoding="utf-8"))
+    clusters = json.loads((run_root() / "loop2" / set_name / "clusters.json").read_text(encoding="utf-8"))
     chosen = S3.select_clusters(clusters, a.include_dropped)
     notes = [f"Clusters in clusters.json: {len(clusters)}; sent to Step 3: {len(chosen)} "
              f"({'all with spans' if a.include_dropped else 'kept only'})."]
@@ -153,7 +160,7 @@ def voted(odir, manifest, ent):
 
 
 def read_clusters(set_name):
-    return {c["id"]: c for c in json.loads((paths.RESULTS / "wf_v41" / "loop2" / set_name / "clusters.json").read_text(encoding="utf-8"))}
+    return {c["id"]: c for c in json.loads((run_root() / "loop2" / set_name / "clusters.json").read_text(encoding="utf-8"))}
 
 
 # ------------------------------------------------------------------ duplicate check after Step 3 (diary Nov 7 task 6)

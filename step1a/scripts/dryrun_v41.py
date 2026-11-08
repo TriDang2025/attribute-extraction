@@ -22,16 +22,9 @@ CONFIG = ROOT / "config" / "wf_v41_gemini.json"
 
 
 def parsers():
-    """{format: parse(raw, job, schema) -> (parsed, errors)} for the wf_v4.1 formats; others go to llm_cache.parse_job."""
-    from s1a import llm_cache as LC
-
-    def plain_json(raw, job, schema):
-        try:
-            return json.loads(raw), []
-        except json.JSONDecodeError:
-            obj, errs = LC._obj_errors(raw, [], lambda o, e: None)
-            return obj, errs
-    return {"s1b": plain_json, "contam": plain_json, "judge": plain_json}
+    """{format: parse(raw, job, schema) -> (parsed, errors)} for the wf_v4.1 plain-JSON formats (s1a/nov16_v41.parse_answer)."""
+    from s1a import nov16_v41 as NV
+    return {f: NV.parse_answer for f in NV.PLAIN_FORMATS}
 
 
 def run(out, manifest, model_name, jobs_filter=None):
@@ -43,13 +36,7 @@ def run(out, manifest, model_name, jobs_filter=None):
         model = F.respond
     else:
         model = GM.responder(model_name, out / "gemini_cache")
-    ps = parsers()
-
-    def parse(raw, job, schema):
-        if job["format"] in ps:
-            return ps[job["format"]](raw, job, schema)
-        from s1a import llm_cache as LC
-        return LC.parse_job(raw, job["format"], schema)[:2]
+    from s1a.nov16_v41 import parse_answer as parse
     bad = 0
     for job in jobs:
         bad += F.run_jobs(out, [job], model=model, parse=parse)

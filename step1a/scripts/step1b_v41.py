@@ -28,7 +28,8 @@ def cols_of(set_name):
     return B.read_json(ROOT / "results" / "wf_v4" / "inputs" / set_name / "a.columns.json")
 
 
-def build():
+def build(out=OUT):
+    """Prompts, schemas and manifest of both sets under `out`; returns the jobs."""
     jobs, lines = [], ["| set | attributes | headings | est. prompt tokens |", "|---|---|---|---|"]
     for s in SETS:
         cols = cols_of(s)
@@ -36,21 +37,23 @@ def build():
         if B._DATASET_WORDS.search(text):
             raise ValueError(f"{s}: dataset name in the prompt")
         name = f"step1b_{s}"
-        B.write(OUT / "prompts" / f"{name}.txt", text)
-        B.write_json(OUT / "prompts" / f"{name}.schema.json", schema)
+        B.write(out / "prompts" / f"{name}.txt", text)
+        B.write_json(out / "prompts" / f"{name}.schema.json", schema)
         jobs.append({"job": name, "family": "s1b", "format": "s1b", "set": s, "run_tag": name, "prompt": f"prompts/{name}.txt",
                      "schema": f"prompts/{name}.schema.json", "max_tokens": MAX_TOKENS, "est_prompt_tokens": S1B.prompt_tokens(text)})
         lines.append(f"| {s} | {len(cols)} | {len({c['id'].split(':')[0] for c in cols})} | {S1B.prompt_tokens(text):,} |")
-    B.write_json(OUT / "manifest.json", {"stage": 1, "jobs": jobs})
-    B.write(OUT / "token_counts.md", "# Step 1b prompt sizes (estimate: pilot_input.est_tokens)\n\n" + "\n".join(lines) + "\n")
+    B.write_json(out / "manifest.json", {"stage": 1, "jobs": jobs})
+    B.write(out / "token_counts.md", "# Step 1b prompt sizes (estimate: pilot_input.est_tokens)\n\n" + "\n".join(lines) + "\n")
     print("\n".join(lines))
+    return jobs
 
 
-def check():
-    rep = ["# Step 1b dry run check", "", "**DRY RUN, not a result.** Answers come from a Gemini dry run (prompt and code test only).", ""]
+def check(out=OUT, dry=DRY):
+    """Labels and check.md from the responses under `out`. dry = folder for the DRY RUN copies of the answers (None for a real run)."""
+    rep = ["# Step 1b check", ""] + (["**DRY RUN, not a result.** Answers come from a Gemini dry run (prompt and code test only).", ""] if dry else [])
     for s in SETS:
         name = f"step1b_{s}"
-        row = B.last_row(OUT / "responses" / f"{name}.jsonl")
+        row = B.last_row(out / "responses" / f"{name}.jsonl")
         if row is None:
             rep.append(f"## {s}\nno response\n")
             continue
@@ -58,12 +61,13 @@ def check():
         a = row["parsed"] if isinstance(row["parsed"], dict) else {}
         errs = list(row["errors"]) + (S1B.validate(a, cols) if a else [])
         model = re.sub(r"[^A-Za-z0-9.-]+", "_", (row.get("model") or "unknown").split(" (")[0]).strip("_")  # short, path-safe
-        B.write_json(DRY / f"step1b_{model}_{s}.json",
-                     {"note": "DRY RUN, not a result", "model": row.get("model"), "prompt": f"results/wf_v41/step1b/prompts/{name}.txt",
-                      "guided": row.get("guided"), "prompt_tokens": row.get("prompt_tokens"), "output_tokens": row.get("output_tokens"),
-                      "raw": row["raw"], "parsed": row["parsed"], "errors": errs})
+        if dry is not None:
+            B.write_json(dry / f"step1b_{model}_{s}.json",
+                         {"note": "DRY RUN, not a result", "model": row.get("model"), "prompt": f"results/wf_v41/step1b/prompts/{name}.txt",
+                          "guided": row.get("guided"), "prompt_tokens": row.get("prompt_tokens"), "output_tokens": row.get("output_tokens"),
+                          "raw": row["raw"], "parsed": row["parsed"], "errors": errs})
         labs = S1B.labels(a, cols) if a else []
-        B.write_json(OUT / f"labels_{s}.json", labs)
+        B.write_json(out / f"labels_{s}.json", labs)
         rep += [f"## {s}", f"- model {row.get('model')}, guided JSON {row.get('guided')}, tokens in/out {row.get('prompt_tokens')}/{row.get('output_tokens')}",
                 f"- schema and rule errors: {len(errs)}" + "".join(f"\n  - {e}" for e in errs[:30]),
                 f"- loop-2 labels kept: {len(labs)}", "", "| heading | keep | rename | merge | flag | new |", "|---|---|---|---|---|---|"]
@@ -73,7 +77,7 @@ def check():
         for h in a.get("headings", []):
             rep += [f"- {h['heading']}: {n.get('name')} / {n.get('label')} / {n.get('type')}" for n in h.get("new_attributes", [])]
         rep.append("")
-    B.write(OUT / "check.md", "\n".join(rep) + "\n")
+    B.write(out / "check.md", "\n".join(rep) + "\n")
     print("\n".join(rep))
 
 
