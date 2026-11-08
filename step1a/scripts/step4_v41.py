@@ -21,15 +21,20 @@ from s1a import batch_v4 as B  # noqa: E402
 from s1a import batch_v4_fake as F  # noqa: E402
 
 OUT = ROOT / "results" / "wf_v41" / "step4_dryrun"
-CHAINS = [{"id": B.chain_id("c1", "dev50", 0), "kind": "main", "input": "c1", "set": "dev50", "seed": 0, "exclude": [], "prompt_version": "v41"}]
+def chains(inp="c1", sets=("dev50",), seed=0):
+    return [{"id": B.chain_id(inp, s, seed), "kind": "main", "input": inp, "set": s, "seed": seed, "exclude": [], "prompt_version": "v41"}
+            for s in sets]
+
+
+CHAINS = chains()
 V0_SCORES = ROOT / "results" / "wf_v4" / "colab" / "final" / "scores.csv"
 SHOW = ["table_f1", "grouping_f1", "gt_columns_placed", "placement", "pk_right", "pk_right_b", "rel_recall", "rel_precision", "types_right",
         "unused_real", "duplicates"]
 
 
-def build(out, k):
+def build(out, k, chs=None):
     if k == 1:
-        return B.build_chains_stage1(out, CHAINS).save()
+        return B.build_chains_stage1(out, chs or CHAINS).save()
     return B.build_stage(out, k)
 
 
@@ -51,13 +56,14 @@ def report(out):
     import score_v4 as SC
     status = [r for r in B.assemble_all(out, ROOT) if r["kind"] == "main"]
     gt = SC.load(ROOT / "gt" / "schema_gt_v1.yaml", ROOT / "results" / "wf_v4" / "gt", B.SETS)
+    set_of = {c["id"]: c["set"] for c in B.read_json(out / "chains.json")}
     rows = []
     for r in status:
         if r["ok"]:
-            rows += SC.score_rows(r["run"], B.read_json(out / "final" / r["run"] / "canonical.json"), gt, "dev50", ROOT / "handover")
+            rows += SC.score_rows(r["run"], B.read_json(out / "final" / r["run"] / "canonical.json"), gt, set_of[r["run"]], ROOT / "handover")
     SC.write_rows(out / "final" / "scores.csv", rows)
     v0 = {(x["schema"], x["reachable_only"]): x for x in csv.DictReader(open(V0_SCORES, encoding="utf-8"))}
-    lines = ["# wf_v4.1 task 4: v4.1 Step-4 prompts, dry run on c1 / dev50 / seed 0", "",
+    lines = [f"# wf_v4.1: v4.1 Step-4 prompts, dry run on {', '.join(set_of)}", "",
              "**DRY RUN, not a result.** v4.1 answers come from Gemini; the v0 column is the real Qwen2.5-32B run of the same chain "
              "(different models, so the comparison only shows whether the prompt changes work as intended).", ""]
     for r in status:
@@ -80,14 +86,17 @@ def main():
     ap.add_argument("--build", type=int, choices=[1, 2, 3, 4])
     ap.add_argument("--report", action="store_true")
     ap.add_argument("--fake", action="store_true")
+    ap.add_argument("--input", default="c1", choices=B.INPUTS, help="Step-4 input (diary Nov 7 task 2: a = real Step-3 handover)")
+    ap.add_argument("--sets", default="dev50", help="comma list, e.g. dev50,dev50b")
     a = ap.parse_args()
+    chs = chains(a.input, tuple(a.sets.split(",")))
     if a.fake:
         for k in (1, 2, 3, 4):
-            F.run_jobs(a.dir, build(a.dir, k))
+            F.run_jobs(a.dir, build(a.dir, k, chs))
         report(a.dir)
         return
     if a.build:
-        jobs = build(a.dir, a.build)
+        jobs = build(a.dir, a.build, chs)
         print(f"stage {a.build}: {len(jobs)} jobs")
     if a.report:
         report(a.dir)

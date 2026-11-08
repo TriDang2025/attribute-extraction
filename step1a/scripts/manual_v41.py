@@ -25,7 +25,9 @@ PACK = Path(r"C:\Users\nguye\OneDrive\Desktop\Work\TEAR\report\3_main\wf_v4.1\ge
 STEP4 = RES / "step4_dryrun"
 # (group, job dir, manifests); Step 4 has one manifest per stage, built one after the other
 GROUPS = [("step1b", RES / "step1b", ["manifest.json"]),
+          ("step1b", RES / "step1b_r2", ["manifest.json"]),  # diary Nov 7 task 4 (repeat, compare counts only)
           ("step4", STEP4, ["manifest.json"] + [f"manifest_stage{k}.json" for k in (2, 3, 4)]),
+          ("step4", RES / "step4_dryrun_a", ["manifest.json"] + [f"manifest_stage{k}.json" for k in (2, 3, 4)]),  # diary Nov 7 task 2
           ("judge", RES / "judge", ["manifest.json"]),
           ("step3", RES / "step3_loop2" / "dev50", ["manifest.json"]),
           ("step3", RES / "step3_loop2" / "dev50b", ["manifest.json"])]
@@ -97,21 +99,24 @@ def import_answers(pack):
 
 
 def next_step4():
-    """Build the next Step-4 stage when every job of the last built stage has a response (stage 1 is built if missing)."""
+    """Build the next Step-4 stage of each Step-4 dir when every job of its last built stage has a response (stage 1 of the c1 dir is
+    built if missing; the input-a dir is built by step4_v41.py --input a --build 1)."""
     import step4_v41 as S4
-    if not (STEP4 / "manifest.json").exists():
-        S4.build(STEP4, 1)
-        return
-    for k in (2, 3, 4):
-        prev = STEP4 / ("manifest.json" if k == 2 else f"manifest_stage{k - 1}.json")
-        cur = STEP4 / f"manifest_stage{k}.json"
-        if cur.exists():
+    for d in [x for g, x, _ in GROUPS if g == "step4"]:
+        if not (d / "manifest.json").exists():
+            if d == STEP4:
+                S4.build(STEP4, 1)
             continue
-        jobs = B.read_json(prev)["jobs"]
-        if jobs and all(B.last_row(STEP4 / "responses" / f"{j['job']}.jsonl") for j in jobs):
-            built = S4.build(STEP4, k)
-            print(f"Step 4 stage {k}: {len(built)} new prompt(s)")
-        return
+        for k in (2, 3, 4):
+            prev = d / ("manifest.json" if k == 2 else f"manifest_stage{k - 1}.json")
+            cur = d / f"manifest_stage{k}.json"
+            if cur.exists():
+                continue
+            jobs = B.read_json(prev)["jobs"]
+            if jobs and all(B.last_row(d / "responses" / f"{j['job']}.jsonl") for j in jobs):
+                built = S4.build(d, k)
+                print(f"Step 4 stage {k} ({d.name}): {len(built)} new prompt(s)")
+            break
 
 
 def main():
