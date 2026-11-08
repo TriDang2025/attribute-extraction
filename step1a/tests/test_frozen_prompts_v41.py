@@ -1,4 +1,4 @@
-"""Frozen prompts (diary Nov 7, user decision 2026-11-08): Step 1b and Step 4 v4.1.
+"""Frozen prompts and thresholds (diary Nov 7, 2026-11-08): Step 1b and Step 4 v4.1 prompts, loop 2 thresholds.
 
 Rebuilding the prompts from the dry-run inputs must give byte-for-byte the files that were dry-run in Gemini. If this test fails, a
 frozen prompt changed: undo the change, or get the user's OK and re-freeze (rebuild the dry-run files) on purpose.
@@ -22,6 +22,12 @@ STEP4 = RES / "step4_dryrun_a"
 
 def _read(p):
     return Path(p).read_text(encoding="utf-8")
+
+
+def test_loop2_thresholds_frozen():
+    """Diary Nov 7 task 3: defaults kept after the sensitivity check (results/wf_v41/loop2_sens/report.md), frozen 2026-11-08."""
+    assert B.read_json(ROOT / "config" / "wf_v41_loop2.json") == {
+        "k": 40, "threshold": 0.3, "min_dialogues": 3, "min_support": 0.05, "max_overlap": 0.5}
 
 
 @pytest.mark.parametrize("set_name", ["dev50", "dev50b"])
