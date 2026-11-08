@@ -7,7 +7,13 @@ python scripts/step3_loop2_v41.py --set dev50 --check
      3-order vote, writes answers.md (cluster, name given, action, placement).
 Input: results/wf_v41/loop2/<set>/clusters.json (scripts/loop2_v41.py) and the loop-1 run results/graph_v22_<set>/ (read only).
 Only the kept loop-2 clusters go to Step 3; --include-dropped sends all clusters and marks the manifest (dry run only).
-Jobs: <ent>_a_l2_<set>_s{0,1,2}, family "a", format "v2" (llm_cache.parse_job parses the answers). No encoder, no LLM.
+python scripts/step3_loop2_v41.py --set dev50 --dupcheck        (diary Nov 7 task 6; after the Step 3 responses)
+  -> prompts/dupcheck_l2_<set>_<ent>_o{0,1}.txt + .schema.json, manifest_dupcheck.json, new_columns.json (s1a/dupcheck_l2_v41.py)
+python scripts/step3_loop2_v41.py --set dev50 --dupcheck-apply  (after the duplicate-check responses)
+  -> columns_l2.json (final new columns; duplicates of old handover columns marked), dupcheck.md
+Jobs: <ent>_a_l2_<set>_s{0,1,2}, family "a", format "v2"; dupcheck_l2_<set>_<ent>_o{0,1}, family "dupcheck_l2", format "dupcheck".
+Every job has a schema file for guided JSON (tests/test_step3_loop2_v41.py checks it); llm_cache.parse_job parses the answers.
+No encoder, no LLM.
 """
 
 import argparse
@@ -24,11 +30,13 @@ from s1a import llm_cache as LC  # noqa: E402
 from s1a import paths  # noqa: E402
 from s1a import pilot_combine as PC  # noqa: E402
 from s1a import pilot_input as PIN  # noqa: E402
+from s1a import dupcheck_l2_v41 as DL  # noqa: E402
 from s1a import step3_loop2_v41 as S3  # noqa: E402
 from pilot_build_v31 import TOKEN_LIMIT, max_tokens  # noqa: E402
 from pilot_build_v37 import ORDERS, RunInput, a_prompts  # noqa: E402
 
 SEEDS = ORDERS
+DUP_MAX_TOKENS = 1024   # STEP3.md, duplicate check
 
 
 def out_dir(set_name):
@@ -108,29 +116,99 @@ def check(a):
     """Frozen decisions_from_v2 per order + PC.vote over the answers of each entity; writes answers.md."""
     odir = out_dir(a.set)
     manifest = json.loads((odir / "manifest.json").read_text(encoding="utf-8"))
-    clusters = {c["id"]: c for c in json.loads((paths.RESULTS / "wf_v41" / "loop2" / a.set / "clusters.json").read_text(encoding="utf-8"))}
+    clusters = read_clusters(a.set)
     lines = [f"# Step 3 naming for loop 2, {a.set}: answers", ""]
     if manifest["include_dropped"]:
         lines += ["**DRY RUN: dropped clusters were in the prompts; answers from a dry-run model are not a result.**", ""]
     lines += ["| cluster | label | loop-2 keep | name given | action | placement |", "|---|---|---|---|---|---|"]
     for ent in dict.fromkeys(j["ent"] for j in manifest["jobs"]):
-        tables, cids = [], None
-        for j in sorted((j for j in manifest["jobs"] if j["ent"] == ent), key=lambda j: j["run_tag"]):
-            obj = PC.load_obj(odir, j)
-            ids = LC.schema_enum(PC._schema(odir, j), "cluster_id")
-            if obj is None:
-                lines.append(f"| {ent} {j['run_tag']} | no response in responses/{j['job']}.jsonl | | | |")
-                continue
-            tables.append(S3.order_table(obj, ids, j["run_tag"]))
-            cids = ids
-        if not tables:
+        dec, stats, cids, missing = voted(odir, manifest, ent)
+        lines += [f"| {ent} {j['run_tag']} | no response in responses/{j['job']}.jsonl | | | |" for j in missing]
+        if dec is None:
             continue
-        dec, stats = S3.voted_table(tables)
         for r in S3.answer_rows(dec, [clusters[c] for c in cids]):
             lines.append(f"| {r['cluster']} | {r['label']} | {'keep' if r['keep'] else 'drop'} | {r['name']} | {r['action']} | "
                          f"{r['placement']} |")
-        lines.append(f"| {ent}: {len(tables)} orders | | | | agree_mean {stats['agree_mean']:.2f}, ties {stats['ties']} | |")
+        lines.append(f"| {ent}: {stats['n_orders']} orders | | | | agree_mean {stats['agree_mean']:.2f}, ties {stats['ties']} | |")
     (odir / "answers.md").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    print("\n".join(lines))
+
+
+def voted(odir, manifest, ent):
+    """(voted decision table or None, vote stats + n_orders, cluster ids, [jobs without a response]) of one entity: the frozen
+    decisions_from_v2 per order and PC.vote over the orders that have a response."""
+    tables, cids, missing = [], None, []
+    for j in sorted((j for j in manifest["jobs"] if j["ent"] == ent), key=lambda j: j["run_tag"]):
+        obj = PC.load_obj(odir, j)
+        ids = LC.schema_enum(PC._schema(odir, j), "cluster_id")
+        if obj is None:
+            missing.append(j)
+            continue
+        tables.append(S3.order_table(obj, ids, j["run_tag"]))
+        cids = ids
+    if not tables:
+        return None, None, cids, missing
+    dec, stats = S3.voted_table(tables)
+    return dec, {**stats, "n_orders": len(tables)}, cids, missing
+
+
+def read_clusters(set_name):
+    return {c["id"]: c for c in json.loads((paths.RESULTS / "wf_v41" / "loop2" / set_name / "clusters.json").read_text(encoding="utf-8"))}
+
+
+# ------------------------------------------------------------------ duplicate check after Step 3 (diary Nov 7 task 6)
+def dup_job_name(ent, set_name, o):
+    return f"dupcheck_l2_{set_name}_{ent}_o{o}"
+
+
+def dupcheck_build(a):
+    """Duplicate-check prompts (frozen v3.8 prompt, 2 orders) over the old handover columns + the new columns named by the voted Step 3
+    answer; writes prompts/dupcheck_l2_*.txt + .schema.json, manifest_dupcheck.json and new_columns.json. An entity with no new column
+    gets no job. Stops when a Step 3 response is missing."""
+    from s1a import step4_inputs as I
+    odir = out_dir(a.set)
+    manifest = json.loads((odir / "manifest.json").read_text(encoding="utf-8"))
+    clusters, handover = read_clusters(a.set), I.load_handover(a.set, paths.ROOT)
+    jobs, cols = [], {}
+    for ent in dict.fromkeys(j["ent"] for j in manifest["jobs"]):
+        dec, _, _, missing = voted(odir, manifest, ent)
+        if missing:
+            sys.exit(f"STOP: Step 3 responses missing: {[j['job'] for j in missing]}")
+        old = DL.old_columns(handover[ent])
+        new = DL.new_columns(dec, clusters, max(c["cid"] for c in old) + 1)
+        cols[ent] = {"old": old, "new": new}
+        if not new:
+            continue
+        for o, (text, schema) in DL.prompts(old, new, f"{a.set}/{ent}").items():
+            name = dup_job_name(ent, a.set, o)
+            (odir / "prompts" / f"{name}.txt").write_text(text, encoding="utf-8", newline="\n")
+            (odir / "prompts" / f"{name}.schema.json").write_text(json.dumps(schema, indent=1), encoding="utf-8", newline="\n")
+            jobs.append({"job": name, "ent": ent, "entity": handover[ent]["stage1_entity"], "family": "dupcheck_l2", "format": "dupcheck",
+                         "order_seed": o, "run_tag": f"o{o}", "stage": 2, "round": 0, "carry_from": [], "prompt": f"prompts/{name}.txt",
+                         "schema": f"prompts/{name}.schema.json", "max_tokens": DUP_MAX_TOKENS, "n_columns": len(old) + len(new),
+                         "est_prompt_tokens": PIN.est_tokens(text)})
+    (odir / "manifest_dupcheck.json").write_text(json.dumps({"set": a.set, "jobs": jobs}, indent=1), encoding="utf-8", newline="\n")
+    (odir / "new_columns.json").write_text(json.dumps(cols, indent=1), encoding="utf-8", newline="\n")
+    print(f"{len(jobs)} duplicate-check jobs; new columns: " + ", ".join(f"{e} {len(c['new'])}" for e, c in cols.items()))
+
+
+def dupcheck_apply(a):
+    """Reads the duplicate-check responses; writes columns_l2.json (final new columns per entity, duplicates marked) and dupcheck.md."""
+    odir = out_dir(a.set)
+    jobs = json.loads((odir / "manifest_dupcheck.json").read_text(encoding="utf-8"))["jobs"]
+    cols = json.loads((odir / "new_columns.json").read_text(encoding="utf-8"))
+    missing = [j["job"] for j in jobs if PC.load_obj(odir, j) is None]
+    if missing:
+        sys.exit(f"STOP: duplicate-check responses missing: {missing}")
+    final = {ent: DL.resolve(c["old"], c["new"], [PC.load_obj(odir, j) for j in jobs if j["ent"] == ent]) for ent, c in cols.items()}
+    (odir / "columns_l2.json").write_text(json.dumps(final, indent=1), encoding="utf-8", newline="\n")
+    lines = [f"# Loop 2 duplicate check, {a.set}", "",
+             "Frozen v3.8 prompt, 2 orders; a duplicate needs the same name as an old column or a join with it in both orders.", "",
+             "| entity | new column | clusters | status | duplicate of | reason | joined |", "|---|---|---|---|---|---|---|"]
+    for ent, rows in final.items():
+        lines += [f"| {ent} | {r['name']} | {', '.join(r['clusters'])} | {r['status']} | {', '.join(r['duplicate_of'])} | {r['reason']} | "
+                  f"{', '.join(r['joined'])} |" for r in rows]
+    (odir / "dupcheck.md").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     print("\n".join(lines))
 
 
@@ -140,8 +218,15 @@ def main():
     ap.add_argument("--include-dropped", action="store_true", help="dry run: send dropped clusters too")
     ap.add_argument("--seed", type=int, default=0, help="example-selection seed")
     ap.add_argument("--check", action="store_true", help="read the responses and write answers.md")
+    ap.add_argument("--dupcheck", action="store_true", help="build the duplicate-check jobs from the Step 3 answers")
+    ap.add_argument("--dupcheck-apply", action="store_true", help="read the duplicate-check responses, write columns_l2.json")
     a = ap.parse_args()
-    check(a) if a.check else build(a)
+    if a.dupcheck_apply:
+        dupcheck_apply(a)
+    elif a.dupcheck:
+        dupcheck_build(a)
+    else:
+        check(a) if a.check else build(a)
 
 
 if __name__ == "__main__":

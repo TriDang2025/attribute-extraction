@@ -1,6 +1,6 @@
 """wf_v4.1 Step 3 naming for loop 2: adapter from loop-2 clusters to the inputs of the frozen Step 3 A prompt (pure; no I/O).
 
-Loop 2 (s1a/loop2_v41.py) writes clusters.json: one cluster per label, ids "L2:<entity>#<n>", the mentions inline. The frozen A
+Loop 2 (s1a/loop2_v41.py) writes clusters.json: one cluster per label, ids "L2_<entity>#<n>", the mentions inline. The frozen A
 prompt (pilot_input.render_v2 + schema_v2, STEP3.md) wants a PilotInput whose clusters are ClusterInput(cluster_id, n_mentions,
 n_values, low_conf, examples [(ex_id, mention_id)]) and whose mentions are looked up by mention_id in export.mentions. Nothing
 in the frozen code changes: the loop-2 mentions are appended to a COPY of the loop-1 mentions table (cluster_id = the L2 id,

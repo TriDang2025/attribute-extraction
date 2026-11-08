@@ -199,7 +199,7 @@ def run_label(lab, number, docs, items, item_vecs, encoder, predict, mention_tab
     ev = evidence(ms, ent_insts, columns, mention_table, encoder, len(docs))
     keep, reason = decide(ev, cfg) if ms else (False, "no spans")
     return dict(
-        id=f"L2:{lab['entity']}#{number}", entity=lab["entity"], stage1_entity=stage1_entity, label=lab["label"],
+        id=f"L2_{lab['entity']}#{number}", entity=lab["entity"], stage1_entity=stage1_entity, label=lab["label"],
         name=lab["name"], description=lab["description"], label_value_type=lab["value_type"],
         value_type=value_types([m["text"] for m in ms]), n_mentions=len(ms), n_dialogues=ev["n_dialogues"],
         n_instances=ev["n_instances"], top_values=top_values(ms), evidence=ev, keep=keep, reason=reason,

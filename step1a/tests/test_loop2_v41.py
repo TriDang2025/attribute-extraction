@@ -95,7 +95,7 @@ def test_run_label_builds_cluster_with_evidence():
     items = L2.turn_items(DOCS)
     vecs = FakeEnc().encode([it["text"] for it in items])
     c = L2.run_label(lab(), 0, DOCS, items, vecs, FakeEnc(), fake_predict, mention_table(), INST, COLUMNS, "E1", 100, CFG)
-    assert c["id"] == "L2:train#0" and c["n_mentions"] == 2 and c["n_dialogues"] == 2
+    assert c["id"] == "L2_train#0" and c["n_mentions"] == 2 and c["n_dialogues"] == 2
     assert [m["mention_id"] for m in c["mentions"]] == [100, 101]
     assert c["mentions"][0]["text"] == "12 pounds" and c["mentions"][0]["norm_value"]
     assert c["evidence"]["support"] == 1.0 and c["evidence"]["cohesion"] == pytest.approx(1.0)
@@ -124,7 +124,7 @@ def test_no_spans_is_dropped_and_support_falls_back_to_dialogues():
     vecs = FakeEnc().encode([it["text"] for it in items])
     c = L2.run_label(lab("phone", "hotel"), 3, DOCS, items, vecs, FakeEnc(), lambda t, l, th: [[] for _ in t],
                      mention_table(), INST, [], None, 100, CFG)
-    assert c["id"] == "L2:hotel#3" and not c["keep"] and c["reason"] == "no spans"
+    assert c["id"] == "L2_hotel#3" and not c["keep"] and c["reason"] == "no spans"
     assert c["retrieval"]["scope"] == "all turns" and c["evidence"]["support_unit"].startswith("dialogues")
 
 
@@ -138,6 +138,6 @@ def test_outputs_render():
     vecs = FakeEnc().encode([it["text"] for it in items])
     c = L2.run_label(lab(), 0, DOCS, items, vecs, FakeEnc(), fake_predict, mention_table(), INST, COLUMNS, "E1", 100, CFG)
     rows = L2.evidence_rows([c])
-    assert rows[0]["id"] == "L2:train#0" and rows[0]["keep"]
+    assert rows[0]["id"] == "L2_train#0" and rows[0]["keep"]
     md = L2.summary_md([c], "dev50", CFG, "labels.json", 1.0)
     assert "min_support=0.05" in md and "| train | 1 | 1 | 0 |" in md

@@ -30,7 +30,7 @@ def mention(mid, needle, turn, cid_hint=""):
 
 def cluster(num, needles, keep=True, entity="train", stage1="E1"):
     ms = [mention(100 + 10 * num + i, n, t) for i, (n, t) in enumerate(needles)]
-    return dict(id=f"L2:{entity}#{num}", entity=entity, stage1_entity=stage1, label=f"lab{num}", name=f"n{num}", keep=keep,
+    return dict(id=f"L2_{entity}#{num}", entity=entity, stage1_entity=stage1, label=f"lab{num}", name=f"n{num}", keep=keep,
                 reason="ok" if keep else "overlap", n_mentions=len(ms), mentions=ms)
 
 
@@ -49,8 +49,8 @@ CLUSTERS = [cluster(0, [("5 people", 0), ("4 tickets", 1)]), cluster(1, [("ticke
 
 
 def test_select_clusters_kept_or_all():
-    empty = dict(CLUSTERS[0], id="L2:train#5", mentions=[])
-    assert [c["id"] for c in S3.select_clusters(CLUSTERS + [empty])] == ["L2:train#0", "L2:train#10"]
+    empty = dict(CLUSTERS[0], id="L2_train#5", mentions=[])
+    assert [c["id"] for c in S3.select_clusters(CLUSTERS + [empty])] == ["L2_train#0", "L2_train#10"]
     assert len(S3.select_clusters(CLUSTERS + [empty], include_dropped=True)) == 3
 
 
@@ -59,7 +59,7 @@ def test_merge_is_a_copy_with_loop2_ids_and_checks_collisions():
     merged = S3.merge_mentions(base, CLUSTERS)
     assert len(base) == 1 and len(merged) == 1 + 5
     row = merged[merged["mention_id"] == 100].iloc[0]
-    assert row["cluster_id"] == "L2:train#0" and row["entity"] == "E1" and row["entity_gold"] == ""
+    assert row["cluster_id"] == "L2_train#0" and row["entity"] == "E1" and row["entity_gold"] == ""
     with pytest.raises(ValueError, match="not unique"):
         S3.merge_mentions(base.assign(mention_id=100), CLUSTERS)
     with pytest.raises(ValueError, match="stage1_entity"):
@@ -70,10 +70,10 @@ def test_l2_input_examples_values_and_order():
     merged = S3.merge_mentions(base_table(), CLUSTERS)
     inp = S3.l2_input(base_inp(), merged, CLUSTERS)
     assert inp.entity == "E1" and inp.options == base_inp().options and inp.others == base_inp().others
-    assert [c.cluster_id for c in inp.clusters] == ["L2:train#0", "L2:train#1", "L2:train#10"]   # numeric, not text, order
+    assert [c.cluster_id for c in inp.clusters] == ["L2_train#0", "L2_train#1", "L2_train#10"]   # numeric, not text, order
     c0 = inp.clusters[0]
     assert (c0.n_mentions, c0.n_values, c0.low_conf) == (2, 2, False)
-    assert [e for e, _ in c0.examples] == ["L2:train#0:0", "L2:train#0:1"]
+    assert [e for e, _ in c0.examples] == ["L2_train#0:0", "L2_train#0:1"]
     assert {m for _, m in c0.examples} == {100, 101}
     with pytest.raises(ValueError, match="belongs to"):
         S3.l2_input(base_inp(), merged, [dict(CLUSTERS[0], stage1_entity="E2")])
@@ -84,11 +84,11 @@ def test_frozen_render_and_schema_accept_loop2_clusters():
     inp = S3.l2_input(base_inp(), merged, CLUSTERS)
     export = MN.Export(merged, pd.DataFrame(), pd.DataFrame(), None, None)
     text = PIN.render_v2(inp, export, {"D1": doc()}, "v2")
-    assert "### L2:train#0  (mentions 2, distinct values 2)" in text and "[[5 people]]" in text
-    assert "- L2:train#10:0 [" in text and "Entity E1: 3 clusters." in text
+    assert "### L2_train#0  (mentions 2, distinct values 2)" in text and "[[5 people]]" in text
+    assert "- L2_train#10:0 [" in text and "Entity E1: 3 clusters." in text
     ids = LC.schema_enum(PIN.schema_v2(inp), "cluster_id")
-    assert ids == ["L2:train#0", "L2:train#1", "L2:train#10"]
-    assert PIN.render_v2(inp, export, {"D1": doc()}, "v2", order_seed=1).count("### L2:train#") == 3
+    assert ids == ["L2_train#0", "L2_train#1", "L2_train#10"]
+    assert PIN.render_v2(inp, export, {"D1": doc()}, "v2", order_seed=1).count("### L2_train#") == 3
 
 
 def answer(cids, names, actions=None):
@@ -98,12 +98,12 @@ def answer(cids, names, actions=None):
 
 
 def test_l2_ids_survive_the_frozen_parser_decisions_and_vote():
-    cids = ["L2:train#0", "L2:train#1", "L2:train#10"]
+    cids = ["L2_train#0", "L2_train#1", "L2_train#10"]
     raw = json.dumps(answer(cids, ["num_people", "not_attribute", "num_people"]))
     parsed, errs, n = LC.parse_job(raw, "v2", {"properties": {"cluster_id": {"enum": cids}}})
     assert errs == [] and n == 3
     t = S3.order_table(parsed, cids, "s0")
-    assert list(t["action"]) == ["merge", "not_attribute", "merge"] and t.iloc[0]["merge_with"] == '["L2:train#10"]'
+    assert list(t["action"]) == ["merge", "not_attribute", "merge"] and t.iloc[0]["merge_with"] == '["L2_train#10"]'
     dec, stats = S3.voted_table([t, S3.order_table(parsed, cids, "s1")])
     rows = S3.answer_rows(dec, CLUSTERS)
     assert [r["name"] for r in rows] == ["num_people", "", "num_people"] and rows[1]["keep"] is False
@@ -115,7 +115,7 @@ def test_check_reads_responses_and_writes_the_table(tmp_path, monkeypatch):
     odir = tmp_path / "wf_v41" / "step3_loop2" / "dev50"
     (tmp_path / "wf_v41" / "loop2" / "dev50").mkdir(parents=True)
     (tmp_path / "wf_v41" / "loop2" / "dev50" / "clusters.json").write_text(json.dumps(CLUSTERS), encoding="utf-8")
-    cids = ["L2:train#0", "L2:train#1", "L2:train#10"]
+    cids = ["L2_train#0", "L2_train#1", "L2_train#10"]
     (odir / "prompts").mkdir(parents=True)
     (odir / "responses").mkdir()
     jobs = [SC.job_row("train", "E1", "dev50", s, 8, True, 1000) for s in SC.SEEDS]
@@ -128,7 +128,7 @@ def test_check_reads_responses_and_writes_the_table(tmp_path, monkeypatch):
     (odir / jobs[2]["schema"]).write_text(schema, encoding="utf-8")
     SC.check(type("A", (), {"set": "dev50"})())
     text = (odir / "answers.md").read_text(encoding="utf-8")
-    assert "DRY RUN" in text and "| L2:train#0 | lab0 | keep | num_people | merge | current entity E1 |" in text
+    assert "DRY RUN" in text and "| L2_train#0 | lab0 | keep | num_people | merge | current entity E1 |" in text
     assert "no response in responses/train_a_l2_dev50_s2.jsonl" in text and "2 orders" in text
 
 

@@ -56,7 +56,7 @@ def test_loop1_found_equals_step3(set_name):
 
 def fake_clusters(tmp_path, entity="train", keep=True, wrap=False, **extra):
     ms = [{"dialogue_id": "PMUL0001.json", "turn": 2, "text": "Friday"}, {"dialogue_id": "PMUL0002", "turn": 1, "text": "Monday", "norm_value": "monday"}]
-    rec = {"id": "L2:train#0", "entity": entity, "label": "travel day", "keep": keep, "mentions": ms, **extra}
+    rec = {"id": "L2_train#0", "entity": entity, "label": "travel day", "keep": keep, "mentions": ms, **extra}
     p = tmp_path / "clusters.json"
     p.write_text(json.dumps({"clusters": [rec]} if wrap else [rec]), encoding="utf-8")
     return p
@@ -99,7 +99,7 @@ def test_summaries_compare_and_blind_sheet():
     gold_all = {"Train day", "Train leave at", "Hotel name"}
     a = M.item("loop1", "train", "travel day", "train:1", [[["Train day"]] * 4], ["friday"] * 4)
     b = M.item("loop1", "hotel", "mystery", "hotel:1", [[[], ["Hotel fax"], []]], ["x", "x", "y"])
-    c = M.item("loop2", "hotel", "hotel name", "L2:hotel#0", [[["Hotel name"]] * 3], ["a b", "c d", "a b"])
+    c = M.item("loop2", "hotel", "hotel name", "L2_hotel#0", [[["Hotel name"]] * 3], ["a b", "c d", "a b"])
     s1 = M.summarize_loop("loop1", [a, b], {"train": M.totals(M.item_labels(a)), "hotel": M.totals(M.item_labels(b))}, gold)
     assert s1["found"]["train"] == {"Train day"} and s1["found"]["hotel"] == set() and [i["id"] for i in s1["new"]] == ["hotel:1"]
     s2 = M.summarize_loop("loop2", [a, b, c], {"train": M.totals(M.item_labels(a)), "hotel": M.totals(M.item_labels(b) + M.item_labels(c))}, gold)
@@ -135,7 +135,7 @@ def test_cli_loop1_and_fake_loop2(tmp_path):
     ids = [i for i, ls in labels.items() if ls == [missing]]
     ments = [{"dialogue_id": mt.loc[i, "dialogue_id"], "turn": int(mt.loc[i, "turn"]), "text": mt.loc[i, "norm_value"]} for i in ids]
     p = tmp_path / "clusters.json"
-    p.write_text(json.dumps([{"id": "L2:train#0", "entity": "train", "keep": True, "name": "x", "mentions": ments}]), encoding="utf-8")
+    p.write_text(json.dumps([{"id": "L2_train#0", "entity": "train", "keep": True, "name": "x", "mentions": ments}]), encoding="utf-8")
     out = tmp_path / "out"
     r = subprocess.run([sys.executable, "-I", str(ROOT / "scripts" / "mainclaim_v41.py"), "--set", "dev50", "--loop2", str(p), "--tear", str(tmp_path / "none.jsonl"),
                         "--out", str(out)], capture_output=True, text=True)
@@ -177,8 +177,8 @@ def test_parse_real_and_merge_answers():
 def test_blind_shuffled_sheet_and_human_found():
     gold = {"train": [], "hotel": ["Hotel internet", "Hotel parking"], "restaurant": []}
     l1 = [M.item("loop1", "hotel", f"col {i}", f"hotel:{i}", [[[]]], ["v"]) for i in range(6)]
-    l2 = [M.item("loop2", "hotel", "internet access", "L2:hotel#0", [[[], []]], ["free wifi", "wifi"]),
-          M.item("loop2", "hotel", "parking available", "L2:hotel#1", [[[]]], ["parking"])]
+    l2 = [M.item("loop2", "hotel", "internet access", "L2_hotel#0", [[[], []]], ["free wifi", "wifi"]),
+          M.item("loop2", "hotel", "parking available", "L2_hotel#1", [[[]]], ["parking"])]
     s1 = {"source": "loop1", "found": {}, "new": l1, "n_items": {}}
     s2 = {"source": "loop2", "found": {"hotel": set()}, "new": l1 + l2, "n_items": {}}
     tear = {"source": "tear", "found": {}, "new": [M.item("tear", "hotel", "Hotel internet", "Hotel internet", [[[]]], ["yes"])], "n_items": {}}
@@ -188,7 +188,7 @@ def test_blind_shuffled_sheet_and_human_found():
     assert M.sheet_rows([s1, s2, tear], gold, CFG)[1].equals(key)                           # fixed seed
     assert "tear" not in sheet.to_csv() and "loop" not in sheet.to_csv()
     by_item = dict(zip(key["item_id"], key["id"]))
-    answers = {i: None for i in key["id"]} | {by_item["L2:hotel#0"]: True, by_item["L2:hotel#1"]: False, by_item["Hotel internet"]: True}
+    answers = {i: None for i in key["id"]} | {by_item["L2_hotel#0"]: True, by_item["L2_hotel#1"]: False, by_item["Hotel internet"]: True}
     fh = M.human_found([s1, s2, tear], key, answers)
     assert fh == {"loop1": {}, "loop2": {"hotel": {"Hotel internet"}}, "tear": {"hotel": {"Hotel internet"}}}
     rows = {(r["source"], r["entity"]): r for r in M.compare_rows("dev50", gold, [s1, s2, tear], fh)}
