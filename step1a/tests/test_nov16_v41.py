@@ -183,7 +183,38 @@ def test_parse_answer_plain_and_frozen_formats():
 def test_notebook_pins_and_runs_the_pipeline():
     nb = json.loads((ROOT / "colab" / "S1A_nov16_v41_colab.ipynb").read_text(encoding="utf-8"))
     src = "".join("".join(c["source"]) for c in nb["cells"])
-    for pin in ("vllm==0.33.0", "gliner==0.2.29", "sentence-transformers==5.6.0", "5c7cb76a268fc6cfbb9c4777eb24ba6e27f9ee6c",
+    for pin in ("vllm==0.33.0", "gliner==0.2.29", "sentence-transformers==5.6.0",
                 "40ec419335d09393f298636f471328b722c6da9e", "5617a9f61b028005a4858fdac845db406aefb181"):
         assert pin in src, pin
-    assert "NV.VllmBackend(" in src and "P.run_all(RUN, backend, on_saved=push)" in src and 'BRANCH = "wf-v4.1"' in src
+    assert "NV.VllmBackend(" in src and 'P.run_all(RUN, backend, on_saved=push, copy_v4_base=SET["copy_v4_base"])' in src
+    assert 'BRANCH = "wf-v4.1"' in src and 'quantization=SET["quantization"]' in src and "TAG = SETTING" in src
+    cfg = json.loads(NV.MODELS_CONFIG.read_text(encoding="utf-8"))
+    assert f'SETTING = "qwen32b"  #@param {json.dumps([k for k in cfg if not k.startswith("_")])}' in src   # the options = the config
+
+
+# ---------------------------------------------------------------- task 9: model settings
+def test_model_settings_qwen_and_llama():
+    q, ll = NV.model_setting("qwen32b"), NV.model_setting("llama8b")
+    assert (q["model"], q["revision"], q["quantization"]) == ("Qwen/Qwen2.5-32B-Instruct-AWQ", "5c7cb76a268fc6cfbb9c4777eb24ba6e27f9ee6c", "awq")
+    assert (ll["model"], ll["quantization"]) == ("meta-llama/Llama-3.1-8B-Instruct", None) and len(ll["revision"]) == 40
+    assert q["copy_v4_base"] is True and ll["copy_v4_base"] is False      # only the v4 model reuses the v4 base chain
+    with pytest.raises(ValueError, match="unknown model setting"):
+        NV.model_setting("gpt")
+
+
+def test_fake_llm_counts_prompts_with_the_setting_tokenizer(tmp_path):
+    jobs = [_job(tmp_path, "d", "dupcheck_l2", "dupcheck", "a b c d", {"type": "object"})]
+    llm = NV.FakeLLM(tok=_Tok())
+    llm.run(tmp_path, jobs)
+    assert llm.max_prompt_tokens == 4
+    with pytest.raises(ValueError, match="over the limit"):
+        NV.FakeLLM(tok=_Tok(), limit=3).run(tmp_path / "o", [_job(tmp_path / "o", "d", "dupcheck_l2", "dupcheck", "a b c d", {})])
+
+
+def test_task13_runs_its_own_base_chain_when_not_copying(tmp_path):
+    P.stage_task13(tmp_path, NV.FakeLLM(), {"copy_v4_base": False})
+    base = [c for c in B.read_json(tmp_path / "task13" / "chains.json") if c["kind"] == "base"][0]
+    for k in (1, 2, 3, 4):
+        assert B.last_row(tmp_path / "task13" / "responses" / f"{base['id']}_4{k}.jsonl")["model"] == "fake"   # not the v4 Qwen rows
+    P.stage_task13(tmp_path / "c", NV.FakeLLM(), {"copy_v4_base": True})
+    assert B.last_row(tmp_path / "c" / "task13" / "responses" / f"{base['id']}_41.jsonl")["model"] != "fake"

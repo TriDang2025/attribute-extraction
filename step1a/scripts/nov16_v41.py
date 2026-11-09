@@ -1,7 +1,9 @@
 """wf_v4.1 diary Nov 7 task 7: the Nov 16 run. Seven stages in order, saved after each one, restartable after a crash.
 
-python scripts/nov16_v41.py --model fake [--run results/wf_v41/nov16/fake] [--stop-after loop2]
+python scripts/nov16_v41.py --model fake [--setting llama8b] [--run results/wf_v41/nov16/fake] [--stop-after loop2]
     no GPU: the fake model (s1a/nov16_v41.FakeLLM). Loop 2 runs for real, so use the chunking venv (gliner, sentence-transformers).
+    --setting (task 9): a model setting of config/wf_v41_models.json; its tokenizer counts every prompt in the model's chat template
+    (fails over the limit, as on the GPU) and its copy_v4_base decides task 13's base chain. Default run folder fake_<setting>.
 python scripts/nov16_v41.py --calls results/wf_v41/nov16/<tag>      -> rewrites <run>/calls.csv and calls.md (calls and tokens per stage)
 On Colab, colab/S1A_nov16_v41_colab.ipynb makes an s1a/nov16_v41.VllmBackend and calls run_all(run_dir, backend, on_saved=push).
 
@@ -13,7 +15,8 @@ a response, so a crash costs at most the batch in flight):
   dupcheck       step3_loop2/<set>/: v3.8 duplicate check, 2 orders, columns_l2.json, dupcheck.md
   step4          step4/: inputs/<set>/a2.columns.json, Step 4 v4.1 chains 4.1-4.4 (18 chains), final/ (batch_v4.assemble_all)
   contamination  contamination/: the probe prompt, its answer, scores.{csv,md}                 (s1a/contamination_v41.py)
-  task13         task13/: the v4 placement test: base chain copied from results/wf_v4/colab (real Qwen answers), placement stages 5-9
+  task13         task13/: the v4 placement test: base chain copied from results/wf_v4/colab (real Qwen answers; copy_v4_base=True) or
+                 run with this model (4 calls; other models), then placement stages 5-9
 """
 import argparse
 import csv
@@ -150,16 +153,23 @@ def stage_contamination(run, llm, ctx):
 
 
 def stage_task13(run, llm, ctx):
-    """The v4 placement test (gpu_todo.md): base chain answers copied from the v4 Qwen run, then one stage per held-out column."""
+    """The v4 placement test (gpu_todo.md): base chain 4.1-4.4 copied from the v4 Qwen run (ctx copy_v4_base) or run with `llm` (another
+    model must place columns into its own base schema), then one stage per held-out column."""
     out = run / "task13"
     base = [c for c in B.read_json(V4_COLAB / "chains.json") if c["kind"] == "base"]
-    B.write_json(out / "chains.json", base)
+    out.mkdir(parents=True, exist_ok=True)
     shutil.copy(V4_COLAB / "placement.json", out / "placement.json")
-    for k in (1, 2, 3, 4):
-        name = f"{base[0]['id']}_4{k}.jsonl"
-        (out / "responses").mkdir(parents=True, exist_ok=True)
-        shutil.copy(V4_COLAB / "responses" / name, out / "responses" / name)
     info = {}
+    if ctx.get("copy_v4_base", True):
+        B.write_json(out / "chains.json", base)
+        for k in (1, 2, 3, 4):
+            name = f"{base[0]['id']}_4{k}.jsonl"
+            (out / "responses").mkdir(parents=True, exist_ok=True)
+            shutil.copy(V4_COLAB / "responses" / name, out / "responses" / name)
+    else:
+        info["stage1"] = llm.run(out, B.build_chains_stage1(out, base, ROOT).save())
+        for k in (2, 3, 4):
+            info[f"stage{k}"] = llm.run(out, B.build_stage(out, k, ROOT))
     for k in range(5, 5 + B.n_place_steps(out)):
         info[f"stage{k}"] = llm.run(out, B.build_stage(out, k, ROOT))
     st = [r for r in B.assemble_all(out, ROOT) if r["kind"] == "place"]
@@ -181,7 +191,8 @@ def call_rows(run):
         if r is None:
             continue
         rel = p.relative_to(run).parts
-        copied = rel[0] == "task13" and p.stem.startswith("base_")      # the v4 base chain, not a call of this run
+        v4 = V4_COLAB / "responses" / p.name
+        copied = rel[0] == "task13" and v4.exists() and v4.read_bytes() == p.read_bytes()   # the v4 base chain, not a call of this run
         rows.append({"stage_dir": "/".join(rel[:-2]), "job": p.stem, "format": r.get("format", ""), "model": r.get("model", ""),
                      "copied": copied, "guided": r.get("guided"), "errors": len(r.get("errors") or []),
                      "prompt_tokens": r.get("prompt_tokens", 0), "output_tokens": r.get("output_tokens", 0),
@@ -209,14 +220,15 @@ def write_calls(run):
 
 
 # ---------------------------------------------------------------- run
-def run_all(run, llm, encoder=None, on_saved=None, stop_after=None, log=print):
+def run_all(run, llm, encoder=None, on_saved=None, stop_after=None, copy_v4_base=True, log=print):
     """Run the stages not yet in state.json; after each one mark it done, rewrite calls.csv and call on_saved(stage) (the notebook
-    commits and pushes there). encoder() makes the bge-m3 encoder of loop 2 (default scripts/run.py encoder)."""
+    commits and pushes there). encoder() makes the bge-m3 encoder of loop 2 (default scripts/run.py encoder). copy_v4_base: the model
+    setting's flag for task 13 (False: the model runs the base chain itself)."""
     run = Path(run)
     run.mkdir(parents=True, exist_ok=True)
     if encoder is None:
         from run import encoder
-    ctx = {"encoder": encoder}
+    ctx = {"encoder": encoder, "copy_v4_base": copy_v4_base}
     for stage in NV.STAGES:
         if stage in NV.load_state(run)["done"]:
             log(f"== {stage}: done before, skipped")
@@ -237,6 +249,7 @@ def run_all(run, llm, encoder=None, on_saved=None, stop_after=None, log=print):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--model", choices=["fake"], help="the laptop runs the fake model only; Qwen / Llama run in the notebook")
+    ap.add_argument("--setting", help="a model setting of config/wf_v41_models.json (task 9): its tokenizer and copy_v4_base")
     ap.add_argument("--run", type=Path)
     ap.add_argument("--stop-after", choices=NV.STAGES)
     ap.add_argument("--calls", type=Path, help="rewrite calls.csv / calls.md of a run folder")
@@ -247,10 +260,16 @@ def main():
         return
     if not a.model:
         ap.error("give --model fake or --calls <run>")
-    run = a.run or ROOT / "results" / "wf_v41" / "nov16" / "fake"
-    fake = NV.FakeLLM(REPLAY)
-    state = run_all(run, fake, stop_after=a.stop_after)
-    print(f"done: {state['done']}; fake answers replayed {fake.n_replayed}, made {fake.n_made}")
+    tok, copy_base = None, True
+    if a.setting:
+        from transformers import AutoTokenizer
+        st = NV.model_setting(a.setting)
+        tok, copy_base = AutoTokenizer.from_pretrained(st["model"], revision=st["revision"]), st["copy_v4_base"]
+    run = a.run or ROOT / "results" / "wf_v41" / "nov16" / ("fake_" + a.setting if a.setting else "fake")
+    fake = NV.FakeLLM(REPLAY, tok=tok)
+    state = run_all(run, fake, stop_after=a.stop_after, copy_v4_base=copy_base)
+    print(f"done: {state['done']}; fake answers replayed {fake.n_replayed}, made {fake.n_made}"
+          + (f"; longest prompt {fake.max_prompt_tokens} {a.setting} tokens" if tok else ""))
 
 
 if __name__ == "__main__":

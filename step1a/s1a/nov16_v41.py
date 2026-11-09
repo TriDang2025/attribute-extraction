@@ -9,6 +9,7 @@
   Step 1b and the seed-0 Step 4 chains are byte-identical), else writes a minimal valid answer (Step 3 A: one attribute per cluster;
   duplicate check: no joins; Step 4 and placement: batch_v4_fake). Its rows are marked "fake".
 - State: <run>/state.json lists the finished stages; a rerun skips them, and an LLM stage skips the jobs that already have a response.
+- model_setting (task 9): the model settings of config/wf_v41_models.json (Qwen2.5-32B-AWQ, Llama-3.1-8B); prompts are the same for all.
 """
 import hashlib
 import json
@@ -27,6 +28,33 @@ PLAIN_FORMATS = ("s1b", "contam", "judge")
 SETS = ("dev50", "dev50b")
 STEP4_RUNS = (("a", "dev50"), ("a", "dev50b"), ("b", "dev50"), ("c1", "dev50"), ("a2", "dev50"), ("a2", "dev50b"))
 SEEDS = (0, 1, 2)
+MODELS_CONFIG = Path(__file__).resolve().parents[1] / "config" / "wf_v41_models.json"
+SETTING_KEYS = ("model", "revision", "quantization", "min_gpu_gb", "copy_v4_base")
+
+
+def model_setting(name, path=MODELS_CONFIG):
+    """The model setting `name` of config/wf_v41_models.json: {model, revision, quantization, min_gpu_gb, copy_v4_base}."""
+    cfg = json.loads(Path(path).read_text(encoding="utf-8"))
+    names = [k for k in cfg if not k.startswith("_")]
+    if name not in names:
+        raise ValueError(f"unknown model setting {name!r}; choose one of {names}")
+    missing = [k for k in SETTING_KEYS if k not in cfg[name]]
+    if missing:
+        raise ValueError(f"model setting {name!r} misses {missing}")
+    return cfg[name]
+
+
+def chat_text(tok, text):
+    """The prompt as the model sees it: one user message in the model's chat template."""
+    return tok.apply_chat_template([{"role": "user", "content": text}], tokenize=False, add_generation_prompt=True)
+
+
+def prompt_tokens(tok, job_name, text, limit):
+    """Token count of the chat-wrapped prompt; ValueError over `limit`."""
+    n = len(tok(chat_text(tok, text), add_special_tokens=False).input_ids)
+    if n > limit:
+        raise ValueError(f"{job_name}: prompt has {n} tokens, over the limit {limit}")
+    return n
 
 
 def parse_answer(raw, job, schema):
@@ -108,9 +136,11 @@ class FakeLLM:
     """run(out, jobs): answers the jobs without a response (replay first, then a minimal valid answer)."""
     model_id = "fake"
 
-    def __init__(self, replay_dirs=()):
+    def __init__(self, replay_dirs=(), tok=None, limit=30000):
+        """tok: the tokenizer of a model setting; each job's prompt is then counted and checked against `limit` as on the GPU."""
         self.replay_dirs = [Path(d) for d in replay_dirs]
         self.n_replayed = self.n_made = 0
+        self.tok, self.limit, self.max_prompt_tokens = tok, limit, 0
 
     def replayed(self, job, prompt):
         for d in self.replay_dirs:
@@ -137,6 +167,10 @@ class FakeLLM:
 
     def run(self, out, jobs):
         todo = todo_jobs(out, jobs)
+        if self.tok is not None:
+            for j in todo:
+                n = prompt_tokens(self.tok, j["job"], (Path(out) / j["prompt"]).read_text(encoding="utf-8"), self.limit)
+                self.max_prompt_tokens = max(self.max_prompt_tokens, n)
 
         def model(job, prompt, schema):
             return self.respond(job, prompt, schema)
@@ -159,7 +193,7 @@ class VllmBackend:
         self.max_len, self.batch, self.limit, self.vllm_version, self.log = max_len, batch, limit, vllm_version, log
 
     def chat(self, text):
-        return self.tok.apply_chat_template([{"role": "user", "content": text}], tokenize=False, add_generation_prompt=True)
+        return chat_text(self.tok, text)
 
     def _generate(self, texts, items):
         try:
@@ -190,9 +224,7 @@ class VllmBackend:
         for j in jobs:
             prompt = (out / j["prompt"]).read_text(encoding="utf-8")
             schema = json.loads((out / j["schema"]).read_text(encoding="utf-8"))
-            n = len(self.tok(self.chat(prompt), add_special_tokens=False).input_ids)
-            if n > self.limit:
-                raise ValueError(f"{j['job']}: prompt has {n} tokens, over the limit {self.limit}")
+            n = prompt_tokens(self.tok, j["job"], prompt, self.limit)
             max_tokens = min(j["max_tokens"], self.max_len - n - 64)
             schema_sha = hashlib.sha256(json.dumps(schema, sort_keys=True).encode("utf-8")).hexdigest()[:16]
             params = {"temperature": 0, "max_tokens": max_tokens, "guided_json": j["schema"], "schema_sha": schema_sha}
