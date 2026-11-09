@@ -1,0 +1,154 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement code from the listed options. Examples are marked with [[...]] inside a few words of the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "mixed": false, "placement": "cur"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "mixed": false, "placement": "cur"}]}
+
+Entity E0: 20 clusters.
+
+Placement codes (copy one code into "placement"):
+- cur: the attribute belongs to E0
+- sub: a part of E0 that has attributes of its own
+- oth:E1: the attribute belongs to E1
+- oth:E2: the attribute belongs to E2
+- oth:E3: the attribute belongs to E3
+- oth:E4: the attribute belongs to E4
+- rel:E1: links E0 and E1
+- rel:E2: links E0 and E2
+- rel:E3: links E0 and E3
+- rel:E4: links E0 and E4
+- sep: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E1: guesthouse, hotel, acorn guest house; 2 night, 4 night, 5 night; wednesday, friday, sunday
+- E2: centre, centre of town, centre area; cb23bu, cb17gx, cb18dw; 01223307402, 01223314960, 01223333516
+- E3: moderately priced, moderate price range, expensive; restaurant, j restaurant, danish restaurant; centre, city centre, center of town
+- E4: 14:45, 19:15, 06:45; 07048450899, 07128258422, 07267142867; restaurant, hotel, j restaurant
+
+### E0#0  (mentions 24, distinct values 7)
+Examples:
+- E0#0:0 [system] ... cambridge at 5:11 and arriving at 5:58 on [[sunday]] .
+- E0#0:1 [user] Yes I'd like to travel on [[Friday]] .
+- E0#0:2 [system] ... and will arrive at peterborough at 13:56 on [[Monday]] . Would you like me to book a ticket?
+
+### E0#1  (mentions 6, distinct values 1)
+Examples:
+- E0#1:0 [system] There are several trains headed to [[broxbourne]] . What time of day would you like to leave?
+- E0#1:1 [user] I want a train that is leaving from [[broxbourne]] .
+- E0#1:2 [user] ... should depart from cambridge and should go to [[broxbourne]]
+
+### E0#2  (mentions 5, distinct values 4, low confidence)
+Examples:
+- E0#2:0 [system] [[What day]] are you traveling?
+- E0#2:1 [user] It might, [[what time]] does the train depart?
+- E0#2:2 [system] There are several trains headed to broxbourne. [[What time of day]] would you like to leave?
+
+### E0#3  (mentions 45, distinct values 42)
+Examples:
+- E0#3:0 [user] ... from leicester that would get me there by [[11:30]] ?
+- E0#3:1 [system] ... next train is the TR0545 leaving cambridge at [[13:06]] . Would you like me to book it or more information?
+- E0#3:2 [user] I would like to leave after [[16:15]] .
+
+### E0#4  (mentions 14, distinct values 13, low confidence)
+Examples:
+- E0#4:0 [system] Yes, [[TR2515]] departs on friday at 05:21 to stevenage, would you like me to ...
+- E0#4:1 [system] The next train is the [[TR0545]] leaving cambridge at 13:06. Would you like me to book it or ...
+- E0#4:2 [system] I have [[TR2289]] leaving at 7:00 and arriving at 7:51. Would you like reservations?
+
+### E0#5  (mentions 6, distinct values 6, low confidence)
+Examples:
+- E0#5:0 [user] Could you book that for me for [[2 people]] ?
+- E0#5:1 [user] Yes, can you please book for [[3 seats]] ?
+- E0#5:2 [user] That sounds great. Can you book me [[4 tickets]] on that train please?
+
+### E0#6  (mentions 8, distinct values 8, low confidence)
+Examples:
+- E0#6:0 [system] Sure! The fare is [[12.80 pounds]] and the travel time is 49 minutes. Is there anything else I ...
+- E0#6:1 [system] Alright. The price for TR 6357 is [[17.90 pounds]] . Anything else?
+- E0#6:2 [system] One ticket to London Kings Cross will cost [[23.60 pounds]] . Would you like me to book the ticket for you?
+
+### E0#7  (mentions 9, distinct values 9)
+Examples:
+- E0#7:0 [system] I was able to book it, reference is [[0W0BQB8W]] .
+- E0#7:1 [system] ... for at the station. Your reference number is [[13GQ9S3A]] .
+- E0#7:2 [system] ... fee is 42.96 GBP and your reference # [[1l0FBGWG]]
+
+### E0#8  (mentions 3, distinct values 2)
+Examples:
+- E0#8:0 [user] hello. I'm trying to get to [[kings lynn]] on sunday. can you help?
+- E0#8:1 [user] I need to find a train out of [[King's Lynn]] that will arrive by 17:45.
+- E0#8:2 [system] ... depart cambridge Sunday at 8:11 and arrive in [[Kings Lynn]] at 8:58. How many tickets would you like to book?
+
+### E0#9  (mentions 23, distinct values 2)
+Examples:
+- E0#9:0 [system] TR4170 leaves leicester at 9:09 and arrives in [[cambridge]] on Friday at 10:54. 8 tickets are booked, reference #: CL4V2583. Do ...
+- E0#9:1 [system] Thank you for contacting the [[Cambridge TownInfo centre]] . Goodbye
+- E0#9:2 [system] Just to clarify a train from [[Cambridge]] , correct? Where will it be to and what date & time?
+
+### E0#10  (mentions 4, distinct values 1)
+Examples:
+- E0#10:0 [system] ... total fee is 82.5 GBP payable at the [[station]] . Reference number is : JU3L0EZL. Is there anything else you need?
+- E0#10:1 [system] ... total fee is 51.2 GBP payable at the [[station]] . Reference number is : XX5DNFKS.
+- E0#10:2 [system] ... you, which you can pay for at the [[station]] . Your reference number is 13GQ9S3A.
+
+### E0#11  (mentions 4, distinct values 2)
+Examples:
+- E0#11:0 [user] ... Are there any trains leaving for cambridge from [[leicester]] that would get me there by 11:30?
+- E0#11:1 [user] I'm going to [[London]] 's Kings Cross on Monday.
+- E0#11:2 [system] TR4170 leaves [[leicester]] at 9:09 and arrives in cambridge on Friday at 10:54. 8 tickets ...
+
+### E0#12  (mentions 2, distinct values 2)
+Examples:
+- E0#12:0 [user] I'm going to London's [[Kings Cross]] on Monday.
+- E0#12:1 [system] One ticket to [[London Kings Cross]] will cost 23.60 pounds. Would you like me to book the ticket ...
+
+### E0#13  (mentions 7, distinct values 2)
+Examples:
+- E0#13:0 [system] TR2874 train arrives at [[stevenage]] at 14:10. Would you like more info or can I book it ...
+- E0#13:1 [user] I also need a train from [[Stevanage]] to Cambridge.
+- E0#13:2 [user] ... looking for a train for Thursday departing from [[Stevenage]] .
+
+### E0#14  (mentions 5, distinct values 4, low confidence)
+Examples:
+- E0#14:0 [system] Sure! The fare is 12.80 pounds and the [[travel time]] is 49 minutes. Is there anything else I can help you with ...
+- E0#14:1 [system] ... 8:11 and arrive in Kings Lynn at 8:58. [[How many tickets]] would you like to book?
+- E0#14:2 [system] Alright. The price for [[TR 6357]] is 17.90 pounds. Anything else?
+
+### E0#15  (mentions 3, distinct values 2)
+Examples:
+- E0#15:0 [system] ... is 12.80 pounds and the travel time is [[49 minutes]] . Is there anything else I can help you with today?
+- E0#15:1 [system] The total travel time will be [[163 minutes]] . Is there anything else I can help you with today?
+- E0#15:2 [system] The total travel time is [[49 minutes]] .
+
+### E0#16  (mentions 5, distinct values 1)
+Examples:
+- E0#16:0 [user] ... need some train info. I'll be leaving from [[Peterborough]] on Tuesday, sometime after 15:15.
+- E0#16:1 [user] I want a train that goes to [[peterborough]] and leaves after 13:00
+- E0#16:2 [user] I need to get to Cambridge from [[Peterborough]] by 13:15 on the the same day as my reservation.
+
+### E0#17  (mentions 5, distinct values 2)
+Examples:
+- E0#17:0 [user] I need to go to [[Birmingham new street]] on Monday.
+- E0#17:1 [user] I'd like to go to london [[liverpool street]] on Sunday. I need to get there by 21:00.
+- E0#17:2 [user] I'm departing from [[birmingham new street]] on Saturday and I'd like to leave after 12:45.
+
+### E0#18  (mentions 2, distinct values 2)
+Examples:
+- E0#18:0 [system] ... or to book the train? The cost is [[17.90]] per ticket.
+- E0#18:1 [system] ... arrives in cambridge at 16:23. The price is [[60.08]] . Shall I book it?
+
+### E0#19  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#19:0 [system] [[The TR5933]] leaves peterborough at 15:19.
+
+Return the JSON object now.

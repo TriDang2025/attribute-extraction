@@ -1,0 +1,174 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement code from the listed options. Examples are marked with [[...]] inside a few words of the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "mixed": false, "placement": "cur"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "mixed": false, "placement": "cur"}]}
+
+Entity E2: 28 clusters. This is part 2 of 2: the entity's other clusters are in other calls. Name the attributes of these clusters only.
+
+Placement codes (copy one code into "placement"):
+- cur: the attribute belongs to E2
+- sub: a part of E2 that has attributes of its own
+- oth:E0: the attribute belongs to E0
+- oth:E1: the attribute belongs to E1
+- oth:E3: the attribute belongs to E3
+- oth:E4: the attribute belongs to E4
+- rel:E0: links E2 and E0
+- rel:E1: links E2 and E1
+- rel:E3: links E2 and E3
+- rel:E4: links E2 and E4
+- sep: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E2#3  (mentions 4, distinct values 2)
+Examples:
+- E2#3:0 [system] No, they do not. How about Pizza Hut [[Cherry Hinton]] ? It is Italian but it is popular with the Americans here.
+- E2#3:1 [system] There is Taj Tandoori which is located on [[64 Cherry Hinton Road]] . Would you like me to book a table for you?
+- E2#3:2 [system] ... It's address is 43 High Street Cherry Hinton [[Cherry Hinton]] , their postcode is C.B 1, 9 H.X, and their phone number ...
+
+### E2#4  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#4:0 [system] ... Street Cherry Hinton Cherry Hinton, their postcode is [[C.B 1]] , 9 H.X, and their phone number is 01223 249955.
+
+### E2#5  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#5:0 [system] ... Hinton Cherry Hinton, their postcode is C.B 1, [[9 H.X]] , and their phone number is 01223 249955.
+
+### E2#8  (mentions 2, distinct values 1)
+Examples:
+- E2#8:0 [user] Actually I am specifically looking for the [[Cocum restaurant]] , I would like to book for 7 people at 15:00 on ...
+- E2#8:1 [system] ... for you and 6 other guests at the [[Cocum restaurant]] on Monday at 15:00. The reference number is BPE8LVHA.
+
+### E2#12  (mentions 17, distinct values 17)
+Examples:
+- E2#12:0 [system] Your table was booked. Your reference number is [[42XEDGDF]] . Is there anything else I can help you with?
+- E2#12:1 [system] ... on Monday at 15:00. The reference number is [[BPE8LVHA]] .
+- E2#12:2 [system] ... asian oriental food! Phone is 01223311911 postcode is [[cb12as]] and they are at 100 Mill Rd City Centre
+
+### E2#14  (mentions 15, distinct values 14)
+Examples:
+- E2#14:0 [system] ... Bedouin, and is expensive. Their phone number is [[01223367660]] . Would you like me to book for you?
+- E2#14:1 [system] ... road in city centre, the phone # is [[01223276182]] , and the postcode is cb30df. will there be anything else ?
+- E2#14:2 [system] ... serves the best asian oriental food! Phone is [[01223311911]] postcode is cb12as and they are at 100 Mill Rd City Centre
+
+### E2#16  (mentions 2, distinct values 1)
+Examples:
+- E2#16:0 [system] ... African restuarant in the Center. It is named [[Bedouin]] , and is expensive. Their phone number is 01223367660. Would you like ...
+- E2#16:1 [system] [[bedouin]] 100 Mill Road City Centre
+
+### E2#22  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#22:0 [system] Oh well if your letting me decide then [[kymmoy]] serves the best asian oriental food! Phone is 01223311911 postcode is cb12as ...
+
+### E2#23  (mentions 1, distinct values 1)
+Examples:
+- E2#23:0 [system] ... 01223311911 postcode is cb12as and they are at [[100 Mill Rd]] City Centre
+
+### E2#24  (mentions 2, distinct values 2)
+Examples:
+- E2#24:0 [user] ... book a taxi. The taxi should depart from [[la Margarita]] and should go to riverboat Georgina.
+- E2#24:1 [system] What about [[La Margherita]] ? They serve Italian.
+
+### E2#25  (mentions 1, distinct values 1)
+Examples:
+- E2#25:0 [user] ... depart from la Margarita and should go to [[riverboat Georgina]] .
+
+### E2#27  (mentions 1, distinct values 1)
+Examples:
+- E2#27:0 [system] The address is [[regent street]] and there is no entry fee.
+
+### E2#28  (mentions 2, distinct values 1)
+Examples:
+- E2#28:0 [system] Your table at [[Panahar]] has been reserved for 15 minutes starting at 15:15 on Sunday. Your ...
+- E2#28:1 [user] I need information on a restaurant called [[panahar]] .
+
+### E2#30  (mentions 3, distinct values 1)
+Examples:
+- E2#30:0 [system] [[thanh binh]] is located at 17 magdalene street city centre and its phone number ...
+- E2#30:1 [system] I found [[Thanh Binh]] ; would you like me to make you a reservation?
+- E2#30:2 [system] [[Thanh binh]] is located in the west part of town and is in the ...
+
+### E2#31  (mentions 2, distinct values 1)
+Examples:
+- E2#31:0 [system] thanh binh is located at [[17 magdalene street]] city centre and its phone number is 01223315232. Is there anything else ...
+- E2#31:1 [system] ... also in the west side area, located at [[17 Magdalene Street]] City Centre. Would you like to make a reservation?
+
+### E2#32  (mentions 5, distinct values 2)
+Examples:
+- E2#32:0 [user] ... find a Chinese restaurant in the centre of [[Cambridge]] .
+- E2#32:1 [system] Thank you for contacting [[Cambridge TownInfo centre]] . Goodbye!
+- E2#32:2 [system] enjoy your time in [[Cambridge]] !
+
+### E2#34  (mentions 1, distinct values 1)
+Examples:
+- E2#34:0 [system] [[The cambridge chop house]] serves british food, it is in the centre of town and is ...
+
+### E2#36  (mentions 1, distinct values 1)
+Examples:
+- E2#36:0 [system] Certainly. They're at [[4 - 6 Rose Crescent]] . Their number is 01223464550. I can help you book a table ...
+
+### E2#37  (mentions 2, distinct values 1)
+Examples:
+- E2#37:0 [system] ... to fulfill your request. You are booked at [[Anatolia]] on Wednesday at 11:15. The reservation is for 6 people. How else ...
+- E2#37:1 [system] [[Anatolia]] is located at 30 Bridge Street City Centre.
+
+### E2#41  (mentions 1, distinct values 1)
+Examples:
+- E2#41:0 [system] I have pulled up 3. How about [[anatolia]] , they are moderately priced.
+
+### E2#45  (mentions 2, distinct values 2)
+Examples:
+- E2#45:0 [system] No, I'm sorry [[the ugly duckling]] is in the expensive price range. The copper kettle serves british food ...
+- E2#45:1 [system] My recommendation would be the [[Ugly Duckling]] , a Chinese restaurant in the centre of town. It is located ...
+
+### E2#49  (mentions 2, distinct values 1)
+Examples:
+- E2#49:0 [system] ... food, the first is tandoori palace located at [[68 Histon Road]] Chesterton. Would you like a reservation and for how many?
+- E2#49:1 [system] ... palace meets your criteria. It is located at [[68 Histon Road]] Chesterton.
+
+### E2#50  (mentions 4, distinct values 1, low confidence)
+Examples:
+- E2#50:0 [system] The Nirala is located at 7 Milton Street [[Chesterton]] .
+- E2#50:1 [system] The Nirala is located at 7 Milton Road [[Chesterton]] , cb41uy. How else can I help you today?
+- E2#50:2 [system] ... is tandoori palace located at 68 Histon Road [[Chesterton]] . Would you like a reservation and for how many?
+
+### E2#52  (mentions 1, distinct values 1)
+Examples:
+- E2#52:0 [system] ... excellent choice for british food. The address is [[6 Lensfield Road]] .
+
+### E2#53  (mentions 4, distinct values 2)
+Examples:
+- E2#53:0 [system] The phone number for the [[Nirala]] is 01223 360966. Is there anything else I can help you with?
+- E2#53:1 [system] [[The Nirala]] is located at 7 Milton Road Chesterton, cb41uy. How else can I ...
+- E2#53:2 [system] ... a great time picking a dish at the [[nirala]] which serves indian.
+
+### E2#54  (mentions 2, distinct values 2)
+Examples:
+- E2#54:0 [system] The Nirala is located at [[7 Milton Road]] Chesterton, cb41uy. How else can I help you today?
+- E2#54:1 [system] The Nirala is located at [[7 Milton Street]] Chesterton.
+
+### E2#55  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#55:0 [system] I recommend [[Jinling Noodle Bar]] . It's located at 11 Peas Hill City Center. Would you like ...
+
+### E2#56  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E2#56:0 [system] How about cafe uno or [[don pasquale]] pizzeria?
+- E2#56:1 [system] The address to [[Don Pasquale Pizzeria]] is 12 Market Hill at City Centre. Would you like the phone ...
+
+Return the JSON object now.

@@ -1,0 +1,271 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement code from the listed options. Examples are marked with [[...]] inside a few words of the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "mixed": false, "placement": "cur"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "mixed": false, "placement": "cur"}]}
+
+Entity E3: 48 clusters.
+
+Placement codes (copy one code into "placement"):
+- cur: the attribute belongs to E3
+- sub: a part of E3 that has attributes of its own
+- oth:E0: the attribute belongs to E0
+- oth:E1: the attribute belongs to E1
+- oth:E2: the attribute belongs to E2
+- oth:E4: the attribute belongs to E4
+- rel:E0: links E3 and E0
+- rel:E1: links E3 and E1
+- rel:E2: links E3 and E2
+- rel:E4: links E3 and E4
+- sep: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 11:30, 13:06, 16:15; sunday, friday, monday; cambridge, cambridge towninfo centre
+- E1: guesthouse, hotel, acorn guest house; 2 night, 4 night, 5 night; wednesday, friday, sunday
+- E2: centre, centre of town, centre area; cb23bu, cb17gx, cb18dw; 01223307402, 01223314960, 01223333516
+- E4: 14:45, 19:15, 06:45; 07048450899, 07128258422, 07267142867; restaurant, hotel, j restaurant
+
+### E3#15  (mentions 6, distinct values 5)
+Examples:
+- E3#15:0 [user] That will be on Friday for [[2]] please.
+- E3#15:1 [user] ... suggest. I need to book a table for [[1]] at 13:15 on Tuesday.
+- E3#15:2 [system] There are [[17]] Chinese restaurants. Are you looking for any particular area or price range?
+
+### E3#25  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#25:0 [system] Okay, I've booked a table at the [[Curry Prince]] for you. The reference number is NZ5WKZ9V. The table will be reserved ...
+
+### E3#40  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#40:0 [system] [[Maharajah tandoori restaurant]] on 41518 Castle Street City Centre is a good fit for you.
+
+### E3#23  (mentions 6, distinct values 5, low confidence)
+Examples:
+- E3#23:0 [user] ... same group of people at 12:45 on the [[same day]] .
+- E3#23:1 [user] ... to arrive at the restaurant no later than [[ten o'clock]] a.m.
+- E3#23:2 [user] I would like an indian restaurant in the [[same price range]] as the hotel please.
+
+### E3#30  (mentions 3, distinct values 2)
+Examples:
+- E3#30:0 [system] ... of town. It is cheap and located at [[86 Regent Street]] City Centre.
+- E3#30:1 [system] the address is [[83 Regent Street]] , postcode is C.B 2, 1 A.W.
+- E3#30:2 [system] Here is the address for the J restaurant, [[86 Regent Street]] City Centre. I currently do not have reviews of the restaurant avialable.
+
+### E3#6  (mentions 1, distinct values 1)
+Examples:
+- E3#6:0 [system] ... the moderate price range. Their phone number is [[01223 308871]] . The address is Corn Exchange Street and the postcode is C.B ...
+
+### E3#27  (mentions 1, distinct values 1)
+Examples:
+- E3#27:0 [system] I would recommend [[golden house]]
+
+### E3#37  (mentions 1, distinct values 1)
+Examples:
+- E3#37:0 [system] [[corpus christi]] is popular this time of year. The address is at king's parade. ...
+
+### E3#3  (mentions 4, distinct values 4)
+Examples:
+- E3#3:0 [system] Some options are Lebanese, Turkish, international, [[British]] , European, and Chinese. Do any of these interest you?
+- E3#3:1 [system] ... options are Lebanese, Turkish, international, British, European, and [[Chinese]] . Do any of these interest you?
+- E3#3:2 [system] Some options are Lebanese, Turkish, international, British, [[European]] , and Chinese. Do any of these interest you?
+
+### E3#28  (mentions 2, distinct values 2)
+Examples:
+- E3#28:0 [system] [[01223]] 308871 Will that be all?
+- E3#28:1 [system] ... a red volvo and the contact number is [[07754509492]] . Is there anything else I can help with?
+
+### E3#9  (mentions 4, distinct values 2)
+Examples:
+- E3#9:0 [user] Is there any good Jamaican food in [[Cambridge]] ?
+- E3#9:1 [system] You are welcome. Thank you for using [[Cambridge TownInfo centre]] . Goodbye.
+- E3#9:2 [user] I am traveling to [[Cambridge]] and looking forward to try local restaurants.
+
+### E3#33  (mentions 1, distinct values 1)
+Examples:
+- E3#33:0 [system] I would recommend Tandoori Palace at [[68 Histon Road]] Chesterton. The food there is great. Would you like for me to ...
+
+### E3#16  (mentions 7, distinct values 5, low confidence)
+Examples:
+- E3#16:0 [user] ... serve scandinavian food and should be in the [[east]] .
+- E3#16:1 [system] I would recommend Royal Spice in the [[north end]] . Would you like me to make a reservation there for you?
+- E3#16:2 [user] ... a restaurant to book a reservation. I want [[asian oriental]] in the expensive price range
+
+### E3#24  (mentions 5, distinct values 3)
+Examples:
+- E3#24:0 [user] ... from the attraction to the restaurant, leaving the [[attraction]] at 05:45?
+- E3#24:1 [system] ... king's parade. The post code cb21rh and the [[entree fee]] is 2 pounds.
+- E3#24:2 [system] ... a table for you and give you a [[reservation number]]
+
+### E3#0  (mentions 33, distinct values 14, low confidence)
+Examples:
+- E3#0:0 [user] I am looking for a [[restaurant]] .
+- E3#0:1 [system] [[J restaurant]] is an asian oriental restaurant in the centre of town. It is ...
+- E3#0:2 [system] There are no [[Danish restaurants]] in the moderate price range. Would you like me to check for ...
+
+### E3#20  (mentions 11, distinct values 8)
+Examples:
+- E3#20:0 [user] Yes. I need a table for [[8 people]] at 16:15 on the same day.
+- E3#20:1 [system] ... places to eat. Two are moderately priced and [[two]] are expensive. Do you have a preference?
+- E3#20:2 [user] ... good. I need to make a reservation for [[2 people]] on Tuesday.
+
+### E3#22  (mentions 1, distinct values 1)
+Examples:
+- E3#22:0 [system] Okay. [[Pizza Express]] would suite your needs, would you like me to make you a ...
+
+### E3#7  (mentions 2, distinct values 2)
+Examples:
+- E3#7:0 [system] Maharajah tandoori restaurant on 41518 [[Castle Street]] City Centre is a good fit for you.
+- E3#7:1 [system] ... phone number is 01223 308871. The address is [[Corn Exchange Street]] and the postcode is C.B 2, 3QF
+
+### E3#46  (mentions 3, distinct values 2, low confidence)
+Examples:
+- E3#46:0 [system] [[Darrys cookhouse and wine shop]] is located in the centre. It is expensive and serves modern european ...
+- E3#46:1 [system] [[Darrys Cookhouse]] is a modern European restaurant in the Centre. It is located at ...
+- E3#46:2 [user] I am looking for a restaurant called [[darrys cookhouse and wine shop]] .
+
+### E3#35  (mentions 3, distinct values 2)
+Examples:
+- E3#35:0 [system] [[Jinling noodle bar]] looks like a good place.
+- E3#35:1 [user] ... a college in the same area as the [[noodle bar]] , can you find me one?
+- E3#35:2 [system] [[Jinling noodle bar]] , postcode cb23pp. Is there any more info I can give you?
+
+### E3#17  (mentions 1, distinct values 1)
+Examples:
+- E3#17:0 [system] I would recommend either [[Hakka]] or The Hotpot. Would you like for me to book a reservation ...
+
+### E3#19  (mentions 7, distinct values 1, low confidence)
+Examples:
+- E3#19:0 [system] I can reserve a [[table]] for you and give you a reservation number
+- E3#19:1 [user] That sounds perfect. Could you book a [[table]] for 8 people at 19:30 on Friday?
+- E3#19:2 [user] ... Whatever you suggest. I need to book a [[table]] for 1 at 13:15 on Tuesday.
+
+### E3#45  (mentions 1, distinct values 1)
+Examples:
+- E3#45:0 [system] I would suggest [[Loch Fyne]] . They serve the most amazing selection of seafood in the entire ...
+
+### E3#29  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#29:0 [system] 01223 [[308871]] Will that be all?
+
+### E3#31  (mentions 1, distinct values 1)
+Examples:
+- E3#31:0 [system] ... restaurant and coffee bar, you ref # is [[SUY8VW]] , anything else for you today?
+
+### E3#21  (mentions 5, distinct values 2)
+Examples:
+- E3#21:0 [system] ... is booked! Your table will be reserved for [[15 minutes]] and your reference number is VWDBTAYR.
+- E3#21:1 [system] There are a total of [[15]] restaurants that are cheap in the centre. Is there another type you ...
+- E3#21:2 [system] ... is NZ5WKZ9V. The table will be reserved for [[15 minutes]] .
+
+### E3#43  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#43:0 [system] There are [[four cheap Indian places]] , three in city centre, and one on the north end.
+
+### E3#1  (mentions 34, distinct values 13)
+Examples:
+- E3#1:0 [user] I would like a [[moderately priced]] restaurant that serves creative food.
+- E3#1:1 [user] ... centre. I would like a restaurant in the [[moderate price range]] .
+- E3#1:2 [system] ... shop is located in the centre. It is [[expensive]] and serves modern european food. Would you like a reservation?
+
+### E3#11  (mentions 19, distinct values 12, low confidence)
+Examples:
+- E3#11:0 [user] ... booked for the same group of people at [[12:45]] on the same day.
+- E3#11:1 [user] ... reserve a table for 2 for Sunday at [[13:15]] ?
+- E3#11:2 [user] Okay, will you try [[10:30]] instead?
+
+### E3#47  (mentions 1, distinct values 1)
+Examples:
+- E3#47:0 [system] ... restaurant in the Centre. It is located at [[40270 King Street City]] and is in the expensive price range.
+
+### E3#14  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E3#14:0 [system] There are [[13 colleges]] in the centre of town. Most are free, but some do charge ...
+- E3#14:1 [system] I have [[13 colleges]] available in the centre. Did yo have one particular in mind?
+
+### E3#4  (mentions 1, distinct values 1)
+Examples:
+- E3#4:0 [system] Some options are Lebanese, Turkish, [[international]] , British, European, and Chinese. Do any of these interest you?
+
+### E3#44  (mentions 1, distinct values 1)
+Examples:
+- E3#44:0 [system] I would recommend [[Royal Spice]] in the north end. Would you like me to make a reservation ...
+
+### E3#39  (mentions 1, distinct values 1)
+Examples:
+- E3#39:0 [system] ... post code cb21rh and the entree fee is [[2 pounds]] .
+
+### E3#42  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#42:0 [system] ... is 83 Regent Street, postcode is C.B 2, [[1 A.W.]]
+
+### E3#26  (mentions 1, distinct values 1)
+Examples:
+- E3#26:0 [system] ... What day are you looking to eat on, [[how many are in your party]] , and what time would you like?
+
+### E3#34  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#34:0 [system] ... would recommend Tandoori Palace at 68 Histon Road [[Chesterton]] . The food there is great. Would you like for me to ...
+
+### E3#2  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E3#2:0 [system] Some options are [[Lebanese]] , Turkish, international, British, European, and Chinese. Do any of these interest ...
+- E3#2:1 [user] Let's try [[Lebanese]] .
+
+### E3#12  (mentions 15, distinct values 7)
+Examples:
+- E3#12:0 [user] Yes 4 people on 18:15 on [[friday]] . Should be a fin way to start the weekend.
+- E3#12:1 [user] ... a table for 8 people at 16:30 on [[tuesday]] ?
+- E3#12:2 [user] ... Are you sure you don't have anything for [[Wednesday]] at 12:45?
+
+### E3#10  (mentions 1, distinct values 1)
+Examples:
+- E3#10:0 [system] I have one listing for [[ali baba]] . Would you like any other information?
+
+### E3#36  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#36:0 [user] I would like to visit a [[college]] in the same area as the noodle bar, can you find me ...
+
+### E3#5  (mentions 21, distinct values 12)
+Examples:
+- E3#5:0 [user] I would like to go to the [[centre]] , please.
+- E3#5:1 [system] ... is cheap and located at 86 Regent Street [[City Centre]] .
+- E3#5:2 [system] ... I do have an African restaurant in the [[center of town]] as well as some gastropubs. Would either interest you?
+
+### E3#8  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E3#8:0 [system] the address is 83 Regent Street, postcode is [[C.B 2]] , 1 A.W.
+- E3#8:1 [system] ... is Corn Exchange Street and the postcode is [[C.B 2]] , 3QF
+
+### E3#32  (mentions 1, distinct values 1)
+Examples:
+- E3#32:0 [system] I would recommend [[Tandoori Palace]] at 68 Histon Road Chesterton. The food there is great. Would you ...
+
+### E3#41  (mentions 1, distinct values 1)
+Examples:
+- E3#41:0 [system] [[De Luca Cucina and Bar]] is moderately priced and serves modern European food.
+
+### E3#18  (mentions 1, distinct values 1)
+Examples:
+- E3#18:0 [system] I would recommend either Hakka or [[The Hotpot]] . Would you like for me to book a reservation for one ...
+
+### E3#13  (mentions 14, distinct values 14)
+Examples:
+- E3#13:0 [system] ... are booked for 10:30. Your reference number is [[4H1DRIF8]] . Is there anything else I can assist you with?
+- E3#13:1 [system] ... be reserved for 15 minutes. Reference number is [[56AHCPLE]] .
+- E3#13:2 [system] ... reserved for 15 minutes. The reference number is [[97AAF776]] .
+
+### E3#38  (mentions 1, distinct values 1)
+Examples:
+- E3#38:0 [system] ... this time of year. The address is at [[king's parade]] . The post code cb21rh and the entree fee is 2 pounds.
+
+Return the JSON object now.

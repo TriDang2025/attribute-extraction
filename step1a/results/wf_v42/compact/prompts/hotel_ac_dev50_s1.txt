@@ -1,0 +1,199 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement code from the listed options. Examples are marked with [[...]] inside a few words of the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "mixed": false, "placement": "cur"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "mixed": false, "placement": "cur"}]}
+
+Entity E0: 31 clusters.
+
+Placement codes (copy one code into "placement"):
+- cur: the attribute belongs to E0
+- sub: a part of E0 that has attributes of its own
+- oth:E1: the attribute belongs to E1
+- oth:E2: the attribute belongs to E2
+- oth:E3: the attribute belongs to E3
+- oth:E4: the attribute belongs to E4
+- rel:E1: links E0 and E1
+- rel:E2: links E0 and E2
+- rel:E3: links E0 and E3
+- rel:E4: links E0 and E4
+- sep: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E0#26  (mentions 1, distinct values 1)
+Examples:
+- E0#26:0 [system] Sure, the phone number is [[01223355017]] . How many days will you be staying, what day do you ...
+
+### E0#28  (mentions 3, distinct values 3)
+Examples:
+- E0#28:0 [system] Yes, [[hamilton lodge]] is located on 156 chesterton road.
+- E0#28:1 [system] ... I was able to book you for the [[Huntingdon Marriott Hotel]] . Reference #IHGCTXH9. Anything else I can help with?
+- E0#28:2 [system] I have 2 options for you - [[The Huntingdon Marriott]] on the west side, and the University Arms in the center. Are ...
+
+### E0#7  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E0#7:0 [user] I need a hotel in the [[west]] with free parking please.
+- E0#7:1 [user] ... four star rating and be located on the [[west side]] .
+
+### E0#1  (mentions 19, distinct values 12)
+Examples:
+- E0#1:0 [user] ... place for me with free wifi in the [[moderate price range]] ?
+- E0#1:1 [user] ... looking for a place to stay that is [[cheap]] located in the north.
+- E0#1:2 [user] ... am looking to book a guesthouse in the [[cheap price range]] that includes free wifi.
+
+### E0#3  (mentions 2, distinct values 2)
+Examples:
+- E0#3:0 [system] ... seven people for three nights, starting Monday, at [[Finches Bed and Breakfast]] . Reference number is CUL9VZ04. Is there anything else?
+- E0#3:1 [system] [[The finches Bed and Breakfast]] fits your needs. When would you like to stay?
+
+### E0#29  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#29:0 [system] ... at either hotel. Would you like to try [[fewer nights]] or perhaps a different arrival day?
+
+### E0#11  (mentions 12, distinct values 6)
+Examples:
+- E0#11:0 [user] ... expensive hotel for 3 nights, starting on Saturday? [[3 people]] . Wifi please.
+- E0#11:1 [user] Yes, for 2 nights for [[5 people]] on the same day
+- E0#11:2 [user] Great can you book that for [[1 person]] for 3 nights starting friday?
+
+### E0#17  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#17:0 [system] There are [[10 hotels]] that meet your needs. Would you like to narrow your search by ...
+
+### E0#23  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E0#23:0 [system] There is one option available. It is [[cityroomz]] . Do you want to book?
+- E0#23:1 [system] ... how many people will be staying in the [[room]] ?
+
+### E0#21  (mentions 2, distinct values 2)
+Examples:
+- E0#21:0 [system] All right, sir, that would be the [[Gonville Hotel]] on Gonville Place.
+- E0#21:1 [system] ... sir, that would be the Gonville Hotel on [[Gonville Place]] .
+
+### E0#16  (mentions 1, distinct values 1)
+Examples:
+- E0#16:0 [system] I have begun a booking for you at [[Avalon]] . How many days will you be staying?
+
+### E0#30  (mentions 1, distinct values 1)
+Examples:
+- E0#30:0 [system] Yes, hamilton lodge is located on [[156 chesterton road]] .
+
+### E0#20  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#20:0 [system] Oh! It looks like we've already booked [[Train TR8167]] for your group of 4. Your reference number is H4BIFD0U. Is there ...
+
+### E0#24  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#24:0 [system] We have [[23]] different options available. Is there an area you would prefer?
+
+### E0#15  (mentions 4, distinct values 3, low confidence)
+Examples:
+- E0#15:0 [system] Sorry, you are right. We actually have [[11]] to choose from.
+- E0#15:1 [user] ... for the same day for a party of [[4]] for 4 nights.
+- E0#15:2 [system] There are [[8]] moderately priced guesthouses in the north. May I suggest the 4 star ...
+
+### E0#2  (mentions 5, distinct values 3, low confidence)
+Examples:
+- E0#2:0 [system] ... How many days would you be staying, and [[how many people]] are in your party? I can see if something is available.
+- E0#2:1 [user] ... in the north? I plan on staying with [[4 other people]] for 4 nights, starting wednesday.
+- E0#2:2 [system] there are [[several]] in the area of the restaurant. would you like to book the ...
+
+### E0#25  (mentions 3, distinct values 2)
+Examples:
+- E0#25:0 [system] [[The Acorn Guest House]] is moderately-priced, in the north. They offer free wifi as well. Would ...
+- E0#25:1 [system] ... the north. May I suggest the 4 star [[Acorn Guest house]] ?
+- E0#25:2 [system] [[The acorn guest house]] is available in your selected region. It's moderately priced and includes free ...
+
+### E0#12  (mentions 11, distinct values 5, low confidence)
+Examples:
+- E0#12:0 [system] Both are 4 stars. [[How many days]] would you be staying, and how many people are in your party? ...
+- E0#12:1 [system] ... 01223355017. How many days will you be staying, [[what day]] do you need to arrive, and how many people will be staying?
+- E0#12:2 [user] ... for 2 nights for 5 people on the [[same day]]
+
+### E0#10  (mentions 6, distinct values 4)
+Examples:
+- E0#10:0 [user] I would prefer the [[centre]] .
+- E0#10:1 [system] ... west side, and the University Arms in the [[center]] . Are you interested in one of these?
+- E0#10:2 [user] ... need a five starts hotel close to a [[mall]] and main restaurants. The hotel should include free wifi in the room.
+
+### E0#4  (mentions 24, distinct values 9)
+Examples:
+- E0#4:0 [user] I will be staying for [[3 nights]] .
+- E0#4:1 [user] Let's try [[4 nights]] only please and I'll need a reference number.
+- E0#4:2 [user] ... am looking for. I need to book for [[2 nights]] starting on Wednesday. Four people will be staying. Please give a reference ...
+
+### E0#5  (mentions 21, distinct values 6)
+Examples:
+- E0#5:0 [user] ... at a guest house named Aylesbray Lodge, starting [[Monday]] .
+- E0#5:1 [user] ... it for 5 people and 4 nights from [[Wednesday]] .
+- E0#5:2 [system] Do you want the reservations to begin on [[Friday]] ?
+
+### E0#8  (mentions 15, distinct values 9)
+Examples:
+- E0#8:0 [user] I'm looking for something expensive in the [[north]] .
+- E0#8:1 [user] ... I book, is the guesthouse located in the [[south part of town]] and at what price range?
+- E0#8:2 [user] ... 4 stars in the moderate price range in [[any area]] ?
+
+### E0#0  (mentions 24, distinct values 14, low confidence)
+Examples:
+- E0#0:0 [user] If this [[guesthouse]] is available please book it for me. By the way, what is ...
+- E0#0:1 [system] ... range? I have one cheap and one expensive [[hotel]] that fits your current criteria.
+- E0#0:2 [user] I'd like more information about the [[Ashley Hotel]] , can you help?
+
+### E0#9  (mentions 2, distinct values 2)
+Examples:
+- E0#9:0 [system] ... Huntingdon Marriott on the west side, and the [[University Arms]] in the center. Are you interested in one of these?
+- E0#9:1 [system] I have a hotel called [[university arms hotel]] located in the centre. Would you like to make reservations?
+
+### E0#14  (mentions 10, distinct values 3)
+Examples:
+- E0#14:0 [system] There are no 4-star lodgings available in [[Cambridge]] that meet your criteria. Shall we check 5-star locations instead?
+- E0#14:1 [system] ... just message us again. Thanks for contacting the [[Cambridge TownInfo Centre]] and have a great day!
+- E0#14:2 [system] [[The Cambridge Belfry]] fits your requirements, would you like to book a reservation there?
+
+### E0#18  (mentions 2, distinct values 1)
+Examples:
+- E0#18:0 [system] ... star guesthouse with free internet and free parking, [[Worth House]] is a good choice.
+- E0#18:1 [system] ... City Centre North B and B, or at [[Worth House]] ?
+
+### E0#22  (mentions 2, distinct values 1)
+Examples:
+- E0#22:0 [user] ... like to book at a guest house named [[Aylesbray Lodge]] , starting Monday.
+- E0#22:1 [system] I'm starting to book your reservation at [[Aylesbray Lodge]] starting on Monday, how many days will you be staying?
+
+### E0#13  (mentions 4, distinct values 2)
+Examples:
+- E0#13:0 [system] [[alexander bed and breakfast]] would be perfect for you. Shall i book it ?
+- E0#13:1 [system] Alright, I have your party booked at the [[Alexander]] . The reference number is : G2YMGI0L. Is there anything else I ...
+- E0#13:2 [system] Alright, might I suggest the [[Alexander Bed and Breakfast]] then?
+
+### E0#27  (mentions 1, distinct values 1)
+Examples:
+- E0#27:0 [user] ... five starts hotel close to a mall and [[main restaurants]] . The hotel should include free wifi in the room.
+
+### E0#6  (mentions 16, distinct values 15)
+Examples:
+- E0#6:0 [system] ... have made the booking the Reference number is [[E6UVD9OL]] . Is there anything else i can help you with?
+- E0#6:1 [system] That works out perfectly. Your reference number is [[72YCMLXX]] . Is there anything else I can help you with today?
+- E0#6:2 [system] ... hotel has 2 stars. They're in the postcode [[cb41er]] .
+
+### E0#19  (mentions 1, distinct values 1)
+Examples:
+- E0#19:0 [user] Yes please, for 4 people. How about the [[TR8167]] please.
+
+Return the JSON object now.
