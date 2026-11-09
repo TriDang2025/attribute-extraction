@@ -14,7 +14,8 @@ Settings (environment variables; defaults reproduce the original laptop run):
   TEAR_MODELS       folder holding surrogate_conversation_cont2 (default <project>/models)
   TEAR_LLAMA_SERVER llama.cpp llama-server binary (default tools/llama.cpp/bin/llama-server[.exe])
   TEAR_LLAMA_GGUF   Meta-Llama-3-8B-Instruct-Q4_K_M.gguf (default <TEAR_MODELS>/gguf/...)
-  TEAR_DEV50        1 = only TEAR on the 50 dev50 texts (colab/DEV50_RUN.md); TEAR_N is ignored
+  TEAR_DEV50        only TEAR on held-out Step-1a dev texts (colab/DEV50_RUN.md); TEAR_N is ignored:
+                    1 or dev50 = the 50 dev50 texts, dev50b = the 50 dev50b texts (wf_v4.1), both = dev50 then dev50b
   TEAR_LLAMA_ARGS   extra llama-server arguments, e.g. "-ngl 99" for a GPU (default "-t 10")
 Progress goes to results/run_all.log; RUN_ALL_DONE or RUN_ALL_FAILED marks the end.
 """
@@ -123,25 +124,37 @@ def level_chain(level: str) -> None:
     reproduce("tearstar", *common, "--seed", "0", "--n", str(N))
 
 
-def dev50() -> None:
-    """TEAR_DEV50=1: TEAR extraction (Lfull, seed 0) of the 50 dev50 texts, demonstrations from the pool without
-    them (dataset conversation_dev50, results/conversation_dev50/). Previews: surrogate predictions, written once."""
-    log("dev50: TEAR extraction of the 50 dev50 texts")
-    reproduce("embed", "--dataset", "conversation_dev50", "--n", "50")  # pool and test texts are cached already
+HELD_OUT_SETS = {"1": ("dev50",), "dev50": ("dev50",), "dev50b": ("dev50b",), "both": ("dev50", "dev50b")}
+
+
+def held_out_sets(value: str) -> tuple:
+    """Sets of a TEAR_DEV50 value; anything else is an error (a typo must not start the full run)."""
+    if value not in HELD_OUT_SETS:
+        raise ValueError(f"TEAR_DEV50={value!r}: use 1, dev50, dev50b or both")
+    return HELD_OUT_SETS[value]
+
+
+def held_out(name: str) -> None:
+    """TEAR extraction (Lfull, seed 0) of the 50 texts of one held-out set (dev50 / dev50b), demonstrations from the pool
+    without them (dataset conversation_<name>, results/conversation_<name>/). Previews: surrogate predictions, written once."""
+    key = f"conversation_{name}"
+    log(f"{name}: TEAR extraction of the 50 {name} texts")
+    reproduce("embed", "--dataset", key, "--n", "50")  # pool and test texts are cached already
     wait_for(surrogate_ready, "the trained surrogate")
-    out = ROOT / "data/conversation/previews_dev50.jsonl"
+    out = R.HELD_OUT[key]["previews"]
     if not out.exists() or len(out.read_text(encoding="utf-8").splitlines()) < 50:
         subprocess.run([PY, "-m", "surrogate.predict", "--model", str(MODELS / "surrogate_conversation_cont2"),
-                        "--input", str(ROOT / "data/conversation_dev50.jsonl"), "--out", str(out)], check=True)
-    reproduce("te", "--dataset", "conversation_dev50", "--methods", "tear", "--seeds", "0", "--level", "full",
-              "--n", "50")
-    log("RUN_ALL_DONE")
+                        "--input", str(R.HELD_OUT[key]["test"]), "--out", str(out)], check=True)
+    reproduce("te", "--dataset", key, "--methods", "tear", "--seeds", "0", "--level", "full", "--n", "50")
 
 
 def main() -> None:
     log("run_all started")
     if os.environ.get("TEAR_DEV50"):
-        return dev50()
+        for name in held_out_sets(os.environ["TEAR_DEV50"]):
+            held_out(name)
+        log("RUN_ALL_DONE")
+        return
     if not embeddings_ready():  # needs the SFR embedding server on port 8082
         reproduce("embed", "--dataset", "conversation", "--n", str(N))
     # RAG needs no previews, so all its seeds run while the surrogate is still training.

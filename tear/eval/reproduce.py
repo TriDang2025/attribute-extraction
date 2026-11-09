@@ -32,11 +32,12 @@ DATA = {
     "incidents": ("Incidents", ROOT / "data/incidents_small"),
     "weather": ("Weather", ROOT / "data/weather_small"),
     "conversation_dev50": ("Conversation", ROOT / "data/conversation"),  # same pool/embeddings as conversation
+    "conversation_dev50b": ("Conversation", ROOT / "data/conversation"),  # wf_v4.1: pool[50:100], step1a split.DEV50B
 }
 # dev50 (wf_v3.6): the 50 Step-1a dev dialogues are texts to extract (and not demonstrations): their own test
-# file and previews, and the pool without their ids. Results go to results/conversation_dev50/.
-HELD_OUT = {"conversation_dev50": {"test": ROOT / "data/conversation_dev50.jsonl",
-                                   "previews": ROOT / "data/conversation/previews_dev50.jsonl"}}
+# file and previews, and the pool without their ids. Results go to results/conversation_dev50/. dev50b (wf_v4.1) the same.
+HELD_OUT = {k: {"test": ROOT / f"data/conversation_{k[13:]}.jsonl", "previews": ROOT / f"data/conversation/previews_{k[13:]}.jsonl"}
+            for k in ("conversation_dev50", "conversation_dev50b")}
 RESULTS = ROOT / "results"
 
 # Paper Table 2, Llama-3-8B-Instruct: (RAG, TEAR) per (dataset, metric, sim).

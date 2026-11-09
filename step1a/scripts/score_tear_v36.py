@@ -1,6 +1,8 @@
 """wf_v3.6 TEAR scorer: map the columns of a TEAR run on dev50 to MultiWOZ 2.2 attributes and count its extras.
 
 python scripts/score_tear_v36.py --tear ../tear/results/conversation_dev50/te_tear_Lfull_s0.jsonl
+python scripts/score_tear_v36.py --set dev50b --tear ../tear/results/conversation_dev50b/te_tear_Lfull_s0.jsonl --out results/wf_v41/tear_dev50b
+        (wf_v4.1: --set picks the default spans file of the set and the report title)
         [--spans data/mwoz22_spans.csv --map config/tear_to_mwoz.json --db ../chunking/data/MULTIWOZ2.4.zip --out results/loop1_v36]
 Value mapping and name mapping: see s1a/tear_cols.py. Writes <out>/tear_names_to_rate.csv (blind sheet for 2 raters; labels come
 back as tear_names_rater1.csv / tear_names_rater2.csv with columns row_id,label, read on the next run), tear_columns.csv,
@@ -21,6 +23,8 @@ from s1a import gt_ext as G  # noqa: E402
 from s1a import precision_v36 as PR  # noqa: E402
 from s1a import tear_cols as TC  # noqa: E402
 
+SPANS = {"dev50": Path("data/mwoz22_spans.csv"), "dev50b": Path("results/loop1_v37/dev50b/gt/mwoz22_spans.csv")}
+
 
 def score(rows, spans, tear_map, db_idx=None, raters=()):
     """(columns, sheet, disagree, table): columns = tear_cols.final_columns, sheet = the name sheet, disagree = label
@@ -38,11 +42,13 @@ def score(rows, spans, tear_map, db_idx=None, raters=()):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--tear", required=True, type=Path)
-    ap.add_argument("--spans", type=Path, default=Path("data/mwoz22_spans.csv"))
+    ap.add_argument("--set", default="dev50", choices=list(SPANS))
+    ap.add_argument("--spans", type=Path, help="default: SPANS[--set]")
     ap.add_argument("--map", type=Path, default=Path("config/tear_to_mwoz.json"))
     ap.add_argument("--db", type=Path, default=Path("../chunking/data/MULTIWOZ2.4.zip"))
     ap.add_argument("--out", type=Path, default=Path("results/loop1_v36"))
     a = ap.parse_args()
+    a.spans = a.spans or SPANS[a.set]
     a.out.mkdir(parents=True, exist_ok=True)
 
     rows = [json.loads(line) for line in a.tear.read_text(encoding="utf-8").splitlines() if line.strip()]
@@ -61,7 +67,7 @@ def main():
     rated = sum(p.exists() for p in raters)
     notes = [f"{len(cols)} columns from {len({r['id'] for r in rows})} TEAR rows ({a.tear.name}); {len(sheet)} unmatched columns "
              f"on the name sheet, {rated} of 2 rater files read."]
-    (a.out / "tear_extras.md").write_text(PR.kinds_md("wf_v3.6 TEAR extras by GT level (dev50)", table, notes),
+    (a.out / "tear_extras.md").write_text(PR.kinds_md(f"wf_v3.6 TEAR extras by GT level ({a.set})", table, notes),
                                           encoding="utf-8", newline="\n")
     print(cols.to_string(index=False))
     print(table.to_string())
