@@ -1,0 +1,24 @@
+# wf_v4.2 T1: frozen Step 3 A prompt with Llama (18 calls)
+
+Parsed without errors: **1/18**
+
+| job | answered | parse_errors | guided | retried | finish | prompt_tokens | output_tokens | batch_seconds | clusters_expected | cluster_rows | distinct_ids | top_id | top_id_rows |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| train_a_v22d50_s0 | True | 31 | True | True | length | 18532 | 18626 | 440.95 | 29 | 0 | 0 |  | 0 |
+| train_a_v22d50_s1 | True | 31 | True | True | length | 18532 | 20012 | 440.95 | 29 | 223 | 1 | E1#21 | 223 |
+| train_a_v22d50_s2 | True | 31 | True | True | length | 18532 | 24000 | 440.95 | 29 | 0 | 0 |  | 0 |
+| hotel_a_v22d50_s0 | True | 33 | True | True | length | 16806 | 24000 | 440.95 | 31 | 221 | 24 | E0#0 | 26 |
+| hotel_a_v22d50_s1 | True | 33 | True | True | length | 16806 | 19874 | 440.95 | 31 | 197 | 7 | E0#11 | 180 |
+| hotel_a_v22d50_s2 | True | 33 | True | True | length | 16806 | 24000 | 440.95 | 31 | 208 | 5 | E0#10 | 202 |
+| restaurant_a_v22d50_s0 | True | 59 | True | True | length | 26918 | 24000 | 440.95 | 57 | 281 | 16 | E2#10 | 39 |
+| restaurant_a_v22d50_s1 | True | 59 | True | True | length | 26918 | 20767 | 440.95 | 57 | 258 | 2 | E2#6 | 255 |
+| restaurant_a_v22d50_s2 | True | 59 | True | True | length | 26918 | 24000 | 440.95 | 57 | 283 | 15 | E2#7 | 244 |
+| train_a_v22d50b_s0 | True | 0 | False | True | stop | 14394 | 13770 | 20.44 | 20 | 20 | 20 | E0#0 | 1 |
+| train_a_v22d50b_s1 | True | 22 | True | True | length | 14394 | 18691 | 440.95 | 20 | 223 | 1 | E0#1 | 223 |
+| train_a_v22d50b_s2 | True | 22 | True | True | length | 14394 | 24000 | 440.95 | 20 | 175 | 1 | E0#0 | 175 |
+| hotel_a_v22d50b_s0 | True | 33 | True | True | length | 19202 | 19465 | 440.95 | 31 | 181 | 1 | E1#0 | 181 |
+| hotel_a_v22d50b_s1 | True | 33 | True | True | length | 19202 | 18703 | 440.95 | 31 | 0 | 0 |  | 0 |
+| hotel_a_v22d50b_s2 | True | 33 | True | True | length | 19202 | 20303 | 440.95 | 31 | 285 | 3 | E1#7 | 278 |
+| restaurant_a_v22d50b_s0 | True | 1 | True | True | stop | 20362 | 5746 | 440.95 | 48 | 48 | 48 | E3#0 | 1 |
+| restaurant_a_v22d50b_s1 | True | 50 | True | True | length | 20362 | 24000 | 440.95 | 48 | 286 | 1 | E3#15 | 286 |
+| restaurant_a_v22d50b_s2 | True | 50 | True | True | length | 20362 | 24000 | 440.95 | 48 | 174 | 1 | E3#5 | 174 |
