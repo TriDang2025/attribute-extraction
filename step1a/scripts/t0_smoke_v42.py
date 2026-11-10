@@ -2,7 +2,7 @@
 
 python scripts/t0_smoke_v42.py --build [--out DIR]   -> DIR/manifest.json + prompts (default results/wf_v42/t0_smoke)
 python scripts/t0_smoke_v42.py --fake  [--out DIR]   -> answers the jobs with nov16_v41.FakeLLM (laptop plumbing test only)
-python scripts/t0_smoke_v42.py --check [--out DIR]   -> DIR/check.md; exit 1 when a job has no answer or a parse error
+python scripts/t0_smoke_v42.py --check [--out DIR]   -> DIR/check.md + check.csv (s1a/check_v42.py); exit 1 when a job has no answer or a parse error
 On Colab, colab/S1A_wf42_colab.ipynb runs the jobs with nov16_v41.VllmBackend between --build and --check.
 
 Jobs:
@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from s1a import batch_v4 as B  # noqa: E402
+from s1a import check_v42 as C  # noqa: E402
 from s1a import nov16_v41 as NV  # noqa: E402
 
 OUT = ROOT / "results" / "wf_v42" / "t0_smoke"
@@ -42,28 +43,6 @@ def build(out):
     return [s3, *s4]
 
 
-def check(out):
-    """Rows of check.md; ok = every job has an answer without parse errors."""
-    out, rows, ok, model = Path(out), [], True, ""
-    for j in jobs_of(out):
-        r = B.last_row(out / "responses" / f"{j['job']}.jsonl")
-        model = model or (r or {}).get("model", "")
-        if r is None:
-            rows.append(f"| {j['job']} | no answer | | | | | |")
-            ok = False
-            continue
-        ok &= not r["errors"]
-        secs = r.get("batch_seconds", "")
-        rows.append(f"| {j['job']} | {len(r['errors'])} | {r.get('guided')} | {r.get('finish_reason')} | {r.get('prompt_tokens', '')} | "
-                    f"{r.get('output_tokens', '')} | {secs} |")
-        if r["errors"]:
-            rows.append(f"|  | first errors: {'; '.join(map(str, r['errors'][:3]))[:300]} | | | | | |")
-    md = [f"# wf_v4.2 T0 smoke test ({model or 'no answers'})", "", f"Result: **{'pass' if ok else 'FAIL'}**", "",
-          "| job | parse errors | guided | finish | tokens in | tokens out | seconds |", "|---|---|---|---|---|---|---|", *rows]
-    B.write(out / "check.md", "\n".join(md) + "\n")
-    return ok
-
-
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     g = ap.add_mutually_exclusive_group(required=True)
@@ -77,7 +56,7 @@ def main():
     elif a.fake:
         print(NV.FakeLLM().run(a.out, jobs_of(a.out)))
     else:
-        ok = check(a.out)
+        _, ok = C.write_check(a.out, "wf_v4.2 T0 smoke test")
         print((a.out / "check.md").read_text(encoding="utf-8"))
         sys.exit(0 if ok else 1)
 
