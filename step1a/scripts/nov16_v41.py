@@ -126,13 +126,7 @@ def a2_inputs(run):
 
 def stage_step4(run, llm, ctx):
     out = run / "step4"
-    chains = NV.step4_chains(a2_inputs(run))
-    info = {"chains": len(chains), "stage1": llm.run(out, B.build_chains_stage1(out, chains, ROOT).save())}
-    for k in (2, 3, 4):
-        info[f"stage{k}"] = llm.run(out, B.build_stage(out, k, ROOT))
-    status = [r for r in B.assemble_all(out, ROOT) if r["kind"] == "main"]
-    info["finished"] = f"{sum(r['ok'] for r in status)}/{len(status)}"
-    return info
+    return NV.run_chains(out, llm, NV.step4_chains(a2_inputs(run)), ROOT)
 
 
 def stage_contamination(run, llm, ctx):

@@ -80,6 +80,17 @@ def step4_chains(a2_files, runs=STEP4_RUNS, seeds=SEEDS):
     return out
 
 
+def run_chains(out, llm, chains, root):
+    """Step 4 chains 4.1 -> 4.4 under `out`, one stage at a time (each stage built from the answers before it); llm.run(out, jobs)
+    answers a stage. Returns {"chains", "stage1".."stage4", "finished": "ok/n"} (main chains)."""
+    info = {"chains": len(chains), "stage1": llm.run(out, B.build_chains_stage1(out, chains, root).save())}
+    for k in (2, 3, 4):
+        info[f"stage{k}"] = llm.run(out, B.build_stage(out, k, root))
+    status = [r for r in B.assemble_all(out, root) if r["kind"] == "main"]
+    info["finished"] = f"{sum(r['ok'] for r in status)}/{len(status)}"
+    return info
+
+
 def a2_columns(a_cols, final, clusters, k=I.N_EXAMPLES, width=I.WIDTH):
     """Input a2: input a plus one column per new loop-2 column. final = {entity: [columns_l2.json rows]}; clusters = {L2 id: cluster}.
     Returns (columns, added [(id, name, clusters)])."""

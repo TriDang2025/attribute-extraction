@@ -26,6 +26,7 @@ Model: Llama-3.1-8B-Instruct, bf16, vLLM, temperature 0, guided JSON from each j
 
 - Cells 1-5: setup (as the Nov 16 notebook). Cell 6: **T0 smoke test** (1 Step 3 call + 1 Step 4 call); results are committed and pushed.
 - Cell 7: **T1** frozen Step 3 A prompt, 18 calls (3 entities x 3 orders x dev50 / dev50b), unchanged (option A of the T0 report). It counts failures; it does not stop on them. Time: about 3 min if all answers stop normally, up to about 45 min if all loop (each looping answer is retried once, unguided, one at a time).
+- Cell 8: **T2** Step 4 v4.1 with Llama on input c1 and on input a (Qwen's frozen Step 3 handover), dev50 and dev50b, seeds 0-2: 12 chains x 4 stages = 48 calls. Time: about 5-15 min; up to about 1 h if many answers loop (estimate).
 - After a crash or disconnect: rerun cells 1, 3, 4, 5 and then the cell you were on. Answered calls are read from the cache.
 - Colab Secrets `HF_TOKEN` and `GH_TOKEN`, notebook access on. The HF account must have accepted the Llama 3.1 license. Never put a token in a cell.
 - When the GPU work is done: **Runtime > Disconnect and delete runtime**, so the paid GPU stops.
@@ -61,9 +62,18 @@ p = subprocess.run(["bash", "colab/sync.sh", "push-results", "wf_v42 T1 step3", 
 print(p.stdout.strip() or p.stderr[-500:])
 print("T1 done: tell Claude 'T1 done'")
 """
+t2 = """#@title 8. T2: Step 4 v4.1 with Llama, inputs c1 and a, dev50 + dev50b, seeds 0-2 (12 chains, 4 stages)
+import subprocess
+from pathlib import Path
+sys.path.insert(0, "/content/attribute-extraction/step1a/scripts")
+import t2_step4_v42 as T2
+print(T2.run(T2.OUT, backend))
+p = subprocess.run(["bash", "colab/sync.sh", "push-results", "wf_v42 T2 step4", "wf_v42/t2_step4"], capture_output=True, text=True)
+print(p.stdout.strip() or p.stderr[-500:])
+"""
 nb = dict(src)
 nb["cells"] = [cell("markdown", intro), cell("code", c1), cells[2], cells[3], cell("code", c3), cell("code", c5), cell("code", text(cells[7]).replace("#@title 6. Backend", "#@title 5. Backend")),
-               cell("code", t0), cell("code", t1)]
+               cell("code", t0), cell("code", t1), cell("code", t2)]
 out = step1a / "colab" / "S1A_wf42_colab.ipynb"
 out.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 print("wrote", out, len(nb["cells"]), "cells")
