@@ -58,7 +58,11 @@ def prompt_tokens(tok, job_name, text, limit):
 
 
 def parse_answer(raw, job, schema):
-    """(parsed, errors) of a raw answer: plain JSON for PLAIN_FORMATS (errors = JSON errors), llm_cache.parse_job for the others."""
+    """(parsed, errors) of a raw answer: plain JSON for PLAIN_FORMATS (errors = JSON errors), llm_cache.parse_job for the others.
+    A job marked "keyed" (wf_v4.2 option B, s1a/keyed_v42.py) is first turned back into the frozen list format."""
+    if job.get("keyed"):
+        from . import keyed_v42 as K
+        raw, schema = K.unkey(job["format"], raw), K.parse_schema(job["format"], schema)
     if job["format"] in PLAIN_FORMATS:
         try:
             return json.loads(raw), []

@@ -3,6 +3,8 @@
 python scripts/t1_step3_v42.py --build [--out DIR]   -> DIR/manifest.json + prompts (default results/wf_v42/t1_step3)
 python scripts/t1_step3_v42.py --fake  [--out DIR]   -> nov16_v41.FakeLLM answers (laptop plumbing test only)
 python scripts/t1_step3_v42.py --check [--out DIR]   -> DIR/check.md + check.csv (s1a/check_v42.py)
+--keyed (option B, s1a/keyed_v42.py): the same 18 jobs in results/wf_v42/t1b_step3_keyed, run through keyed_v42.KeyedLLM
+("exactly once" guided schema, frozen prompt text); --fake --keyed uses keyed_v42.fake_keyed.
 On Colab, colab/S1A_wf42_colab.ipynb cell 7 runs the jobs with nov16_v41.VllmBackend between --build and --check.
 
 18 jobs = 3 entities x 3 orders x 2 sets, the prompt and schema files copied byte for byte from the Qwen runs that STEP3.md is built on:
@@ -21,9 +23,11 @@ sys.path.insert(0, str(ROOT))
 
 from s1a import batch_v4 as B  # noqa: E402
 from s1a import check_v42 as C  # noqa: E402
+from s1a import keyed_v42 as K  # noqa: E402
 from s1a import nov16_v41 as NV  # noqa: E402
 
 OUT = ROOT / "results" / "wf_v42" / "t1_step3"
+OUT_KEYED = ROOT / "results" / "wf_v42" / "t1b_step3_keyed"
 R = ROOT / "results"
 ENTS = ("train", "hotel", "restaurant")
 DEV50_SRC = ((R / "loop1_v31", "{ent}_v2"), (R / "loop1_v31", "{ent}_v2_r2"), (R / "loop1_v36" / "colab", "{ent}_v2_s2"))
@@ -68,14 +72,18 @@ def main():
     g.add_argument("--build", action="store_true")
     g.add_argument("--fake", action="store_true")
     g.add_argument("--check", action="store_true")
-    ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--keyed", action="store_true", help="option B: keyed guided schemas (s1a/keyed_v42.py)")
+    ap.add_argument("--out", type=Path)
     a = ap.parse_args()
+    a.out = a.out or (OUT_KEYED if a.keyed else OUT)
     if a.build:
         print(f"{len(build(a.out))} jobs in {a.out}")
     elif a.fake:
-        print(NV.FakeLLM().run(a.out, B.read_json(a.out / "manifest.json")["jobs"]))
+        llm = K.KeyedLLM(K.fake_keyed()) if a.keyed else NV.FakeLLM()
+        print(llm.run(a.out, B.read_json(a.out / "manifest.json")["jobs"]))
     else:
-        rows, _ = C.write_check(a.out, "wf_v4.2 T1: frozen Step 3 A prompt with Llama (18 calls)")
+        title = "option B, keyed schemas" if a.keyed else "frozen schemas"
+        rows, _ = C.write_check(a.out, f"wf_v4.2 T1: frozen Step 3 A prompt with Llama, {title} (18 calls)")
         print((a.out / "check.md").read_text(encoding="utf-8"))
 
 

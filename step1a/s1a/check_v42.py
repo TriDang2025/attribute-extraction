@@ -13,13 +13,15 @@ from . import batch_v4 as B
 COLS = ["job", "answered", "parse_errors", "guided", "retried", "finish", "prompt_tokens", "output_tokens", "batch_seconds",
         "clusters_expected", "cluster_rows", "distinct_ids", "top_id", "top_id_rows"]
 _CLUSTER_ID = re.compile(r'"cluster_id"\s*:\s*"([^"]+)"')
+_CLUSTER_KEY = re.compile(r'"(E\d+#\d+)"\s*:\s*\{')       # keyed answers (s1a/keyed_v42.py): "E1#0": {...}
 
 
 def a_stats(raw, schema):
     """Cluster rows of a Step 3 A answer (raw text, so a cut-off answer counts too) against the schema's cluster ids."""
-    ids = _CLUSTER_ID.findall(raw)
+    ids = _CLUSTER_ID.findall(raw) + _CLUSTER_KEY.findall(raw)
     top = collections.Counter(ids).most_common(1)
-    expected = schema["properties"]["clusters"]["items"]["properties"]["cluster_id"]["enum"]
+    clusters = schema["properties"]["clusters"]
+    expected = list(clusters["properties"]) if "properties" in clusters else clusters["items"]["properties"]["cluster_id"]["enum"]
     return {"clusters_expected": len(expected), "cluster_rows": len(ids), "distinct_ids": len(set(ids)),
             "top_id": top[0][0] if top else "", "top_id_rows": top[0][1] if top else 0}
 
