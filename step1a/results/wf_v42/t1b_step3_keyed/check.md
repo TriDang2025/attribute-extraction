@@ -1,0 +1,24 @@
+# wf_v4.2 T1: frozen Step 3 A prompt with Llama, option B, keyed schemas (18 calls)
+
+Parsed without errors: **15/18**
+
+| job | answered | parse_errors | guided | retried | finish | prompt_tokens | output_tokens | batch_seconds | clusters_expected | cluster_rows | distinct_ids | top_id | top_id_rows |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| train_a_v22d50_s0 | True | 0 | True | False | stop | 9266 | 1882 | 150.69 | 29 | 29 | 29 | E1#0 | 1 |
+| train_a_v22d50_s1 | True | 0 | True | False | stop | 9266 | 1737 | 150.69 | 29 | 29 | 29 | E1#0 | 1 |
+| train_a_v22d50_s2 | True | 0 | True | False | stop | 9266 | 2118 | 150.69 | 29 | 29 | 29 | E1#0 | 1 |
+| hotel_a_v22d50_s0 | True | 0 | True | False | stop | 8403 | 2332 | 150.69 | 31 | 31 | 31 | E0#0 | 1 |
+| hotel_a_v22d50_s1 | True | 0 | True | False | stop | 8403 | 2303 | 150.69 | 31 | 31 | 31 | E0#0 | 1 |
+| hotel_a_v22d50_s2 | True | 10 | True | True | stop | 16806 | 14666 | 150.69 | 31 | 31 | 31 | E0#0 | 1 |
+| restaurant_a_v22d50_s0 | True | 0 | True | False | stop | 13459 | 3233 | 150.69 | 57 | 57 | 57 | E2#0 | 1 |
+| restaurant_a_v22d50_s1 | True | 0 | True | False | stop | 13459 | 4254 | 150.69 | 57 | 57 | 57 | E2#0 | 1 |
+| restaurant_a_v22d50_s2 | True | 0 | True | False | stop | 13459 | 3290 | 150.69 | 57 | 57 | 57 | E2#0 | 1 |
+| train_a_v22d50b_s0 | True | 0 | True | False | stop | 7197 | 1913 | 150.69 | 20 | 20 | 20 | E0#0 | 1 |
+| train_a_v22d50b_s1 | True | 0 | True | False | stop | 7197 | 1747 | 150.69 | 20 | 20 | 20 | E0#0 | 1 |
+| train_a_v22d50b_s2 | True | 0 | True | False | stop | 7197 | 1612 | 150.69 | 20 | 20 | 20 | E0#0 | 1 |
+| hotel_a_v22d50b_s0 | True | 0 | True | False | stop | 9601 | 2419 | 150.69 | 31 | 31 | 31 | E1#0 | 1 |
+| hotel_a_v22d50b_s1 | True | 0 | True | False | stop | 9601 | 2198 | 150.69 | 31 | 31 | 31 | E1#0 | 1 |
+| hotel_a_v22d50b_s2 | True | 0 | True | False | stop | 9601 | 2347 | 150.69 | 31 | 31 | 31 | E1#0 | 1 |
+| restaurant_a_v22d50b_s0 | True | 0 | True | False | stop | 10181 | 3564 | 150.69 | 48 | 48 | 48 | E3#0 | 1 |
+| restaurant_a_v22d50b_s1 | True | 1 | True | True | stop | 20362 | 15738 | 150.69 | 48 | 48 | 48 | E3#0 | 1 |
+| restaurant_a_v22d50b_s2 | True | 1 | True | True | stop | 20362 | 15559 | 150.69 | 48 | 48 | 48 | E3#0 | 1 |
