@@ -28,6 +28,7 @@ Model: Llama-3.1-8B-Instruct, bf16, vLLM, temperature 0, guided JSON from each j
 - Cell 7: **T1** frozen Step 3 A prompt, 18 calls (3 entities x 3 orders x dev50 / dev50b), unchanged (option A of the T0 report). It counts failures; it does not stop on them. Time: about 3 min if all answers stop normally, up to about 45 min if all loop (each looping answer is retried once, unguided, one at a time).
 - Cell 8: **T2** Step 4 v4.1 with Llama on input c1 and on input a (Qwen's frozen Step 3 handover), dev50 and dev50b, seeds 0-2: 12 chains x 4 stages = 48 calls. Time: about 5-15 min; up to about 1 h if many answers loop (estimate).
 - Cells 9-10: **option B** (user choice 2026-11-11): the same T1 and T2 jobs with "exactly once" guided schemas (`s1a/keyed_v42.py`), frozen prompt text. Cell 9 = Step 3 (18 calls, about 3-5 min), cell 10 = Step 4 (12 chains, about 5-10 min); estimates.
+- Cell 11: **option B extended** (user choice 2026-11-12): Step 4 again with 4.3 capped and repeated 4.2 names renamed, in `t2c_step4_keyed_ext` (about 5 min, estimate).
 - After a crash or disconnect: rerun cells 1, 3, 4, 5 and then the cell you were on. Answered calls are read from the cache.
 - Colab Secrets `HF_TOKEN` and `GH_TOKEN`, notebook access on. The HF account must have accepted the Llama 3.1 license. Never put a token in a cell.
 - When the GPU work is done: **Runtime > Disconnect and delete runtime**, so the paid GPU stops.
@@ -92,9 +93,19 @@ print(T2.run(T2.OUT_KEYED, backend, keyed=True))
 p = subprocess.run(["bash", "colab/sync.sh", "push-results", "wf_v42 T2b keyed", "wf_v42/t2b_step4_keyed"], capture_output=True, text=True)
 print(p.stdout.strip() or p.stderr[-500:])
 """
+t2c = """#@title 11. Option B extended, Step 4: also 4.3 capped and repeated 4.2 table names renamed (fresh folder t2c)
+import sys, subprocess, importlib
+sys.path.insert(0, "/content/attribute-extraction/step1a/scripts")
+from s1a import keyed_v42 as K
+import t2_step4_v42 as T2
+importlib.reload(K); importlib.reload(T2)
+print(T2.run(T2.OUT_EXT, backend, keyed=True))
+p = subprocess.run(["bash", "colab/sync.sh", "push-results", "wf_v42 T2c keyed ext", "wf_v42/t2c_step4_keyed_ext"], capture_output=True, text=True)
+print(p.stdout.strip() or p.stderr[-500:])
+"""
 nb = dict(src)
 nb["cells"] = [cell("markdown", intro), cell("code", c1), cells[2], cells[3], cell("code", c3), cell("code", c5), cell("code", text(cells[7]).replace("#@title 6. Backend", "#@title 5. Backend")),
-               cell("code", t0), cell("code", t1), cell("code", t2), cell("code", t1b), cell("code", t2b)]
+               cell("code", t0), cell("code", t1), cell("code", t2), cell("code", t1b), cell("code", t2b), cell("code", t2c)]
 out = step1a / "colab" / "S1A_wf42_colab.ipynb"
 out.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 print("wrote", out, len(nb["cells"]), "cells")

@@ -3,7 +3,7 @@ user choice 2026-11-10, since Llama's own Step 3 fails, T1). dev50 and dev50b, s
 
 python scripts/t2_step4_v42.py --fake [--keyed] [--out DIR]   -> all stages with the fake model (laptop plumbing test only)
 --keyed / run(..., keyed=True): option B (s1a/keyed_v42.py), keyed "exactly once" schemas for 4.1, 4.2 and 4.4, in
-results/wf_v42/t2b_step4_keyed.
+results/wf_v42/t2b_step4_keyed (first run, 4.3 not capped) and results/wf_v42/t2c_step4_keyed_ext (extended, cell 11).
 On Colab, colab/S1A_wf42_colab.ipynb cell 8 calls run(OUT, backend) (nov16_v41.run_chains with nov16_v41.VllmBackend).
 Scoring of the answers (T7 scorers, PK rules a and b) is a separate laptop step after the run.
 """
@@ -20,6 +20,7 @@ from s1a import nov16_v41 as NV  # noqa: E402
 
 OUT = ROOT / "results" / "wf_v42" / "t2_step4"
 OUT_KEYED = ROOT / "results" / "wf_v42" / "t2b_step4_keyed"
+OUT_EXT = ROOT / "results" / "wf_v42" / "t2c_step4_keyed_ext"     # option B extended (4.3 capped, 4.2 names renamed), 2026-11-12
 RUNS = tuple((inp, s) for inp in ("c1", "a") for s in NV.SETS)
 
 

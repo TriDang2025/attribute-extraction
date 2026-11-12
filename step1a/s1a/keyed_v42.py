@@ -8,6 +8,11 @@ column). The frozen schemas check each list item's shape only. Here the per-id l
 - s4_41 (4.1):     groups + unused -> columns {column: {group "G<n>" | "unused", reason}} and groups [{group, note}].
 - s4_42 (4.2):     tables      -> {group: {name, description, row}}.
 - s4_44 (4.4):     tables      -> {table name: {primary_key, new_id_name, columns, foreign_keys}}.
+Extension (user choice 2026-11-12, after the first option B run: 4/12 chains looped at 4.3, 3/12 stopped at 4.2 on a repeated name):
+- s4_43 (4.3):     list form kept (no fixed ids); relationships capped at 2 x the pairs of tables, new_tables at the pairs,
+                   short strings.
+- s4_42 names:     unkey() renames a repeated table name (case-insensitive, as validate_42) to <name>_<group>, the first keeps it;
+                   renamed_42() counts these repairs for the report.
 unkey() turns an answer back into the frozen list format before the frozen parser runs (an answer already in list form, e.g. an
 unguided retry, passes unchanged). KeyedLLM wraps a backend (nov16_v41.VllmBackend / FakeLLM): it rewrites the schema files of these
 formats to the keyed form (the frozen file kept as <schema>.frozen.json) and marks the jobs, so nov16_v41.parse_answer unkeys them.
@@ -16,8 +21,8 @@ import json
 from pathlib import Path
 
 MARK = "keyed_v42"
-FORMATS = ("v2", "s4_41", "s4_42", "s4_44")
-CAP = {"attr_name": 60, "attr_text": 200, "evidence": 300, "reason": 150}
+FORMATS = ("v2", "s4_41", "s4_42", "s4_43", "s4_44")
+CAP = {"attr_name": 60, "attr_text": 200, "evidence": 300, "reason": 150, "name": 60}
 _STR = {"type": "string"}
 
 
@@ -60,6 +65,15 @@ def key_schema(fmt, frozen):
     elif fmt == "s4_42":
         item = _items(frozen, "tables")
         props = {"tables": _obj({g: _value(item, "group") for g in item["properties"]["group"]["enum"]})}
+    elif fmt == "s4_43":
+        n = len(_items(frozen, "new_tables")["properties"]["between"]["items"]["enum"])
+        pairs = max(1, n * (n - 1) // 2)
+        rel = _obj({"from": _cap(CAP["name"]), "to": _cap(CAP["name"]), "kind": _items(frozen, "relationships")["properties"]["kind"],
+                    "reason": _cap(CAP["reason"])})
+        new = _obj({"name": _cap(CAP["name"]), "description": _cap(CAP["attr_text"]), "row": _cap(CAP["attr_text"]),
+                    "between": _items(frozen, "new_tables")["properties"]["between"]})
+        props = {"relationships": {"type": "array", "items": rel, "maxItems": 2 * pairs},
+                 "new_tables": {"type": "array", "items": new, "maxItems": pairs}}
     elif fmt == "s4_44":
         item = _items(frozen, "tables")
         props = {"tables": _obj({n: _value(item, "name") for n in item["properties"]["name"]["enum"]})}
@@ -103,12 +117,42 @@ def unkey(fmt, raw):
         obj = {"groups": [{"group": g, "columns": cs, "note": notes.get(g, "")} for g, cs in groups.items()], "unused": unused,
                "duplicate_flags": obj.get("duplicate_flags", [])}
     elif fmt == "s4_42" and isinstance(obj.get("tables"), dict):
-        obj["tables"] = [{"group": g, **v} for g, v in obj["tables"].items()]
+        obj["tables"] = _unique_names([{"group": g, **v} for g, v in obj["tables"].items()])
     elif fmt == "s4_44" and isinstance(obj.get("tables"), dict):
         obj["tables"] = [{"name": n, **v} for n, v in obj["tables"].items()]
     else:
         return raw
     return json.dumps(obj, ensure_ascii=False)
+
+
+def _norm(name):
+    return str(name or "").strip().lower()
+
+
+def _unique_names(tables):
+    """4.2 tables with a repeated name (as validate_42 compares them) renamed to <name>_<group>[_<k>]; the first keeps its name."""
+    used = set()
+    for t in tables:
+        if isinstance(t, dict) and _norm(t.get("name")):
+            base = name = str(t["name"]).strip()
+            if _norm(name) in used:
+                base = name = f"{base}_{str(t.get('group', '')).lower()}"
+                k = 2
+                while _norm(name) in used:
+                    name, k = f"{base}_{k}", k + 1
+            t["name"] = name
+            used.add(_norm(name))
+    return tables
+
+
+def renamed_42(raw):
+    """Number of table names unkey() renames in a keyed 4.2 answer (0 for a cut-off or list-form answer)."""
+    obj = _load(raw)
+    tables = obj.get("tables") if obj else None
+    if not isinstance(tables, dict):
+        return 0
+    names = [_norm(v.get("name")) for v in tables.values() if isinstance(v, dict) and _norm(v.get("name"))]
+    return len(names) - len(set(names))
 
 
 def key_answer(fmt, raw):
