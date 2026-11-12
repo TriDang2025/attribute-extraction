@@ -1,0 +1,85 @@
+{
+ "type": "object",
+ "properties": {
+  "relationships": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "from": {
+      "type": "string",
+      "maxLength": 60
+     },
+     "to": {
+      "type": "string",
+      "maxLength": 60
+     },
+     "kind": {
+      "enum": [
+       "one_to_many",
+       "many_to_many"
+      ]
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 150
+     }
+    },
+    "required": [
+     "from",
+     "to",
+     "kind",
+     "reason"
+    ],
+    "additionalProperties": false
+   },
+   "maxItems": 6
+  },
+  "new_tables": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 60
+     },
+     "description": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "row": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "between": {
+      "type": "array",
+      "items": {
+       "enum": [
+        "train_info",
+        "hotel_info",
+        "restaurant_info"
+       ]
+      },
+      "minItems": 2,
+      "maxItems": 2
+     }
+    },
+    "required": [
+     "name",
+     "description",
+     "row",
+     "between"
+    ],
+    "additionalProperties": false
+   },
+   "maxItems": 3
+  }
+ },
+ "required": [
+  "relationships",
+  "new_tables"
+ ],
+ "additionalProperties": false,
+ "title": "keyed_v42"
+}
