@@ -1,0 +1,42 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+This table refers to the other tables listed below. For each of them, choose the id of the column of this table that holds the reference (its value points to a row of that table), or "new" when no column does; a new reference column is then added. Tables referred to: train_reference (one train_reference row has many rows of train_departure_time).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "x:3", "new_id_name": "", "foreign_keys": {"table_b": "new"}}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table train_departure_time (one row = one train_departure_time), 5 columns:
+[train:14] time minutes
+  values: duration (share 0.88); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+[train:6] departure time
+  values: time (share 1.00); 89 mentions in 27 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+[restaurant:23] time int
+  values: time (share 1.00); 18 mentions in 10 dialogues
+  examples:
+    "18:00" (in: "I be able to get a table there Thursday at 18:00 for 7?")
+    "10:00" (in: "How about 10:00 on the same day as before?")
+[restaurant:24] time str
+  values: day (share 0.47); 34 mentions in 12 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+[restaurant:18] reservation time
+  values: duration (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+
+Return the JSON object now.

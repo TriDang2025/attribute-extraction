@@ -1,0 +1,40 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_destination and train_departure_location are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_destination -> train_departure_location": one train_destination row has many train_departure_location rows (each train_departure_location row refers to one train_destination row)
+- "train_departure_location -> train_destination": one train_departure_location row has many train_destination rows (each train_destination row refers to one train_departure_location row)
+- "many_to_many": a train_destination row can go with many train_departure_location rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_destination (one row = one train_destination), 2 columns:
+[train:1] day of week
+  values: day (share 1.00); 30 mentions in 24 dialogues
+  examples:
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "wednesday" (in: "I would like to leave on Wednesday.")
+[train:2] day of week relative
+  values: day (share 1.00); 11 mentions in 5 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+
+Table train_departure_location (one row = one train_departure_location), 2 columns:
+[train:4] departure location
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "peterborough" (in: "like to go to Cambridge and will be departing from Peterborough.")
+[train:5] departure station
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples:
+    "norwich" (in: "I am looking for a train that will depart from Norwich on Sunday")
+    "birmingham new street" (in: "I would like to depart from birmingham new street after 14:45.")
+
+Return the JSON object now.

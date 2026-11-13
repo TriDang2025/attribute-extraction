@@ -1,0 +1,157 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table hotel (one row = one hotel), 30 columns:
+[hotel:3] 4 star guesthouse
+  values: text (share 1.00); 20 mentions in 12 dialogues
+  examples:
+    "guesthouse" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "guest house" (in: "Hi, I need a guest house please.")
+[hotel:10] guesthouse
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "acorn guest house" (in: "Yes the phone number to the acorn guest house 01223353888 with a price range ...")
+    "bridge guest house" (in: "bridge guest house is a 3 star and a nice place.Do you want")
+[hotel:5] address
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "74 chesterton road" (in: "...ia. Ashely Hotel located at 74 Chesterton road and Lovell Lodge located at...")
+    "56 saint barnaba road" (in: "The address is 56 saint barnabas road.")
+[hotel:33] time
+  values: time (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "16:00" (in: "...e book reservation for 2 people at 16:00 on Friday. Send me the reference ...")
+[hotel:6] best guest house
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "best guest house" (in: "provide me the phone number and price range of the best guest house?")
+[hotel:13] hotel name
+  values: text (share 1.00); 10 mentions in 8 dialogues
+  examples:
+    "hotel" (in: "...s available. Do you have a preference of guesthouse or hotel and price range?")
+[hotel:12] hotel
+  values: text (share 1.00); 7 mentions in 5 dialogues
+  examples:
+    "the lensfield hotel" (in: "The Lensfield Hotel meets your criteria. Would you like me to book it?")
+    "ashely hotel" (in: "... hotels meeting your criteria. Ashely Hotel located at 74 Chesterton road ...")
+[hotel:24] num people
+  values: number (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "2 people" (in: "please book it for 5 nights starting on Wednesday for 2 people total.")
+[hotel:16] location part
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "north" (in: "There are no 3 star hotels in the North. You sure a guesthouse won't work?")
+[hotel:31] price range
+  values: text (share 1.00); 16 mentions in 11 dialogues
+  examples:
+    "moderately priced" (in: "...here you'll be dining and is moderately priced. Their address is 138 Perne...")
+    "cheap" (in: "Hotel allenbell is what I found that is cheap and has parking.")
+[hotel:21] num guests
+  values: number (share 1.00); 10 mentions in 8 dialogues
+  examples:
+    "2 night" (in: "I would like it for 6 people for 2 nights starting on Wednesday.")
+    "1 night" (in: "...ked at the bridge guest house for 1 night (Saturday). Your reference numbe...")
+[hotel:30] price
+  values: text (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "east" (in: "I am looking for a cheap hotel on the east.")
+    "south" (in: "moderately priced. Do you want to be in the north, south, or west side of town?")
+[hotel:7] date
+  values: id (share 1.00); 16 mentions in 16 dialogues
+  examples:
+    "23ekiufo" (in: "...ations. Your reference number is 23EKIUFO. Is there anything else I can he...")
+    "7sn0baat" (in: "...ghts for 8 people. Your reference number 7SN0BAAT. Do you need anything else?")
+[hotel:28] phone number
+  values: number (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "01223247015" (in: "address is 138 Perne Road and their phone number is 01223247015.")
+    "01223334860" (in: "The phone of Downing College is 01223334860. Do you need a place to stay?")
+[hotel:17] location str
+  values: text (share 0.67); 6 mentions in 5 dialogues
+  examples:
+    "west side of town" (in: "Do you want to be in the north, south, or west side of town?")
+    "cb13js" (in: "The postcode is cb13js. Would you like to get a room reserved?")
+[hotel:18] lodging type
+  values: number (share 0.80); 5 mentions in 3 dialogues
+  examples:
+    "2 star" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "3 star" (in: "Yes, how about a guesthouse with 3 stars and free wifi instead?")
+[hotel:22] num hotels
+  values: number (share 1.00); 8 mentions in 5 dialogues
+  examples:
+    "4 night" (in: "How about four nights instead of five?")
+    "5 night" (in: "Yes, please book it for 5 nights starting on Wednesday for 2 people total.")
+[hotel:11] guesthouse name
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "finch bed and breakfast" (in: "Finches Bed and Breakfast is a cheap 4-star guesthouse on the west side. Its")
+    "carolina bed and breakfast" (in: "I recommend Carolina Bed and Breakfast. It's located close to where you'll be...")
+[hotel:4] 4 star places
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "4 star place" (in: "Not really. I like 4 star places that include free parking though.")
+[hotel:19] num
+  values: number (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "3" (in: "I found 3 for you all in the expensive price range. Can you")
+    "2" (in: "...king? If yes, please book a room for 2 for 2 nights. We'll be checking in ...")
+[hotel:8] day of week
+  values: day (share 1.00); 19 mentions in 16 dialogues
+  examples:
+    "wednesday" (in: "like it for 6 people for 2 nights starting on Wednesday.")
+    "friday" (in: "...ok reservation for 2 people at 16:00 on Friday. Send me the reference number.")
+[hotel:15] location area
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "north side of town" (in: "I'd like to be in the north side of town.")
+    "free parking" (in: "Yes, I need internet and free parking.")
+[hotel:23] num nights
+  values: number (share 1.00); 11 mentions in 10 dialogues
+  examples:
+    "8 people" (in: "yes, i want to book it for 8 people and 3 nights starting from wednesday")
+    "3 guesthouse" (in: "I have 3 guesthouses all in the moderate price range. Would you like me")
+[hotel:1] 2 star hotel
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2-star hotel" (in: "No, just any 2-star hotel with free wifi will do.")
+[hotel:29] place to stay
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "place to stay" (in: "...ming trip and am looking for a place to stay. Can you recommend something ...")
+[hotel:32] reference number
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "ashley hotel" (in: "I have you booked in the Ashley hotel. Your reference number is CW6YMT0B. Is ...")
+    "ashley motel" (in: "I was able to book your stay at ashley motel. Your reference number is KJHYRD...")
+[hotel:20] num days
+  values: number (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "4 people" (in: "Yes I'll need it for Sunday for 2 nights and 4 people.")
+    "6 people" (in: "I would like it for 6 people for 2 nights starting on Wednesday.")
+[hotel:14] location
+  values: text (share 1.00); 31 mentions in 14 dialogues
+  examples:
+    "north" (in: "I would like a hotel in the north, please.")
+    "cambridge" (in: "I am going to cambridge and need a hotel")
+[hotel:25] num people ordinal
+  values: number (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "3 people" (in: "yes please. book it for 3 people and 3 nights starting from friday.")
+[hotel:2] 3 star guest houses
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "4 3 star guest house" (in: "There are four three star guest houses. Is there an area of town that interes...")
+
+Return the JSON object now.

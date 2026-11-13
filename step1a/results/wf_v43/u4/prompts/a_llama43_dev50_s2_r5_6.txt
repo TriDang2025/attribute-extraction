@@ -1,0 +1,110 @@
+Below are two tables of a relational database design, each with its columns. Decide whether time and price are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "time -> price": one time row has many price rows (each price row refers to one time row)
+- "price -> time": one price row has many time rows (each time row refers to one price row)
+- "many_to_many": a time row can go with many price rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table time (one row = one time), 7 columns:
+[train:6] departure time
+  values: time (share 1.00); 89 mentions in 27 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+[train:2] day of week relative
+  values: day (share 1.00); 11 mentions in 5 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+[train:1] day of week
+  values: day (share 1.00); 30 mentions in 24 dialogues
+  examples:
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "wednesday" (in: "I would like to leave on Wednesday.")
+[train:14] time minutes
+  values: duration (share 0.88); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+[hotel:15] start date
+  values: day (share 1.00); 21 mentions in 14 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+[restaurant:23] time int
+  values: time (share 1.00); 18 mentions in 10 dialogues
+  examples:
+    "18:00" (in: "I be able to get a table there Thursday at 18:00 for 7?")
+    "10:00" (in: "How about 10:00 on the same day as before?")
+[restaurant:24] time str
+  values: day (share 0.47); 34 mentions in 12 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+
+Table price (one row = one price), 11 columns:
+[train:15] total fee
+  values: price (share 0.81); 16 mentions in 13 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+[hotel:12] price str
+  values: text (share 1.00); 19 mentions in 10 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+[hotel:11] price range
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "the acorn guest house" (in: "The Acorn Guest House is moderately-priced, in the north. They offer free wif...")
+    "acorn guest house" (in: "guesthouses in the north. May I suggest the 4 star Acorn Guest house?")
+[hotel:14] stars
+  values: number (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+    "2 star" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+[restaurant:10] moderate price range
+  values: text (share 1.00); 8 mentions in 5 dialogues
+  examples:
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "moderately price" (in: "One of them is cheap and the other is moderately price.")
+[restaurant:5] cuisine
+  values: text (share 1.00); 9 mentions in 6 dialogues
+  examples:
+    "chinese" (in: "I have five places. Do you prefer, Italian, Chinese, Mexican or Indian?")
+    "chinese place" (in: "I would like a suggestion of a moderately priced Chinese place.")
+[restaurant:7] expensive
+  values: text (share 1.00); 13 mentions in 12 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "expensive price range" (in: "is in the centre of town and is in the expensive price range.")
+[restaurant:12] phone number
+  values: number (share 0.79); 19 mentions in 16 dialogues
+  examples:
+    "01223367660" (in: "...xpensive. Their phone number is 01223367660. Would you like me to book for...")
+    "01223 249955" (in: "is C.B 1, 9 H.X, and their phone number is 01223 249955.")
+[restaurant:15] price range
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "moderate price range" (in: "...estaurant in the north with a moderate price range? Any type of food will do.")
+[restaurant:3] cheap
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "cheap" (in: "There are 10 choices and we have cheap, moderate and expensive options, any p...")
+    "cheap price range" (in: "...t part of town and is in the cheap price range. Would you like their infor...")
+[restaurant:14] price
+  values: text (share 1.00); 6 mentions in 6 dialogues
+  examples:
+    "south" (in: "I have 9 different restaurants in the south. Lets try to narrow it down. Do y...")
+    "north" (in: "... Both are expensive. One is in the north and one is in the centre. Do you ...")
+
+Return the JSON object now.

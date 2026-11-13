@@ -1,0 +1,41 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_price and train_destination are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_price -> train_destination": one train_price row has many train_destination rows (each train_destination row refers to one train_price row)
+- "train_destination -> train_price": one train_destination row has many train_price rows (each train_price row refers to one train_destination row)
+- "many_to_many": a train_price row can go with many train_destination rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_price (one row = one train_price), 2 columns:
+[train:15] total fee
+  values: price (share 0.81); 16 mentions in 13 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+[train:11] price str
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+
+Table train_destination (one row = one train_destination), 2 columns:
+[train:1] day of week
+  values: day (share 1.00); 30 mentions in 24 dialogues
+  examples:
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "wednesday" (in: "I would like to leave on Wednesday.")
+[train:2] day of week relative
+  values: day (share 1.00); 11 mentions in 5 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+
+Return the JSON object now.

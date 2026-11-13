@@ -1,0 +1,36 @@
+Below are two tables of a relational database design, each with its columns. Decide whether restaurant and reservation are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "restaurant -> reservation": one restaurant row has many reservation rows (each reservation row refers to one restaurant row)
+- "reservation -> restaurant": one reservation row has many restaurant rows (each restaurant row refers to one reservation row)
+- "many_to_many": a restaurant row can go with many reservation rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table restaurant (one row = one restaurant), 1 columns:
+[restaurant:20] restaurant name
+  values: text (share 1.00); 40 mentions in 21 dialogues
+  examples:
+    "anatolia" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "graffiti" (in: "I'm also looking to eat at a restaurant called graffiti.")
+
+Table reservation (one row = one reservation), 2 columns:
+[restaurant:21] table
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "table" (in: "Yes I have three. When would you like the table reserved for and for how many?")
+    "your table" (in: "Your table was booked. Your reference number is 42XEDGDF. Is there anything")
+[restaurant:18] reservation time
+  values: duration (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+
+Return the JSON object now.

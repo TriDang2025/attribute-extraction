@@ -1,0 +1,139 @@
+Below are two tables of a relational database design, each with its columns. Decide whether location and price are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "location -> price": one location row has many price rows (each price row refers to one location row)
+- "price -> location": one price row has many location rows (each location row refers to one price row)
+- "many_to_many": a location row can go with many price rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table location (one row = one location), 13 columns:
+[train:4] departure location
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "peterborough" (in: "like to go to Cambridge and will be departing from Peterborough.")
+[train:7] destination
+  values: text (share 1.00); 6 mentions in 4 dialogues
+  examples:
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+    "broxbourne" (in: "I'd like to go to Cambridge via Broxbourne. I'd like to leave on Thursday and...")
+[train:8] location capitalized
+  values: text (share 1.00); 11 mentions in 7 dialogues
+  examples:
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+    "stansted" (in: "be great. How much would it cost to travel to stansted from Cambridge?")
+[train:9] location str
+  values: text (share 1.00); 53 mentions in 27 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "leicester" (in: "I'll be leaving Leicester and I want to be in Cambridge by 11:30, please.")
+[train:5] departure station
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples:
+    "norwich" (in: "I am looking for a train that will depart from Norwich on Sunday")
+    "birmingham new street" (in: "I would like to depart from birmingham new street after 14:45.")
+[hotel:4] location
+  values: text (share 0.97); 34 mentions in 13 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+    "north" (in: "I'm looking for something expensive in the north.")
+[hotel:5] location adverb
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+    "north part of town" (in: "... priced 2-star hotel in the north part of town. It offers free wifi and fr...")
+[hotel:6] location snake
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "the cambridge belfry" (in: "The Cambridge Belfry fits your requirements, would you like to book a reserva...")
+[restaurant:9] location str
+  values: text (share 1.00); 24 mentions in 18 dialogues
+  examples:
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+    "north part of town" (in: "...nd a good restaurant in the north part of town that serves Australasian food?")
+[restaurant:19] restaurant address
+  values: text (share 1.00); 6 mentions in 6 dialogues
+  examples:
+    "68 histon road" (in: "...is tandoori palace located at 68 Histon Road Chesterton. Would you like a ...")
+    "11 pea hill city center" (in: "...dle Bar. It's located at 11 Peas Hill City Center. Would you like me to bo...")
+[restaurant:1] address
+  values: text (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "30 bridge street" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "10 homerton street" (in: "...eking Restaurant located at 10 Homerton Street City Centre? Would you like...")
+[restaurant:8] location
+  values: text (share 0.88); 41 mentions in 21 dialogues
+  examples:
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+    "chesterton" (in: "...alace located at 68 Histon Road Chesterton. Would you like a reservation a...")
+[restaurant:13] pickup location
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "pizza express" (in: "I would suggest pizza express.")
+    "hamilton lodge" (in: "...honda will pick you up at the hamilton lodge in time to arrive at restaura...")
+
+Table price (one row = one price), 11 columns:
+[train:15] total fee
+  values: price (share 0.81); 16 mentions in 13 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+[hotel:12] price str
+  values: text (share 1.00); 19 mentions in 10 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+[hotel:11] price range
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "the acorn guest house" (in: "The Acorn Guest House is moderately-priced, in the north. They offer free wif...")
+    "acorn guest house" (in: "guesthouses in the north. May I suggest the 4 star Acorn Guest house?")
+[hotel:14] stars
+  values: number (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+    "2 star" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+[restaurant:10] moderate price range
+  values: text (share 1.00); 8 mentions in 5 dialogues
+  examples:
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "moderately price" (in: "One of them is cheap and the other is moderately price.")
+[restaurant:5] cuisine
+  values: text (share 1.00); 9 mentions in 6 dialogues
+  examples:
+    "chinese" (in: "I have five places. Do you prefer, Italian, Chinese, Mexican or Indian?")
+    "chinese place" (in: "I would like a suggestion of a moderately priced Chinese place.")
+[restaurant:7] expensive
+  values: text (share 1.00); 13 mentions in 12 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "expensive price range" (in: "is in the centre of town and is in the expensive price range.")
+[restaurant:12] phone number
+  values: number (share 0.79); 19 mentions in 16 dialogues
+  examples:
+    "01223367660" (in: "...xpensive. Their phone number is 01223367660. Would you like me to book for...")
+    "01223 249955" (in: "is C.B 1, 9 H.X, and their phone number is 01223 249955.")
+[restaurant:15] price range
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "moderate price range" (in: "...estaurant in the north with a moderate price range? Any type of food will do.")
+[restaurant:3] cheap
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "cheap" (in: "There are 10 choices and we have cheap, moderate and expensive options, any p...")
+    "cheap price range" (in: "...t part of town and is in the cheap price range. Would you like their infor...")
+[restaurant:14] price
+  values: text (share 1.00); 6 mentions in 6 dialogues
+  examples:
+    "south" (in: "I have 9 different restaurants in the south. Lets try to narrow it down. Do y...")
+    "north" (in: "... Both are expensive. One is in the north and one is in the centre. Do you ...")
+
+Return the JSON object now.

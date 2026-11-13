@@ -1,0 +1,46 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_departure_location and train_location are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_departure_location -> train_location": one train_departure_location row has many train_location rows (each train_location row refers to one train_departure_location row)
+- "train_location -> train_departure_location": one train_location row has many train_departure_location rows (each train_departure_location row refers to one train_location row)
+- "many_to_many": a train_departure_location row can go with many train_location rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_departure_location (one row = one train_departure_location), 2 columns:
+[train:4] departure location
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "peterborough" (in: "like to go to Cambridge and will be departing from Peterborough.")
+[train:5] departure station
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples:
+    "norwich" (in: "I am looking for a train that will depart from Norwich on Sunday")
+    "birmingham new street" (in: "I would like to depart from birmingham new street after 14:45.")
+
+Table train_location (one row = one train_location), 3 columns:
+[train:7] destination
+  values: text (share 1.00); 6 mentions in 4 dialogues
+  examples:
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+    "broxbourne" (in: "I'd like to go to Cambridge via Broxbourne. I'd like to leave on Thursday and...")
+[train:9] location str
+  values: text (share 1.00); 53 mentions in 27 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "leicester" (in: "I'll be leaving Leicester and I want to be in Cambridge by 11:30, please.")
+[train:8] location capitalized
+  values: text (share 1.00); 11 mentions in 7 dialogues
+  examples:
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+    "stansted" (in: "be great. How much would it cost to travel to stansted from Cambridge?")
+
+Return the JSON object now.

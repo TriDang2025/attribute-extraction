@@ -1,0 +1,105 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table restaurant (one row = one restaurant), 18 columns:
+[restaurant:19] table size
+  values: number (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "2" (in: "That will be on Friday for 2 please.")
+    "1" (in: "Whatever you suggest. I need to book a table for 1 at 13:15 on Tuesday.")
+[restaurant:17] restaurant name
+  values: text (share 1.00); 35 mentions in 20 dialogues
+  examples:
+    "restaurant" (in: "...to dine in the centre. I would like a restaurant in the moderate price range.")
+    "j restaurant" (in: "you! Do you have the reviews and address for the J Restaurant near there?")
+[restaurant:13] price range
+  values: text (share 1.00); 26 mentions in 14 dialogues
+  examples:
+    "moderately priced" (in: "I would like to find a danish restaurant this is moderately priced.")
+    "moderate price range" (in: "... Danish restaurants in the moderate price range. Would you like me to chec...")
+[restaurant:4] entrance fee
+  values: price (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 pound" (in: "parade. The post code cb21rh and the entree fee is 2 pounds.")
+[restaurant:18] table
+  values: text (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "table" (in: "Lets try Hakka,can you book a table for 8 people at 16:30 on tuesday?")
+[restaurant:7] location
+  values: text (share 1.00); 13 mentions in 10 dialogues
+  examples:
+    "cambridge" (in: "Is there any good Jamaican food in Cambridge?")
+    "east" (in: "restaurant should serve scandinavian food and should be in the east.")
+[restaurant:20] time
+  values: time (share 1.00); 5 mentions in 3 dialogues
+  examples:
+    "10:30" (in: "Okay, will you try 10:30 instead?")
+    "16:15" (in: "Yes. I need a table for 8 people at 16:15 on the same day.")
+[restaurant:6] famous college
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "corpus christi" (in: "corpus christi is popular this time of year. The address is at")
+    "king's parade" (in: "...ime of year. The address is at king's parade. The post code cb21rh and the...")
+[restaurant:12] phone number
+  values: number (share 0.75); 4 mentions in 3 dialogues
+  examples:
+    "01223" (in: "01223 308871 Will that be all?")
+    "01223 308871" (in: "...e range. Their phone number is 01223 308871. The address is Corn Exchange ...")
+[restaurant:2] cuisine
+  values: text (share 1.00); 7 mentions in 2 dialogues
+  examples:
+    "lebanese" (in: "Some options are Lebanese, Turkish, international, British, European, and Chi...")
+    "british" (in: "...Lebanese, Turkish, international, British, European, and Chinese. Do any o...")
+[restaurant:11] number of people
+  values: day (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "tuesday" (in: "need to book a table for 1 at 13:15 on Tuesday.")
+    "wednesday" (in: "have available. Are you sure you don't have anything for Wednesday at 12:45?")
+[restaurant:9] location str
+  values: text (share 0.67); 6 mentions in 6 dialogues
+  examples:
+    "cb21rh" (in: "...ess is at king's parade. The post code cb21rh and the entree fee is 2 pounds.")
+    "cb30ad" (in: "prezzo's postcode is cb30ad.")
+[restaurant:16] reservation duration
+  values: duration (share 0.67); 6 mentions in 5 dialogues
+  examples:
+    "15 minute" (in: "...Your table will be reserved for 15 minutes and your reference number is VW...")
+    "15" (in: "There are a total of 15 restaurants that are cheap in the centre. Is there an...")
+[restaurant:14] price range str
+  values: text (share 1.00); 18 mentions in 13 dialogues
+  examples:
+    "expensive" (in: "I'd like it to be in the north, and expensive would be best.")
+    "cheap" (in: "...a total of 15 restaurants that are cheap in the centre. Is there another t...")
+[restaurant:1] address
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "86 regent street" (in: "...ddress for the J restaurant, 86 Regent Street City Centre. I currently do ...")
+    "1 a.w" (in: "the address is 83 Regent Street, postcode is C.B 2, 1 A.W.")
+[restaurant:10] num options
+  values: number (share 0.52); 21 mentions in 13 dialogues
+  examples:
+    "friday" (in: "would like the reservation for 5 people at 18:45 on Friday.")
+    "8 people" (in: "Lets try Hakka,can you book a table for 8 people at 16:30 on tuesday?")
+[restaurant:15] reference number
+  values: time (share 0.54); 26 mentions in 14 dialogues
+  examples:
+    "12:45" (in: "I would like a reservation for 2 at 12:45 please.")
+    "13:15" (in: "suggest. I need to book a table for 1 at 13:15 on Tuesday.")
+[restaurant:8] location id
+  values: text (share 1.00); 17 mentions in 12 dialogues
+  examples:
+    "centre" (in: "I have 13 colleges available in the centre. Did yo have one particular in mind?")
+    "city centre" (in: "... J restaurant, 86 Regent Street City Centre. I currently do not have revie...")
+
+Return the JSON object now.

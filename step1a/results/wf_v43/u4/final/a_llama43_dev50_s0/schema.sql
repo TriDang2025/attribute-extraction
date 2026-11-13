@@ -1,0 +1,62 @@
+CREATE TABLE "train" (
+  "reference number key" INTEGER,
+  "day of week" TEXT,
+  "day of week relative" TEXT,
+  "departure location" TEXT,
+  "departure station" TEXT,
+  "departure time" TIME,
+  "destination" TEXT,
+  "location capitalized" TEXT,
+  "location str" TEXT,
+  "price str" INTEGER,
+  "reference number" INTEGER,
+  "time minutes" INTERVAL,
+  "total fee" NUMERIC(10, 2),
+  PRIMARY KEY ("reference number key")
+);
+
+CREATE TABLE "hotel" (
+  "reference number key" INTEGER,
+  "guesthouse" TEXT,
+  "hotel amenities" TEXT,
+  "hotel name" TEXT,
+  "location" TEXT,
+  "location adverb" TEXT,
+  "location snake" TEXT,
+  "num nights" INTEGER,
+  "num people" INTEGER,
+  "people" INTEGER,
+  "phone number" INTEGER,
+  "price range" TEXT,
+  "price str" TEXT,
+  "reference number" INTEGER,
+  "stars" INTEGER,
+  "start date" TEXT,
+  "train id" INTEGER,
+  PRIMARY KEY ("reference number key")
+);
+
+CREATE TABLE "restaurant" (
+  "restaurant name key" INTEGER,
+  "address" TEXT,
+  "cheap" TEXT,
+  "cuisine" TEXT,
+  "entry fee" TEXT,
+  "expensive" TEXT,
+  "location" TEXT,
+  "location str" TEXT,
+  "moderate price range" TEXT,
+  "num table" INTEGER,
+  "phone number" INTEGER,
+  "pickup location" TEXT,
+  "price" TEXT,
+  "price range" TEXT,
+  "reference number" INTEGER,
+  "reservation time" INTERVAL,
+  "restaurant address" TEXT,
+  "restaurant name" TEXT,
+  "table" TEXT,
+  "time int" TIME,
+  "time str" TEXT,
+  PRIMARY KEY ("restaurant name key")
+);
