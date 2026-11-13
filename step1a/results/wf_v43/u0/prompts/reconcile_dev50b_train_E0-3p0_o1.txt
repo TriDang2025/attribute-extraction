@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#3/0: name: time str | description: time
+Examples:
+- 1 [system] previous turn, user: I'm traveling on tuesday and I want to arrive by 16:15 | turn: TR6357 leaves at [[05:01]] and arrives at 06:01. Would you like me to book a ticket for you?
+- 2 [system] previous turn, user: I want a train that is leaving from broxbourne. | turn: There is a train leaving from Broxbourne to Cambridge on Friday at 5:32 and will arrive there at [[6:32]].
+- 3 [system] previous turn, user: Tuesday, I want to arrive at 20:15. | turn: The latest train gets into Cambridge on tuesday is at [[18:43]]. Will that work for you?
+- 4 [system] previous turn, user: I'm departing from birmingham new street on Saturday and I'd like to leave after 12:45. | turn: How about TR8390 that leaves birmingham new street at [[13:40]] on Saturday. It arrives in cambridge at 16:23. The price is 60.08. Shall I book it?
+- 5 [user] turn: I need to get train ticket leaving cambridge after [[14:45]] please.
+
+Columns (5):
+- name: day of week | description: day of the week | examples: sunday; friday; monday
+- name: travel time | description: time of travel | examples: 49 minute; travel time; 163 minute
+- name: price | description: price of the ticket | examples: 17.90; 60.08
+- name: number of tickets | description: number of tickets | examples: 2 people; 3 seat; 4 ticket
+- name: time num | examples: 09:09; 09:30; 13:09
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#3/0", "reason": "str", "same_as": "<column name or none>"}

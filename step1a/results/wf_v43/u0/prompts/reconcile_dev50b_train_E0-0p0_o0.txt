@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#0/0: name: day of week | description: day of the week
+Examples:
+- 1 [system] previous turn, user: Sure, for 8 people please. | turn: TR4170 leaves leicester at 9:09 and arrives in cambridge on [[Friday]] at 10:54. 8 tickets are booked, reference #: CL4V2583. Do you need further help?
+- 2 [system] previous turn, user: I'm departing from birmingham new street on Saturday and I'd like to leave after 12:45. | turn: How about TR8390 that leaves birmingham new street at 13:40 on [[Saturday]]. It arrives in cambridge at 16:23. The price is 60.08. Shall I book it?
+- 3 [user] turn: hello. I'm trying to get to kings lynn on [[sunday]]. can you help?
+- 4 [system] previous turn, user: Does it leave on Monday? | turn: Train TR3154 leaves cambridge at 13:06 and will arrive at peterborough at 13:56 on [[Monday]]. Would you like me to book a ticket?
+- 5 [user] previous turn, system: This restaurant is of the moderate price range. Would you like to book a table? | turn: No thanks, but I do need some train info. I'll be leaving from Peterborough on [[Tuesday]], sometime after 15:15.
+
+Columns (5):
+- name: departure station | description: station the train departs from | examples: broxbourne; stevenage; peterborough
+- name: number of tickets | description: number of tickets | examples: 2 people; 3 seat; 4 ticket
+- name: time str | examples: 11:30; 13:06; 16:15
+- name: travel time | description: time of travel | examples: 49 minute; travel time; 163 minute
+- name: reference number | description: reference number of the booking | examples: station; 0w0bqb8w; 13gq9s3a
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#0/0", "reason": "str", "same_as": "<column name or none>"}

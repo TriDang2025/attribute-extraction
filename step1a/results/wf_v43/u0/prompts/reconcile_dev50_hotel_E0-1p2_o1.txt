@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#1/2: name: price adjective | description: price adjective
+Examples:
+- 1 [system] previous turn, user: I would prefer it to be a 4 star hotel, with free parking. | turn: We have several hotels that meet your requirements. Would you prefer a hotel that is [[cheap]] or moderate in price?
+- 2 [user] previous turn, system: We have 23 different options available. Is there an area you would prefer? | turn: I'm looking for [[something expensive]] in the north.
+- 3 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a 4 star, [[expensive hotel]] for 3 nights, starting on Saturday? 3 people. Wifi please.
+- 4 [user] previous turn, system: What area would you like to stay in? | turn: I'm looking for a place to stay that is [[cheap]] located in the north.
+- 5 [user] previous turn, system: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with free internet and free parking, Worth House is a good choice. | turn: I'm looking for a place to stay that is [[cheap]] located in the north.
+
+Columns (5):
+- name: hotel | examples: hotel; 3 star hotel; 4 star hotel
+- name: hotel area | description: the area of the hotel | examples: centre; center; mall
+- name: price range str | examples: moderate price range; cheap price range; cheaper price range
+- name: price str | examples: price per night; reasonable price
+- name: hotel name | description: the name of the hotel | examples: alexander bed and breakfast; aylesbray lodge; the acorn guest house
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#1/2", "reason": "str", "same_as": "<column name or none>"}
