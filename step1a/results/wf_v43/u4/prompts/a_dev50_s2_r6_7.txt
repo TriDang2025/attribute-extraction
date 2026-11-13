@@ -1,0 +1,39 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_total_fee and train_reference_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_total_fee -> train_reference_number": one train_total_fee row has many train_reference_number rows (each train_reference_number row refers to one train_total_fee row)
+- "train_reference_number -> train_total_fee": one train_reference_number row has many train_total_fee rows (each train_total_fee row refers to one train_reference_number row)
+- "many_to_many": a train_total_fee row can go with many train_reference_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_total_fee (one row = one train_total_fee), 1 columns:
+[train:13] total fee
+  description: Indicates the total cost for multiple tickets.
+  role: cost
+  values: price (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+    "10.56 gbp" (in: "...ful for TR5713, the total fee is 10.56 GBP payable at the station. Your re...")
+  checker evidence: support 1/7; fits a neighbouring column 3/10
+  checker: noise; flags: noise
+
+Table train_reference_number (one row = one train_reference_number), 1 columns:
+[train:10] reference number
+  description: the reference number for the booking
+  role: identifier
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+
+Return the JSON object now.

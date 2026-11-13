@@ -1,0 +1,55 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_id and train_total_fee are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_id -> train_total_fee": one train_id row has many train_total_fee rows (each train_total_fee row refers to one train_id row)
+- "train_total_fee -> train_id": one train_total_fee row has many train_id rows (each train_id row refers to one train_total_fee row)
+- "many_to_many": a train_id row can go with many train_total_fee rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_id (one row = one train_id), 3 columns:
+[train:14] train id
+  description: the unique identifier for the train
+  role: identifier
+  values: id (share 1.00); 31 mentions in 18 dialogues
+  examples:
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+[train:10] reference number
+  description: the reference number for the booking
+  role: identifier
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+[restaurant:8] reference number
+  description: uniquely identifies a reservation
+  role: uniquely identifies a reservation
+  values: id (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "42xedgdf" (in: "...booked. Your reference number is 42XEDGDF. Is there anything else I can he...")
+    "bpe8lvha" (in: "Cocum restaurant on Monday at 15:00. The reference number is BPE8LVHA.")
+  checker evidence: support 10/10; fits a neighbouring column 2/9
+
+Table train_total_fee (one row = one train_total_fee), 1 columns:
+[train:13] total fee
+  description: Indicates the total cost for multiple tickets.
+  role: cost
+  values: price (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+    "10.56 gbp" (in: "...ful for TR5713, the total fee is 10.56 GBP payable at the station. Your re...")
+  checker evidence: support 1/7; fits a neighbouring column 3/10
+  checker: noise; flags: noise
+
+Return the JSON object now.

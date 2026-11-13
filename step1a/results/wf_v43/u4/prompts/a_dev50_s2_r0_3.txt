@@ -1,0 +1,38 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_id and train_price_per_ticket are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_id -> train_price_per_ticket": one train_id row has many train_price_per_ticket rows (each train_price_per_ticket row refers to one train_id row)
+- "train_price_per_ticket -> train_id": one train_price_per_ticket row has many train_id rows (each train_id row refers to one train_price_per_ticket row)
+- "many_to_many": a train_id row can go with many train_price_per_ticket rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_id (one row = one train_id), 1 columns:
+[train:14] train id
+  description: the unique identifier for the train
+  role: identifier
+  values: id (share 1.00); 31 mentions in 18 dialogues
+  examples:
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+
+Table train_price_per_ticket (one row = one train_price_per_ticket), 1 columns:
+[train:9] price per ticket
+  description: the cost of a single train ticket
+  role: cost
+  values: price (share 0.89); 9 mentions in 9 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "12.80 pound" (in: "Both options are 12.80 pounds. Would you like to book one of these options?")
+  checker evidence: support 7/9; fits a neighbouring column 2/10
+
+Return the JSON object now.

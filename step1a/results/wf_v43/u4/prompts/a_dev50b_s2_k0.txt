@@ -1,0 +1,103 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table train (one row = one train), 10 columns:
+[train:10] total fee
+  description: the total cost of the tickets
+  role: total cost
+  values: price (share 0.80); 10 mentions in 10 dialogues
+  examples:
+    "12.80 pound" (in: "Sure! The fare is 12.80 pounds and the travel time is 49 minutes. Is there an...")
+    "17.90" (in: "want info or to book the train? The cost is 17.90 per ticket.")
+  checker evidence: support 5/10; fits a neighbouring column 0/10
+  checker: unsure
+[train:12] travel time
+  description: the duration of the train journey
+  role: travel duration
+  values: duration (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "49 minute" (in: "...0 pounds and the travel time is 49 minutes. Is there anything else I can h...")
+    "163 minute" (in: "The total travel time will be 163 minutes. Is there anything else I can help ...")
+  checker evidence: support 2/3; fits a neighbouring column 1/10
+  checker: unsure
+[train:4] departure station
+  description: the station where the train departs from
+  role: origin of the train journey
+  values: text (share 1.00); 31 mentions in 15 dialogues
+  examples:
+    "cambridge" (in: "Cambridge, and it will be on sunday.")
+    "peterborough" (in: "I need to get to Cambridge from Peterborough by 13:15 on the the same day as ...")
+  checker evidence: support 15/19; fits a neighbouring column 2/6
+  checker: unsure
+[train:5] departure time
+  description: departure time of the train
+  role: departure time
+  values: time (share 1.00); 37 mentions in 17 dialogues
+  examples:
+    "11:30" (in: "I would like to arrive in cambridge by 11:30.")
+    "13:06" (in: "...is the TR0545 leaving cambridge at 13:06. Would you like me to book it or ...")
+  checker evidence: support 4/10; fits a neighbouring column 1/10
+  checker: unsure
+[train:8] payment location
+  description: the location where the ticket is paid for
+  role: location for payment
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "station" (in: "...tal fee is 31.36 GBP payable at the station . Reference number is : 8K88DU7K.")
+  checker evidence: support 4/4; fits a neighbouring column 0/10
+[train:9] reference number
+  description: the reference number for the booking
+  role: booking reference
+  values: id (share 1.00); 9 mentions in 9 dialogues
+  examples:
+    "0w0bqb8w" (in: "I was able to book it, reference is 0W0BQB8W.")
+    "13gq9s3a" (in: "can pay for at the station. Your reference number is 13GQ9S3A.")
+  checker evidence: support 8/9; fits a neighbouring column 3/10
+[train:3] departure day
+  description: the day the train departs
+  role: departure day
+  values: day (share 1.00); 24 mentions in 16 dialogues
+  examples:
+    "sunday" (in: "Cambridge, and it will be on sunday.")
+    "friday" (in: "Yes, TR2515 departs on friday at 05:21 to stevenage, would you like me to book")
+  checker evidence: support 5/10; fits a neighbouring column 0/10
+  checker: unsure
+[train:11] train id
+  description: the unique identifier of the train
+  role: train identifier
+  values: id (share 1.00); 14 mentions in 13 dialogues
+  examples:
+    "tr2515" (in: "Yes, TR2515 departs on friday at 05:21 to stevenage, would you like")
+    "tr0545" (in: "The next train is the TR0545 leaving cambridge at 13:06. Would you like me to...")
+  checker evidence: support 10/10; fits a neighbouring column 0/9
+[train:2] arrival time
+  description: arrival time of the train
+  role: arrival time
+  values: time (share 1.00); 8 mentions in 8 dialogues
+  examples:
+    "05:58" (in: "have train TR6003 leaving cambridge at 5:11 and arriving at 5:58 on sunday.")
+    "06:01" (in: "TR6357 leaves at 05:01 and arrives at 06:01. Would you like me to book a tick...")
+  checker evidence: support 4/8; fits a neighbouring column 2/10
+  checker: unsure
+[train:1] arrival station
+  description: the station where the train arrives
+  role: destination of the train journey
+  values: text (share 1.00); 23 mentions in 13 dialogues
+  examples:
+    "broxbourne" (in: "I am also look for a train on saturday to broxbourne.")
+    "stevenage" (in: "am also looking for a train for Thursday departing from Stevenage.")
+  checker evidence: support 6/15; fits a neighbouring column 1/10
+  checker: unsure
+
+Return the JSON object now.

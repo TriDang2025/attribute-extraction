@@ -1,0 +1,103 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table location (one row = one location), 10 columns:
+[train:8] payment location
+  description: the location where the ticket is paid for
+  role: location for payment
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "station" (in: "...tal fee is 31.36 GBP payable at the station . Reference number is : 8K88DU7K.")
+  checker evidence: support 4/4; fits a neighbouring column 0/10
+[train:1] arrival station
+  description: the station where the train arrives
+  role: destination of the train journey
+  values: text (share 1.00); 23 mentions in 13 dialogues
+  examples:
+    "broxbourne" (in: "I am also look for a train on saturday to broxbourne.")
+    "stevenage" (in: "am also looking for a train for Thursday departing from Stevenage.")
+  checker evidence: support 6/15; fits a neighbouring column 1/10
+  checker: unsure
+[train:4] departure station
+  description: the station where the train departs from
+  role: origin of the train journey
+  values: text (share 1.00); 31 mentions in 15 dialogues
+  examples:
+    "cambridge" (in: "Cambridge, and it will be on sunday.")
+    "peterborough" (in: "I need to get to Cambridge from Peterborough by 13:15 on the the same day as ...")
+  checker evidence: support 15/19; fits a neighbouring column 2/6
+  checker: unsure
+[hotel:11] postcode
+  description: postal code for addresses
+  role: postcode
+  values: id (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "cb13js" (in: "The postcode is cb13js. Would you like to get a room reserved?")
+    "cb58pa" (in: "...d Fen Ditton and the post code is cb58pa. Can I do anything else for you t...")
+  checker evidence: support 2/2; fits a neighbouring column 0/9
+[hotel:2] address
+  description: the address of the accommodation
+  role: address
+  values: text (share 1.00); 7 mentions in 3 dialogues
+  examples:
+    "74 chesterton road" (in: "...ia. Ashely Hotel located at 74 Chesterton road and Lovell Lodge located at...")
+    "138 perne road" (in: "...tely priced. Their address is 138 Perne Road and their phone number is 012...")
+  checker evidence: support 3/7; fits a neighbouring column 1/10
+  checker: unsure
+[hotel:6] location
+  description: the location of the accommodation
+  role: location
+  values: text (share 1.00); 33 mentions in 14 dialogues
+  examples:
+    "north" (in: "I would like a hotel in the north, please.")
+    "cambridge" (in: "I am going to cambridge and need a hotel")
+  checker evidence: support 7/10; fits a neighbouring column 1/10
+[restaurant:6] postcode
+  description: provides the postal code for a location
+  role: address
+  values: id (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "cb21rh" (in: "...ess is at king's parade. The post code cb21rh and the entree fee is 2 pounds.")
+    "cb30ad" (in: "prezzo's postcode is cb30ad.")
+  checker evidence: support 1/2; fits a neighbouring column 0/9
+  checker: unsure
+[restaurant:14] restaurant postcode
+  description: the postcode of the restaurant
+  role: location
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "c.b 2" (in: "The address is Corn Exchange Street and the postcode is C.B 2, 3QF")
+    "1 a.w" (in: "the address is 83 Regent Street, postcode is C.B 2, 1 A.W.")
+  checker evidence: support 2/3; fits a neighbouring column 0/9
+  checker: unsure
+[restaurant:11] restaurant address
+  description: the address of the restaurant
+  role: location
+  values: text (share 1.00); 8 mentions in 8 dialogues
+  examples:
+    "86 regent street" (in: "...ddress for the J restaurant, 86 Regent Street City Centre. I currently do ...")
+    "40270 king street city" (in: "... Centre. It is located at 40270 King Street City and is in the expensive p...")
+  checker evidence: support 5/8; fits a neighbouring column 1/10
+  checker: unsure
+[restaurant:1] area
+  description: the area of the city where the restaurant is located
+  role: location
+  values: text (share 1.00); 22 mentions in 15 dialogues
+  examples:
+    "cambridge" (in: "Is there any good Jamaican food in Cambridge?")
+    "center of town" (in: "... an African restaurant in the center of town as well as some gastropubs. W...")
+  checker evidence: support 14/20; fits a neighbouring column 6/10
+  checker: too general; flags: too general
+
+Return the JSON object now.

@@ -1,0 +1,39 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_price_per_ticket and train_total_fee are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_price_per_ticket -> train_total_fee": one train_price_per_ticket row has many train_total_fee rows (each train_total_fee row refers to one train_price_per_ticket row)
+- "train_total_fee -> train_price_per_ticket": one train_total_fee row has many train_price_per_ticket rows (each train_price_per_ticket row refers to one train_total_fee row)
+- "many_to_many": a train_price_per_ticket row can go with many train_total_fee rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_price_per_ticket (one row = one train_price_per_ticket), 1 columns:
+[train:9] price per ticket
+  description: the cost of a single train ticket
+  role: cost
+  values: price (share 0.89); 9 mentions in 9 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "12.80 pound" (in: "Both options are 12.80 pounds. Would you like to book one of these options?")
+  checker evidence: support 7/9; fits a neighbouring column 2/10
+
+Table train_total_fee (one row = one train_total_fee), 1 columns:
+[train:13] total fee
+  description: Indicates the total cost for multiple tickets.
+  role: cost
+  values: price (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+    "10.56 gbp" (in: "...ful for TR5713, the total fee is 10.56 GBP payable at the station. Your re...")
+  checker evidence: support 1/7; fits a neighbouring column 3/10
+  checker: noise; flags: noise
+
+Return the JSON object now.

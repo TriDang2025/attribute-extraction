@@ -1,0 +1,39 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_number_of_tickets and train_number_of_trains are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_number_of_tickets -> train_number_of_trains": one train_number_of_tickets row has many train_number_of_trains rows (each train_number_of_trains row refers to one train_number_of_tickets row)
+- "train_number_of_trains -> train_number_of_tickets": one train_number_of_trains row has many train_number_of_tickets rows (each train_number_of_tickets row refers to one train_number_of_trains row)
+- "many_to_many": a train_number_of_tickets row can go with many train_number_of_trains rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_number_of_tickets (one row = one train_number_of_tickets), 1 columns:
+[train:7] number of tickets
+  description: the number of tickets booked
+  role: quantity
+  values: number (share 0.67); 18 mentions in 10 dialogues
+  examples:
+    "how many ticket" (in: "...he tr1393 which leaves the station at 09:19, how many tickets would you like?")
+    "16" (in: "There are trains every hour on the :16 that will get you there by noon, begin...")
+  checker evidence: support 8/17; fits a neighbouring column 0/5
+  checker: unsure
+
+Table train_number_of_trains (one row = one train_number_of_trains), 1 columns:
+[train:8] number of trains
+  description: specifies the number of trains available or matching a certain criteria
+  role: specifies the number of trains available or matching a certain criteria
+  values: number (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "1 train" (in: "...arting for Cambridge on Tuesday. One train departs every hour starting at ...")
+    "12" (in: "There are twelve possible trains leaving after 12:15. Should I book you on")
+  checker evidence: support 4/5; fits a neighbouring column 1/10
+
+Return the JSON object now.

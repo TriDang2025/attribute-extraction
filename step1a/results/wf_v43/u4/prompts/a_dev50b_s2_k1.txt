@@ -1,0 +1,152 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table hotel (one row = one hotel), 16 columns:
+[hotel:4] generic accommodation type
+  description: generic types of accommodation
+  role: generic types of accommodation
+  values: text (share 1.00); 38 mentions in 18 dialogues
+  examples:
+    "guesthouse" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "hotel" (in: "...s available. Do you have a preference of guesthouse or hotel and price range?")
+  checker evidence: support 7/10; fits a neighbouring column 5/10
+  checker: unsure
+[hotel:10] phone number
+  description: the phone number of the accommodation
+  role: contact
+  values: number (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "01223247015" (in: "address is 138 Perne Road and their phone number is 01223247015.")
+    "01223334860" (in: "The phone of Downing College is 01223334860. Do you need a place to stay?")
+  checker evidence: support 3/4; fits a neighbouring column 0/7
+[hotel:17] start date
+  description: the start date of the reservation
+  role: start
+  values: day (share 0.95); 20 mentions in 16 dialogues
+  examples:
+    "wednesday" (in: "like it for 6 people for 2 nights starting on Wednesday.")
+    "friday" (in: "...ok reservation for 2 people at 16:00 on Friday. Send me the reference number.")
+  checker evidence: support 8/10; fits a neighbouring column 0/10
+[hotel:13] reference number
+  description: confirmation code for reservations
+  role: identifier
+  values: id (share 1.00); 16 mentions in 16 dialogues
+  examples:
+    "23ekiufo" (in: "...ations. Your reference number is 23EKIUFO. Is there anything else I can he...")
+    "7sn0baat" (in: "...ghts for 8 people. Your reference number 7SN0BAAT. Do you need anything else?")
+  checker evidence: support 10/10; fits a neighbouring column 4/6
+  checker: too general; flags: too general
+[hotel:1] accommodation type
+  description: type of accommodation, such as hotel or guesthouse
+  role: type
+  values: text (share 1.00); 16 mentions in 11 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "Alexander bed and breakfast can acommodate your request.")
+    "hobson house" (in: "There is the hobsons house. Would you like me to book it?")
+  checker evidence: support 9/10; fits a neighbouring column 8/10
+  checker: too general; flags: too general
+[hotel:5] hotel name
+  description: Identifies the name of a hotel being discussed or booked.
+  role: current entity E1
+  values: text (share 1.00); 15 mentions in 7 dialogues
+  examples:
+    "allenbell" (in: "mentioned all have free wifi and parking. I recommend the Allenbell.")
+    "hotel allenbell" (in: "Hotel allenbell is what I found that is cheap and has parking.")
+  checker evidence: support 6/12; fits a neighbouring column 4/10
+  checker: unsure
+[hotel:8] number of options
+  description: indicates the count of available accommodations
+  role: indicates the count of available accommodations
+  values: number (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "3" (in: "I found 3 for you all in the expensive price range. Can you")
+    "3 guesthouse" (in: "I have 3 guesthouses all in the moderate price range. Would you like me")
+  checker evidence: support 5/8; fits a neighbouring column 1/10
+  checker: unsure
+[hotel:14] restaurant name
+  description: Identifies the name of a restaurant being discussed.
+  role: Identifies the name of a restaurant being discussed.
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "grafton hotel restaurant" (in: "I have located the grafton hotel restaurant, would you like more info or a bo...")
+  checker evidence: support 1/1; fits a neighbouring column 0/10
+[hotel:16] stars
+  description: Rating of the hotel or guesthouse in stars
+  role: current entity E1
+  values: number (share 1.00); 4 mentions in 2 dialogues
+  examples:
+    "2 star" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "3 star" (in: "Yes, how about a guesthouse with 3 stars and free wifi instead?")
+  checker evidence: support 4/4; fits a neighbouring column 4/10
+  checker: unsure
+[hotel:9] number of people
+  description: specifies the number of people for booking
+  role: occupancy
+  values: number (share 1.00); 13 mentions in 13 dialogues
+  examples:
+    "2 people" (in: "please book it for 5 nights starting on Wednesday for 2 people total.")
+    "8 people" (in: "yes, i want to book it for 8 people and 3 nights starting from wednesday")
+  checker evidence: support 10/10; fits a neighbouring column 1/8
+[hotel:12] price adjective
+  description: Refers to the price range as a category or level of pricing.
+  role: Refers to the price range as a category or level of pricing.
+  values: text (share 1.00); 16 mentions in 11 dialogues
+  examples:
+    "moderately priced" (in: "...here you'll be dining and is moderately priced. Their address is 138 Perne...")
+    "cheap" (in: "Hotel allenbell is what I found that is cheap and has parking.")
+  checker evidence: support 11/13; fits a neighbouring column 1/10
+[hotel:15] specific guesthouse
+  description: names of specific guesthouses or hotels
+  role: names of specific guesthouses or hotels
+  values: text (share 1.00); 7 mentions in 5 dialogues
+  examples:
+    "acorn guest house" (in: "Yes the phone number to the acorn guest house 01223353888 with a price range ...")
+    "bridge guest house" (in: "bridge guest house is a 3 star and a nice place.Do you want")
+  checker evidence: support 3/7; fits a neighbouring column 4/10
+  checker: unsure
+[hotel:11] postcode
+  description: postal code for addresses
+  role: postcode
+  values: id (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "cb13js" (in: "The postcode is cb13js. Would you like to get a room reserved?")
+    "cb58pa" (in: "...d Fen Ditton and the post code is cb58pa. Can I do anything else for you t...")
+  checker evidence: support 2/2; fits a neighbouring column 0/9
+[hotel:7] number of nights
+  description: specifies the duration of stay
+  role: duration
+  values: number (share 1.00); 19 mentions in 13 dialogues
+  examples:
+    "2 night" (in: "I would like it for 6 people for 2 nights starting on Wednesday.")
+    "4 night" (in: "How about four nights instead of five?")
+  checker evidence: support 9/10; fits a neighbouring column 0/10
+[hotel:6] location
+  description: the location of the accommodation
+  role: location
+  values: text (share 1.00); 33 mentions in 14 dialogues
+  examples:
+    "north" (in: "I would like a hotel in the north, please.")
+    "cambridge" (in: "I am going to cambridge and need a hotel")
+  checker evidence: support 7/10; fits a neighbouring column 1/10
+[hotel:2] address
+  description: the address of the accommodation
+  role: address
+  values: text (share 1.00); 7 mentions in 3 dialogues
+  examples:
+    "74 chesterton road" (in: "...ia. Ashely Hotel located at 74 Chesterton road and Lovell Lodge located at...")
+    "138 perne road" (in: "...tely priced. Their address is 138 Perne Road and their phone number is 012...")
+  checker evidence: support 3/7; fits a neighbouring column 1/10
+  checker: unsure
+
+Return the JSON object now.

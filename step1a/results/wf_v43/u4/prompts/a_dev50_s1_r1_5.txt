@@ -1,0 +1,99 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_departure_time and train_travel_date are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_departure_time -> train_travel_date": one train_departure_time row has many train_travel_date rows (each train_travel_date row refers to one train_departure_time row)
+- "train_travel_date -> train_departure_time": one train_travel_date row has many train_departure_time rows (each train_departure_time row refers to one train_travel_date row)
+- "many_to_many": a train_departure_time row can go with many train_travel_date rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_departure_time (one row = one train_departure_time), 5 columns:
+[train:3] departure location
+  description: the location from which the train departs
+  role: start of the journey
+  values: text (share 1.00); 28 mentions in 17 dialogues
+  examples:
+    "cambridge" (in: "need a train that leaves at 20:45 from stevenage to cambridge")
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+  checker evidence: support 10/20; fits a neighbouring column 2/10
+  checker: unsure
+[train:4] departure time
+  description: the time at which the train departs
+  role: start of the journey
+  values: time (share 1.00); 62 mentions in 23 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+  checker evidence: support 4/10; fits a neighbouring column 2/8
+  checker: unsure
+[train:12] time query
+  description: Asking about the time of departure or arrival.
+  role: Asking about the time of departure or arrival.
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "what time" (in: "There are 19 trains that day. What time do you need to leave cambridge and/or...")
+  checker evidence: support 2/3; fits a neighbouring column 2/10
+  checker: unsure
+[restaurant:10] reservation time
+  description: the time of the reservation
+  role: reservation time
+  values: time (share 0.71); 28 mentions in 12 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+  checker evidence: support 10/18; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[restaurant:19] time for taxi
+  description: time requested for taxi pickup or drop-off
+  role: time requested for taxi pickup or drop-off
+  values: time (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "10:00" (in: "How about 10:00 on the same day as before?")
+    "17:45" (in: "check if they would have a table for 7 at 17:45 on Sunday?")
+  checker evidence: support 3/8; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+
+Table train_travel_date (one row = one train_travel_date), 4 columns:
+[train:15] travel date
+  description: the date of the train journey
+  role: date
+  values: day (share 0.87); 47 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+  checker evidence: support 15/16; fits a neighbouring column 0/3
+[train:16] travel time
+  description: the duration of the train journey
+  role: duration
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+  checker evidence: support 8/8; fits a neighbouring column 0/1
+[hotel:19] start date
+  description: the start date of the stay
+  role: start date
+  values: day (share 0.75); 28 mentions in 16 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+  checker evidence: support 8/17; fits a neighbouring column 0/4
+  checker: unsure
+[restaurant:9] reservation date
+  description: the date of the reservation
+  role: reservation date
+  values: day (share 0.80); 20 mentions in 13 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+  checker evidence: support 8/10; fits a neighbouring column 0/10
+
+Return the JSON object now.

@@ -1,0 +1,70 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_arrival_time and train_reference_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_arrival_time -> train_reference_number": one train_arrival_time row has many train_reference_number rows (each train_reference_number row refers to one train_arrival_time row)
+- "train_reference_number -> train_arrival_time": one train_reference_number row has many train_arrival_time rows (each train_arrival_time row refers to one train_reference_number row)
+- "many_to_many": a train_arrival_time row can go with many train_reference_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_arrival_time (one row = one train_arrival_time), 5 columns:
+[train:5] destination city
+  description: destination city in train queries
+  role: destination city in train queries
+  values: text (share 1.00); 34 mentions in 23 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+  checker evidence: support 7/10; fits a neighbouring column 3/6; answers suggest mixed roles
+  checker: unsure; flags: mixed roles
+[train:11] stay duration days
+  description: Indicates the number of days a user will be staying.
+  role: Indicates the number of days a user will be staying.
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 day" (in: "I'm staying for 2 days and it's just myself. What train can I take to")
+  checker evidence: support 1/1; fits a neighbouring column 0/10
+[train:15] travel date
+  description: the date of the train journey
+  role: date
+  values: day (share 0.87); 47 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+  checker evidence: support 15/16; fits a neighbouring column 0/3
+[train:16] travel time
+  description: the duration of the train journey
+  role: duration
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+  checker evidence: support 8/8; fits a neighbouring column 0/1
+[train:2] arrival time
+  description: specifies the time a train is expected to arrive at the destination
+  role: end of the journey
+  values: time (share 1.00); 28 mentions in 16 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "18:15" (in: "just need to leave on Wednesday and should arrive by 18:15.")
+  checker evidence: support 1/10; fits a neighbouring column 1/8
+  checker: noise; flags: noise
+
+Table train_reference_number (one row = one train_reference_number), 1 columns:
+[train:10] reference number
+  description: the reference number for the booking
+  role: identifier
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+
+Return the JSON object now.

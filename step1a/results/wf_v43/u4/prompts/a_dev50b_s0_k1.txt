@@ -1,0 +1,223 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table location (one row = one location), 24 columns:
+[train:1] arrival station
+  description: the station where the train arrives
+  role: destination of the train journey
+  values: text (share 1.00); 23 mentions in 13 dialogues
+  examples:
+    "broxbourne" (in: "I am also look for a train on saturday to broxbourne.")
+    "stevenage" (in: "am also looking for a train for Thursday departing from Stevenage.")
+  checker evidence: support 6/15; fits a neighbouring column 1/10
+  checker: unsure
+[train:2] arrival time
+  description: arrival time of the train
+  role: arrival time
+  values: time (share 1.00); 8 mentions in 8 dialogues
+  examples:
+    "05:58" (in: "have train TR6003 leaving cambridge at 5:11 and arriving at 5:58 on sunday.")
+    "06:01" (in: "TR6357 leaves at 05:01 and arrives at 06:01. Would you like me to book a tick...")
+  checker evidence: support 4/8; fits a neighbouring column 2/10
+  checker: unsure
+[train:3] departure day
+  description: the day the train departs
+  role: departure day
+  values: day (share 1.00); 24 mentions in 16 dialogues
+  examples:
+    "sunday" (in: "Cambridge, and it will be on sunday.")
+    "friday" (in: "Yes, TR2515 departs on friday at 05:21 to stevenage, would you like me to book")
+  checker evidence: support 5/10; fits a neighbouring column 0/10
+  checker: unsure
+[train:4] departure station
+  description: the station where the train departs from
+  role: origin of the train journey
+  values: text (share 1.00); 31 mentions in 15 dialogues
+  examples:
+    "cambridge" (in: "Cambridge, and it will be on sunday.")
+    "peterborough" (in: "I need to get to Cambridge from Peterborough by 13:15 on the the same day as ...")
+  checker evidence: support 15/19; fits a neighbouring column 2/6
+  checker: unsure
+[train:5] departure time
+  description: departure time of the train
+  role: departure time
+  values: time (share 1.00); 37 mentions in 17 dialogues
+  examples:
+    "11:30" (in: "I would like to arrive in cambridge by 11:30.")
+    "13:06" (in: "...is the TR0545 leaving cambridge at 13:06. Would you like me to book it or ...")
+  checker evidence: support 4/10; fits a neighbouring column 1/10
+  checker: unsure
+[train:6] entity name
+  description: name of an entity, such as a town information center
+  role: name of an entity, such as a town information center
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "Thank you for contacting the Cambridge TownInfo centre. Goodbye")
+  checker evidence: support 1/1; fits a neighbouring column 5/10
+  checker: unsure
+[train:8] payment location
+  description: the location where the ticket is paid for
+  role: location for payment
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "station" (in: "...tal fee is 31.36 GBP payable at the station . Reference number is : 8K88DU7K.")
+  checker evidence: support 4/4; fits a neighbouring column 0/10
+[hotel:2] address
+  description: the address of the accommodation
+  role: address
+  values: text (share 1.00); 7 mentions in 3 dialogues
+  examples:
+    "74 chesterton road" (in: "...ia. Ashely Hotel located at 74 Chesterton road and Lovell Lodge located at...")
+    "138 perne road" (in: "...tely priced. Their address is 138 Perne Road and their phone number is 012...")
+  checker evidence: support 3/7; fits a neighbouring column 1/10
+  checker: unsure
+[hotel:5] hotel name
+  description: Identifies the name of a hotel being discussed or booked.
+  role: current entity E1
+  values: text (share 1.00); 15 mentions in 7 dialogues
+  examples:
+    "allenbell" (in: "mentioned all have free wifi and parking. I recommend the Allenbell.")
+    "hotel allenbell" (in: "Hotel allenbell is what I found that is cheap and has parking.")
+  checker evidence: support 6/12; fits a neighbouring column 4/10
+  checker: unsure
+[hotel:6] location
+  description: the location of the accommodation
+  role: location
+  values: text (share 1.00); 33 mentions in 14 dialogues
+  examples:
+    "north" (in: "I would like a hotel in the north, please.")
+    "cambridge" (in: "I am going to cambridge and need a hotel")
+  checker evidence: support 7/10; fits a neighbouring column 1/10
+[hotel:10] phone number
+  description: the phone number of the accommodation
+  role: contact
+  values: number (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "01223247015" (in: "address is 138 Perne Road and their phone number is 01223247015.")
+    "01223334860" (in: "The phone of Downing College is 01223334860. Do you need a place to stay?")
+  checker evidence: support 3/4; fits a neighbouring column 0/7
+[hotel:11] postcode
+  description: postal code for addresses
+  role: postcode
+  values: id (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "cb13js" (in: "The postcode is cb13js. Would you like to get a room reserved?")
+    "cb58pa" (in: "...d Fen Ditton and the post code is cb58pa. Can I do anything else for you t...")
+  checker evidence: support 2/2; fits a neighbouring column 0/9
+[hotel:14] restaurant name
+  description: Identifies the name of a restaurant being discussed.
+  role: Identifies the name of a restaurant being discussed.
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "grafton hotel restaurant" (in: "I have located the grafton hotel restaurant, would you like more info or a bo...")
+  checker evidence: support 1/1; fits a neighbouring column 0/10
+[hotel:15] specific guesthouse
+  description: names of specific guesthouses or hotels
+  role: names of specific guesthouses or hotels
+  values: text (share 1.00); 7 mentions in 5 dialogues
+  examples:
+    "acorn guest house" (in: "Yes the phone number to the acorn guest house 01223353888 with a price range ...")
+    "bridge guest house" (in: "bridge guest house is a 3 star and a nice place.Do you want")
+  checker evidence: support 3/7; fits a neighbouring column 4/10
+  checker: unsure
+[hotel:16] stars
+  description: Rating of the hotel or guesthouse in stars
+  role: current entity E1
+  values: number (share 1.00); 4 mentions in 2 dialogues
+  examples:
+    "2 star" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "3 star" (in: "Yes, how about a guesthouse with 3 stars and free wifi instead?")
+  checker evidence: support 4/4; fits a neighbouring column 4/10
+  checker: unsure
+[restaurant:1] area
+  description: the area of the city where the restaurant is located
+  role: location
+  values: text (share 1.00); 22 mentions in 15 dialogues
+  examples:
+    "cambridge" (in: "Is there any good Jamaican food in Cambridge?")
+    "center of town" (in: "... an African restaurant in the center of town as well as some gastropubs. W...")
+  checker evidence: support 14/20; fits a neighbouring column 6/10
+  checker: too general; flags: too general
+[restaurant:3] food type
+  description: the type of food served by the restaurant
+  role: cuisine
+  values: text (share 1.00); 12 mentions in 5 dialogues
+  examples:
+    "danish restaurant" (in: "I would like to find a danish restaurant this is moderately priced.")
+    "lebanese" (in: "Some options are Lebanese, Turkish, international, British, European, and Chi...")
+  checker evidence: support 9/12; fits a neighbouring column 0/10
+[restaurant:6] postcode
+  description: provides the postal code for a location
+  role: address
+  values: id (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "cb21rh" (in: "...ess is at king's parade. The post code cb21rh and the entree fee is 2 pounds.")
+    "cb30ad" (in: "prezzo's postcode is cb30ad.")
+  checker evidence: support 1/2; fits a neighbouring column 0/9
+  checker: unsure
+[restaurant:11] restaurant address
+  description: the address of the restaurant
+  role: location
+  values: text (share 1.00); 8 mentions in 8 dialogues
+  examples:
+    "86 regent street" (in: "...ddress for the J restaurant, 86 Regent Street City Centre. I currently do ...")
+    "40270 king street city" (in: "... Centre. It is located at 40270 King Street City and is in the expensive p...")
+  checker evidence: support 5/8; fits a neighbouring column 1/10
+  checker: unsure
+[restaurant:12] restaurant name
+  description: the name of the restaurant
+  role: identifier
+  values: text (share 1.00); 25 mentions in 18 dialogues
+  examples:
+    "j restaurant" (in: "you! Do you have the reviews and address for the J Restaurant near there?")
+    "darry cookhouse and wine shop" (in: "I am looking for a restaurant called darrys cookhouse and wine shop.")
+  checker evidence: support 8/10; fits a neighbouring column 0/10
+[restaurant:13] restaurant phone number
+  description: the phone number of the restaurant
+  role: contact
+  values: number (share 0.75); 4 mentions in 3 dialogues
+  examples:
+    "01223" (in: "01223 308871 Will that be all?")
+    "01223 308871" (in: "...e range. Their phone number is 01223 308871. The address is Corn Exchange ...")
+  checker evidence: support 1/4; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+[restaurant:14] restaurant postcode
+  description: the postcode of the restaurant
+  role: location
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "c.b 2" (in: "The address is Corn Exchange Street and the postcode is C.B 2, 3QF")
+    "1 a.w" (in: "the address is 83 Regent Street, postcode is C.B 2, 1 A.W.")
+  checker evidence: support 2/3; fits a neighbouring column 0/9
+  checker: unsure
+[restaurant:17] restaurant type
+  description: generic mentions of restaurants
+  role: generic mentions of restaurants
+  values: text (share 1.00); 21 mentions in 16 dialogues
+  examples:
+    "restaurant" (in: "...to dine in the centre. I would like a restaurant in the moderate price range.")
+    "hotel" (in: "... center of town near attractions, hotels and easy access to transportation...")
+  checker evidence: support 5/10; fits a neighbouring column 3/10
+  checker: unsure
+[restaurant:18] specific address
+  description: Refers to a specific address or landmark within the town.
+  role: Refers to a specific address or landmark within the town.
+  values: text (share 1.00); 11 mentions in 9 dialogues
+  examples:
+    "centre" (in: "I have 13 colleges available in the centre. Did yo have one particular in mind?")
+    "city centre" (in: "... J restaurant, 86 Regent Street City Centre. I currently do not have revie...")
+  checker evidence: support 2/10; fits a neighbouring column 2/10
+  checker: noise; flags: noise
+
+Return the JSON object now.

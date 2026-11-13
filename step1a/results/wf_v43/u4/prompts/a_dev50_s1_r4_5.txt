@@ -1,0 +1,72 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_number_of_trains and train_travel_date are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_number_of_trains -> train_travel_date": one train_number_of_trains row has many train_travel_date rows (each train_travel_date row refers to one train_number_of_trains row)
+- "train_travel_date -> train_number_of_trains": one train_travel_date row has many train_number_of_trains rows (each train_number_of_trains row refers to one train_travel_date row)
+- "many_to_many": a train_number_of_trains row can go with many train_travel_date rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_number_of_trains (one row = one train_number_of_trains), 2 columns:
+[train:8] number of trains
+  description: specifies the number of trains available or matching a certain criteria
+  role: specifies the number of trains available or matching a certain criteria
+  values: number (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "1 train" (in: "...arting for Cambridge on Tuesday. One train departs every hour starting at ...")
+    "12" (in: "There are twelve possible trains leaving after 12:15. Should I book you on")
+  checker evidence: support 4/5; fits a neighbouring column 1/10
+[restaurant:5] number of results
+  description: indicates the number of search results
+  role: indicates the number of search results
+  values: number (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "3" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "2" (in: "There are two. Both are expensive. One is in the north and")
+  checker evidence: support 4/7; fits a neighbouring column 0/10
+  checker: unsure
+
+Table train_travel_date (one row = one train_travel_date), 4 columns:
+[train:15] travel date
+  description: the date of the train journey
+  role: date
+  values: day (share 0.87); 47 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+  checker evidence: support 15/16; fits a neighbouring column 0/3
+[train:16] travel time
+  description: the duration of the train journey
+  role: duration
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+  checker evidence: support 8/8; fits a neighbouring column 0/1
+[hotel:19] start date
+  description: the start date of the stay
+  role: start date
+  values: day (share 0.75); 28 mentions in 16 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+  checker evidence: support 8/17; fits a neighbouring column 0/4
+  checker: unsure
+[restaurant:9] reservation date
+  description: the date of the reservation
+  role: reservation date
+  values: day (share 0.80); 20 mentions in 13 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+  checker evidence: support 8/10; fits a neighbouring column 0/10
+
+Return the JSON object now.

@@ -1,0 +1,167 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table hotel (one row = one hotel), 18 columns:
+[hotel:1] entity
+  description: refers to a specific entity or organization
+  role: refers to a specific entity or organization
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "...in. Thanks for contacting the Cambridge TownInfo Centre and have a great day!")
+  checker evidence: support 1/1; fits a neighbouring column 10/10
+  checker: too general; flags: too general
+[hotel:2] hotel address
+  description: address of the hotel or guesthouse
+  role: location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "156 chesterton road" (in: "Yes, hamilton lodge is located on 156 chesterton road.")
+  checker evidence: support 1/1; fits a neighbouring column 0/10
+[hotel:3] hotel location
+  description: location or area of the hotel or guesthouse
+  role: location
+  values: text (share 1.00); 15 mentions in 11 dialogues
+  examples:
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+  checker evidence: support 10/15; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[hotel:4] hotel name
+  description: the name of the hotel or guesthouse
+  role: identifier
+  values: text (share 1.00); 29 mentions in 16 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+  checker evidence: support 16/16; fits a neighbouring column 0/5
+[hotel:5] hotel number of guests
+  description: number of guests for the hotel booking
+  role: quantity
+  values: number (share 0.71); 17 mentions in 13 dialogues
+  examples:
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+  checker evidence: support 6/10; fits a neighbouring column 0/10
+  checker: unsure
+[hotel:6] hotel number of nights
+  description: number of nights for the hotel booking
+  role: duration
+  values: number (share 0.79); 24 mentions in 14 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+  checker evidence: support 11/15; fits a neighbouring column 0/6
+[hotel:7] hotel phone number
+  description: phone number of the hotel or guesthouse
+  role: contact information
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "01223355017" (in: "Sure, the phone number is 01223355017. How many days will you be staying, wha...")
+  checker evidence: support 1/1; fits a neighbouring column 0/6
+[hotel:8] hotel type
+  description: types of hotels or guesthouses
+  role: types of hotels or guesthouses
+  values: text (share 1.00); 14 mentions in 9 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "hotel" (in: "Can you please confirm that the hotel you've booked for us offers free wi-fi?...")
+  checker evidence: support 5/10; fits a neighbouring column 10/10
+  checker: too general; flags: too general
+[hotel:9] location
+  description: specifies the city or area where the hotel or information is sought
+  role: location
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+  checker evidence: support 8/8; fits a neighbouring column 5/6
+  checker: too general; flags: too general
+[hotel:10] location description
+  description: Refers to a specific location or area within the dialogue.
+  role: Refers to a specific location or area within the dialogue.
+  values: text (share 1.00); 8 mentions in 3 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "city centre north b and b" (in: "Okay! Would you like to stay at City Centre North B and B, or at Worth House?")
+  checker evidence: support 7/8; fits a neighbouring column 7/10
+  checker: too general; flags: too general
+[hotel:11] postcode
+  description: Postcode of the hotel
+  role: Postcode of the hotel
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cb41er" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+  checker evidence: support 1/1; fits a neighbouring column 0/6
+[hotel:12] price adjective
+  description: Uses adjectives to describe the cost of a hotel or accommodation.
+  role: Uses adjectives to describe the cost of a hotel or accommodation.
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+    "cheap price range" (in: "...ooking to book a guesthouse in the cheap price range that includes free wifi.")
+  checker evidence: support 4/5; fits a neighbouring column 7/8
+  checker: too general; flags: too general
+[hotel:13] price extreme
+  description: Refers to the cost category at the extreme ends, such as expensive or cheap.
+  role: Refers to the cost category at the extreme ends, such as expensive or cheap.
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "expensive hotel" (in: "...ld you try and book a 4 star, expensive hotel for 3 nights, starting on Sa...")
+    "expensive price range" (in: "... finding any hotels in the expensive price range in the North. Would you l...")
+  checker evidence: support 3/3; fits a neighbouring column 4/6
+  checker: too general; flags: too general
+[hotel:14] price range
+  description: Describes the cost category of a hotel or accommodation.
+  role: price range
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "cheaper price range" (in: "...also like a guesthouse in the cheaper price range. Can you help me with that?")
+  checker evidence: support 9/10; fits a neighbouring column 4/8
+  checker: unsure
+[hotel:15] reference number
+  description: Reference number for bookings
+  role: booking identifier
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples:
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+    "72ycmlxx" (in: "...fectly. Your reference number is 72YCMLXX. Is there anything else I can he...")
+  checker evidence: support 10/10; fits a neighbouring column 1/2
+  checker: unsure
+[hotel:16] specific hotel name
+  description: names a specific hotel that matches the user's criteria
+  role: names a specific hotel that matches the user's criteria
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "the cambridge belfry" (in: "The Cambridge Belfry fits your requirements, would you like to book a reserva...")
+  checker evidence: support 10/10; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[hotel:18] star rating
+  description: specifies the star rating of the hotel
+  role: rating
+  values: number (share 0.56); 9 mentions in 4 dialogues
+  examples:
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+    "2 star" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+  checker evidence: support 8/9; fits a neighbouring column 0/10
+[hotel:19] start date
+  description: the start date of the stay
+  role: start date
+  values: day (share 0.75); 28 mentions in 16 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+  checker evidence: support 8/17; fits a neighbouring column 0/4
+  checker: unsure
+
+Return the JSON object now.

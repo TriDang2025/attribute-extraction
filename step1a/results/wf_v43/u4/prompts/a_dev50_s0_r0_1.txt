@@ -1,0 +1,304 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train and hotel are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train -> hotel": one train row has many hotel rows (each hotel row refers to one train row)
+- "hotel -> train": one hotel row has many train rows (each train row refers to one hotel row)
+- "many_to_many": a train row can go with many hotel rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train (one row = one train), 16 columns:
+[train:1] arrival location
+  description: the location where the train arrives
+  role: end of the journey
+  values: text (share 1.00); 23 mentions in 16 dialogues
+  examples:
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+    "leicester" (in: "I'll be leaving Leicester and I want to be in Cambridge by 11:30, please.")
+  checker evidence: support 1/10; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+[train:2] arrival time
+  description: specifies the time a train is expected to arrive at the destination
+  role: end of the journey
+  values: time (share 1.00); 28 mentions in 16 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "18:15" (in: "just need to leave on Wednesday and should arrive by 18:15.")
+  checker evidence: support 1/10; fits a neighbouring column 1/8
+  checker: noise; flags: noise
+[train:3] departure location
+  description: the location from which the train departs
+  role: start of the journey
+  values: text (share 1.00); 28 mentions in 17 dialogues
+  examples:
+    "cambridge" (in: "need a train that leaves at 20:45 from stevenage to cambridge")
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+  checker evidence: support 10/20; fits a neighbouring column 2/10
+  checker: unsure
+[train:4] departure time
+  description: the time at which the train departs
+  role: start of the journey
+  values: time (share 1.00); 62 mentions in 23 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+  checker evidence: support 4/10; fits a neighbouring column 2/8
+  checker: unsure
+[train:5] destination city
+  description: destination city in train queries
+  role: destination city in train queries
+  values: text (share 1.00); 34 mentions in 23 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+  checker evidence: support 7/10; fits a neighbouring column 3/6; answers suggest mixed roles
+  checker: unsure; flags: mixed roles
+[train:6] local information center
+  description: local information center in a city
+  role: local information center in a city
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "...able to help you today. Call the Cambridge TownInfo centre whenever you like!")
+  checker evidence: support 1/1; fits a neighbouring column 0/10
+[train:7] number of tickets
+  description: the number of tickets booked
+  role: quantity
+  values: number (share 0.67); 18 mentions in 10 dialogues
+  examples:
+    "how many ticket" (in: "...he tr1393 which leaves the station at 09:19, how many tickets would you like?")
+    "16" (in: "There are trains every hour on the :16 that will get you there by noon, begin...")
+  checker evidence: support 8/17; fits a neighbouring column 0/5
+  checker: unsure
+[train:8] number of trains
+  description: specifies the number of trains available or matching a certain criteria
+  role: specifies the number of trains available or matching a certain criteria
+  values: number (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "1 train" (in: "...arting for Cambridge on Tuesday. One train departs every hour starting at ...")
+    "12" (in: "There are twelve possible trains leaving after 12:15. Should I book you on")
+  checker evidence: support 4/5; fits a neighbouring column 1/10
+[train:9] price per ticket
+  description: the cost of a single train ticket
+  role: cost
+  values: price (share 0.89); 9 mentions in 9 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "12.80 pound" (in: "Both options are 12.80 pounds. Would you like to book one of these options?")
+  checker evidence: support 7/9; fits a neighbouring column 2/10
+[train:10] reference number
+  description: the reference number for the booking
+  role: identifier
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+[train:11] stay duration days
+  description: Indicates the number of days a user will be staying.
+  role: Indicates the number of days a user will be staying.
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 day" (in: "I'm staying for 2 days and it's just myself. What train can I take to")
+  checker evidence: support 1/1; fits a neighbouring column 0/10
+[train:12] time query
+  description: Asking about the time of departure or arrival.
+  role: Asking about the time of departure or arrival.
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "what time" (in: "There are 19 trains that day. What time do you need to leave cambridge and/or...")
+  checker evidence: support 2/3; fits a neighbouring column 2/10
+  checker: unsure
+[train:13] total fee
+  description: Indicates the total cost for multiple tickets.
+  role: cost
+  values: price (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+    "10.56 gbp" (in: "...ful for TR5713, the total fee is 10.56 GBP payable at the station. Your re...")
+  checker evidence: support 1/7; fits a neighbouring column 3/10
+  checker: noise; flags: noise
+[train:14] train id
+  description: the unique identifier for the train
+  role: identifier
+  values: id (share 1.00); 31 mentions in 18 dialogues
+  examples:
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+[train:15] travel date
+  description: the date of the train journey
+  role: date
+  values: day (share 0.87); 47 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+  checker evidence: support 15/16; fits a neighbouring column 0/3
+[train:16] travel time
+  description: the duration of the train journey
+  role: duration
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+  checker evidence: support 8/8; fits a neighbouring column 0/1
+
+Table hotel (one row = one hotel), 18 columns:
+[hotel:1] entity
+  description: refers to a specific entity or organization
+  role: refers to a specific entity or organization
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "...in. Thanks for contacting the Cambridge TownInfo Centre and have a great day!")
+  checker evidence: support 1/1; fits a neighbouring column 10/10
+  checker: too general; flags: too general
+[hotel:2] hotel address
+  description: address of the hotel or guesthouse
+  role: location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "156 chesterton road" (in: "Yes, hamilton lodge is located on 156 chesterton road.")
+  checker evidence: support 1/1; fits a neighbouring column 0/10
+[hotel:3] hotel location
+  description: location or area of the hotel or guesthouse
+  role: location
+  values: text (share 1.00); 15 mentions in 11 dialogues
+  examples:
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+  checker evidence: support 10/15; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[hotel:4] hotel name
+  description: the name of the hotel or guesthouse
+  role: identifier
+  values: text (share 1.00); 29 mentions in 16 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+  checker evidence: support 16/16; fits a neighbouring column 0/5
+[hotel:5] hotel number of guests
+  description: number of guests for the hotel booking
+  role: quantity
+  values: number (share 0.71); 17 mentions in 13 dialogues
+  examples:
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+  checker evidence: support 6/10; fits a neighbouring column 0/10
+  checker: unsure
+[hotel:6] hotel number of nights
+  description: number of nights for the hotel booking
+  role: duration
+  values: number (share 0.79); 24 mentions in 14 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+  checker evidence: support 11/15; fits a neighbouring column 0/6
+[hotel:7] hotel phone number
+  description: phone number of the hotel or guesthouse
+  role: contact information
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "01223355017" (in: "Sure, the phone number is 01223355017. How many days will you be staying, wha...")
+  checker evidence: support 1/1; fits a neighbouring column 0/6
+[hotel:8] hotel type
+  description: types of hotels or guesthouses
+  role: types of hotels or guesthouses
+  values: text (share 1.00); 14 mentions in 9 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "hotel" (in: "Can you please confirm that the hotel you've booked for us offers free wi-fi?...")
+  checker evidence: support 5/10; fits a neighbouring column 10/10
+  checker: too general; flags: too general
+[hotel:9] location
+  description: specifies the city or area where the hotel or information is sought
+  role: location
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+  checker evidence: support 8/8; fits a neighbouring column 5/6
+  checker: too general; flags: too general
+[hotel:10] location description
+  description: Refers to a specific location or area within the dialogue.
+  role: Refers to a specific location or area within the dialogue.
+  values: text (share 1.00); 8 mentions in 3 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "city centre north b and b" (in: "Okay! Would you like to stay at City Centre North B and B, or at Worth House?")
+  checker evidence: support 7/8; fits a neighbouring column 7/10
+  checker: too general; flags: too general
+[hotel:11] postcode
+  description: Postcode of the hotel
+  role: Postcode of the hotel
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cb41er" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+  checker evidence: support 1/1; fits a neighbouring column 0/6
+[hotel:12] price adjective
+  description: Uses adjectives to describe the cost of a hotel or accommodation.
+  role: Uses adjectives to describe the cost of a hotel or accommodation.
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+    "cheap price range" (in: "...ooking to book a guesthouse in the cheap price range that includes free wifi.")
+  checker evidence: support 4/5; fits a neighbouring column 7/8
+  checker: too general; flags: too general
+[hotel:13] price extreme
+  description: Refers to the cost category at the extreme ends, such as expensive or cheap.
+  role: Refers to the cost category at the extreme ends, such as expensive or cheap.
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "expensive hotel" (in: "...ld you try and book a 4 star, expensive hotel for 3 nights, starting on Sa...")
+    "expensive price range" (in: "... finding any hotels in the expensive price range in the North. Would you l...")
+  checker evidence: support 3/3; fits a neighbouring column 4/6
+  checker: too general; flags: too general
+[hotel:14] price range
+  description: Describes the cost category of a hotel or accommodation.
+  role: price range
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "cheaper price range" (in: "...also like a guesthouse in the cheaper price range. Can you help me with that?")
+  checker evidence: support 9/10; fits a neighbouring column 4/8
+  checker: unsure
+[hotel:15] reference number
+  description: Reference number for bookings
+  role: booking identifier
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples:
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+    "72ycmlxx" (in: "...fectly. Your reference number is 72YCMLXX. Is there anything else I can he...")
+  checker evidence: support 10/10; fits a neighbouring column 1/2
+  checker: unsure
+[hotel:16] specific hotel name
+  description: names a specific hotel that matches the user's criteria
+  role: names a specific hotel that matches the user's criteria
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "the cambridge belfry" (in: "The Cambridge Belfry fits your requirements, would you like to book a reserva...")
+  checker evidence: support 10/10; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[hotel:18] star rating
+  description: specifies the star rating of the hotel
+  role: rating
+  values: number (share 0.56); 9 mentions in 4 dialogues
+  examples:
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+    "2 star" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+  checker evidence: support 8/9; fits a neighbouring column 0/10
+[hotel:19] start date
+  description: the start date of the stay
+  role: start date
+  values: day (share 0.75); 28 mentions in 16 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+  checker evidence: support 8/17; fits a neighbouring column 0/4
+  checker: unsure
+
+Return the JSON object now.

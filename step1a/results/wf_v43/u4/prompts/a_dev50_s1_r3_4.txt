@@ -1,0 +1,47 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_price_per_ticket and train_number_of_trains are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_price_per_ticket -> train_number_of_trains": one train_price_per_ticket row has many train_number_of_trains rows (each train_number_of_trains row refers to one train_price_per_ticket row)
+- "train_number_of_trains -> train_price_per_ticket": one train_number_of_trains row has many train_price_per_ticket rows (each train_price_per_ticket row refers to one train_number_of_trains row)
+- "many_to_many": a train_price_per_ticket row can go with many train_number_of_trains rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_price_per_ticket (one row = one train_price_per_ticket), 1 columns:
+[train:9] price per ticket
+  description: the cost of a single train ticket
+  role: cost
+  values: price (share 0.89); 9 mentions in 9 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "12.80 pound" (in: "Both options are 12.80 pounds. Would you like to book one of these options?")
+  checker evidence: support 7/9; fits a neighbouring column 2/10
+
+Table train_number_of_trains (one row = one train_number_of_trains), 2 columns:
+[train:8] number of trains
+  description: specifies the number of trains available or matching a certain criteria
+  role: specifies the number of trains available or matching a certain criteria
+  values: number (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "1 train" (in: "...arting for Cambridge on Tuesday. One train departs every hour starting at ...")
+    "12" (in: "There are twelve possible trains leaving after 12:15. Should I book you on")
+  checker evidence: support 4/5; fits a neighbouring column 1/10
+[restaurant:5] number of results
+  description: indicates the number of search results
+  role: indicates the number of search results
+  values: number (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "3" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "2" (in: "There are two. Both are expensive. One is in the north and")
+  checker evidence: support 4/7; fits a neighbouring column 0/10
+  checker: unsure
+
+Return the JSON object now.

@@ -1,0 +1,152 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_departure_time and train_arrival_time are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_departure_time -> train_arrival_time": one train_departure_time row has many train_arrival_time rows (each train_arrival_time row refers to one train_departure_time row)
+- "train_arrival_time -> train_departure_time": one train_arrival_time row has many train_departure_time rows (each train_departure_time row refers to one train_arrival_time row)
+- "many_to_many": a train_departure_time row can go with many train_arrival_time rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_departure_time (one row = one train_departure_time), 5 columns:
+[train:3] departure location
+  description: the location from which the train departs
+  role: start of the journey
+  values: text (share 1.00); 28 mentions in 17 dialogues
+  examples:
+    "cambridge" (in: "need a train that leaves at 20:45 from stevenage to cambridge")
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+  checker evidence: support 10/20; fits a neighbouring column 2/10
+  checker: unsure
+[train:4] departure time
+  description: the time at which the train departs
+  role: start of the journey
+  values: time (share 1.00); 62 mentions in 23 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+  checker evidence: support 4/10; fits a neighbouring column 2/8
+  checker: unsure
+[train:12] time query
+  description: Asking about the time of departure or arrival.
+  role: Asking about the time of departure or arrival.
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "what time" (in: "There are 19 trains that day. What time do you need to leave cambridge and/or...")
+  checker evidence: support 2/3; fits a neighbouring column 2/10
+  checker: unsure
+[restaurant:10] reservation time
+  description: the time of the reservation
+  role: reservation time
+  values: time (share 0.71); 28 mentions in 12 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+  checker evidence: support 10/18; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[restaurant:19] time for taxi
+  description: time requested for taxi pickup or drop-off
+  role: time requested for taxi pickup or drop-off
+  values: time (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "10:00" (in: "How about 10:00 on the same day as before?")
+    "17:45" (in: "check if they would have a table for 7 at 17:45 on Sunday?")
+  checker evidence: support 3/8; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+
+Table train_arrival_time (one row = one train_arrival_time), 10 columns:
+[train:1] arrival location
+  description: the location where the train arrives
+  role: end of the journey
+  values: text (share 1.00); 23 mentions in 16 dialogues
+  examples:
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+    "leicester" (in: "I'll be leaving Leicester and I want to be in Cambridge by 11:30, please.")
+  checker evidence: support 1/10; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+[train:2] arrival time
+  description: specifies the time a train is expected to arrive at the destination
+  role: end of the journey
+  values: time (share 1.00); 28 mentions in 16 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "18:15" (in: "just need to leave on Wednesday and should arrive by 18:15.")
+  checker evidence: support 1/10; fits a neighbouring column 1/8
+  checker: noise; flags: noise
+[train:5] destination city
+  description: destination city in train queries
+  role: destination city in train queries
+  values: text (share 1.00); 34 mentions in 23 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+  checker evidence: support 7/10; fits a neighbouring column 3/6; answers suggest mixed roles
+  checker: unsure; flags: mixed roles
+[restaurant:16] restaurant phone number
+  description: the phone number of the restaurant
+  role: phone number
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "01223 249955" (in: "is C.B 1, 9 H.X, and their phone number is 01223 249955.")
+    "01223 360966" (in: "...phone number for the Nirala is 01223 360966. Is there anything else I can ...")
+  checker evidence: support 2/4; fits a neighbouring column 2/10
+  checker: unsure
+[restaurant:11] restaurant address
+  description: the address of the restaurant
+  role: address
+  values: text (share 1.00); 17 mentions in 17 dialogues
+  examples:
+    "17 magdalene street" (in: "thanh binh is located at 17 magdalene street city centre and its phone number...")
+    "30 bridge street" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+  checker evidence: support 9/10; fits a neighbouring column 0/10
+[restaurant:13] restaurant food type
+  description: the type of food served by the restaurant
+  role: food type
+  values: text (share 1.00); 26 mentions in 14 dialogues
+  examples:
+    "restaurant" (in: "what is the food type of that restaurant ?")
+    "restaurant alimentum" (in: "I was able to book restaurant alimentum reference number is HCY10A2Z")
+  checker evidence: support 8/19; fits a neighbouring column 2/8
+  checker: unsure
+[restaurant:6] postcode
+  description: the postcode of the restaurant
+  role: identifies a location's postal code
+  values: id (share 0.71); 7 mentions in 6 dialogues
+  examples:
+    "9 h.x" (in: "...y Hinton, their postcode is C.B 1, 9 H.X, and their phone number is 01223 ...")
+    "c.b 1" (in: "...n Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is...")
+  checker evidence: support 5/7; fits a neighbouring column 0/9
+[restaurant:18] taxi phone numbers
+  description: provides phone numbers for taxis
+  role: provides phone numbers for taxis
+  values: number (share 1.00); 15 mentions in 14 dialogues
+  examples:
+    "01223367660" (in: "...xpensive. Their phone number is 01223367660. Would you like me to book for...")
+    "01223276182" (in: "... in city centre, the phone # is 01223276182, and the postcode is cb30df. w...")
+  checker evidence: support 4/10; fits a neighbouring column 1/9
+  checker: unsure
+[restaurant:15] restaurant name
+  description: the name of the restaurant
+  role: name
+  values: text (share 1.00); 58 mentions in 28 dialogues
+  examples:
+    "anatolia" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "graffiti" (in: "I'm also looking to eat at a restaurant called graffiti.")
+  checker evidence: support 5/10; fits a neighbouring column 1/10
+  checker: unsure
+[restaurant:14] restaurant location
+  description: general location of the restaurant
+  role: location
+  values: text (share 1.00); 54 mentions in 26 dialogues
+  examples:
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+  checker evidence: support 14/20; fits a neighbouring column 0/5
+
+Return the JSON object now.

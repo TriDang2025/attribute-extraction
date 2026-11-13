@@ -1,0 +1,34 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table train_number_of_tickets (one row = one train_number_of_tickets), 2 columns:
+[train:7] number of tickets
+  description: the number of tickets booked
+  role: quantity
+  values: number (share 0.67); 18 mentions in 10 dialogues
+  examples:
+    "how many ticket" (in: "...he tr1393 which leaves the station at 09:19, how many tickets would you like?")
+    "16" (in: "There are trains every hour on the :16 that will get you there by noon, begin...")
+  checker evidence: support 8/17; fits a neighbouring column 0/5
+  checker: unsure
+[restaurant:4] number of people
+  description: specifies the number of people for a reservation
+  role: specifies the number of people for a reservation
+  values: number (share 1.00); 6 mentions in 4 dialogues
+  examples:
+    "4" (in: "Please book a table for 4 at 15:15 on wednesday.")
+    "7" (in: "Can you check if they would have a table for 7 at 17:45 on Sunday?")
+  checker evidence: support 9/10; fits a neighbouring column 1/7
+
+Return the JSON object now.

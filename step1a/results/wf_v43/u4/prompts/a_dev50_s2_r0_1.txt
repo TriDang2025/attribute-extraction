@@ -1,0 +1,48 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_id and train_departure_time are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_id -> train_departure_time": one train_id row has many train_departure_time rows (each train_departure_time row refers to one train_id row)
+- "train_departure_time -> train_id": one train_departure_time row has many train_id rows (each train_id row refers to one train_departure_time row)
+- "many_to_many": a train_id row can go with many train_departure_time rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_id (one row = one train_id), 1 columns:
+[train:14] train id
+  description: the unique identifier for the train
+  role: identifier
+  values: id (share 1.00); 31 mentions in 18 dialogues
+  examples:
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+
+Table train_departure_time (one row = one train_departure_time), 2 columns:
+[train:4] departure time
+  description: the time at which the train departs
+  role: start of the journey
+  values: time (share 1.00); 62 mentions in 23 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+  checker evidence: support 4/10; fits a neighbouring column 2/8
+  checker: unsure
+[train:3] departure location
+  description: the location from which the train departs
+  role: start of the journey
+  values: text (share 1.00); 28 mentions in 17 dialogues
+  examples:
+    "cambridge" (in: "need a train that leaves at 20:45 from stevenage to cambridge")
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+  checker evidence: support 10/20; fits a neighbouring column 2/10
+  checker: unsure
+
+Return the JSON object now.

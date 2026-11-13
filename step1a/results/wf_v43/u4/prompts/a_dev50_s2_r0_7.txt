@@ -1,0 +1,38 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_id and train_reference_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_id -> train_reference_number": one train_id row has many train_reference_number rows (each train_reference_number row refers to one train_id row)
+- "train_reference_number -> train_id": one train_reference_number row has many train_id rows (each train_id row refers to one train_reference_number row)
+- "many_to_many": a train_id row can go with many train_reference_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_id (one row = one train_id), 1 columns:
+[train:14] train id
+  description: the unique identifier for the train
+  role: identifier
+  values: id (share 1.00); 31 mentions in 18 dialogues
+  examples:
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+
+Table train_reference_number (one row = one train_reference_number), 1 columns:
+[train:10] reference number
+  description: the reference number for the booking
+  role: identifier
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+
+Return the JSON object now.

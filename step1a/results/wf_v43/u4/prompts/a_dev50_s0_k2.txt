@@ -1,0 +1,176 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table restaurant (one row = one restaurant), 19 columns:
+[restaurant:1] entry fee
+  description: Describes the cost of entering a location, such as a college.
+  role: Describes the cost of entering a location, such as a college.
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "entry fee" (in: "The address is regent street and there is no entry fee.")
+  checker evidence: support 0/1; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+[restaurant:2] hotel
+  description: references to hotels
+  role: references to hotels
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "hotel" (in: "place to dine in the same price range as the hotel.")
+  checker evidence: support 3/3; fits a neighbouring column 0/10
+[restaurant:3] number of options
+  description: indicates the number of people for a reservation
+  role: indicates the number of people for a reservation
+  values: number (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "6 people" (in: "Can you make a reservation for 6 people at 12:15 on wednesday?")
+    "2 people" (in: "I want a reservation for 2 people at 17:30 on thursday. Sorry, I don't know w...")
+  checker evidence: support 9/10; fits a neighbouring column 1/7
+[restaurant:4] number of people
+  description: specifies the number of people for a reservation
+  role: specifies the number of people for a reservation
+  values: number (share 1.00); 6 mentions in 4 dialogues
+  examples:
+    "4" (in: "Please book a table for 4 at 15:15 on wednesday.")
+    "7" (in: "Can you check if they would have a table for 7 at 17:45 on Sunday?")
+  checker evidence: support 9/10; fits a neighbouring column 1/7
+[restaurant:5] number of results
+  description: indicates the number of search results
+  role: indicates the number of search results
+  values: number (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "3" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "2" (in: "There are two. Both are expensive. One is in the north and")
+  checker evidence: support 4/7; fits a neighbouring column 0/10
+  checker: unsure
+[restaurant:6] postcode
+  description: the postcode of the restaurant
+  role: identifies a location's postal code
+  values: id (share 0.71); 7 mentions in 6 dialogues
+  examples:
+    "9 h.x" (in: "...y Hinton, their postcode is C.B 1, 9 H.X, and their phone number is 01223 ...")
+    "c.b 1" (in: "...n Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is...")
+  checker evidence: support 5/7; fits a neighbouring column 0/9
+[restaurant:7] price range
+  description: Describes the cost level of a restaurant.
+  role: Describes the cost level of a restaurant.
+  values: text (share 1.00); 24 mentions in 17 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+  checker evidence: support 8/10; fits a neighbouring column 2/6
+  checker: unsure
+[restaurant:8] reference number
+  description: uniquely identifies a reservation
+  role: uniquely identifies a reservation
+  values: id (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "42xedgdf" (in: "...booked. Your reference number is 42XEDGDF. Is there anything else I can he...")
+    "bpe8lvha" (in: "Cocum restaurant on Monday at 15:00. The reference number is BPE8LVHA.")
+  checker evidence: support 10/10; fits a neighbouring column 2/9
+[restaurant:9] reservation date
+  description: the date of the reservation
+  role: reservation date
+  values: day (share 0.80); 20 mentions in 13 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+  checker evidence: support 8/10; fits a neighbouring column 0/10
+[restaurant:10] reservation time
+  description: the time of the reservation
+  role: reservation time
+  values: time (share 0.71); 28 mentions in 12 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+  checker evidence: support 10/18; fits a neighbouring column 5/5
+  checker: too general; flags: too general
+[restaurant:11] restaurant address
+  description: the address of the restaurant
+  role: address
+  values: text (share 1.00); 17 mentions in 17 dialogues
+  examples:
+    "17 magdalene street" (in: "thanh binh is located at 17 magdalene street city centre and its phone number...")
+    "30 bridge street" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+  checker evidence: support 9/10; fits a neighbouring column 0/10
+[restaurant:12] restaurant area
+  description: the area or part of the city where the restaurant is located
+  role: area
+  values: text (share 1.00); 4 mentions in 2 dialogues
+  examples:
+    "cherry hinton" (in: "...It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode...")
+    "64 cherry hinton road" (in: "...ndoori which is located on 64 Cherry Hinton Road. Would you like me to boo...")
+  checker evidence: support 3/4; fits a neighbouring column 3/10
+[restaurant:13] restaurant food type
+  description: the type of food served by the restaurant
+  role: food type
+  values: text (share 1.00); 26 mentions in 14 dialogues
+  examples:
+    "restaurant" (in: "what is the food type of that restaurant ?")
+    "restaurant alimentum" (in: "I was able to book restaurant alimentum reference number is HCY10A2Z")
+  checker evidence: support 8/19; fits a neighbouring column 2/8
+  checker: unsure
+[restaurant:14] restaurant location
+  description: general location of the restaurant
+  role: location
+  values: text (share 1.00); 54 mentions in 26 dialogues
+  examples:
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+  checker evidence: support 14/20; fits a neighbouring column 0/5
+[restaurant:15] restaurant name
+  description: the name of the restaurant
+  role: name
+  values: text (share 1.00); 58 mentions in 28 dialogues
+  examples:
+    "anatolia" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "graffiti" (in: "I'm also looking to eat at a restaurant called graffiti.")
+  checker evidence: support 5/10; fits a neighbouring column 1/10
+  checker: unsure
+[restaurant:16] restaurant phone number
+  description: the phone number of the restaurant
+  role: phone number
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "01223 249955" (in: "is C.B 1, 9 H.X, and their phone number is 01223 249955.")
+    "01223 360966" (in: "...phone number for the Nirala is 01223 360966. Is there anything else I can ...")
+  checker evidence: support 2/4; fits a neighbouring column 2/10
+  checker: unsure
+[restaurant:18] taxi phone numbers
+  description: provides phone numbers for taxis
+  role: provides phone numbers for taxis
+  values: number (share 1.00); 15 mentions in 14 dialogues
+  examples:
+    "01223367660" (in: "...xpensive. Their phone number is 01223367660. Would you like me to book for...")
+    "01223276182" (in: "... in city centre, the phone # is 01223276182, and the postcode is cb30df. w...")
+  checker evidence: support 4/10; fits a neighbouring column 1/9
+  checker: unsure
+[restaurant:19] time for taxi
+  description: time requested for taxi pickup or drop-off
+  role: time requested for taxi pickup or drop-off
+  values: time (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "10:00" (in: "How about 10:00 on the same day as before?")
+    "17:45" (in: "check if they would have a table for 7 at 17:45 on Sunday?")
+  checker evidence: support 3/8; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+[restaurant:20] time of day
+  description: specifies the time of day for dining
+  role: specifies the time of day for dining
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "night" (in: "am also looking for a place to dine for the night. Do you have any suggestions?")
+  checker evidence: support 0/1; fits a neighbouring column 0/10
+  checker: noise; flags: noise
+
+Return the JSON object now.

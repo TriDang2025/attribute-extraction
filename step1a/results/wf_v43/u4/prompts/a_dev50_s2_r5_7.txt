@@ -1,0 +1,38 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train_number_of_trains and train_reference_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train_number_of_trains -> train_reference_number": one train_number_of_trains row has many train_reference_number rows (each train_reference_number row refers to one train_number_of_trains row)
+- "train_reference_number -> train_number_of_trains": one train_reference_number row has many train_number_of_trains rows (each train_number_of_trains row refers to one train_reference_number row)
+- "many_to_many": a train_number_of_trains row can go with many train_reference_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train_number_of_trains (one row = one train_number_of_trains), 1 columns:
+[train:8] number of trains
+  description: specifies the number of trains available or matching a certain criteria
+  role: specifies the number of trains available or matching a certain criteria
+  values: number (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "1 train" (in: "...arting for Cambridge on Tuesday. One train departs every hour starting at ...")
+    "12" (in: "There are twelve possible trains leaving after 12:15. Should I book you on")
+  checker evidence: support 4/5; fits a neighbouring column 1/10
+
+Table train_reference_number (one row = one train_reference_number), 1 columns:
+[train:10] reference number
+  description: the reference number for the booking
+  role: identifier
+  values: id (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+  checker evidence: support 10/10; fits a neighbouring column 0/10
+
+Return the JSON object now.
