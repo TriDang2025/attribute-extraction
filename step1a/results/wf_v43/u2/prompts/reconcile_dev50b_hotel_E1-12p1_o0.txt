@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#12/1: name: price | description: price
+Examples:
+- 1 [user] previous turn, system: I have no hotels in the north that meet those specification. May I try something else? | turn: I just need a 3 star hotel in the [[north center]].
+- 2 [system] previous turn, user: I will be visiting Cambridge soon and need a place to stay. I am looking for a guesthouse with at least a star 3 rating. | turn: 4 guesthouses match your request and they're all moderately priced. Do you want to be in the north, [[south]], or west side of town?
+- 3 [user] turn: I am looking for a cheap hotel on the [[east]].
+- 4 [system] previous turn, user: Try either a hotel or guesthouse. | turn: The express by holiday inn cambridge is a 2 star hotel in the [[east area]] that is expensive. It has wifi and parking. Would you like to make a reservation?
+- 5 [system] previous turn, user: I know I have found places with those requirements before. I just don't remember the name. I really want to stay moderately priced with the 3 stars and parking. | turn: There are no hotels matching your criteria in the East, but there are 3 hotels in the [[south]], north, and west. Would you like to try one of those?
+
+Columns (5):
+- name: location | examples: north; cambridge; alexander bed and breakfast
+- name: stars | examples: north
+- name: location area | examples: north side of town; free parking
+- name: location str | examples: centre of town; centre; centre area
+- name: location part | examples: west side of town; west; west side
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#12/1", "reason": "str", "same_as": "<column name or none>"}
