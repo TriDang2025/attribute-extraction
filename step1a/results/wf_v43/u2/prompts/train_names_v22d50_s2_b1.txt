@@ -1,0 +1,74 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 1 of 6 (29 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E1#16  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E1#16:0 [user] previous turn, system: The earliest leaves at 13:40 and the trains depart every hour through 23:40. If you'd like to choose one I can book it for you. | turn: That would be great. [[How much]] would it cost to travel to stansted from Cambridge?
+- E1#16:1 [system] previous turn, user: Just one seat. | turn: Your booking was successful! The reference number is 698RE4W1. The [[total fee]] of 17.89 is payable at the station.
+- E1#16:2 [user] previous turn, system: There are trains every hour on the :16 that will get you there by noon, beginning at 5:16. Which would you prefer? | turn: How about 7:16? [[What is the price]]?
+
+### E1#25  (mentions 2, distinct values 1)
+Examples:
+- E1#25:0 [user] previous turn, system: Sheep's Green and Lammas Land Park Fen Causeway is located at Fen Causeway, Newnham road, postal code cb322ad. | turn: Thanks! I'm also looking for a train from Cambridge to [[Kings Lynn]].
+- E1#25:1 [user] previous turn, system: Booking was successful. Reference number is : FC2BDIC9. | turn: I also need a train on Wednesday, leaving from [[Kings Lynn]].
+
+### E1#12  (mentions 6, distinct values 4, low confidence)
+Examples:
+- E1#12:0 [system] previous turn, user: Yes that will work thank you. | turn: [[How many tickets]] would you like me to book for train TR5713?
+- E1#12:1 [system] previous turn, user: Sunday,can you book it for me and I need a reference number,please | turn: Sure. Just to confirm, [[how many seats]] will you need?
+- E1#12:2 [system] previous turn, user: Yes, please book it and provide the reference number. | turn: [[How many train tickets]] would you like to book?
+- E1#12:3 [system] previous turn, user: Is there another day you would like me to check? | turn: [[There are only 4 trains]] that leave on Saturday
+- E1#12:4 [system] previous turn, user: I'll be heading to Cambridge and I'd like to leave at or a little after 09:00, if possible. | turn: I have the tr1393 which leaves the station at 09:19, [[how many tickets]] would you like?
+- E1#12:5 [system] previous turn, user: Yes, that works! I would like the reference number please. | turn: [[How many tickets]] do you need?
+
+### E1#27  (mentions 4, distinct values 1)
+Examples:
+- E1#27:0 [user] turn: Could you help me find a train to [[norwich]]?
+- E1#27:1 [user] previous turn, system: Sure. Where are you departing from? | turn: I'm leaving from [[Norwich]] and would like to leave after 12:15, please.
+- E1#27:2 [user] previous turn, system: Hi there, let's start with the train arrival, where would you be travelling from? | turn: I am looking for a train that will depart from [[Norwich]] on Sunday
+- E1#27:3 [user] previous turn, system: There are twelve possible trains leaving after 12:15. Should I book you on one of them? | turn: I am sorry. I need the train to leave after 21:15 from [[Norwich]]. Are there any available?
+
+### E1#10  (mentions 19, distinct values 19)
+Examples:
+- E1#10:0 [system] previous turn, user: What are the other 4 times of departure for Saturday. I'll need bookings for 5 people and a reference number. | turn: Alright, I booked 5 tickets for Saturday train your reference number is [[1R61PO9r]]. You can pay for your tickets at the station. Is there anything else?
+- E1#10:1 [system] previous turn, user: Before I continue with the train details, was Travellers Rest booked? I didn't get a reference number. | turn: My sincerest apologies for that. Yes, your booking is completed and the reference number is [[64UQ7M3G]]
+- E1#10:2 [system] previous turn, user: Just one seat. | turn: Your booking was successful! The reference number is [[698RE4W1]]. The total fee of 17.89 is payable at the station.
+- E1#10:3 [system] previous turn, user: 5, please. Include the reference number. | turn: You will arrive at 10:54 the reference number is [[69luuzq7]]
+- E1#10:4 [system] previous turn, user: Can I have the reference number please? | turn: The reference number is [[G7THDK3O]]. Is there anything else I can help you with.
+- E1#10:5 [system] previous turn, user: I need 2 adult and 1 child. Thank you. | turn: Booking was successful for TR5713, the total fee is 10.56 GBP payable at the station. Your reference number is : [[GGE66KI2]]. Is there anything else I can help you with?
+- E1#10:6 [system] previous turn, user: That works for me. Go ahead and book it. | turn: Done - your reference number is [[GJ3062PE]]. The total fee is 37.79 GPB which you can pay at the station.
+- E1#10:7 [system] previous turn, user: Yes, please. Can you book me 4 tickets? | turn: Booking was successful, the total fee is 40.4 GBP payable at the station. Reference number is : [[H4BIFD0U]]. Will there be anything else today?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#16, E1#25, E1#12, E1#27, E1#10) and its name as the value, like {"E1#16": "<name>"}.

@@ -1,0 +1,80 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 4 of 4 (20 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: guesthouse, hotel, acorn guest house; 2 night, 4 night, 5 night; wednesday, friday, sunday
+- E2: centre, centre of town, centre area; cb23bu, cb17gx, cb18dw; 01223307402, 01223314960, 01223333516
+- E3: moderately priced, moderate price range, expensive; restaurant, j restaurant, danish restaurant; centre, city centre, center of town
+- E4: 14:45, 19:15, 06:45; 07048450899, 07128258422, 07267142867; restaurant, hotel, j restaurant
+
+### E0#9  (mentions 23, distinct values 2)
+Examples:
+- E0#9:0 [system] previous turn, user: Sure, for 8 people please. | turn: TR4170 leaves leicester at 9:09 and arrives in [[cambridge]] on Friday at 10:54. 8 tickets are booked, reference #: CL4V2583. Do you need further help?
+- E0#9:1 [system] previous turn, user: No thanks. That was all I needed to know. Goodbye. | turn: Thank you for contacting the [[Cambridge TownInfo centre]]. Goodbye
+- E0#9:2 [system] previous turn, user: I need a train out of Cambridge, to arrive by 20:00. | turn: Just to clarify a train from [[Cambridge]], correct? Where will it be to and what date & time?
+- E0#9:3 [user] previous turn, system: I sure can. Which stations will you be using? | turn: I need to get to [[Cambridge]] from Peterborough by 13:15 on the the same day as my reservation.
+- E0#9:4 [user] previous turn, system: There are many train departure options on Thursday. When do you want to leave and arrive by? | turn: I would like to arrive in [[cambridge]] by 11:30.
+- E0#9:5 [system] previous turn, user: Does it leave on Monday? | turn: Train TR3154 leaves [[cambridge]] at 13:06 and will arrive at peterborough at 13:56 on Monday. Would you like me to book a ticket?
+- E0#9:6 [user] turn: I'm looking for a train. The train should depart from [[cambridge]] and should go to broxbourne
+- E0#9:7 [user] previous turn, system: You should check out Primavera. The phone number is 01223357708. It is at 10 King's Parade and the postcode is cb21sj. | turn: I also need a train going to [[cambridge]].
+
+### E0#14  (mentions 5, distinct values 4, low confidence)
+Examples:
+- E0#14:0 [system] previous turn, user: I'd like the price and travel time, please? | turn: Sure! The fare is 12.80 pounds and the [[travel time]] is 49 minutes. Is there anything else I can help you with today?
+- E0#14:1 [system] previous turn, user: Depart from cambridge and arriving by 0930 please | turn: TR8042 will depart cambridge Sunday at 8:11 and arrive in Kings Lynn at 8:58. [[How many tickets]] would you like to book?
+- E0#14:2 [system] previous turn, user: No, but I do need the price. | turn: Alright. The price for [[TR 6357]] is 17.90 pounds. Anything else?
+- E0#14:3 [system] previous turn, user: No thats it thankl you | turn: Did you need the [[train number]] or price today?
+- E0#14:4 [user] previous turn, system: TR2874 train arrives at stevenage at 14:10. Would you like more info or can I book it for you? | turn: I'd like the price and [[travel time]], please?
+
+### E0#13  (mentions 7, distinct values 2)
+Examples:
+- E0#13:0 [system] previous turn, user: I need arrive in stevenage by 15:00. | turn: TR2874 train arrives at [[stevenage]] at 14:10. Would you like more info or can I book it for you?
+- E0#13:1 [user] previous turn, system: Your booking at the Allenbell was successful. Your reference number is PV039AJH. | turn: I also need a train from [[Stevanage]] to Cambridge.
+- E0#13:2 [user] previous turn, system: The price is uknown at this time, and the postcode is cb18dw. | turn: I am also looking for a train for Thursday departing from [[Stevenage]].
+- E0#13:3 [system] previous turn, user: Can I catch a train to Stevenage? | turn: Yes, TR2515 departs on friday at 05:21 to [[stevenage]], would you like me to book it?
+- E0#13:4 [user] previous turn, system: Where will you be headed? | turn: I need arrive in [[stevenage]] by 15:00.
+- E0#13:5 [user] turn: Can I catch a train to [[Stevenage]]?
+- E0#13:6 [system] previous turn, user: Yes please when is the arrival time? | turn: TR2515 arrives in [[Stevenage]] at 06:10, bright and early!
+
+### E0#6  (mentions 8, distinct values 8, low confidence)
+Examples:
+- E0#6:0 [system] previous turn, user: I'd like the price and travel time, please? | turn: Sure! The fare is [[12.80 pounds]] and the travel time is 49 minutes. Is there anything else I can help you with today?
+- E0#6:1 [system] previous turn, user: No, but I do need the price. | turn: Alright. The price for TR 6357 is [[17.90 pounds]]. Anything else?
+- E0#6:2 [system] previous turn, user: What is the price of a ticket? | turn: One ticket to London Kings Cross will cost [[23.60 pounds]]. Would you like me to book the ticket for you?
+- E0#6:3 [system] previous turn, user: That sounds great. Can you book me 4 tickets on that train please? | turn: Booking was successful, the total fee is [[31.36 GBP]] payable at the station . Reference number is : 8K88DU7K.
+- E0#6:4 [system] previous turn, user: Could you book that for me for 2 people? | turn: Sure thing. I've booked two tickets on TR5933. The total fee is [[33 GBP]] and your reference number is TL4R46YS. Is there anything else I can help you with?
+- E0#6:5 [system] previous turn, user: Yes, can you please book for 3 seats? | turn: That booking was successful, the total fee is [[42.96 GBP]] and your reference #1l0FBGWG
+- E0#6:6 [system] previous turn, user: That sounds good. I need tickets for 4 people. Can I get a reference number? | turn: Booking was successful, the total fee is [[51.2 GBP]] payable at the station. Reference number is : XX5DNFKS.
+- E0#6:7 [system] previous turn, user: Yes please. I need 5 tickets. | turn: The Booking was successful, the total fee is [[82.5 GBP]] payable at the station. Reference number is : JU3L0EZL. Is there anything else you need?
+
+### E0#19  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#19:0 [system] previous turn, user: No thanks, but I do need some train info. I'll be leaving from Peterborough on Tuesday, sometime after 15:15. | turn: [[The TR5933]] leaves peterborough at 15:19.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#9, E0#14, E0#13, E0#6, E0#19) and its name as the value, like {"E0#9": "<name>"}.

@@ -1,0 +1,68 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 6 of 7 (31 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E0#18  (mentions 2, distinct values 1)
+Examples:
+- E0#18:0 [system] previous turn, user: Hello. I'm hoping to find a guesthouse in the north part of Cambridge. Are there any? | turn: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with free internet and free parking, [[Worth House]] is a good choice.
+- E0#18:1 [system] previous turn, user: I'm looking for a place to stay that is cheap located in the north. | turn: Okay! Would you like to stay at City Centre North B and B, or at [[Worth House]]?
+
+### E0#22  (mentions 2, distinct values 1)
+Examples:
+- E0#22:0 [user] previous turn, system: the postcode is cb11pt | turn: I would also like to book at a guest house named [[Aylesbray Lodge]], starting Monday.
+- E0#22:1 [system] previous turn, user: I would also like to book at a guest house named Aylesbray Lodge, starting Monday. | turn: I'm starting to book your reservation at [[Aylesbray Lodge]] starting on Monday, how many days will you be staying?
+
+### E0#13  (mentions 4, distinct values 2)
+Examples:
+- E0#13:0 [system] previous turn, user: from Thursday. | turn: [[alexander bed and breakfast]] would be perfect for you. Shall i book it ?
+- E0#13:1 [system] previous turn, user: That sounds great - I want to book it for 5 people for two nights starting Monday. | turn: Alright, I have your party booked at the [[Alexander]]. The reference number is : G2YMGI0L. Is there anything else I can do for you today?
+- E0#13:2 [system] previous turn, user: Oh, I really don't worry about the price, so long as it has four stars and free parking. | turn: Alright, might I suggest the [[Alexander Bed and Breakfast]] then?
+- E0#13:3 [user] previous turn, system: alexander bed and breakfast would be perfect for you. Shall i book it ? | turn: It'll be very good if you can include [[alexander bed and breakfast]] but need to be in a reasonable price.
+
+### E0#27  (mentions 1, distinct values 1)
+Examples:
+- E0#27:0 [user] turn: I need a five starts hotel close to a mall and [[main restaurants]]. The hotel should include free wifi in the room.
+
+### E0#6  (mentions 16, distinct values 15)
+Examples:
+- E0#6:0 [system] previous turn, user: Sure, I need a reservation for 4 people and 2 nights starting on Monday please. | turn: I have made the booking the Reference number is [[E6UVD9OL]]. Is there anything else i can help you with?
+- E0#6:1 [system] previous turn, user: Let's try 4 nights only please and I'll need a reference number. | turn: That works out perfectly. Your reference number is [[72YCMLXX]]. Is there anything else I can help you with today?
+- E0#6:2 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: The ashley hotel has 2 stars. They're in the postcode [[cb41er]].
+- E0#6:3 [system] previous turn, user: Yes, I am looking to book a guesthouse in the cheap price range that includes free wifi. | turn: I was able to book you a room for seven people for three nights, starting Monday, at Finches Bed and Breakfast. Reference number is [[CUL9VZ04]]. Is there anything else?
+- E0#6:4 [system] previous turn, user: Sure, I need it for 5 people and 4 nights from Wednesday. | turn: Booking was successful. Reference number is : [[FC2BDIC9]].
+- E0#6:5 [system] previous turn, user: That is what I am looking for. I need to book for 2 nights starting on Wednesday. Four people will be staying. Please give a reference number. | turn: Ok, your reservation is booked, your reference number is [[FCQZW2OT]]. Can I help you with anything else?
+- E0#6:6 [system] previous turn, user: That sounds great - I want to book it for 5 people for two nights starting Monday. | turn: Alright, I have your party booked at the Alexander. The reference number is : [[G2YMGI0L]]. Is there anything else I can do for you today?
+- E0#6:7 [system] previous turn, user: Yes please, for 4 people. How about the TR8167 please. | turn: Oh! It looks like we've already booked Train TR8167 for your group of 4. Your reference number is [[H4BIFD0U]]. Is there anything else I can help you with today?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#18, E0#22, E0#13, E0#27, E0#6) and its name as the value, like {"E0#18": "<name>"}.

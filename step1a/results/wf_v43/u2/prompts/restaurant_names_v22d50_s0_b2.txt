@@ -1,0 +1,74 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E2: batch 2 of 12 (57 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E2#5  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#5:0 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is C.B 1, [[9 H.X]], and their phone number is 01223 249955.
+
+### E2#6  (mentions 4, distinct values 4)
+Examples:
+- E2#6:0 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is [[01223 249955]].
+- E2#6:1 [system] previous turn, user: What is the phone number? | turn: The phone number for the Nirala is [[01223 360966]]. Is there anything else I can help you with?
+- E2#6:2 [system] previous turn, user: Yes please, I need to book a taxi to the restaurant from the hotel for the dinner reservation. | turn: Ok, a grey honda will pick you up at the hamilton lodge in time to arrive at restaurant alimentum for your 10:00 reservations. [[Taxi contact number]] is 07242149665. Anything else?
+- E2#6:3 [user] previous turn, system: Okay, how about Peking Restaurant located at 10 Homerton Street City Centre? Would you like a reservation? | turn: I don't need a reservation, but could you give me [[their phone number]]?
+
+### E2#7  (mentions 24, distinct values 12, low confidence)
+Examples:
+- E2#7:0 [user] previous turn, system: There are many restaurant options available to you. What type of food would you like to eat and what is your price range? | turn: I would like a [[restaurant]] that serves eritrean food and in the expensive price range.
+- E2#7:1 [user] previous turn, system: I found Thanh Binh; would you like me to make you a reservation? | turn: First, tell me how far away from the [[hotel]] this restaurant is.
+- E2#7:2 [system] previous turn, user: i dont mind any | turn: Okay, how about [[Peking Restaurant]] located at 10 Homerton Street City Centre? Would you like a reservation?
+- E2#7:3 [system] previous turn, user: Yes please, I need to book a taxi to the restaurant from the hotel for the dinner reservation. | turn: Ok, a grey honda will pick you up at the hamilton lodge in time to arrive at [[restaurant alimentum]] for your 10:00 reservations. Taxi contact number is 07242149665. Anything else?
+- E2#7:4 [user] turn: I am looking for a place to dine. [[The restaurant]] should serve african food and should be in the centre
+- E2#7:5 [system] previous turn, user: Hi! I am looking for a turkish food restaurant around the centre. | turn: There are [[3 Turkish restaurants]] in the centre. Would you prefer expensive or moderate price range?
+- E2#7:6 [system] previous turn, user: Yes, I am also looking for a barbeque restaurant in the same area and price range as my hotel. | turn: Unfortunately, I could not find a [[barbecue restaurant]] using your criteria. Is there another type of restaurant you would like to consider?
+- E2#7:7 [system] previous turn, user: Is the restaurant moderately priced? If so, please book a table for 5 at 18:00 and send me the reference number. | turn: No, I'm sorry the ugly duckling is in the expensive price range. The copper kettle serves [[british food]] and is moderately priced. Would you like a reservation for it?
+
+### E2#8  (mentions 2, distinct values 1)
+Examples:
+- E2#8:0 [user] previous turn, system: Would love to! What kind of food do you like? | turn: Actually I am specifically looking for the [[Cocum restaurant]], I would like to book for 7 people at 15:00 on monday if possible.
+- E2#8:1 [system] previous turn, user: Actually I am specifically looking for the Cocum restaurant, I would like to book for 7 people at 15:00 on monday if possible. | turn: I have a table reserved for you and 6 other guests at the [[Cocum restaurant]] on Monday at 15:00. The reference number is BPE8LVHA.
+
+### E2#9  (mentions 11, distinct values 7)
+Examples:
+- E2#9:0 [system] previous turn, user: I am craving Turkish food in the centre. Is there a restaurant available? | turn: I have pulled up [[3]]. How about anatolia, they are moderately priced.
+- E2#9:1 [user] previous turn, system: There are 5 results for restaurants serving indian food, the first is tandoori palace located at 68 Histon Road Chesterton. Would you like a reservation and for how many? | turn: Yes please for [[six people]] thank you.
+- E2#9:2 [system] previous turn, user: I'm hoping to find a french restaurant in Cambridge. | turn: There are [[two]]. Both are expensive. One is in the north and one is in the centre. Do you have a preference?
+- E2#9:3 [user] previous turn, system: What day would you like to dine on ? | turn: I want a reservation for [[2 people]] at 17:30 on thursday. Sorry, I don't know why I said the other thing before that. I must be going crazy.
+- E2#9:4 [system] previous turn, user: Please book a table for 4 at 15:15 on wednesday. | turn: Alright, now have a reservation for [[four people]] at the Tandoori Palace at 3:15 on Wednesday. Is there anything else I can assist you with?
+- E2#9:5 [user] previous turn, system: Would love to! What kind of food do you like? | turn: Actually I am specifically looking for the Cocum restaurant, I would like to book for [[7 people]] at 15:00 on monday if possible.
+- E2#9:6 [user] previous turn, system: Yes I have three. When would you like the table reserved for and for how many? | turn: Is one of those expensive? If so, book me a table there for Thursday for [[8 people]] at 13:30 please.
+- E2#9:7 [user] previous turn, system: I recommend Jinling Noodle Bar. It's located at 11 Peas Hill City Center. Would you like me to book a table for you? | turn: Yes can you please for [[three]] at 17:00.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E2#5, E2#6, E2#7, E2#8, E2#9) and its name as the value, like {"E2#5": "<name>"}.

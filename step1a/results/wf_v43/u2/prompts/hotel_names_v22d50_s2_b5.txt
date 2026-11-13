@@ -1,0 +1,66 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 5 of 7 (31 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E0#0  (mentions 24, distinct values 14, low confidence)
+Examples:
+- E0#0:0 [user] previous turn, system: Yes, hamilton lodge is located on 156 chesterton road. | turn: If this [[guesthouse]] is available please book it for me. By the way, what is the price per night?
+- E0#0:1 [system] previous turn, user: I need a hotel in the west with free parking please. | turn: Do you care about the price range? I have one cheap and one expensive [[hotel]] that fits your current criteria.
+- E0#0:2 [user] turn: I'd like more information about the [[Ashley Hotel]], can you help?
+- E0#0:3 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: [[The ashley hotel]] has 2 stars. They're in the postcode cb41er.
+- E0#0:4 [user] previous turn, system: I do not have 4 or 5 star hotels in that area. Can I try something else? | turn: I want to stay at a [[3 star hotel]] with free parking.
+- E0#0:5 [user] previous turn, system: I have 2 options for you - The Huntingdon Marriott on the west side, and the University Arms in the center. Are you interested in one of these? | turn: Maybe. Is either one a [[4 star hotel]]? If so, I'd like to book a room for 4 nights.
+- E0#0:6 [user] previous turn, system: Anatolia is located at 30 Bridge Street City Centre. | turn: Thank you! I am also looking for a [[5 star hotel]].
+- E0#0:7 [user] previous turn, system: There are no 4-star lodgings available in Cambridge that meet your criteria. Shall we check 5-star locations instead? | turn: Yes, please try [[5-star hotels]] with free parking.
+
+### E0#28  (mentions 3, distinct values 3)
+Examples:
+- E0#28:0 [system] previous turn, user: I need a 3 star hotel in Cambridge, that offers a guesthouse, can you book it for me ? | turn: Yes, [[hamilton lodge]] is located on 156 chesterton road.
+- E0#28:1 [system] previous turn, user: I may have been confusing you. Could you try and book a 4 star, expensive hotel for 3 nights, starting on Saturday? 3 people. Wifi please. | turn: Sure. I was able to book you for the [[Huntingdon Marriott Hotel]]. Reference #IHGCTXH9. Anything else I can help with?
+- E0#28:2 [system] previous turn, user: How about something with 4 stars and something expensive. | turn: I have 2 options for you - [[The Huntingdon Marriott]] on the west side, and the University Arms in the center. Are you interested in one of these?
+
+### E0#17  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#17:0 [system] previous turn, user: Find a budget hotel with free parking in Cambridge. | turn: There are [[10 hotels]] that meet your needs. Would you like to narrow your search by area?
+
+### E0#19  (mentions 1, distinct values 1)
+Examples:
+- E0#19:0 [user] previous turn, system: There are 2 trains that meet your criteria. The TR8167 and the TR9693. Would you like me to book one of them for you? | turn: Yes please, for 4 people. How about the [[TR8167]] please.
+
+### E0#9  (mentions 2, distinct values 2)
+Examples:
+- E0#9:0 [system] previous turn, user: How about something with 4 stars and something expensive. | turn: I have 2 options for you - The Huntingdon Marriott on the west side, and the [[University Arms]] in the center. Are you interested in one of these?
+- E0#9:1 [system] previous turn, user: Thanks Can you help me find a hotel called the university aims no university arms hotel. | turn: I have a hotel called [[university arms hotel]] located in the centre. Would you like to make reservations?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#0, E0#28, E0#17, E0#19, E0#9) and its name as the value, like {"E0#0": "<name>"}.

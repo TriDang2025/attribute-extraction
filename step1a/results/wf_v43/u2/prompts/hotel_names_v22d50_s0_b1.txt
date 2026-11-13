@@ -1,0 +1,82 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 1 of 7 (31 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E0#0  (mentions 24, distinct values 14, low confidence)
+Examples:
+- E0#0:0 [user] previous turn, system: Yes, hamilton lodge is located on 156 chesterton road. | turn: If this [[guesthouse]] is available please book it for me. By the way, what is the price per night?
+- E0#0:1 [system] previous turn, user: I need a hotel in the west with free parking please. | turn: Do you care about the price range? I have one cheap and one expensive [[hotel]] that fits your current criteria.
+- E0#0:2 [user] turn: I'd like more information about the [[Ashley Hotel]], can you help?
+- E0#0:3 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: [[The ashley hotel]] has 2 stars. They're in the postcode cb41er.
+- E0#0:4 [user] previous turn, system: I do not have 4 or 5 star hotels in that area. Can I try something else? | turn: I want to stay at a [[3 star hotel]] with free parking.
+- E0#0:5 [user] previous turn, system: I have 2 options for you - The Huntingdon Marriott on the west side, and the University Arms in the center. Are you interested in one of these? | turn: Maybe. Is either one a [[4 star hotel]]? If so, I'd like to book a room for 4 nights.
+- E0#0:6 [user] previous turn, system: Anatolia is located at 30 Bridge Street City Centre. | turn: Thank you! I am also looking for a [[5 star hotel]].
+- E0#0:7 [user] previous turn, system: There are no 4-star lodgings available in Cambridge that meet your criteria. Shall we check 5-star locations instead? | turn: Yes, please try [[5-star hotels]] with free parking.
+
+### E0#1  (mentions 19, distinct values 12)
+Examples:
+- E0#1:0 [user] previous turn, system: There are no 5 star hotels, do you want to choose something else | turn: Yes, can you find a place for me with free wifi in the [[moderate price range]]?
+- E0#1:1 [user] previous turn, system: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with free internet and free parking, Worth House is a good choice. | turn: I'm looking for a place to stay that is [[cheap]] located in the north.
+- E0#1:2 [user] previous turn, system: I booked your restaurant table, and the reference number is CUL9VZ04. Is there anything else I can help you with? | turn: Yes, I am looking to book a guesthouse in the [[cheap price range]] that includes free wifi.
+- E0#1:3 [user] previous turn, system: I have a table reserved for you and 6 other guests at the Cocum restaurant on Monday at 15:00. The reference number is BPE8LVHA. | turn: Thank you. I'd also like a guesthouse in the [[cheaper price range]]. Can you help me with that?
+- E0#1:4 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a 4 star, [[expensive hotel]] for 3 nights, starting on Saturday? 3 people. Wifi please.
+- E0#1:5 [system] previous turn, user: No parking preference. Can you please recommend one. | turn: I'm sorry. I am not finding any hotels in the [[expensive price range]] in the North. Would you like to change your search?
+- E0#1:6 [user] previous turn, system: No I'm sorry we don't have anything matching those criteria. | turn: There are literally no 4 star accommodations of any kind with [[moderate price]] and wifi in all of Cambridge? I find that very hard to believe!
+- E0#1:7 [system] previous turn, user: I am also looking for a hotel in the north please. | turn: The acorn guest house is available in your selected region. It's [[moderately priced]] and includes free internet and parking.
+
+### E0#2  (mentions 5, distinct values 3, low confidence)
+Examples:
+- E0#2:0 [system] previous turn, user: Maybe. Is either one a 4 star hotel? If so, I'd like to book a room for 4 nights. | turn: Both are 4 stars. How many days would you be staying, and [[how many people]] are in your party? I can see if something is available.
+- E0#2:1 [user] previous turn, system: There are 8 moderately priced guesthouses in the north. May I suggest the 4 star Acorn Guest house? | turn: Are there any expensive hotels in the north? I plan on staying with [[4 other people]] for 4 nights, starting wednesday.
+- E0#2:2 [system] previous turn, user: Thank you. I'd also like a guesthouse in the cheaper price range. Can you help me with that? | turn: there are [[several]] in the area of the restaurant. would you like to book the closest one?
+- E0#2:3 [system] previous turn, user: If this guesthouse is available please book it for me. By the way, what is the price per night? | turn: I do not have the prices, what day would you like to stay, for how many nights, and [[how many people]]?
+- E0#2:4 [system] previous turn, user: I will be staying for 3 nights. | turn: OK, and [[how many people]] will be staying in the room?
+
+### E0#3  (mentions 2, distinct values 2)
+Examples:
+- E0#3:0 [system] previous turn, user: Yes, I am looking to book a guesthouse in the cheap price range that includes free wifi. | turn: I was able to book you a room for seven people for three nights, starting Monday, at [[Finches Bed and Breakfast]]. Reference number is CUL9VZ04. Is there anything else?
+- E0#3:1 [system] previous turn, user: As long as it has free wifi | turn: [[The finches Bed and Breakfast]] fits your needs. When would you like to stay?
+
+### E0#4  (mentions 24, distinct values 9)
+Examples:
+- E0#4:0 [user] previous turn, system: I'm starting to book your reservation at Aylesbray Lodge starting on Monday, how many days will you be staying? | turn: I will be staying for [[3 nights]].
+- E0#4:1 [user] previous turn, system: Unfortunately the booking was unsuccessful. Can you book for another day or a shorter stay? | turn: Let's try [[4 nights]] only please and I'll need a reference number.
+- E0#4:2 [user] previous turn, system: The ashley hotel is a moderately priced 2-star hotel in the north part of town. It offers free wifi and free parking. | turn: That is what I am looking for. I need to book for [[2 nights]] starting on Wednesday. Four people will be staying. Please give a reference number.
+- E0#4:3 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a [[4 star]], expensive hotel for 3 nights, starting on Saturday? 3 people. Wifi please.
+- E0#4:4 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: The ashley hotel has [[2 stars]]. They're in the postcode cb41er.
+- E0#4:5 [system] previous turn, user: Yes, can you try it for 3 nights, please. | turn: Neither hotel appears to have [[three days]] available starting on Sunday for three people, can I look something else up for you?
+- E0#4:6 [system] previous turn, user: I want to stay at a 3 star hotel with free parking. | turn: I'm sorry for the confusion. There are two expensive hotels with [[3 stars]] and parking. Do you prefer the centre or the south?
+- E0#4:7 [user] previous turn, system: The Cambridge Belfry fits your requirements, would you like to book a reservation there? | turn: Please book it for 5 people and [[5 nights]] starting from wednesday.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#0, E0#1, E0#2, E0#3, E0#4) and its name as the value, like {"E0#0": "<name>"}.
