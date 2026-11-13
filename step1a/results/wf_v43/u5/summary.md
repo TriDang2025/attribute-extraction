@@ -71,6 +71,8 @@ Reading: with the validators on, 0 of the c1 chains pass without the 4.4 repairs
 | unguided_retry | event | 5 | 0 |
 | unguided_job | event | 1 | 0 |
 | cut_off | event | 4 | 0 |
-| total |  | 471 | 0 |
+| col_name_dup | ? | 0 | 42 |
+| key_name_renamed | ? | 0 | 58 |
+| p2_empty_table | ? | 0 | 80 |
+| total |  | 471 | 180 |
 
-v4.3 Step 4 not run yet: no repairs.json under results/wf_v43/u4; re-run this command after it. Note that the old column mixes input c1 and input a; compare by input only if the v4.3 chains say which input they used.
