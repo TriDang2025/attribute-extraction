@@ -1,0 +1,77 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table train (one row = one train), 10 columns:
+[gt:7] Train leave at
+  description: leaving time for the train
+  values: time (share 1.00); 20 mentions in 14 dialogues
+  examples:
+    "13:06" (in: "...is the TR0545 leaving cambridge at 13:06. Would you like me to book it or ...")
+    "05:01" (in: "TR6357 leaves at 05:01 and arrives at 06:01. Would you like me to book")
+[gt:9] Train requested people
+  description: how many train tickets you need
+  values: number (share 0.86); 7 mentions in 6 dialogues
+  examples:
+    "2 people" (in: "Could you book that for me for 2 people?")
+    "3 seat" (in: "Yes, can you please book for 3 seats?")
+[gt:10] Train trainid
+  description: id of the train
+  values: id (share 0.88); 16 mentions in 13 dialogues
+  examples:
+    "tr2515" (in: "Yes, TR2515 departs on friday at 05:21 to stevenage, would you like")
+    "the tr5933" (in: "The TR5933 leaves peterborough at 15:19.")
+[gt:8] Train price
+  description: price of the train
+  values: price (share 0.78); 9 mentions in 9 dialogues
+  examples:
+    "12.80 pound" (in: "Sure! The fare is 12.80 pounds and the travel time is 49 minutes. Is there an...")
+    "17.90" (in: "want info or to book the train? The cost is 17.90 per ticket.")
+[gt:6] Train duration
+  description: duration of the travel
+  values: duration (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "49 minute" (in: "...0 pounds and the travel time is 49 minutes. Is there anything else I can h...")
+    "163 minute" (in: "The total travel time will be 163 minutes. Is there anything else I can help ...")
+[gt:4] Train departure
+  description: departure location of the train
+  values: text (share 1.00); 25 mentions in 15 dialogues
+  examples:
+    "cambridge" (in: "I need a train out of Cambridge, to arrive by 20:00.")
+    "peterborough" (in: "I need to get to Cambridge from Peterborough by 13:15 on the the same day as ...")
+[gt:1] Train arrive by
+  description: arrival time of the train
+  values: time (share 1.00); 25 mentions in 15 dialogues
+  examples:
+    "11:30" (in: "I would like to arrive in cambridge by 11:30.")
+    "05:58" (in: "have train TR6003 leaving cambridge at 5:11 and arriving at 5:58 on sunday.")
+[gt:5] Train destination
+  description: destination of the train
+  values: text (share 1.00); 33 mentions in 17 dialogues
+  examples:
+    "cambridge" (in: "Cambridge, and it will be on sunday.")
+    "stevenage" (in: "I need arrive in stevenage by 15:00.")
+[gt:2] Train confirmed reference
+  description: reference number of the train booking
+  values: id (share 1.00); 8 mentions in 8 dialogues
+  examples:
+    "0w0bqb8w" (in: "I was able to book it, reference is 0W0BQB8W.")
+    "13gq9s3a" (in: "can pay for at the station. Your reference number is 13GQ9S3A.")
+[gt:3] Train day
+  description: day of the train
+  values: day (share 1.00); 23 mentions in 15 dialogues
+  examples:
+    "sunday" (in: "Cambridge, and it will be on sunday.")
+    "monday" (in: "I'm going to London's Kings Cross on Monday.")
+
+Return the JSON object now.

@@ -1,0 +1,47 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table price (one row = one price), 5 columns:
+[gt:6] Train duration
+  description: duration of the travel
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+[gt:8] Train price
+  description: price of the train
+  values: price (share 0.93); 14 mentions in 14 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+[gt:20] Hotel price range
+  description: price budget of the hotel
+  values: text (share 1.00); 14 mentions in 7 dialogues
+  examples:
+    "moderate price range" (in: "find a place for me with free wifi in the moderate price range?")
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+[gt:24] Hotel stars
+  description: star rating of the hotel
+  values: number (share 0.83); 12 mentions in 7 dialogues
+  examples:
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+[gt:34] Restaurant price range
+  description: price budget for the restaurant
+  values: text (share 1.00); 21 mentions in 16 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+
+Return the JSON object now.

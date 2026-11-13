@@ -1,0 +1,77 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table train (one row = one train), 10 columns:
+[gt:7] Train leave at
+  description: leaving time for the train
+  values: time (share 0.98); 58 mentions in 21 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+[gt:9] Train requested people
+  description: how many train tickets you need
+  values: number (share 0.73); 11 mentions in 10 dialogues
+  examples:
+    "1 pound fee" (in: "John's has a 2.50 pound fee, and Trinity has a 1 pound fee.")
+    "19 train" (in: "There are 19 trains that day. What time do you need to leave cambridge")
+[gt:10] Train trainid
+  description: id of the train
+  values: id (share 0.97); 31 mentions in 18 dialogues
+  examples:
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+[gt:8] Train price
+  description: price of the train
+  values: price (share 0.93); 14 mentions in 14 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+[gt:6] Train duration
+  description: duration of the travel
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+[gt:4] Train departure
+  description: departure location of the train
+  values: text (share 1.00); 48 mentions in 28 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "leicester" (in: "I'll be leaving Leicester and I want to be in Cambridge by 11:30, please.")
+[gt:1] Train arrive by
+  description: arrival time of the train
+  values: time (share 0.97); 32 mentions in 18 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "18:15" (in: "just need to leave on Wednesday and should arrive by 18:15.")
+[gt:5] Train destination
+  description: destination of the train
+  values: text (share 1.00); 41 mentions in 27 dialogues
+  examples:
+    "cambridge" (in: "Yes, I need a train going to cambridge.")
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+[gt:2] Train confirmed reference
+  description: reference number of the train booking
+  values: id (share 1.00); 18 mentions in 17 dialogues
+  examples:
+    "h4bifd0u" (in: "...e station. Reference number is : H4BIFD0U. Will there be anything else today?")
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+[gt:3] Train day
+  description: day of the train
+  values: day (share 1.00); 41 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+
+Return the JSON object now.

@@ -1,0 +1,35 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table people (one row = one people), 3 columns:
+[gt:9] Train requested people
+  description: how many train tickets you need
+  values: number (share 0.73); 11 mentions in 10 dialogues
+  examples:
+    "1 pound fee" (in: "John's has a 2.50 pound fee, and Trinity has a 1 pound fee.")
+    "19 train" (in: "There are 19 trains that day. What time do you need to leave cambridge")
+[gt:22] Hotel requested people
+  description: number of people for the hotel booking
+  values: number (share 0.94); 17 mentions in 12 dialogues
+  examples:
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+[gt:36] Restaurant requested people
+  description: how many people for the restaurant reservation
+  values: number (share 1.00); 14 mentions in 9 dialogues
+  examples:
+    "4" (in: "Please book a table for 4 at 15:15 on wednesday.")
+    "6 people" (in: "Can you make a reservation for 6 people at 12:15 on wednesday?")
+
+Return the JSON object now.

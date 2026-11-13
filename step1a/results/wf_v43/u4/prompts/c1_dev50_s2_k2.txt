@@ -1,0 +1,83 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table restaurant (one row = one restaurant), 11 columns:
+[gt:29] Restaurant confirmed reference
+  description: reference number of the restaurant booking
+  values: id (share 1.00); 13 mentions in 13 dialogues
+  examples:
+    "42xedgdf" (in: "...booked. Your reference number is 42XEDGDF. Is there anything else I can he...")
+    "64uq7m3g" (in: "Yes, your booking is completed and the reference number is 64UQ7M3G")
+[gt:26] Restaurant address
+  description: address of the restaurant
+  values: text (share 1.00); 36 mentions in 20 dialogues
+  examples:
+    "city centre" (in: "... located at 17 magdalene street city centre and its phone number is 012233...")
+    "chesterton" (in: "...alace located at 68 Histon Road Chesterton. Would you like a reservation a...")
+[gt:35] Restaurant requested day
+  description: day of the restaurant booking
+  values: day (share 0.94); 17 mentions in 11 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+[gt:36] Restaurant requested people
+  description: how many people for the restaurant reservation
+  values: number (share 1.00); 14 mentions in 9 dialogues
+  examples:
+    "4" (in: "Please book a table for 4 at 15:15 on wednesday.")
+    "6 people" (in: "Can you make a reservation for 6 people at 12:15 on wednesday?")
+[gt:27] Restaurant area
+  description: area or place of the restaurant
+  values: text (share 1.00); 39 mentions in 21 dialogues
+  examples:
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+[gt:30] Restaurant food
+  description: the cuisine of the restaurant you are looking for
+  values: text (share 1.00); 14 mentions in 10 dialogues
+  examples:
+    "3 turkish restaurant" (in: "There are 3 Turkish restaurants in the centre. Would you prefer expensive or ...")
+    "barbecue restaurant" (in: "...unately, I could not find a barbecue restaurant using your criteria. Is th...")
+[gt:34] Restaurant price range
+  description: price budget for the restaurant
+  values: text (share 1.00); 21 mentions in 16 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+[gt:32] Restaurant phone
+  description: phone number of the restaurant
+  values: number (share 0.83); 12 mentions in 11 dialogues
+  examples:
+    "01223367660" (in: "...xpensive. Their phone number is 01223367660. Would you like me to book for...")
+    "01223 249955" (in: "is C.B 1, 9 H.X, and their phone number is 01223 249955.")
+[gt:37] Restaurant requested time
+  description: time of the restaurant booking
+  values: time (share 1.00); 23 mentions in 13 dialogues
+  examples:
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+    "18:00" (in: "I be able to get a table there Thursday at 18:00 for 7?")
+[gt:33] Restaurant postcode
+  description: postal code of the restaurant
+  values: id (share 0.71); 7 mentions in 6 dialogues
+  examples:
+    "9 h.x" (in: "...y Hinton, their postcode is C.B 1, 9 H.X, and their phone number is 01223 ...")
+    "c.b 1" (in: "...n Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is...")
+[gt:31] Restaurant name
+  description: name of the restaurant
+  values: text (share 1.00); 47 mentions in 25 dialogues
+  examples:
+    "anatolia" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "graffiti" (in: "I'm also looking to eat at a restaurant called graffiti.")
+
+Return the JSON object now.

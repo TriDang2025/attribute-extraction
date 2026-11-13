@@ -1,0 +1,152 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train and hotel are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train -> hotel": one train row has many hotel rows (each hotel row refers to one train row)
+- "hotel -> train": one hotel row has many train rows (each train row refers to one hotel row)
+- "many_to_many": a train row can go with many hotel rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train (one row = one train), 10 columns:
+[gt:7] Train leave at
+  description: leaving time for the train
+  values: time (share 0.98); 58 mentions in 21 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+[gt:9] Train requested people
+  description: how many train tickets you need
+  values: number (share 0.73); 11 mentions in 10 dialogues
+  examples:
+    "1 pound fee" (in: "John's has a 2.50 pound fee, and Trinity has a 1 pound fee.")
+    "19 train" (in: "There are 19 trains that day. What time do you need to leave cambridge")
+[gt:10] Train trainid
+  description: id of the train
+  values: id (share 0.97); 31 mentions in 18 dialogues
+  examples:
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+[gt:8] Train price
+  description: price of the train
+  values: price (share 0.93); 14 mentions in 14 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+[gt:6] Train duration
+  description: duration of the travel
+  values: duration (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+[gt:4] Train departure
+  description: departure location of the train
+  values: text (share 1.00); 48 mentions in 28 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "leicester" (in: "I'll be leaving Leicester and I want to be in Cambridge by 11:30, please.")
+[gt:1] Train arrive by
+  description: arrival time of the train
+  values: time (share 0.97); 32 mentions in 18 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "18:15" (in: "just need to leave on Wednesday and should arrive by 18:15.")
+[gt:5] Train destination
+  description: destination of the train
+  values: text (share 1.00); 41 mentions in 27 dialogues
+  examples:
+    "cambridge" (in: "Yes, I need a train going to cambridge.")
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+[gt:2] Train confirmed reference
+  description: reference number of the train booking
+  values: id (share 1.00); 18 mentions in 17 dialogues
+  examples:
+    "h4bifd0u" (in: "...e station. Reference number is : H4BIFD0U. Will there be anything else today?")
+    "1r61po9r" (in: "...y train your reference number is 1R61PO9r. You can pay for your tickets at...")
+[gt:3] Train day
+  description: day of the train
+  values: day (share 1.00); 41 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+
+Table hotel (one row = one hotel), 12 columns:
+[gt:19] Hotel postcode
+  description: postal code of the hotel
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cb41er" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+[gt:22] Hotel requested people
+  description: number of people for the hotel booking
+  values: number (share 0.94); 17 mentions in 12 dialogues
+  examples:
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+[gt:25] Hotel type
+  description: what is the type of the hotel
+  values: text (share 1.00); 11 mentions in 8 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "hotel" (in: "Sure. Check only for hotels which include free parking also.")
+[gt:24] Hotel stars
+  description: star rating of the hotel
+  values: number (share 0.83); 12 mentions in 7 dialogues
+  examples:
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+[gt:16] Hotel name
+  description: name of the hotel
+  values: text (share 1.00); 30 mentions in 17 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+[gt:21] Hotel requested day
+  description: day of the hotel booking
+  values: day (share 0.91); 23 mentions in 15 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+[gt:20] Hotel price range
+  description: price budget of the hotel
+  values: text (share 1.00); 14 mentions in 7 dialogues
+  examples:
+    "moderate price range" (in: "find a place for me with free wifi in the moderate price range?")
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+[gt:11] Hotel address
+  description: address of the hotel
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "156 chesterton road" (in: "Yes, hamilton lodge is located on 156 chesterton road.")
+    "gonville place" (in: "All right, sir, that would be the Gonville Hotel on Gonville Place.")
+[gt:18] Hotel phone
+  description: phone number of the hotel
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "01223355017" (in: "Sure, the phone number is 01223355017. How many days will you be staying, wha...")
+[gt:12] Hotel area
+  description: area or place of the hotel
+  values: text (share 1.00); 21 mentions in 12 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "cambridge" (in: "... no 3-star lodgings available in Cambridge. Shall we check 4-star location...")
+[gt:14] Hotel confirmed reference
+  description: reference number of the hotel booking
+  values: id (share 1.00); 16 mentions in 14 dialogues
+  examples:
+    "cul9vz04" (in: "...ble, and the reference number is CUL9VZ04. Is there anything else I can he...")
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+[gt:23] Hotel requested stay
+  description: length of stay at the hotel
+  values: number (share 0.95); 20 mentions in 15 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "2 night" (in: "I will arrive Friday and be there for 2 nights.")
+
+Return the JSON object now.

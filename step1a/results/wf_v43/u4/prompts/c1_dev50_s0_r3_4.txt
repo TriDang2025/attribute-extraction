@@ -1,0 +1,82 @@
+Below are two tables of a relational database design, each with its columns. Decide whether time and people are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "time -> people": one time row has many people rows (each people row refers to one time row)
+- "people -> time": one people row has many time rows (each time row refers to one people row)
+- "many_to_many": a time row can go with many people rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table time (one row = one time), 7 columns:
+[gt:1] Train arrive by
+  description: arrival time of the train
+  values: time (share 0.97); 32 mentions in 18 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "18:15" (in: "just need to leave on Wednesday and should arrive by 18:15.")
+[gt:3] Train day
+  description: day of the train
+  values: day (share 1.00); 41 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+[gt:7] Train leave at
+  description: leaving time for the train
+  values: time (share 0.98); 58 mentions in 21 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+[gt:21] Hotel requested day
+  description: day of the hotel booking
+  values: day (share 0.91); 23 mentions in 15 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+[gt:23] Hotel requested stay
+  description: length of stay at the hotel
+  values: number (share 0.95); 20 mentions in 15 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "2 night" (in: "I will arrive Friday and be there for 2 nights.")
+[gt:35] Restaurant requested day
+  description: day of the restaurant booking
+  values: day (share 0.94); 17 mentions in 11 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+[gt:37] Restaurant requested time
+  description: time of the restaurant booking
+  values: time (share 1.00); 23 mentions in 13 dialogues
+  examples:
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+    "18:00" (in: "I be able to get a table there Thursday at 18:00 for 7?")
+
+Table people (one row = one people), 3 columns:
+[gt:9] Train requested people
+  description: how many train tickets you need
+  values: number (share 0.73); 11 mentions in 10 dialogues
+  examples:
+    "1 pound fee" (in: "John's has a 2.50 pound fee, and Trinity has a 1 pound fee.")
+    "19 train" (in: "There are 19 trains that day. What time do you need to leave cambridge")
+[gt:22] Hotel requested people
+  description: number of people for the hotel booking
+  values: number (share 0.94); 17 mentions in 12 dialogues
+  examples:
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+[gt:36] Restaurant requested people
+  description: how many people for the restaurant reservation
+  values: number (share 1.00); 14 mentions in 9 dialogues
+  examples:
+    "4" (in: "Please book a table for 4 at 15:15 on wednesday.")
+    "6 people" (in: "Can you make a reservation for 6 people at 12:15 on wednesday?")
+
+Return the JSON object now.
