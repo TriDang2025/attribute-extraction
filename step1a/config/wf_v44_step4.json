@@ -1,0 +1,21 @@
+{
+ "switches": {
+  "entity_hint": true,
+  "other_choice": true,
+  "key_candidates": true,
+  "code_links": true,
+  "vote": true
+ },
+ "thresholds": {
+  "key_min_mentions": 5,
+  "key_distinct_share": 0.9,
+  "link_min_shared_values": 2,
+  "link_overlap_share": 0.2,
+  "vote_table_jaccard": 0.5
+ },
+ "notes": {
+  "key_*": "A column is id-like when it has at least key_min_mentions mentions, distinct values / mentions >= key_distinct_share, and its value type is not time, day, date, duration, price, decimal or boolean. Set once on dev50 from the distinct-share list of the Step 3 columns (input a): ordinary columns reach at most 0.89, reference numbers and phone numbers 0.93 and up; 0.9 sits in that gap. Not tuned on scores.",
+  "link_*": "Code proposes a link between two tables when they hold two id-like columns (one in each) with the same normalised name, or with at least link_min_shared_values shared distinct values making up at least link_overlap_share of the smaller value set. Same data, same single setting, no score used.",
+  "vote_table_jaccard": "A table of seed k is matched to a table of the first finished seed when the names are equal, else when the column sets have Jaccard >= this value (one to one, best first); an unmatched table stays a table of its own."
+ }
+}
