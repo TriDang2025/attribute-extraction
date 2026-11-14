@@ -73,4 +73,4 @@ Per set: step4 pass 1 (tables) dev50 0.1 min; step4 pass 1 (tables) dev50b 0.1 m
 
 ## 3. Model loading time
 
-not logged (file `results/wf_v44/model_load.json`)
+250.3 s (4.2 min), meta-llama/Llama-3.1-8B-Instruct 0e9e39f249a16976918f6564b8830bc894c89659, logged 2026-11-14 15:03:19 (file `results/wf_v44/model_load.json`)

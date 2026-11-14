@@ -681,6 +681,8 @@ def run(out, backend, inputs=INPUTS, sets=SETS, seeds=SEEDS, cfg=None, step3_dir
     out = Path(out)
     cfg = cfg or load_config()
     chains = make_chains(out, inputs, sets, seeds, cfg, step3_dirs, root, log, values_fn, ids_fn)
+    if (out / "chains.json").exists():        # keep the chains of other inputs run earlier into this out, so final/status.json covers them too
+        chains = [c for c in B.read_json(out / "chains.json") if c["input"] not in inputs] + chains
     B.write_json(out / "chains.json", chains)
     info = {"chains": len(chains), "switches": cfg["switches"], "thresholds": cfg["thresholds"], "inputs": {}}
     for inp in inputs:
