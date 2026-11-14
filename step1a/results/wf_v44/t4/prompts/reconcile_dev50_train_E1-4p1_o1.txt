@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#4/1: name: day of week str | description: day of the week as a string
+Examples:
+- 1 [user] previous turn, system: Not a problem. Where are you departing from, and what day would you like to travel? | turn: I want to leave from cambridge on [[wednesday]].
+- 2 [user] previous turn, system: Do you have a day you would like to travel? | turn: I would like to leave on [[Saturday]] after 18:45.
+- 3 [system] previous turn, user: I would like to depart from birmingham new street after 14:45. | turn: There are 9 trains that depart from Birmingham new street to Cambridge on [[Tuesday]] after 14:45. The earliest is 15:40, does that work?
+- 4 [user] turn: I need to find a train that leaves peterborough on [[friday]].
+- 5 [user] turn: I'm looking to book a train that goes to ely and leaves on [[sunday]] please.
+
+Columns (5):
+- name: departure station | examples: ely; norwich; birmingham new street
+- name: day | examples: what day
+- name: departure time | examples: 16; 10; 2
+- name: day of week | examples: friday; wednesday; thursday
+- name: time int | examples: 12:00; 05:54; 06:08
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#4/1", "reason": "str", "same_as": "<column name or none>"}

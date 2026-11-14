@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#1/1: name: price | description: price
+Examples:
+- 1 [system] previous turn, user: How about a 4 star rating? | turn: I don't have a 4 star in the [[moderate price range]]. Would you like me to look in a different price range?
+- 2 [system] previous turn, user: No parking preference. Can you please recommend one. | turn: I'm sorry. I am not finding any hotels in the [[expensive price range]] in the North. Would you like to change your search?
+- 3 [user] previous turn, system: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with free internet and free parking, Worth House is a good choice. | turn: I'm looking for a place to stay that is [[cheap]] located in the north.
+- 4 [user] previous turn, system: The finches Bed and Breakfast fits your needs. When would you like to stay? | turn: Yes that's find are the in the [[moderate price range]]?
+- 5 [user] previous turn, system: Train TR5921 leaves Stansted Airport at 18:24 and arrives in Cambridge at 18:52 at a price of 10.10 pounds per ticket. Would you like to book this? | turn: Not, at the moment. However, I would also like to find a hotel to stay with free wifi and a [[moderate price range]].
+
+Columns (5):
+- name: entity | examples: guesthouse; 3 star hotel; 4 star hotel
+- name: location | examples: cambridge; centre; south part of town
+- name: price range str | examples: moderately priced; moderately-priced; price per night
+- name: price range | examples: cheap price range; cheaper price range
+- name: price per night | examples: expensive hotel
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#1/1", "reason": "str", "same_as": "<column name or none>"}
