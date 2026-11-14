@@ -1,0 +1,62 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key. The candidates are columns whose values are (almost) all different, so one of them may identify a row. Answer with the id of
+one candidate, or "none" when no candidate identifies a row (a new id column is then added); then give the name of the new key column in
+new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "none" only when no column can do this.
+Candidates: train:12, hotel:16
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "none", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table price (one row = one price), 9 columns:
+[train:2] currency
+  values: price (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "12.80 pound" (in: "Both options are 12.80 pounds. Would you like to book one of these options?")
+[train:8] price
+  values: price (share 1.00); 9 mentions in 9 dialogues
+  examples:
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+    "10.56 gbp" (in: "...ful for TR5713, the total fee is 10.56 GBP payable at the station. Your re...")
+[train:12] total fee
+  values: text (share 0.67); 6 mentions in 5 dialogues
+  examples:
+    "17.89" (in: "...ference number is 698RE4W1. The total fee of 17.89 is payable at the station.")
+    "37.79 gpb" (in: "...ber is GJ3062PE. The total fee is 37.79 GPB which you can pay at the station.")
+[hotel:16] price range
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "moderately priced" (in: "...n your selected region. It's moderately priced and includes free internet ...")
+    "moderately-priced" (in: "The Acorn Guest House is moderately-priced, in the north. They offer free wif...")
+[hotel:17] price range str
+  values: text (share 1.00); 14 mentions in 8 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+[restaurant:12] price
+  values: text (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "moderate price range" (in: "...estaurant in the north with a moderate price range? Any type of food will do.")
+[restaurant:13] price range
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "north" (in: "... Both are expensive. One is in the north and one is in the centre. Do you ...")
+[restaurant:14] price range str
+  values: text (share 1.00); 18 mentions in 15 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "expensive price range" (in: "is in the centre of town and is in the expensive price range.")
+[restaurant:18] str
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "moderately price" (in: "One of them is cheap and the other is moderately price.")
+
+Return the JSON object now.

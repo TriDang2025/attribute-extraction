@@ -1,0 +1,389 @@
+Below are columns found by analysing a corpus of dialogues (a kind of information, with a description, the type of its values, example values and
+counts). Each column sits in a table of a database design: the heading above it is its table. For every column choose exactly one answer:
+- "keep": the column stays in the table it is in
+- "move to <table>": the column belongs in another listed table
+- "unused": a database would not store the column
+Use only the listed tables; do not add tables. Most columns stay where they are.
+Return ONLY one JSON object, nothing before or after it. Shape (the ids and names here are made up): {"x:1": "keep", "x:2": "move to table_b", "x:3": "unused"}
+Every column id must appear once.
+
+Worked example (other domain):
+Tables: customer, car, rental
+Columns as listed (the heading is the table the column is in now): customer: customer_name, customer_phone, car_model; car: car_class, plate_number,
+pickup_date; rental: return_date, daily_rate, loyalty_points
+Answer: {"customer_name": "keep", "customer_phone": "keep", "car_model": "move to car", "car_class": "keep", "plate_number": "keep",
+ "pickup_date": "move to rental", "return_date": "keep", "daily_rate": "keep", "loyalty_points": "unused"}
+
+Tables: train, hotel, restaurant, reservation, event
+
+Columns (58):
+== train ==
+[train:1] booking id
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[train:2] currency
+  values: price (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "12.80 pound" (in: "Both options are 12.80 pounds. Would you like to book one of these options?")
+[train:3] day of week str
+  values: day (share 0.58); 71 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+    "cambridge" (in: "need a train that leaves at 20:45 from stevenage to cambridge")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "wednesday" (in: "I would like to leave on Wednesday.")
+[train:4] departure station
+  values: text (share 1.00); 43 mentions in 22 dialogues
+  examples:
+    "station" (in: "...otal fee is 66 GBP payable at the station . Your reference number is : P6G...")
+    "leicester" (in: "I'll be leaving Leicester and I want to be in Cambridge by 11:30, please.")
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+    "norwich" (in: "I am looking for a train that will depart from Norwich on Sunday")
+    "peterborough" (in: "like to go to Cambridge and will be departing from Peterborough.")
+[train:5] departure time
+  values: number (share 0.75); 8 mentions in 7 dialogues
+  examples:
+    "16" (in: "There are trains every hour on the :16 that will get you there by noon, begin...")
+    "10" (in: "There are 10 trains leaving from Cambridge to Ely. Is there a particular")
+    "2" (in: "2 please and I need a ref. number.")
+    "278" (in: "There are 278 trains that leave after 11:00 on Saturday. Do you have")
+    "5" (in: "5, please. Include the reference number.")
+[train:6] duration str
+  values: duration (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+[train:7] location capitalized
+  values: text (share 1.00); 37 mentions in 23 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "leicester" (in: "I need to go from leicester to cambridge.")
+    "cambridge towninfo centre" (in: "...able to help you today. Call the Cambridge TownInfo centre whenever you like!")
+[train:8] price
+  values: price (share 1.00); 9 mentions in 9 dialogues
+  examples:
+    "66 gbp" (in: "... was successful, the total fee is 66 GBP payable at the station . Your ref...")
+    "10.56 gbp" (in: "...ful for TR5713, the total fee is 10.56 GBP payable at the station. Your re...")
+    "14.08 pound" (in: "...at leaves at 7:16 and it costs 14.08 pounds per ticket. Would you like me ...")
+    "40.4 gbp" (in: "...was successful, the total fee is 40.4 GBP payable at the station. Referenc...")
+    "450.6 gbp" (in: "TYGH2E4A, and the total fee payable at the station is 450.6 GBP.")
+[train:9] time
+  values: time (share 1.00); 57 mentions in 24 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+    "15:45" (in: "I would like to leave Cambridge after 15:45.")
+    "18:15" (in: "just need to leave on Wednesday and should arrive by 18:15.")
+    "18:24" (in: "TR5921 departs the airport at 18:24 and arrives by 18:52, does this suit your...")
+[train:10] time int
+  values: time (share 1.00); 32 mentions in 18 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "05:54" (in: "There are 10 trains, TR9448 leaves at 5:54 would that work for you?")
+    "06:08" (in: "The TR7213 gets you there at 06:08. Need a ticket?")
+    "11:00" (in: "your help finding a train for Saturday that leaves after 11:00.")
+    "13:00" (in: "I would like to leave after 13:00.")
+[train:11] time str
+  values: id (share 0.85); 59 mentions in 28 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+    "tr5713" (in: "TR5713 leaves at 15:50 and arrives by 16:07. Will that work")
+    "what time" (in: "There are 19 trains that day. What time do you need to leave cambridge and/or...")
+    "tr5921" (in: "TR5921 departs the airport at 18:24 and arrives by 18:52, does")
+[train:12] total fee
+  values: text (share 0.67); 6 mentions in 5 dialogues
+  examples:
+    "17.89" (in: "...ference number is 698RE4W1. The total fee of 17.89 is payable at the station.")
+    "37.79 gpb" (in: "...ber is GJ3062PE. The total fee is 37.79 GPB which you can pay at the station.")
+    "8.08gbp" (in: "...a 28-minute trip, and each ticket is 8.08GBP. Would you like to book passage?")
+    "how much" (in: "That would be great. How much would it cost to travel to stansted from Cambri...")
+    "total fee" (in: "...eference number is 698RE4W1. The total fee of 17.89 is payable at the stat...")
+[train:13] train id
+  values: time (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "23:12" (in: "...16 and the trainID that departs at 2312 is TR6387. Would you like me to bo...")
+[train:14] travel time
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "travel time" (in: "yes, what is the travel time, train ID and price please per ticket")
+    "traveller rest" (in: "...e with the train details, was Travellers Rest booked? I didn't get a refer...")
+== hotel ==
+[hotel:1] confirmation number
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[hotel:2] date
+  values: day (share 1.00); 5 mentions in 1 dialogues
+  examples:
+    "sunday" (in: "Will you try Sunday arrival?")
+    "saturday" (in: "I need a reservation for 4 nights starting Saturday.")
+[hotel:3] day
+  values: text (share 1.00); 9 mentions in 8 dialogues
+  examples:
+    "how many day" (in: "I have begun a booking for you at Avalon. How many days will you be staying?")
+    "what day" (in: "That shouldn't be a problem. What day would you like to begin your stay?")
+    "same day" (in: "Yes, for 2 nights for 5 people on the same day")
+[hotel:4] day of week
+  values: day (share 1.00); 16 mentions in 13 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+    "friday" (in: "I would like to book one starting Friday.")
+    "thursday" (in: "from Thursday.")
+[hotel:5] entity
+  values: text (share 1.00); 16 mentions in 9 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "3 star hotel" (in: "I want to stay at a 3 star hotel with free parking.")
+    "4 star hotel" (in: "Maybe. Is either one a 4 star hotel? If so, I'd like to book a room for")
+    "5 star hotel" (in: "Thank you! I am also looking for a 5 star hotel.")
+    "5-star hotel" (in: "Yes, please try 5-star hotels with free parking.")
+[hotel:6] guest house name
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "aylesbray lodge" (in: "would also like to book at a guest house named Aylesbray Lodge, starting Monday.")
+[hotel:7] hotel name
+  values: text (share 1.00); 21 mentions in 12 dialogues
+  examples:
+    "hotel" (in: "Can you please confirm that the hotel you've booked for us offers free wi-fi?...")
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+    "the acorn guest house" (in: "The Acorn Guest House is moderately-priced, in the north. They offer free wif...")
+    "the ashley hotel" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+[hotel:8] location
+  values: text (share 1.00); 25 mentions in 12 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+    "worth house" (in: "...guesthouse with free internet and free parking, Worth House is a good choice.")
+    "156 chesterton road" (in: "Yes, hamilton lodge is located on 156 chesterton road.")
+    "any area" (in: "have any 4 stars in the moderate price range in any area?")
+[hotel:9] location part
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+    "city centre north b and b" (in: "Okay! Would you like to stay at City Centre North B and B, or at Worth House?")
+    "north part of cambridge" (in: "...'m hoping to find a guesthouse in the north part of Cambridge. Are there any?")
+    "north part of town" (in: "... priced 2-star hotel in the north part of town. It offers free wifi and fr...")
+    "northern part of town" (in: "The hotel is found in the Northern part of town and it is in the moderate pri...")
+[hotel:10] num days
+  values: number (share 1.00); 16 mentions in 11 dialogues
+  examples:
+    "2 night" (in: "I will arrive Friday and be there for 2 nights.")
+    "3 night" (in: "I will be staying for 3 nights.")
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+    "5 night" (in: "Please book it for 5 people and 5 nights starting from wednesday.")
+    "6 people" (in: "I'd like 3 nights for 6 people, please.")
+[hotel:11] num nights
+  values: number (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "1 person" (in: "Great can you book that for 1 person for 3 nights starting friday?")
+    "3 day" (in: "Neither hotel appears to have three days available starting on Sunday for thr...")
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+[hotel:12] num people
+  values: number (share 0.85); 13 mentions in 9 dialogues
+  examples:
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+    "2 star" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+    "3 star" (in: "...ere are two expensive hotels with 3 stars and parking. Do you prefer the c...")
+    "4 people" (in: "Sure, I need a reservation for 4 people and 2 nights starting on Monday please.")
+[hotel:13] party size
+  values: number (share 0.67); 15 mentions in 10 dialogues
+  examples:
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+    "how many people" (in: "OK, and how many people will be staying in the room?")
+    "11" (in: "Sorry, you are right. We actually have 11 to choose from.")
+    "4" (in: "book it for the same day for a party of 4 for 4 nights.")
+    "4 other people" (in: "...north? I plan on staying with 4 other people for 4 nights, starting wednes...")
+[hotel:14] phone number
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "01223355017" (in: "Sure, the phone number is 01223355017. How many days will you be staying, wha...")
+[hotel:15] postcode
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cb41er" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+[hotel:16] price range
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "moderately priced" (in: "...n your selected region. It's moderately priced and includes free internet ...")
+    "moderately-priced" (in: "The Acorn Guest House is moderately-priced, in the north. They offer free wif...")
+    "price per night" (in: "book it for me. By the way, what is the price per night?")
+    "reasonable price" (in: "alexander bed and breakfast but need to be in a reasonable price.")
+    "something expensive" (in: "I'm looking for something expensive in the north.")
+[hotel:17] price range str
+  values: text (share 1.00); 14 mentions in 8 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+    "cheap price range" (in: "...ooking to book a guesthouse in the cheap price range that includes free wifi.")
+    "cheaper price range" (in: "...also like a guesthouse in the cheaper price range. Can you help me with that?")
+    "expensive hotel" (in: "...ld you try and book a 4 star, expensive hotel for 3 nights, starting on Sa...")
+[hotel:18] reference number
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples:
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+    "72ycmlxx" (in: "...fectly. Your reference number is 72YCMLXX. Is there anything else I can he...")
+    "cul9vz04" (in: "...ches Bed and Breakfast. Reference number is CUL9VZ04. Is there anything else?")
+    "fc2bdic9" (in: "Booking was successful. Reference number is : FC2BDIC9.")
+    "fcqzw2ot" (in: "...booked, your reference number is FCQZW2OT. Can I help you with anything else?")
+[hotel:19] reservation number
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[hotel:20] start date
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "avalon" (in: "I have begun a booking for you at Avalon. How many days will you be staying?")
+[hotel:21] str
+  values: text (share 1.00); 9 mentions in 6 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+    "cambridge towninfo centre" (in: "...in. Thanks for contacting the Cambridge TownInfo Centre and have a great day!")
+[hotel:22] str2
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[hotel:23] train id
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "tr8167" (in: "Yes please, for 4 people. How about the TR8167 please.")
+== restaurant ==
+[restaurant:1] address
+  values: id (share 0.50); 10 mentions in 8 dialogues
+  examples:
+    "100 mill rd" (in: "Phone is 01223311911 postcode is cb12as and they are at 100 Mill Rd City Centre")
+    "4 - 6 rose crescent" (in: "Certainly. They're at 4 - 6 Rose Crescent. Their number is 01223464550. I can...")
+    "6 lensfield road" (in: "is an excellent choice for british food. The address is 6 Lensfield Road.")
+    "7 milton road" (in: "The Nirala is located at 7 Milton Road Chesterton, cb41uy. How else can I hel...")
+    "7 milton street" (in: "The Nirala is located at 7 Milton Street Chesterton.")
+[restaurant:2] cuisine
+  values: text (share 1.00); 9 mentions in 6 dialogues
+  examples:
+    "chinese" (in: "I have five places. Do you prefer, Italian, Chinese, Mexican or Indian?")
+    "chinese place" (in: "I would like a suggestion of a moderately priced Chinese place.")
+    "indian" (in: "have five places. Do you prefer, Italian, Chinese, Mexican or Indian?")
+    "indian food" (in: "Yes. I would like to eat Indian food.")
+    "italian" (in: "I have five places. Do you prefer, Italian, Chinese, Mexican or Indian?")
+[restaurant:3] date
+  values: day (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+[restaurant:4] day of week
+  values: day (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "sunday" (in: "they would have a table for 7 at 17:45 on Sunday?")
+    "monday" (in: "would like to book for 7 people at 15:00 on monday if possible.")
+    "wednesday" (in: "you make a reservation for 6 people at 12:15 on wednesday?")
+    "friday" (in: "you book me a table for 4 at 16:15 on Friday?")
+[restaurant:5] location
+  values: text (share 1.00); 53 mentions in 23 dialogues
+  examples:
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+    "chesterton" (in: "...alace located at 68 Histon Road Chesterton. Would you like a reservation a...")
+    "cambridge" (in: "I'm hoping to find a french restaurant in Cambridge.")
+    "hotel" (in: "place to dine in the same price range as the hotel.")
+    "table" (in: "Yes I have three. When would you like the table reserved for and for how many?")
+[restaurant:6] location abbrev
+  values: text (share 1.00); 9 mentions in 7 dialogues
+  examples:
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+    "center" (in: "... is one African restuarant in the Center. It is named Bedouin, and is expe...")
+[restaurant:7] location area
+  values: text (share 1.00); 17 mentions in 12 dialogues
+  examples:
+    "south" (in: "I have 9 different restaurants in the south. Lets try to narrow it down. Do y...")
+    "north part of town" (in: "...nd a good restaurant in the north part of town that serves Australasian food?")
+    "south side of town" (in: "...ing for a restaurant on the south side of town that serves international f...")
+    "west" (in: "I'm looking for things to do in the west. Can you recommend anything?")
+    "west part of town" (in: "Any type of food, just cheap in the west part of town.")
+[restaurant:8] location str
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "centre of town" (in: "I want to find an expensive restaurant in the centre of town.")
+    "center of town" (in: "... students and located near the center of town; can you make a recommendation?")
+[restaurant:9] num
+  values: number (share 1.00); 11 mentions in 8 dialogues
+  examples:
+    "3" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "4" (in: "Please book a table for 4 at 15:15 on wednesday.")
+    "2" (in: "There are two. Both are expensive. One is in the north and")
+    "10 choice" (in: "There are 10 choices and we have cheap, moderate and expensive options, any p...")
+    "4 people" (in: "...ght, now have a reservation for four people at the Tandoori Palace at 3:15...")
+[restaurant:10] phone number
+  values: number (share 0.79); 19 mentions in 16 dialogues
+  examples:
+    "01223367660" (in: "...xpensive. Their phone number is 01223367660. Would you like me to book for...")
+    "01223 249955" (in: "is C.B 1, 9 H.X, and their phone number is 01223 249955.")
+    "01223 360966" (in: "...phone number for the Nirala is 01223 360966. Is there anything else I can ...")
+    "01223276182" (in: "... in city centre, the phone # is 01223276182, and the postcode is cb30df. w...")
+    "01223311911" (in: "...t asian oriental food! Phone is 01223311911 postcode is cb12as and they ar...")
+[restaurant:11] postcode
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[restaurant:12] price
+  values: text (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "moderate price range" (in: "...estaurant in the north with a moderate price range? Any type of food will do.")
+[restaurant:13] price range
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "north" (in: "... Both are expensive. One is in the north and one is in the centre. Do you ...")
+[restaurant:14] price range str
+  values: text (share 1.00); 18 mentions in 15 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "expensive price range" (in: "is in the centre of town and is in the expensive price range.")
+    "cheap" (in: "There are 10 choices and we have cheap, moderate and expensive options, any p...")
+    "cheap price range" (in: "...t part of town and is in the cheap price range. Would you like their infor...")
+    "entry fee" (in: "The address is regent street and there is no entry fee.")
+[restaurant:15] reference number
+  values: id (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "42xedgdf" (in: "...booked. Your reference number is 42XEDGDF. Is there anything else I can he...")
+    "bpe8lvha" (in: "Cocum restaurant on Monday at 15:00. The reference number is BPE8LVHA.")
+    "cul9vz04" (in: "...ble, and the reference number is CUL9VZ04. Is there anything else I can he...")
+    "ddlkgevp" (in: "will be reserved for 15 minutes. Reference number is : DDLKGEVP.")
+    "hcy10a2z" (in: "I was able to book restaurant alimentum reference number is HCY10A2Z")
+[restaurant:16] reservation time
+  values: duration (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+[restaurant:17] restaurant name
+  values: text (share 1.00); 60 mentions in 26 dialogues
+  examples:
+    "restaurant" (in: "what is the food type of that restaurant ?")
+    "anatolia" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "graffiti" (in: "I'm also looking to eat at a restaurant called graffiti.")
+    "bedouin" (in: "...uarant in the Center. It is named Bedouin, and is expensive. Their phone n...")
+    "cocum restaurant" (in: "...specifically looking for the Cocum restaurant, I would like to book for 7 ...")
+[restaurant:18] str
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "moderately price" (in: "One of them is cheap and the other is moderately price.")
+[restaurant:19] time int
+  values: time (share 1.00); 25 mentions in 16 dialogues
+  examples:
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+    "18:00" (in: "I be able to get a table there Thursday at 18:00 for 7?")
+    "10:00" (in: "How about 10:00 on the same day as before?")
+    "15:00" (in: "restaurant, I would like to book for 7 people at 15:00 on monday if possible.")
+    "17:45" (in: "check if they would have a table for 7 at 17:45 on Sunday?")
+[restaurant:20] time str
+  values: number (share 0.75); 12 mentions in 8 dialogues
+  examples:
+    "6 people" (in: "Can you make a reservation for 6 people at 12:15 on wednesday?")
+    "7" (in: "Can you check if they would have a table for 7 at 17:45 on Sunday?")
+    "11:15" (in: "Can you try booking it for 11:15?")
+    "11:00" (in: "to book one for the same group of people at 11:00 on the same day as before.")
+    "2 people" (in: "I want a reservation for 2 people at 17:30 on thursday. Sorry, I don't know w...")
+[restaurant:21] venue name
+  values: text (share 1.00); 7 mentions in 4 dialogues
+  examples:
+    "cherry hinton" (in: "...It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode...")
+    "thanh binh" (in: "Thanh binh is located in the west part of town and is")
+    "64 cherry hinton road" (in: "...ndoori which is located on 64 Cherry Hinton Road. Would you like me to boo...")
+
+Return the JSON object now.
