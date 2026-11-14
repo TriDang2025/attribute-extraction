@@ -1,0 +1,67 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 4 of 4 (20 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: guesthouse, hotel, acorn guest house; 2 night, 4 night, 5 night; wednesday, friday, sunday
+- E2: centre, centre of town, centre area; cb23bu, cb17gx, cb18dw; 01223307402, 01223314960, 01223333516
+- E3: moderately priced, moderate price range, expensive; restaurant, j restaurant, danish restaurant; centre, city centre, center of town
+- E4: 14:45, 19:15, 06:45; 07048450899, 07128258422, 07267142867; restaurant, hotel, j restaurant
+
+### E0#15  (mentions 3, distinct values 2)
+Examples:
+- E0#15:0 [system] previous turn, user: I'd like the price and travel time, please? | turn: Sure! The fare is 12.80 pounds and the travel time is [[49 minutes]]. Is there anything else I can help you with today?
+- E0#15:1 [system] previous turn, user: What is the exact travel time on the TR5435? | turn: The total travel time will be [[163 minutes]]. Is there anything else I can help you with today?
+- E0#15:2 [system] previous turn, user: What's the total travel time for the TR2515 ? | turn: The total travel time is [[49 minutes]].
+
+### E0#16  (mentions 5, distinct values 1)
+Examples:
+- E0#16:0 [user] previous turn, system: This restaurant is of the moderate price range. Would you like to book a table? | turn: No thanks, but I do need some train info. I'll be leaving from [[Peterborough]] on Tuesday, sometime after 15:15.
+- E0#16:1 [user] previous turn, system: Your booking was successful! Your reference number is EV4ADBI9. | turn: I want a train that goes to [[peterborough]] and leaves after 13:00
+- E0#16:2 [user] previous turn, system: I sure can. Which stations will you be using? | turn: I need to get to Cambridge from [[Peterborough]] by 13:15 on the the same day as my reservation.
+- E0#16:3 [system] previous turn, user: No thanks, but I do need some train info. I'll be leaving from Peterborough on Tuesday, sometime after 15:15. | turn: The TR5933 leaves [[peterborough]] at 15:19.
+- E0#16:4 [system] previous turn, user: Does it leave on Monday? | turn: Train TR3154 leaves cambridge at 13:06 and will arrive at [[peterborough]] at 13:56 on Monday. Would you like me to book a ticket?
+
+### E0#17  (mentions 5, distinct values 2)
+Examples:
+- E0#17:0 [user] previous turn, system: Ok I have a total of 1,365 entries that leave after that time. Do you have a specific day or destination you would like to select ? | turn: I need to go to [[Birmingham new street]] on Monday.
+- E0#17:1 [user] previous turn, system: No problem! Where will you be going to and on what day? | turn: I'd like to go to london [[liverpool street]] on Sunday. I need to get there by 21:00.
+- E0#17:2 [user] previous turn, system: In order to find a train I need to know where you are departing from and which day. | turn: I'm departing from [[birmingham new street]] on Saturday and I'd like to leave after 12:45.
+- E0#17:3 [system] previous turn, user: I need to go to Birmingham new street on Monday. | turn: I would recommend train ID TR5435 which leaves Cambridge at 15:02 and arrives at [[Birmingham New Street]] at 17:44.
+- E0#17:4 [system] previous turn, user: I'm departing from birmingham new street on Saturday and I'd like to leave after 12:45. | turn: How about TR8390 that leaves [[birmingham new street]] at 13:40 on Saturday. It arrives in cambridge at 16:23. The price is 60.08. Shall I book it?
+
+### E0#18  (mentions 2, distinct values 2)
+Examples:
+- E0#18:0 [system] previous turn, user: Yes can I please get that? | turn: I am sorry. Do you want info or to book the train? The cost is [[17.90]] per ticket.
+- E0#18:1 [system] previous turn, user: I'm departing from birmingham new street on Saturday and I'd like to leave after 12:45. | turn: How about TR8390 that leaves birmingham new street at 13:40 on Saturday. It arrives in cambridge at 16:23. The price is [[60.08]]. Shall I book it?
+
+### E0#19  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#19:0 [system] previous turn, user: No thanks, but I do need some train info. I'll be leaving from Peterborough on Tuesday, sometime after 15:15. | turn: [[The TR5933]] leaves peterborough at 15:19.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#15, E0#16, E0#17, E0#18, E0#19) and its name as the value, like {"E0#15": "<name>"}.

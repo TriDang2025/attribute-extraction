@@ -1,0 +1,64 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E2: batch 11 of 12 (57 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E2#50  (mentions 4, distinct values 1, low confidence)
+Examples:
+- E2#50:0 [system] previous turn, user: Tell me the address of the moderately priced one. | turn: The Nirala is located at 7 Milton Street [[Chesterton]].
+- E2#50:1 [system] previous turn, user: Okay, thanks! Can you please give me the postcode and address? | turn: The Nirala is located at 7 Milton Road [[Chesterton]], cb41uy. How else can I help you today?
+- E2#50:2 [system] previous turn, user: Sure, how about one that serves indian food in that area. | turn: There are 5 results for restaurants serving indian food, the first is tandoori palace located at 68 Histon Road [[Chesterton]]. Would you like a reservation and for how many?
+- E2#50:3 [system] previous turn, user: Yes. I would like to eat Indian food. | turn: The tandoori palace meets your criteria. It is located at 68 Histon Road [[Chesterton]].
+
+### E2#51  (mentions 2, distinct values 2)
+Examples:
+- E2#51:0 [system] previous turn, user: Staying in the centre would be more convenient. What are my choices? | turn: How about [[cafe uno]] or don pasquale pizzeria?
+- E2#51:1 [system] previous turn, user: No, I don't, actually. Surprise me with the type of food and give me the restaurant's address. | turn: [[The oak bistro]] is an excellent choice for british food. The address is 6 Lensfield Road.
+
+### E2#52  (mentions 1, distinct values 1)
+Examples:
+- E2#52:0 [system] previous turn, user: No, I don't, actually. Surprise me with the type of food and give me the restaurant's address. | turn: The oak bistro is an excellent choice for british food. The address is [[6 Lensfield Road]].
+
+### E2#53  (mentions 4, distinct values 2)
+Examples:
+- E2#53:0 [system] previous turn, user: What is the phone number? | turn: The phone number for the [[Nirala]] is 01223 360966. Is there anything else I can help you with?
+- E2#53:1 [system] previous turn, user: Okay, thanks! Can you please give me the postcode and address? | turn: [[The Nirala]] is located at 7 Milton Road Chesterton, cb41uy. How else can I help you today?
+- E2#53:2 [system] previous turn, user: Oooh. I like both of those. Which would you recommend? | turn: I think you will have a great time picking a dish at the [[nirala]] which serves indian.
+- E2#53:3 [system] previous turn, user: Tell me the address of the moderately priced one. | turn: [[The Nirala]] is located at 7 Milton Street Chesterton.
+
+### E2#54  (mentions 2, distinct values 2)
+Examples:
+- E2#54:0 [system] previous turn, user: Okay, thanks! Can you please give me the postcode and address? | turn: The Nirala is located at [[7 Milton Road]] Chesterton, cb41uy. How else can I help you today?
+- E2#54:1 [system] previous turn, user: Tell me the address of the moderately priced one. | turn: The Nirala is located at [[7 Milton Street]] Chesterton.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E2#50, E2#51, E2#52, E2#53, E2#54) and its name as the value, like {"E2#50": "<name>"}.
