@@ -1,0 +1,48 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key. The candidates are columns whose values are (almost) all different, so one of them may identify a row. Answer with the id of
+one candidate, or "none" when no candidate identifies a row (a new id column is then added); then give the name of the new key column in
+new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "none" only when no column can do this.
+Candidates: restaurant:1
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "none", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table event (one row = one event), 6 columns:
+[train:3] day of week str
+  values: day (share 0.58); 71 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+[train:14] travel time
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "travel time" (in: "yes, what is the travel time, train ID and price please per ticket")
+    "traveller rest" (in: "...e with the train details, was Travellers Rest booked? I didn't get a refer...")
+[hotel:15] postcode
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cb41er" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+[restaurant:4] day of week
+  values: day (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "sunday" (in: "they would have a table for 7 at 17:45 on Sunday?")
+    "monday" (in: "would like to book for 7 people at 15:00 on monday if possible.")
+[restaurant:3] date
+  values: day (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+[restaurant:1] address
+  values: id (share 0.50); 10 mentions in 8 dialogues
+  examples:
+    "100 mill rd" (in: "Phone is 01223311911 postcode is cb12as and they are at 100 Mill Rd City Centre")
+    "4 - 6 rose crescent" (in: "Certainly. They're at 4 - 6 Rose Crescent. Their number is 01223464550. I can...")
+
+Return the JSON object now.

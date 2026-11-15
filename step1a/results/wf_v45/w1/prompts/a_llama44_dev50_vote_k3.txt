@@ -1,0 +1,34 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key. The candidates are columns whose values are (almost) all different, so one of them may identify a row. Answer with the id of
+one candidate, or "none" when no candidate identifies a row (a new id column is then added); then give the name of the new key column in
+new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "none" only when no column can do this.
+Candidates: restaurant:1
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "none", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table event (one row = one event), 3 columns:
+[train:3] day of week str
+  values: day (share 0.58); 71 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+[train:10] time int
+  values: time (share 1.00); 32 mentions in 18 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "05:54" (in: "There are 10 trains, TR9448 leaves at 5:54 would that work for you?")
+[restaurant:1] address
+  values: id (share 0.50); 10 mentions in 8 dialogues
+  examples:
+    "100 mill rd" (in: "Phone is 01223311911 postcode is cb12as and they are at 100 Mill Rd City Centre")
+    "4 - 6 rose crescent" (in: "Certainly. They're at 4 - 6 Rose Crescent. Their number is 01223464550. I can...")
+
+Return the JSON object now.

@@ -1,0 +1,92 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key. The candidates are columns whose values are (almost) all different, so one of them may identify a row. Answer with the id of
+one candidate, or "none" when no candidate identifies a row (a new id column is then added); then give the name of the new key column in
+new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "none" only when no column can do this.
+Candidates: restaurant:1
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "none", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table event (one row = one event), 15 columns:
+[train:3] day of week str
+  values: day (share 0.58); 71 mentions in 28 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+[train:7] location capitalized
+  values: text (share 1.00); 37 mentions in 23 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "leicester" (in: "I need to go from leicester to cambridge.")
+[train:9] time
+  values: time (share 1.00); 57 mentions in 24 dialogues
+  examples:
+    "19:30" (in: "bishops stortford on Monday. I would like to leave after 19:30.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+[train:10] time int
+  values: time (share 1.00); 32 mentions in 18 dialogues
+  examples:
+    "12:00" (in: "like to leave on Thursday and arrive no later than 12:00.")
+    "05:54" (in: "There are 10 trains, TR9448 leaves at 5:54 would that work for you?")
+[train:11] time str
+  values: id (share 0.85); 59 mentions in 28 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+[train:13] train id
+  values: time (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "23:12" (in: "...16 and the trainID that departs at 2312 is TR6387. Would you like me to bo...")
+[hotel:5] entity
+  values: text (share 1.00); 16 mentions in 9 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "3 star hotel" (in: "I want to stay at a 3 star hotel with free parking.")
+[hotel:8] location
+  values: text (share 1.00); 25 mentions in 12 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+[hotel:9] location part
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+    "city centre north b and b" (in: "Okay! Would you like to stay at City Centre North B and B, or at Worth House?")
+[hotel:23] train id
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "tr8167" (in: "Yes please, for 4 people. How about the TR8167 please.")
+[restaurant:1] address
+  values: id (share 0.50); 10 mentions in 8 dialogues
+  examples:
+    "100 mill rd" (in: "Phone is 01223311911 postcode is cb12as and they are at 100 Mill Rd City Centre")
+    "4 - 6 rose crescent" (in: "Certainly. They're at 4 - 6 Rose Crescent. Their number is 01223464550. I can...")
+[restaurant:5] location
+  values: text (share 1.00); 53 mentions in 23 dialogues
+  examples:
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+    "chesterton" (in: "...alace located at 68 Histon Road Chesterton. Would you like a reservation a...")
+[restaurant:6] location abbrev
+  values: text (share 1.00); 9 mentions in 7 dialogues
+  examples:
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+    "center" (in: "... is one African restuarant in the Center. It is named Bedouin, and is expe...")
+[restaurant:7] location area
+  values: text (share 1.00); 17 mentions in 12 dialogues
+  examples:
+    "south" (in: "I have 9 different restaurants in the south. Lets try to narrow it down. Do y...")
+    "north part of town" (in: "...nd a good restaurant in the north part of town that serves Australasian food?")
+[restaurant:8] location str
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "centre of town" (in: "I want to find an expensive restaurant in the centre of town.")
+    "center of town" (in: "... students and located near the center of town; can you make a recommendation?")
+
+Return the JSON object now.

@@ -1,0 +1,62 @@
+CREATE TABLE "train" (
+  "travel time" INTERVAL,
+  "time int" TIME,
+  "number of people" INTEGER,
+  "destination" TEXT,
+  "price" NUMERIC(10, 2),
+  "train name" TEXT,
+  PRIMARY KEY ("number of people")
+);
+
+CREATE TABLE "hotel" (
+  "reference number" INTEGER,
+  "checkin date" TEXT,
+  "num" INTEGER,
+  "amenity part" TEXT,
+  "day" TEXT,
+  "str" TEXT,
+  "time" TIME,
+  "amenity str" TEXT,
+  "phone number" INTEGER,
+  "num people" INTEGER,
+  "hotel rating" INTEGER,
+  "location" TEXT,
+  "price range" TEXT,
+  "hotel name" TEXT,
+  "day of week" TEXT,
+  "entity name" TEXT,
+  "lodging type" TEXT,
+  "type" TEXT,
+  "rating" TEXT,
+  "location part" TEXT,
+  "location name" TEXT,
+  "address" TEXT,
+  PRIMARY KEY ("address")
+);
+
+CREATE TABLE "restaurant" (
+  "departure day" TEXT,
+  "time str" TIME,
+  "date" TEXT,
+  "confirmation number" INTEGER,
+  "price" TEXT,
+  "number of colleges" INTEGER,
+  "price range" TEXT,
+  "party size" INTEGER,
+  "date (restaurant:3)" TEXT,
+  "location str" TEXT,
+  "str" TEXT,
+  "cuisine" TEXT,
+  "num options" INTEGER,
+  "location" TEXT,
+  "time" TIME,
+  "table booking" TEXT,
+  "phone number" INTEGER,
+  "postcode" INTEGER,
+  "table reservation time" TIME,
+  "restaurant info" TEXT,
+  "reference number" INTEGER,
+  "num people" INTEGER,
+  "restaurant name" TEXT,
+  PRIMARY KEY ("reference number")
+);

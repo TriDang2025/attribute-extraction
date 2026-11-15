@@ -1,0 +1,102 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key. The candidates are columns whose values are (almost) all different, so one of them may identify a row. Answer with the id of
+one candidate, or "none" when no candidate identifies a row (a new id column is then added); then give the name of the new key column in
+new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "none" only when no column can do this.
+Candidates: hotel:16, hotel:18
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "none", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table hotel (one row = one hotel), 17 columns:
+[hotel:5] entity
+  values: text (share 1.00); 16 mentions in 9 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "3 star hotel" (in: "I want to stay at a 3 star hotel with free parking.")
+[hotel:16] price range
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "moderately priced" (in: "...n your selected region. It's moderately priced and includes free internet ...")
+    "moderately-priced" (in: "The Acorn Guest House is moderately-priced, in the north. They offer free wif...")
+[hotel:3] day
+  values: text (share 1.00); 9 mentions in 8 dialogues
+  examples:
+    "how many day" (in: "I have begun a booking for you at Avalon. How many days will you be staying?")
+    "what day" (in: "That shouldn't be a problem. What day would you like to begin your stay?")
+[hotel:7] hotel name
+  values: text (share 1.00); 21 mentions in 12 dialogues
+  examples:
+    "hotel" (in: "Can you please confirm that the hotel you've booked for us offers free wi-fi?...")
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+[hotel:21] str
+  values: text (share 1.00); 9 mentions in 6 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+    "cambridge towninfo centre" (in: "...in. Thanks for contacting the Cambridge TownInfo Centre and have a great day!")
+[hotel:4] day of week
+  values: day (share 1.00); 16 mentions in 13 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+[hotel:18] reference number
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples:
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+    "72ycmlxx" (in: "...fectly. Your reference number is 72YCMLXX. Is there anything else I can he...")
+[hotel:17] price range str
+  values: text (share 1.00); 14 mentions in 8 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+[hotel:11] num nights
+  values: number (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "1 person" (in: "Great can you book that for 1 person for 3 nights starting friday?")
+    "3 day" (in: "Neither hotel appears to have three days available starting on Sunday for thr...")
+[hotel:12] num people
+  values: number (share 0.85); 13 mentions in 9 dialogues
+  examples:
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+[hotel:6] guest house name
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "aylesbray lodge" (in: "would also like to book at a guest house named Aylesbray Lodge, starting Monday.")
+[hotel:2] date
+  values: day (share 1.00); 5 mentions in 1 dialogues
+  examples:
+    "sunday" (in: "Will you try Sunday arrival?")
+    "saturday" (in: "I need a reservation for 4 nights starting Saturday.")
+[hotel:10] num days
+  values: number (share 1.00); 16 mentions in 11 dialogues
+  examples:
+    "2 night" (in: "I will arrive Friday and be there for 2 nights.")
+    "3 night" (in: "I will be staying for 3 nights.")
+[hotel:8] location
+  values: text (share 1.00); 25 mentions in 12 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+[hotel:9] location part
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+    "city centre north b and b" (in: "Okay! Would you like to stay at City Centre North B and B, or at Worth House?")
+[hotel:15] postcode
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cb41er" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+[hotel:13] party size
+  values: number (share 0.67); 15 mentions in 10 dialogues
+  examples:
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+    "how many people" (in: "OK, and how many people will be staying in the room?")
+
+Return the JSON object now.
