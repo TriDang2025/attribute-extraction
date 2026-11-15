@@ -1,0 +1,40 @@
+CREATE TABLE "train" (
+  "Train leave at" TIME,
+  "Train requested people" INTEGER,
+  "Train trainid" INTEGER,
+  "Train price" NUMERIC(10, 2),
+  "Train duration" INTERVAL,
+  "Train departure" TEXT,
+  "Train arrive by" TIME,
+  "Train destination" TEXT,
+  "Train confirmed reference" INTEGER,
+  "Train day" TEXT,
+  PRIMARY KEY ("Train trainid")
+);
+
+CREATE TABLE "hotel_booking" (
+  "Hotel postcode" INTEGER,
+  "Hotel requested people" INTEGER,
+  "Hotel type" TEXT,
+  "Hotel stars" INTEGER,
+  "Hotel name" TEXT,
+  "Hotel requested day" TEXT,
+  "Hotel price range" TEXT,
+  "Hotel address" TEXT,
+  "Hotel phone" INTEGER,
+  "Hotel area" TEXT,
+  "Hotel confirmed reference" INTEGER,
+  "Hotel requested stay" INTEGER,
+  "Restaurant food" TEXT,
+  "Restaurant postcode" TEXT,
+  "Restaurant phone" INTEGER,
+  "Restaurant area" TEXT,
+  "Restaurant requested time" TIME,
+  "Restaurant confirmed reference" INTEGER,
+  "Restaurant price range" TEXT,
+  "Restaurant requested day" TEXT,
+  "Restaurant requested people" INTEGER,
+  "Restaurant address" TEXT,
+  "Restaurant name" TEXT,
+  PRIMARY KEY ("Hotel confirmed reference")
+);
