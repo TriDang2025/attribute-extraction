@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E4#25:s0": "P1", "E4#25:s1": "P2"}}
+
+Cluster E4#25 of entity E4 (mentions 19, distinct values 1).
+Examples:
+- E4#25:s0 [user] previous turn, system: OK, what are your departure and arrival stations, and what time do you want to travel? | turn: I'd like to go to Cambridge via [[Broxbourne]]. I'd like to leave on Thursday and arrive no later than 12:00.
+- E4#25:s1 [user] previous turn, system: I show 404 rail departures on Thursday, can I get something specific for you? | turn: I'm going from cambridge to [[broxbourne]] any time after 09:15.
+- E4#25:s2 [user] turn: I need a train from [[broxbourne]] on Tuesday.
+- E4#25:s3 [user] previous turn, system: Where are you traveling to and from? | turn: I am leaving from Cambridge and headed to a wedding in [[Broxbourne]].
+- E4#25:s4 [user] turn: I'm planning a trip and I need a train departing from [[broxbourne]] on thursday.
+- E4#25:s5 [user] previous turn, system: There are 19 trains to broxbourne on Monday leaving every hour starting at 05:01. Is there a specific time you'd like? | turn: I would like to arrive in [[broxbourne]] by 13:00.
+- E4#25:s6 [user] turn: I'm looking for a train. The train should depart from cambridge and should go to [[broxbourne]]
+- E4#25:s7 [user] turn: I want a train that is leaving from [[broxbourne]].
+- E4#25:s8 [user] previous turn, system: Your table was booked. Your reference number is 42XEDGDF. Is there anything else I can help you with? | turn: I also need a Friday train to [[Broxbourne]].
+- E4#25:s9 [user] previous turn, system: Yes the phone number to the acorn guest house 01223353888 with a price range of moderate | turn: I am also look for a train on saturday to [[broxbourne]].
+- E4#25:s10 [system] previous turn, user: I am also looking for a train that goes to broxbourne on monday. | turn: There are 19 trains to [[broxbourne]] on Monday leaving every hour starting at 05:01. Is there a specific time you'd like?
+- E4#25:s11 [system] previous turn, user: Can I just get the price on one of them? | turn: All tickets from cambridge to [[broxbourne]] on that day cost 17.90 pounds each.
+- E4#25:s12 [user] previous turn, system: no train are available for the destination | turn: Can you please check again? From Cambridge to [[Broxbourne]], Wednesday after 8:30.
+- E4#25:s13 [system] previous turn, user: I want a train that is leaving from broxbourne. | turn: There is a train leaving from [[Broxbourne]] to Cambridge on Friday at 5:32 and will arrive there at 6:32.
+- E4#25:s14 [system] previous turn, user: I am also look for a train on saturday to broxbourne. | turn: There are several trains headed to [[broxbourne]]. What time of day would you like to leave?
+- E4#25:s15 [system] previous turn, user: I would like to arrive in broxbourne by 13:00. | turn: The one arriving closest to 13:00 is TR5971 leaving cambridge at 11:01 and arrives by 12:01 in [[broxbourne]]. Would you like to book a ticket?
+
+Return the JSON object now.

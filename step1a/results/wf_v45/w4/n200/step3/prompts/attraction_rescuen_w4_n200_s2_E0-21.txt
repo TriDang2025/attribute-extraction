@@ -1,0 +1,49 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 1 of 1 (1 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:45, 13:15, 12:15
+- E2: guesthouse, hotel, ashley hotel; 2 night, 4 night, 5 night; moderate price range, moderately priced, cheap
+- E3: 13:15, 13:30, 02:45; restaurant, hotel, museum; 07015859463, 07032807056, 07048450899
+- E4: 13:00, 18:45, 13:15; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+
+Names already used for this entity (use one of them when the cluster holds the same kind of value with the same role): address, attraction, attraction_info, attraction_name, attraction_type, cinema_name, college_name, departure_time, destination, entrance_fee, fee, location, museum_name, name, nightclub, number_of_attractions, number_of_museums, phone_number, restaurant_name, stay_duration, swimming_pool, theatre_location, theatre_name
+
+### E0#21  (mentions 37, distinct values 16, low confidence)
+Examples:
+- E0#21:0 [system] previous turn, user: How about the postcode and attraction type for Byard Art? | turn: Postcode, cb21sj, and the type is [[museum]]. Is there anything else I may help you with?
+- E0#21:1 [user] previous turn, system: I can definitely help you with that. Is there a specific type of attraction you are interested in or section of the city you were looking at? | turn: I'm looking for a [[theatre]] in any part of the city. Can you recommend one?
+- E0#21:2 [system] previous turn, user: Okay thanks. I'd like some information about a place to go next. | turn: There are many attractions in town. What type are you looking for - architecture, [[cinema]], or a college perhaps?
+- E0#21:3 [user] previous turn, system: There are all kinds of entertainment choices. Did you have something in mind? | turn: No, just an entertainment attraction in the same area as the [[restaurant]]. Can you make a suggestion?
+- E0#21:4 [system] previous turn, user: Is there anything interesting to see in the centre of town? | turn: In addition to [[architecture]], colleges, and museums, we also have boat attractions, nightclubs, and theatres in the centre.
+- E0#21:5 [system] previous turn, user: Can you help me to locate a free attraction near the hotel? | turn: There are many in the centre of town,what type are you looking for a [[church]],or swimming or a park ?
+- E0#21:6 [user] previous turn, system: There are two museums nearby, would you like more details about them? | turn: Yes I would like more information on [[both museums]].
+- E0#21:7 [system] previous turn, user: Hi, what are some fun attractions in west Cambridge? | turn: There are 13 places, colleges, [[entertainment]], and museums
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#21) and its name as the value, like {"E0#21": "<name>"}.

@@ -1,0 +1,67 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 7 of 20 (100 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:45, 13:15, 12:15
+- E2: guesthouse, hotel, ashley hotel; 2 night, 4 night, 5 night; moderate price range, moderately priced, cheap
+- E3: 13:15, 13:30, 02:45; restaurant, hotel, museum; 07015859463, 07032807056, 07048450899
+- E4: 13:00, 18:45, 13:15; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+
+### E0#22  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E0#22:0 [system] previous turn, user: I need a cinema to go to in the south. | turn: [[The cineworld cinema]] is the place!
+- E0#22:1 [system] previous turn, user: I'm going to be in the centre. Can you tell me a little about the one there? | turn: [[The Vue Cinema]] is in the centre of town. The address is The Grafton Centre on East Road, postcode cb11ps, and the phone number is 08712240240.
+
+### E0#55  (mentions 3, distinct values 2, low confidence)
+Examples:
+- E0#55:0 [system] previous turn, user: How about one that is in the type of museum? | turn: Sure, we have 11 museums in the centre area, a few are broughton house gallery, cambridge contemporary art, [[castle galleries]] and primavera. Any sound good?
+- E0#55:1 [system] previous turn, user: Yes please. | turn: [[The cafe jello gallery]] has free admission and is located at 13 magdalene street, postcode cb30af. Would you like information on any others?
+- E0#55:2 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend [[Castle Galleries]], phone number 01223307402, postal code cb23bj, address unit su43, grande arcade, saint andrews street. It is free.
+
+### E0#11  (mentions 5, distinct values 2, low confidence)
+Examples:
+- E0#11:0 [system] previous turn, user: I am looking for a museum. | turn: [[the broughton house gallery]] is a museum located in the centre.
+- E0#11:1 [system] previous turn, user: How about one that is in the type of museum? | turn: Sure, we have 11 museums in the centre area, a few are [[broughton house gallery]], cambridge contemporary art, castle galleries and primavera. Any sound good?
+- E0#11:2 [system] previous turn, user: im looking for a museum in the centre. may i also have the postcode and phone number for them as well? | turn: [[The Broughton house gallery]] is in the centre. It's postcode is cb11ln. The phone number is 01223314960. Is there anything else I can help you with?
+- E0#11:3 [user] turn: I'm looking for information on [[Broughton house gallery]].
+- E0#11:4 [system] previous turn, user: Can I get a postcode, entrance fee, and address of one of them? | turn: [[The Broughton House Gallery]] is located at 98 King Street, cb11ln. Their phone number is 01223314960, and it's free to get in.
+
+### E0#87  (mentions 1, distinct values 1)
+Examples:
+- E0#87:0 [system] previous turn, user: Could you recommend something? | turn: Yes, [[the funky fun house]] is a great place.
+
+### E0#31  (mentions 5, distinct values 3)
+Examples:
+- E0#31:0 [system] previous turn, user: Well, maybe try a swimming pool. That might be better. | turn: [[Parkside pools]] is available, address gonville place, postal cb11ly, prices vary by season and day, but you can call 01223446100 for more info. Any further questions?
+- E0#31:1 [user] previous turn, system: Booking is confirmed. Reference number is : I57N7Y29. May I assistance you with any additional assistance? | turn: What are some attractions on the east side? Is there a [[swimming pool]] available?
+- E0#31:2 [system] previous turn, user: Can you help me to locate a free attraction near the hotel? | turn: There are many in the centre of town,what type are you looking for a church,or [[swimming]] or a park ?
+- E0#31:3 [system] previous turn, user: I am not entirely sure. What would you recommend? | turn: Are you interested in archaeology? Our Museum of Archaelogy and Anthropology might interest you. Or if you want to exercise, [[Parkside Pools]] would be a fun venue.
+- E0#31:4 [user] previous turn, system: There is no multiple sports attraction in the centre but there is one in the east. Are you interested? | turn: Well, maybe try a [[swimming pool]]. That might be better.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#22, E0#55, E0#11, E0#87, E0#31) and its name as the value, like {"E0#22": "<name>"}.

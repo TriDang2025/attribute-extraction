@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#10/3: name: time int | description: time
+Examples:
+- 1 [system] previous turn, user: Thank you that sounds like a great place. | turn: I have booked your reservation for restaurant one seven on Saturday at [[12:00]]. Your reference number is DYSZRX2B. Do you need any other assistance?
+- 2 [system] previous turn, user: Please book a table for 4 at the Chinese place at 12:30 on Sunday and give me the reference number. | turn: Okay you're all set for Sunday at [[12:30]]. Your reference number is F5BTP63A. Can I help you find anything else?
+- 3 [user] previous turn, system: Yes, I have 5 places. What about cotto? | turn: Cotto is fine. I want to book a table for 1 person at [[12:00]] on Sunday.
+- 4 [user] previous turn, system: There are two restaurants fitting your description, one is Chinese cuisine and one is Indian cuisine. Do you have a preference? | turn: Please book a table for 4 at the Chinese place at [[12:30]] on Sunday and give me the reference number.
+- 5 [system] previous turn, user: Cotto is fine. I want to book a table for 1 person at 12:00 on Sunday. | turn: Cotto is completely booked for Saturday at [[noon]]. Could I direct you to a different restaurant?
+
+Columns (5):
+- name: time str | examples: 12:45; 13:15; 12:15
+- name: day of week | examples: wednesday; thursday; tuesday
+- name: num | examples: 2; 1; 4
+- name: location | examples: chesterton; north part of town; west part of town
+- name: time | examples: 15 minute; wednesday; thursday
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#10/3", "reason": "str", "same_as": "<column name or none>"}

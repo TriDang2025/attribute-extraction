@@ -1,0 +1,24 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E4#27:s0": "P1", "E4#27:s1": "P2"}}
+
+Cluster E4#27 of entity E4 (mentions 9, distinct values 1).
+Examples:
+- E4#27:s0 [user] previous turn, system: Hi there, let's start with the train arrival, where would you be travelling from? | turn: I am looking for a train that will depart from [[Norwich]] on Sunday
+- E4#27:s1 [user] turn: Could you help me find a train to [[norwich]]?
+- E4#27:s2 [user] previous turn, system: Sure. Where are you departing from? | turn: I'm leaving from [[Norwich]] and would like to leave after 12:15, please.
+- E4#27:s3 [user] previous turn, system: Your booking was successful, your reference number is 8JYOL10R. Is there anything else I can help you with? | turn: I also need a train leaving from [[Norwich]] and arriving at 08:30.
+- E4#27:s4 [system] previous turn, user: I will be leaving from norwich and I need to arrive by 8:15. | turn: The TR4203 is leaving from [[Norwich]] to Cambridge at 05:16. Would you like to book a ticket?
+- E4#27:s5 [user] previous turn, system: You have to keep mom happy. Where are you departing from and which day? | turn: I'm looking to travel from [[norwich]] and leaving on tuesday
+- E4#27:s6 [system] previous turn, user: I would be going to Cambridge and traveling on Friday. | turn: the TR9900 arrives at 06:35 on friday from [[norwich]] to cambridge.
+- E4#27:s7 [user] previous turn, system: There are twelve possible trains leaving after 12:15. Should I book you on one of them? | turn: I am sorry. I need the train to leave after 21:15 from [[Norwich]]. Are there any available?
+- E4#27:s8 [user] previous turn, system: Yes. There are a total of 202 trains leaving for Cambridge on Wednesday. Where will you be departing from? | turn: I will be leaving from [[norwich]] and I need to arrive by 8:15.
+
+Return the JSON object now.

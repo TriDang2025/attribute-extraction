@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E2#8:s0": "P1", "E2#8:s1": "P2"}}
+
+Cluster E2#8 of entity E2 (mentions 23, distinct values 5).
+Examples:
+- E2#8:s0 [system] previous turn, user: I would like to stay in the West | turn: I have 2 guesthouses matching your criteria. The Finches Bed and Breakfast guesthouse is [[4 stars]] and includes free parking and internet. Would you be interested in this?
+- E2#8:s1 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: The ashley hotel has [[2 stars]]. They're in the postcode cb41er.
+- E2#8:s2 [user] previous turn, system: I'm not finding any guesthouses that meet your criteria. Would you like to try a different area, price range, or stars? | turn: So you can't find a moderately priced guesthouse with [[3 stars]] and free parking anywhere in cambridge at all? Area doesn't matter. Please try again?
+- E2#8:s3 [user] previous turn, system: I have 2 guesthouses matching your criteria. The Finches Bed and Breakfast guesthouse is 4 stars and includes free parking and internet. Would you be interested in this? | turn: I am looking for a guesthouse with [[0 stars]].
+- E2#8:s4 [system] previous turn, user: Yes, please try 5-star hotels with free parking. | turn: Unfortunately, I couldn't find anything with [[5 stars]].
+- E2#8:s5 [user] previous turn, system: I don't have a 4 star in the moderate price range. Would you like me to look in a different price range? | turn: You don't have any [[4 stars]] in the moderate price range in any area?
+- E2#8:s6 [user] previous turn, system: There are actually no 1-star accommodations anywhere in Cambridge. | turn: Okay, how about [[2 stars]]? It does need to include free parking.
+- E2#8:s7 [user] previous turn, system: There isn't a guesthouse with 2 stars and free internet available. Is there another type of hotel I can look up for you? | turn: Yes, how about a guesthouse with [[3 stars]] and free wifi instead?
+- E2#8:s8 [system] previous turn, user: No, that doesn't matter, but I'd like something in the moderate price range. | turn: There are 14 options. How about the Avalon? It has [[4 stars]] and free parking and wifi.
+- E2#8:s9 [user] previous turn, system: I have 3 guesthouses all in the moderate price range. Would you like me to choose one for you? | turn: I'm sorry. I changed my mind. I don't want a guesthouse. Are there any hotels with [[2 stars]]?
+- E2#8:s10 [system] previous turn, user: I want to stay at a 3 star hotel with free parking. | turn: I'm sorry for the confusion. There are two expensive hotels with [[3 stars]] and parking. Do you prefer the centre or the south?
+- E2#8:s11 [system] previous turn, user: I want it to be located in the centre. | turn: Great! I have two guesthouses in the Centre area; Alexander Bed and Breakfast with [[4 stars]] and El Shaddai with 0. Would you like more information on either one?
+- E2#8:s12 [system] previous turn, user: No, but I need free wifi and I would like a 2 star guesthouse please. | turn: There isn't a guesthouse with [[2 stars]] and free internet available. Is there another type of hotel I can look up for you?
+- E2#8:s13 [user] previous turn, system: Parkside pools is gonville place. The area is the centre and phone number is 01223446100. | turn: I also need a place to stay, it should be [[4 stars]], in the north and include free wifi.
+- E2#8:s14 [system] previous turn, user: I need help finding a hotel called Archway House. Can you help me? | turn: Archway House is a moderately priced guesthouse on the north end. It is ranked [[4 stars]], and offers both free wifi and free parking.
+- E2#8:s15 [system] previous turn, user: A guesthouse in the north should be perfect. | turn: How about the Acorn Guest House in the north? It's [[4 stars]] and a moderate price. I would be happy to help you with a reservation.
+
+Return the JSON object now.

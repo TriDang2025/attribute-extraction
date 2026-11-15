@@ -1,0 +1,58 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 11 of 20 (100 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:45, 13:15, 12:15
+- E2: guesthouse, hotel, ashley hotel; 2 night, 4 night, 5 night; moderate price range, moderately priced, cheap
+- E3: 13:15, 13:30, 02:45; restaurant, hotel, museum; 07015859463, 07032807056, 07048450899
+- E4: 13:00, 18:45, 13:15; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+
+### E0#3  (mentions 1, distinct values 1)
+Examples:
+- E0#3:0 [system] previous turn, user: Yes. May I have the address and postcode for the Abbey Pool please? | turn: Yes, of course. They are located at Pool Way, [[Whitehill Road]], off NewMarket Road. Their postcode is cb58nt. Is there anything else I can do for today?
+
+### E0#35  (mentions 2, distinct values 1)
+Examples:
+- E0#35:0 [system] previous turn, user: No thanks, I just need the address please. | turn: There address is [[Hotel Felix Whitehouse Lane]] Huntingdon Road postcode cb30lx. Is there anything else I can assist you with today?
+- E0#35:1 [system] previous turn, user: I am looking for the address for graffiti | turn: Their address is [[Hotel Felix Whitehouse Lane]] Huntingdon Road. Anything more I can help with?
+
+### E0#30  (mentions 1, distinct values 1)
+Examples:
+- E0#30:0 [system] previous turn, user: It'll be very good if you can include alexander bed and breakfast but need to be in a reasonable price. | turn: [[alexander bed and breakfast]] is ideal for you.
+
+### E0#94  (mentions 2, distinct values 1)
+Examples:
+- E0#94:0 [system] previous turn, user: Yes, Hi! I am looking for a hotel in the tampa bay area. | turn: You did not read the directions of this hit. There is no [[Tampa bay area]]. Please read the directions next time.
+- E0#94:1 [user] turn: Yes, Hi! I am looking for a hotel in the [[tampa bay area]].
+
+### E0#96  (mentions 1, distinct values 1)
+Examples:
+- E0#96:0 [user] previous turn, system: You did not read the directions of this hit. There is no Tampa bay area. Please read the directions next time. | turn: i'm sorry, dude. i'm from [[florida]] so i'm not very smart. i'm trying to get from cambridge to stevenage.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#3, E0#35, E0#30, E0#94, E0#96) and its name as the value, like {"E0#3": "<name>"}.

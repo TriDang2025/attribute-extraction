@@ -1,0 +1,102 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table taxi (one row = one taxi), 18 columns:
+[taxi:1] arrival time
+  values: text (share 1.00); 7 mentions in 4 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "guest house" (in: "just confirm whether the Allenbell is a Hotel or a Guest House?")
+[taxi:2] car model
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "blue ford" (in: "Your taxi is booked. Look for a blue ford, their contact number is 0721129711...")
+    "red skoda" (in: "Certainly! I have booked you with a red skoda, whose contact number is 077901...")
+[taxi:3] car type
+  values: number (share 1.00); 36 mentions in 35 dialogues
+  examples:
+    "07015859463" (in: "...s, the driver can be reached at 07015859463, can I assist with anything else?")
+    "07032807056" (in: "...a white tesla booked. The contact number is 07032807056. Anything else today?")
+[taxi:5] cuisine
+  values: text (share 1.00); 8 mentions in 3 dialogues
+  examples:
+    "british" (in: "...Lebanese, Turkish, international, British, European, and Chinese. Do any o...")
+    "chinese" (in: "... international, British, European, and Chinese. Do any of these interest you?")
+[taxi:6] day of week
+  values: day (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "friday" (in: "you book me a table for 4 at 16:15 on Friday?")
+    "saturday" (in: "sounds good. Please book for 2 people at 11:45 on Saturday.")
+[taxi:7] departure time
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "ask" (in: "I'd like to book a taxi from Ask, departing after 19:15.")
+[taxi:8] destination
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "cambridge" (in: "Your welcome, enjoy your time in Cambridge.")
+    "meghan" (in: "... a taxi that goes from Ballare to Meghan and gets me to Meghan by 13:15 fo...")
+[taxi:9] location
+  values: text (share 1.00); 41 mentions in 25 dialogues
+  examples:
+    "restaurant" (in: "I want to leave the restaurant by 09:15. Please get me the contact number and...")
+    "hotel" (in: "need to book a taxi to the restaurant from the hotel for the dinner reservation.")
+[taxi:10] location str
+  values: text (share 1.00); 6 mentions in 6 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "It's my pleasure. Thank you for using Cambridge TownInfo centre. Goodbye.")
+    "cambridge towninfo" (in: "Great! Thanks for using Cambridge TownInfo. Goodbye!")
+[taxi:11] party size
+  values: duration (share 0.50); 2 mentions in 2 dialogues
+  examples:
+    "15 minute" (in: "...l. The table will be reserved for 15 minutes. Reference number is : DDLKGEVP.")
+    "2 people" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+[taxi:12] pickup contact number
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "taxi contact number" (in: "...or your 10:00 reservations. Taxi contact number is 07242149665. Anything e...")
+[taxi:13] pickup location
+  values: text (share 1.00); 30 mentions in 17 dialogues
+  examples:
+    "hughe hall" (in: "A white audi will pick you up at hughes hall at 14:45. The contact number is ...")
+    "allenbell" (in: "...But, can you book me a taxi from Allenbell to J Restaurant. I need to be t...")
+[taxi:14] reference number
+  values: id (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "ddlkgevp" (in: "will be reserved for 15 minutes. Reference number is : DDLKGEVP.")
+    "gue0lwwa" (in: "Your reference number is GUE0LWWA")
+[taxi:15] restaurant name
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "curry garden" (in: "How does the Curry Garden sound?")
+[taxi:16] suggested sight
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "old school" (in: "Sure thing. I would suggest the old schools.")
+[taxi:17] table booking time
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "4" (in: "That's perfect, could you book me a table for 4 at 16:15 on Friday?")
+[taxi:18] time int
+  values: time (share 0.78); 37 mentions in 29 dialogues
+  examples:
+    "what time" (in: "Where would you like to go and what time would you like to travel?")
+    "13:15" (in: "Allenbell to J Restaurant. I need to be there by 13:15.")
+[taxi:19] time str
+  values: time (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "03:00" (in: "taxi for me? I'd like to leave the restaurant by 03:00 and go to the theatre.")
+    "06:45" (in: "I will be leaving from leverton house arriving by 06:45.")
+
+Return the JSON object now.

@@ -1,0 +1,72 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 9 of 23 (113 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; museum, theatre, cinema; cb11ln, cb21sj, cb23bu
+- E2: guesthouse, hotel, ashley hotel; 2 night, 4 night, 5 night; moderate price range, moderately priced, cheap
+- E3: 13:15, 13:30, 02:45; restaurant, hotel, museum; 07015859463, 07032807056, 07048450899
+- E4: 13:00, 18:45, 13:15; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+
+### E1#77  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E1#77:0 [system] previous turn, user: I want to find a moderately priced restaurant serving european food. | turn: [[de luca cucina and bar]] is in the centre part of town and in the moderate price range.
+- E1#77:1 [system] previous turn, user: Yes. How about a restaurant that serves European food? | turn: [[De Luca Cucina and Bar]] is moderately priced and serves modern European food.
+
+### E1#64  (mentions 3, distinct values 2)
+Examples:
+- E1#64:0 [user] previous turn, system: sure thing what's the area and or name? | turn: It's a place called [[Don Pasquale Pizzeria]].
+- E1#64:1 [system] previous turn, user: Please recommend me a cheap restaurant in the north . | turn: [[Da Vinci pizzeria]] is in the north part of town and in the cheap price range. Would you like their location?
+- E1#64:2 [system] previous turn, user: I love pizza that will work can I get the address? | turn: The address to [[Don Pasquale Pizzeria]] is 12 Market Hill at City Centre. Would you like the phone number too?
+
+### E1#20  (mentions 5, distinct values 3)
+Examples:
+- E1#20:0 [system] previous turn, user: Yes, I need a place to eat in that area. I want Italian food. | turn: I would suggest [[pizza express]].
+- E1#20:1 [system] previous turn, user: ok, what are they? | turn: curry prince and rajmahal which both serve indian food. And [[pizza hut]] fen ditton serves italian food.
+- E1#20:2 [system] previous turn, user: Is that Italian? I would like an Italian restaurant, please. | turn: Okay, how about the [[pizza hut city centre]]? I heard it's pretty good.
+- E1#20:3 [system] previous turn, user: Italian would be nice thank you | turn: Okay. [[Pizza Express]] would suite your needs, would you like me to make you a reservation?
+- E1#20:4 [user] previous turn, system: No, they do not. How about Pizza Hut Cherry Hinton? It is Italian but it is popular with the Americans here. | turn: We eat [[Pizza Hut]] way to much. Can you try something with indian food? It is a special occasion so it can be expensive.
+
+### E1#96  (mentions 3, distinct values 2)
+Examples:
+- E1#96:0 [system] previous turn, user: No, but I want the most expensive one. | turn: I would suggest [[Fitzbillies Restaurant]]. Would you like me to book a table now?
+- E1#96:1 [user] previous turn, system: fitzbillies restaurant, the cambridge chop house, and midsummer house restaurant. do any of those interest you? | turn: [[Fitzbillies]] will be fine. Can I get the contact information, please?
+- E1#96:2 [system] previous turn, user: I apologize, disregard what was said before, I will actually just need the expensive british ones, in the centre area | turn: [[fitzbillies restaurant]], the cambridge chop house, and midsummer house restaurant. do any of those interest you?
+
+### E1#60  (mentions 9, distinct values 4)
+Examples:
+- E1#60:0 [system] previous turn, user: I would like a suggestion of a moderately priced Chinese place. | turn: I recommend [[Jinling Noodle Bar]]. It's located at 11 Peas Hill City Center. Would you like me to book a table for you?
+- E1#60:1 [system] previous turn, user: I don't really care what kind of food, but I am on a budget so cheap would be great. | turn: How about [[dojo noodle bar]]? It meets your requirements.
+- E1#60:2 [user] previous turn, system: Jinling noodle bar, postcode cb23pp. Is there any more info I can give you? | turn: I would like to visit a college in the same area as the [[noodle bar]], can you find me one?
+- E1#60:3 [system] previous turn, user: iam looking for something asian oriental and not so expensive restaurant. | turn: I have the [[Yippee Noodle Bar]] that meets your criteria. Would you like me to make a reservation for you?
+- E1#60:4 [user] turn: Can you help me find [[jinling noodle bar]] please, where is it?
+- E1#60:5 [system] previous turn, user: I'd like to find a place that serves moderately priced chinese food. | turn: I show dour restaurants that serve chinese food. Three are located in the centre and one is in the North area. They are all moderately priced. May I start by offering you the [[Jinling Noodle Bar]]?
+- E1#60:6 [system] previous turn, user: No, anything is fine. Can you suggest a great one? | turn: [[Jinling noodle bar]] looks like a good place.
+- E1#60:7 [system] previous turn, user: Can you help me find jinling noodle bar please, where is it? | turn: [[jinling noodle bar]] is in the centre area and the address is 11 Peas Hill City Centre.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#77, E1#64, E1#20, E1#96, E1#60) and its name as the value, like {"E1#77": "<name>"}.

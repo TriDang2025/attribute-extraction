@@ -1,0 +1,131 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table attraction (one row = one attraction), 24 columns:
+[attraction:3] attraction name
+  values: id (share 0.65); 51 mentions in 35 dialogues
+  examples:
+    "ballare" (in: "...t nightclubs in that area. Might I suggest Ballare. Would you like more info?")
+    "emmanuel college" (in: "There are 13 choices, how do you feel about Emmanuel College?")
+[attraction:4] attraction type
+  values: text (share 1.00); 27 mentions in 18 dialogues
+  examples:
+    "museum" (in: "...s to do and places to go such as, museum's, nightclubs, parks and restaura...")
+    "cinema" (in: "I need a cinema to go to in the south.")
+[attraction:5] attraction type str
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "college" (in: "to go in the centre area. I am looking for college.")
+    "a college" (in: "trying to find a place to go in the centre. A college would be fun to visit!")
+[attraction:8] cinema
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "the cineworld cinema" (in: "The cineworld cinema is the place!")
+    "the vue cinema" (in: "The Vue Cinema is in the centre of town. The address is The")
+[attraction:9] college str
+  values: text (share 1.00); 7 mentions in 5 dialogues
+  examples:
+    "christ's college" (in: "Yes, Christ's College is on Saint Andrew's Street and the post code is")
+    "christ" (in: "I honestly recommend visiting a famous college such as Christs or Magdalene.")
+[attraction:12] entrance fee
+  values: price (share 0.78); 9 mentions in 6 dialogues
+  examples:
+    "5 pound" (in: "yard. The phone number is 01223364222. The entrance fee is 5 pounds.")
+    "1 pound fee" (in: "John's has a 2.50 pound fee, and Trinity has a 1 pound fee.")
+[attraction:13] entry fee
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "entrance fee" (in: "Do you have any information on their entrance fees?")
+[attraction:14] free admission
+  values: text (share 1.00); 8 mentions in 8 dialogues
+  examples:
+    "free admission" (in: "...ology at University of Cambridge, Downing Street. It even has free admission!")
+    "free" (in: "street , post code cb21dq. You can visit them for free! Anything else you need?")
+[attraction:15] local attraction
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "boat attraction" (in: "...s, and museums, we also have boat attractions, nightclubs, and theatres in...")
+    "local attraction" (in: "in town. I'm so excited about seeing some of the local attractions.")
+[attraction:16] location
+  values: text (share 1.00); 142 mentions in 61 dialogues
+  examples:
+    "centre" (in: "...re several colleges in either the centre or west part of town. Which area ...")
+    "centre of town" (in: "There are many in the centre of town,what type are you looking for a church,o...")
+[attraction:17] location area
+  values: text (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "south part of town" (in: "Sure, there is a cinema in the south part of town as well as one in the centr...")
+    "east side of town" (in: "No. Are there any swimming pools on the east side of town?")
+[attraction:18] location name
+  values: text (share 1.00); 8 mentions in 5 dialogues
+  examples:
+    "cherry hinton road" (in: "...ed at Cherry Hinton Hall on Cherry Hinton Road. Their phone number is 0122...")
+    "cherry hinton" (in: "Cambridge Leisure Park Clifton Way Cherry Hinton 01223 244277")
+[attraction:19] location proper noun
+  values: text (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "cambridge contemporary art" (in: "...roughton house gallery, cambridge contemporary art, castle galleries and p...")
+    "cambridge towninfo centre" (in: "Thank you for contacting Cambridge TownInfo centre. Goodbye!")
+[attraction:20] location str
+  values: text (share 1.00); 32 mentions in 23 dialogues
+  examples:
+    "cambridge" (in: "I am looking for information in Cambridge")
+    "restaurant" (in: "and places to go such as, museum's, nightclubs, parks and restaurants.")
+[attraction:21] museum name
+  values: text (share 1.00); 12 mentions in 8 dialogues
+  examples:
+    "the broughton house gallery" (in: "the broughton house gallery is a museum located in the centre.")
+    "broughton house gallery" (in: "I'm looking for information on Broughton house gallery.")
+[attraction:22] nightclub
+  values: text (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "nightclub" (in: "... to do and places to go such as, museum's, nightclubs, parks and restaurants.")
+    "high street" (in: "...ham's road , cb13ew and gallery at twelve a high street is at fulbourn,cb15dh")
+[attraction:23] number of attractions
+  values: number (share 1.00); 9 mentions in 9 dialogues
+  examples:
+    "11" (in: "Sure, we have 11 museums in the centre area, a few are broughton house")
+    "13 college" (in: "There are 13 colleges in the center of town. Does entrance fee matter to")
+[attraction:24] park info
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "gog magog hill" (in: "...park located wandlebury ring, gog magog hills, babraham? Postalcode is cb2...")
+[attraction:27] sports venue
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "college attraction" (in: "I am looking for a college attraction to go to in town.")
+    "multiple sport venue" (in: "I am looking for a multiple sports venue in the centre of town.")
+[attraction:29] swimming pool
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "astroturf pitch" (in: "Yes there is the abbey pool and astroturf pitch would you like their address?")
+[attraction:31] theatre
+  values: text (share 0.71); 7 mentions in 4 dialogues
+  examples:
+    "mumford theatre" (in: "There is the Mumford theatre, it is located at Anglia Ruskin Enterprise, East...")
+    "1 theatre" (in: "...tre's in the centre of town and one theatre on the south side. Do you have...")
+[restaurant:2] attraction name
+  values: text (share 1.00); 3 mentions in 1 dialogues
+  examples:
+    "the primavera" (in: "The Primavera is located in the centre area. I'll be happy to")
+[restaurant:7] entrance fee
+  values: price (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 pound" (in: "parade. The post code cb21rh and the entree fee is 2 pounds.")
+[hotel:26] swimming pool
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "parkside pool" (in: "Parkside Pools are in the centre of town, if that would be")
+
+Return the JSON object now.

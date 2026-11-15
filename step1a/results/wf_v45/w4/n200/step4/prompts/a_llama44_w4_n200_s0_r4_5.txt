@@ -1,0 +1,173 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train and booking are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train -> booking": one train row has many booking rows (each booking row refers to one train row)
+- "booking -> train": one booking row has many train rows (each train row refers to one booking row)
+- "many_to_many": a train row can go with many booking rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train (one row = one train), 31 columns:
+[train:1] arrival time
+  values: text (share 0.67); 3 mentions in 3 dialogues
+  examples:
+    "10: 32" (in: "...e train from Broxbourne leaves at 10: 32. Would you like to make a reserva...")
+    "28-minute" (in: "...TR6193, leaving at 13:40. It's a 28-minute trip, and each ticket is 8.08GB...")
+[train:2] cuisine
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "italian" (in: "Italian would be great. I also need a train to Cambridge")
+    "italian place" (in: "There are no Italian places to dine, is there another food you would prefer b...")
+[train:3] currency
+  values: price (share 1.00); 24 mentions in 22 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "12.80 pound" (in: "Both options are 12.80 pounds. Would you like to book one of these options?")
+[train:4] date
+  values: day (share 0.81); 32 mentions in 27 dialogues
+  examples:
+    "sunday" (in: "Sunday,can you book it for me and I need a")
+    "tuesday" (in: "The train should go to Cambridge on Tuesday")
+[train:5] day
+  values: day (share 1.00); 88 mentions in 61 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+[train:6] day of week
+  values: text (share 1.00); 16 mentions in 15 dialogues
+  examples:
+    "what day" (in: "What day would you like to travel by train?")
+    "which day" (in: "I need to know where you are departing from and which day.")
+[train:7] departure day
+  values: number (share 0.50); 4 mentions in 4 dialogues
+  examples:
+    "278" (in: "There are 278 trains that leave after 11:00 on Saturday. Do you have")
+    "2828" (in: "There are 2828 trains available Monday. Where are you traveling to?")
+[train:8] departure location
+  values: text (share 1.00); 7 mentions in 4 dialogues
+  examples:
+    "birmingham new street" (in: "I would like to depart from birmingham new street after 14:45.")
+[train:9] departure station
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "bishop stortford" (in: "Yes, we will be coming from bishops stortford on Monday. I would like to leav...")
+    "bishop stafford" (in: "I also need a train from Bishops Stafford to Cambridge.")
+[train:10] duration str
+  values: duration (share 0.93); 14 mentions in 13 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "49 minute" (in: "at 05:54 and arrives at 06:43. The travel time is 49 minutes.")
+[train:11] location
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "byard art" (in: "Byard art is on the south end of town.")
+    "clare hall" (in: "what about clare hall? it's free to visit")
+[train:12] location cap
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+    "stansted" (in: "be great. How much would it cost to travel to stansted from Cambridge?")
+[train:13] location capitalized
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "stevenage" (in: "I need a train that leaves at 20:45 from stevenage to cambridge")
+    "stevanage" (in: "I also need a train from Stevanage to Cambridge.")
+[train:14] location common noun
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[train:15] location lower
+  values: text (share 1.00); 9 mentions in 6 dialogues
+  examples:
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+[train:16] location proper noun with direction
+  values: text (share 1.00); 13 mentions in 7 dialogues
+  examples:
+    "broxbourne" (in: "I am also look for a train on saturday to broxbourne.")
+[train:17] location snake
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "leicester" (in: "I need to go from leicester to cambridge.")
+[train:18] location str
+  values: text (share 1.00); 28 mentions in 21 dialogues
+  examples:
+    "stevenage" (in: "need a train that departs from Cambridge and goes to Stevenage.")
+    "broxbourne" (in: "I'd like to go to Cambridge via Broxbourne. I'd like to leave on Thursday and...")
+[train:19] location str capitalized
+  values: text (share 1.00); 139 mentions in 75 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "stansted airport" (in: "get a train that leaves on Sunday and goes to stansted airport.")
+[train:20] location title case
+  values: text (share 1.00); 14 mentions in 10 dialogues
+  examples:
+    "peterborough" (in: "like to go to Cambridge and will be departing from Peterborough.")
+    "london liverpool street" (in: "I am traveling to London Liverpool Street from Cambridge.")
+[train:21] num tickets
+  values: number (share 1.00); 12 mentions in 10 dialogues
+  examples:
+    "1 child" (in: "I need 2 adult and 1 child. Thank you.")
+    "1 train" (in: "...arting for Cambridge on Tuesday. One train departs every hour starting at ...")
+[train:22] number of tickets
+  values: number (share 1.00); 6 mentions in 6 dialogues
+  examples:
+    "5" (in: "5, please. Include the reference number.")
+    "9" (in: "We have 9 such trips. Any preference on leaving?")
+[train:23] phone number
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "01223332360" (in: "Absolutely. The phone number is 01223332360, and the postal code is cb39al.")
+[train:24] price
+  values: price (share 0.62); 8 mentions in 7 dialogues
+  examples:
+    "7.84 pound" (in: "... arrives at 05:58. The price is 7.84 pounds per person. Would you like me ...")
+    "13.28gbp" (in: "A ticket from London Liverpool Street to Cambridge is 13.28GBP.")
+[train:25] reference number
+  values: text (share 0.57); 7 mentions in 7 dialogues
+  examples:
+    "1a9jyqs7" (in: "can be paid at the station. The reference number is 1A9JYQS7.")
+    "cb39al" (in: "The phone number is 01223332360, and the postal code is cb39al.")
+[train:26] reference snake
+  values: text (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "leicester" (in: "I'll be leaving Leicester and I want to be in Cambridge by 11:30, please.")
+[train:27] time
+  values: time (share 1.00); 201 mentions in 77 dialogues
+  examples:
+    "13:00" (in: "I would like to leave after 13:00.")
+    "13:15" (in: "I would like to leave Cambridge after 13:15, thank you")
+[train:30] time str
+  values: time (share 0.40); 70 mentions in 44 dialogues
+  examples:
+    "what time" (in: "There are 19 trains that day. What time do you need to leave cambridge and/or...")
+    "18:45" (in: "I would like to leave on Saturday after 18:45.")
+[train:31] total fee
+  values: id (share 0.87); 54 mentions in 47 dialogues
+  examples:
+    "how much" (in: "That would be great. How much would it cost to travel to stansted from Cambri...")
+    "iayfj8si" (in: "...es at 11:54. Reference number is IAYFJ8SI. Total is 102.4 GBP payable at t...")
+[train:32] train frequency
+  values: number (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "16" (in: "There are trains every hour on the :16 that will get you there by noon, begin...")
+    "19" (in: "You bet! I have 19 to choose from. What time do you want to arrive?")
+[train:33] train id
+  values: id (share 0.90); 83 mentions in 59 dialogues
+  examples:
+    "tr3330" (in: "TR3330 will arrive at 10:43, would that work for you?")
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+
+Table booking (one row = one booking), 1 columns:
+[attraction:6] booking reference
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "archway house" (in: "You are booked at Archway House. Your reference number is 2G8LC07R. Camboats ...")
+
+Return the JSON object now.

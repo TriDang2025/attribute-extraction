@@ -1,0 +1,78 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 4 of 23 (113 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; museum, theatre, cinema; cb11ln, cb21sj, cb23bu
+- E2: guesthouse, hotel, ashley hotel; 2 night, 4 night, 5 night; moderate price range, moderately priced, cheap
+- E3: 13:15, 13:30, 02:45; restaurant, hotel, museum; 07015859463, 07032807056, 07048450899
+- E4: 13:00, 18:45, 13:15; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+
+### E1#18  (mentions 6, distinct values 4)
+Examples:
+- E1#18:0 [system] previous turn, user: How about Chinese food? | turn: There are the Peking Restaurant, which is expensive, the Good Luck Chinese Food Takeaway, which is also expensive, and the [[Lucky Star]], which is cheap.
+- E1#18:1 [user] previous turn, system: Sure - The Lucky Star serves Chinese food and Nandos serves Portuguese food. Do either of those sound good? | turn: [[The Lucky Star]] sounds good. That's all I need.
+- E1#18:2 [system] previous turn, user: I want a restaurant in the north part of town. | turn: [[The City Stop]] restaurant is in the north part of town. The Golden Wok is also located in the north part of town.
+- E1#18:3 [system] previous turn, user: I'd like it to be in the north, and expensive would be best. | turn: I would recommend either Hakka or [[The Hotpot]]. Would you like for me to book a reservation for one of these restaurants?
+- E1#18:4 [user] previous turn, system: There are the Peking Restaurant, which is expensive, the Good Luck Chinese Food Takeaway, which is also expensive, and the Lucky Star, which is cheap. | turn: Can I have the address of [[Lucky Star]]?
+- E1#18:5 [system] previous turn, user: No need to book it. Thanks. But can you help me find a cheap restaurant in the south? | turn: Sure - [[The Lucky Star]] serves Chinese food and Nandos serves Portuguese food. Do either of those sound good?
+
+### E1#17  (mentions 6, distinct values 4, low confidence)
+Examples:
+- E1#17:0 [user] previous turn, system: I don't have matches. Do you have any other food preferences? | turn: And I would like something Australasian, or if you can't find that, [[Chinese]], at least.
+- E1#17:1 [user] previous turn, system: There are two restaurants fitting your description, one is Chinese cuisine and one is Indian cuisine. Do you have a preference? | turn: Please book a table for 4 at the [[Chinese place]] at 12:30 on Sunday and give me the reference number.
+- E1#17:2 [user] turn: I am looking for a restaurant to book a reservation. I want [[asian oriental]] in the expensive price range
+- E1#17:3 [system] previous turn, user: How about Chinese food? | turn: There are the Peking Restaurant, which is expensive, the [[Good Luck Chinese Food Takeaway]], which is also expensive, and the Lucky Star, which is cheap.
+- E1#17:4 [system] previous turn, user: The restaurant should be in the expensive price range and should be in the south, i do not have a particular food preference. | turn: I have five places. Do you prefer, Italian, [[Chinese]], Mexican or Indian?
+- E1#17:5 [user] previous turn, system: There are 10 choices and we have cheap, moderate and expensive options, any preference? | turn: I would like a suggestion of a moderately priced [[Chinese place]].
+
+### E1#39  (mentions 4, distinct values 4, low confidence)
+Examples:
+- E1#39:0 [user] previous turn, system: I'm sorry, there isn't anything available like that. Is there something else you might like? | turn: I'm sorry I meant to say west before. I am looking for a [[European place]] that is expensive in the west.
+- E1#39:1 [user] turn: I would like to try an expensive, [[italian place]] while visiting cambridge.
+- E1#39:2 [user] previous turn, system: We have a range of options in the north. Do you have preferred cuisine or price range? | turn: How about an expensive [[venetian place]]?
+- E1#39:3 [user] previous turn, system: That works out perfectly. Your reference number is 72YCMLXX. Is there anything else I can help you with today? | turn: I am also looking for a [[vietnamese place]] to dine in the same price range as the hotel.
+
+### E1#13  (mentions 91, distinct values 15)
+Examples:
+- E1#13:0 [user] previous turn, system: I have 5 of them. 4 in the centre area and one in the south. Would you like more information? | turn: Staying in the [[centre]] would be more convenient. What are my choices?
+- E1#13:1 [system] previous turn, user: Yes that would be great. I am also looking for a place to dine for the night. Do you have any suggestions? | turn: My recommendation would be the Ugly Duckling, a Chinese restaurant in the centre of town. It is located at 12 St. Johns Street [[City Centre]].
+- E1#13:2 [user] turn: I want to find an expensive restaurant in the [[centre of town]].
+- E1#13:3 [system] previous turn, user: I am looking for a north indian food restaurant in the town centre. | turn: I'm sorry, there are no North Indian restaurants in the [[centre area]]. Would you like to check a different area?
+- E1#13:4 [user] turn: I want to visit a restaurant that would be popular with college students and located near the [[center of town]]; can you make a recommendation?
+- E1#13:5 [system] previous turn, user: No. How about gastropub type food? May I please have the address, phone number, and area? | turn: The cow pizza kitchen and bar serves gastropub food, is located in the [[centre part of town]] and is in the moderate price range. Their phone number is 01223 308871. The address is Corn Exchange Street and the postcode is C.B 2, 3QF
+- E1#13:6 [system] previous turn, user: Can you tell me more about gourmet burger kitchen? Where is it? | turn: They are in the [[towns centre]]. Expensive but worth every penny. Would you like to book a table?
+- E1#13:7 [system] previous turn, user: I am looking for a place to dine. The restaurant should serve african food and should be in the centre | turn: There is one African restuarant in the [[Center]]. It is named Bedouin, and is expensive. Their phone number is 01223367660. Would you like me to book for you?
+
+### E1#65  (mentions 3, distinct values 2)
+Examples:
+- E1#65:0 [system] previous turn, user: No. How about gastropub type food? May I please have the address, phone number, and area? | turn: The cow pizza kitchen and bar serves gastropub food, is located in the centre part of town and is in the moderate price range. Their phone number is 01223 308871. The address is [[Corn Exchange Street]] and the postcode is C.B 2, 3QF
+- E1#65:1 [system] previous turn, user: The restaurant should be in the expensive price range | turn: Maharajah tandoori restaurant on 41518 [[Castle Street]] City Centre is a good fit for you.
+- E1#65:2 [system] previous turn, user: I need the address of a restaurant that serves gastropub food. | turn: The cow pizza kitchen and bar serves Gastropub food. Their address is [[Corn Exchange Street]] in the centre area.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#18, E1#17, E1#39, E1#13, E1#65) and its name as the value, like {"E1#18": "<name>"}.

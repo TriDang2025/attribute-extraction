@@ -1,0 +1,65 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 15 of 20 (100 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:45, 13:15, 12:15
+- E2: guesthouse, hotel, ashley hotel; 2 night, 4 night, 5 night; moderate price range, moderately priced, cheap
+- E3: 13:15, 13:30, 02:45; restaurant, hotel, museum; 07015859463, 07032807056, 07048450899
+- E4: 13:00, 18:45, 13:15; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+
+### E0#20  (mentions 12, distinct values 5)
+Examples:
+- E0#20:0 [system] previous turn, user: could i have the address and phone number please? | turn: sure, pizza hut cherry hinton is located at G4 cambridge leisure park clifton way [[cherry hinton]] and the phone number is 01223 413000. Is there anything else I can help you with?
+- E0#20:1 [system] previous turn, user: I am looking for information about the the Cherry Hinton Water Play | turn: That is a free park on the east side of town. They are located at Cherry Hinton Hall on [[Cherry Hinton Road]]. Their phone number is 01223446100.
+- E0#20:2 [system] previous turn, user: No specific area. Just the first thing that pops up. | turn: [[Cherry Hinton hall and grounds]] is on the east part of town.
+- E0#20:3 [user] previous turn, system: You're welcome! Is there anything else I can help you with? | turn: Yes, what type of attraction is [[Cherry Hinton Water Play]]?
+- E0#20:4 [system] previous turn, user: I am looking for information about the the Cherry Hinton Water Play | turn: That is a free park on the east side of town. They are located at [[Cherry Hinton Hall]] on Cherry Hinton Road. Their phone number is 01223446100.
+- E0#20:5 [system] previous turn, user: Can I have the address of Lucky Star? | turn: Cambridge Leisure Park Clifton Way [[Cherry Hinton]] 01223 244277
+- E0#20:6 [system] previous turn, user: Actually, can you just send me the address? | turn: Their address is 2G Cambridge Leisure Park [[Cherry Hinton Road]] Cherry Hinton
+- E0#20:7 [system] previous turn, user: What entertainment attractions are there in the east side of town? | turn: The [[Cherry Hinton Hall and Grounds]] is located on Cherry Hinton Road and is always a fun place. Does that interest you?
+
+### E0#34  (mentions 2, distinct values 1)
+Examples:
+- E0#34:0 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park Fen Causeway is located at [[Fen Causeway]], Newnham road, postal code cb322ad.
+- E0#34:1 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park [[Fen Causeway]] is located at Fen Causeway, Newnham road, postal code cb322ad.
+
+### E0#81  (mentions 1, distinct values 1)
+Examples:
+- E0#81:0 [system] previous turn, user: 3 nights starting on Saturday, can I get the reference number as well? We are also looking for an attraction called Camboats, can you help me? | turn: You are booked at [[Archway House]]. Your reference number is 2G8LC07R. Camboats is a boating attraction in the east. What other information do you need?
+
+### E0#37  (mentions 2, distinct values 1)
+Examples:
+- E0#37:0 [user] turn: Is the [[mumford theatre]] still in operation?
+- E0#37:1 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the [[Mumford theatre]], it is located at Anglia Ruskin Enterprise, East Road in the Centre area.
+
+### E0#73  (mentions 1, distinct values 1)
+Examples:
+- E0#73:0 [system] previous turn, user: Yes I would like more information on both museums. | turn: saint barnabas press gallery is located in the belfast yard, coldham's road , cb13ew and gallery at twelve a high street is at [[fulbourn]],cb15dh
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#20, E0#34, E0#81, E0#37, E0#73) and its name as the value, like {"E0#20": "<name>"}.
