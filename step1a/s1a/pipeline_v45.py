@@ -162,12 +162,17 @@ def cost(out, step1a_info, load_seconds=None):
 def outputs(out, set_name, step1a_info=None, load_seconds=None):
     """<out>/schema.sql (the voted Step 4 schema), attributes.json ({entity: [column names]} of the Step 3 final columns), cost.json."""
     out = Path(out)
-    st = {r["run"]: r for r in B.read_json(out / "step4" / "final" / "status.json")}
-    run = f"a_llama44_{set_name}_vote" if st.get(f"a_llama44_{set_name}_vote", {}).get("ok") else f"a_llama44_{set_name}_s0"
-    (out / "schema.sql").write_text((out / "step4" / "final" / run / "schema.sql").read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
+    st = B.read_json(out / "step4" / "final" / "status.json")
+    ok = {r["run"] for r in st if r["ok"]}
+    # the voted schema, else the first finished seed; none finished -> no schema.sql, the chain errors go to cost.json
+    run = next((r for r in [f"a_llama44_{set_name}_vote"] + [f"a_llama44_{set_name}_s{s}" for s in (0, 1, 2)] if r in ok), None)
+    if run:
+        (out / "schema.sql").write_text((out / "step4" / "final" / run / "schema.sql").read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
     final = B.read_json(out / "step3" / "scores" / "final_columns.json")[set_name]
     B.write_json(out / "attributes.json", {e: [c["name"] for c in cols] for e, cols in final.items()})
-    c = {**cost(out, step1a_info, load_seconds), "schema_from": run}
+    c = {**cost(out, step1a_info, load_seconds), "schema_from": run, "step4_chains_finished": f"{len(ok)}/{len(st)}",
+         "step4_errors": {r["run"]: r["error"] for r in st if not r["ok"]},
+         "step3_columns": sum(len(cols) for cols in final.values())}
     B.write_json(out / "cost.json", c)
     return c
 
