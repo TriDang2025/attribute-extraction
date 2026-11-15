@@ -1,0 +1,84 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 3 of 16 (78 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 13:15, 16:15, 19:30; cambridge, cambridge towninfo centre, cambidge; saturday, friday, sunday
+- E2: guesthouse, hotel, acorn guest house; 2 night, 4 night, 3 night; wednesday, friday, monday
+- E3: 14:45, 19:15, 06:45; 07032807056, 07048450899, 07083984796; restaurant, hotel, city stop restaurant
+- E4: centre, centre of town, town; museum, cinema, college; cb23bu, cb11ln, cb11pt
+
+### E1#49  (mentions 9, distinct values 5, low confidence)
+Examples:
+- E1#49:0 [user] previous turn, system: There are no modern European restaurants in the North but there are 2 in the town center. Do you want to book one or change type of restaurant. | turn: I'd like to book one for the same group of people at 11:00 on the [[same day]] as before.
+- E1#49:1 [system] previous turn, user: Let's try the one on the north side of town. I'd like to make reservations, if possible. | turn: I can try to make that reservation for you. [[What day]] are you looking to eat on, how many are in your party, and what time would you like?
+- E1#49:2 [user] previous turn, system: Sure! when would you like to arrive? | turn: I would like to arrive at the restaurant no later than [[ten o'clock]] a.m.
+- E1#49:3 [user] previous turn, system: Ok I have you booked at The Allenbell for 4 nights for 8 people. Your reference number 7SN0BAAT. Do you need anything else? | turn: I would like an indian restaurant in the [[same price range]] as the hotel please.
+- E1#49:4 [system] previous turn, user: Let's try the one on the north side of town. I'd like to make reservations, if possible. | turn: I can try to make that reservation for you. What day are you looking to eat on, how many are in your party, and [[what time]] would you like?
+- E1#49:5 [user] previous turn, system: Great, your reference number is TYGH2E4A, and the total fee payable at the station is 450.6 GBP. | turn: Great! I also need an expensive restaurant in the west that serves Persian for the [[same day]] and party as well please.
+- E1#49:6 [system] previous turn, user: Can you book it for me and get a reference number ? | turn: [[What day]] would you like to dine on ?
+- E1#49:7 [user] previous turn, system: Okay. Pizza Express would suite your needs, would you like me to make you a reservation? | turn: Yes. I need a table for 8 people at 16:15 on the [[same day]].
+
+### E1#11  (mentions 30, distinct values 7)
+Examples:
+- E1#11:0 [user] previous turn, system: It is also in the west side area, located at 17 Magdalene Street City Centre. Would you like to make a reservation? | turn: Yes I'd like to book for 5 at 13:00 on [[Wednesday]] as well. I will also need the reference number.
+- E1#11:1 [user] previous turn, system: I would suggest Loch Fyne. They serve the most amazing selection of seafood in the entire city. It's definitely an experience. | turn: That sounds perfect. Could you book a table for 8 people at 19:30 on [[Friday]]?
+- E1#11:2 [system] previous turn, user: Yes, would I be able to get a table there Thursday at 18:00 for 7? | turn: I'm sorry 18:00 on [[Thursday]] is also unavailable. Would you like to try a different day?
+- E1#11:3 [user] previous turn, system: I would suggest pizza express. | turn: Can you check if they would have a table for 7 at 17:45 on [[Sunday]]?
+- E1#11:4 [system] previous turn, user: Actually I am specifically looking for the Cocum restaurant, I would like to book for 7 people at 15:00 on monday if possible. | turn: I have a table reserved for you and 6 other guests at the Cocum restaurant on [[Monday]] at 15:00. The reference number is BPE8LVHA.
+- E1#11:5 [user] previous turn, system: I would recommend either Hakka or The Hotpot. Would you like for me to book a reservation for one of these restaurants? | turn: Lets try Hakka,can you book a table for 8 people at 16:30 on [[tuesday]]?
+- E1#11:6 [user] previous turn, system: I have one listing for ali baba. Would you like any other information? | turn: book for me a table for 1 person at 14:45 on [[saturday]]
+- E1#11:7 [system] previous turn, user: Please book a table for 4 at 15:15 on wednesday. | turn: Alright, now have a reservation for four people at the Tandoori Palace at 3:15 on [[Wednesday]]. Is there anything else I can assist you with?
+
+### E1#10  (mentions 41, distinct values 27, low confidence)
+Examples:
+- E1#10:0 [system] previous turn, user: No that is the only date and time I have available. Are you sure you don't have anything for Wednesday at 12:45? | turn: Yes i was able to make your reservation for 2 for Wednesday at [[12:45]]. Your reference number is X3QCMWY3.
+- E1#10:1 [user] previous turn, system: J restaurant is an asian oriental restaurant in the centre of town. It is cheap and located at 86 Regent Street City Centre. | turn: That sounds great. Can you reserve a table for 2 for Sunday at [[13:15]]?
+- E1#10:2 [user] previous turn, system: i've pulled up their info, what would you like to know? | turn: I need reservations for 5 people at [[15:15]] on Sunday. I'll need the reference number as well.
+- E1#10:3 [user] previous turn, system: My recommendation would be the Ugly Duckling, a Chinese restaurant in the centre of town. It is located at 12 St. Johns Street City Centre. | turn: Is the restaurant moderately priced? If so, please book a table for 5 at [[18:00]] and send me the reference number.
+- E1#10:4 [user] previous turn, system: Booking was unfortunately unsuccessful. Let's try another day or time slot. | turn: Okay, will you try [[10:30]] instead?
+- E1#10:5 [user] previous turn, system: I am so sorry nothing available for any of the turkish restaurants for that day & time slot. Something else perhaps? | turn: Can you try booking it for [[11:15]]?
+- E1#10:6 [system] previous turn, user: Actually I am specifically looking for the Cocum restaurant, I would like to book for 7 people at 15:00 on monday if possible. | turn: I have a table reserved for you and 6 other guests at the Cocum restaurant on Monday at [[15:00]]. The reference number is BPE8LVHA.
+- E1#10:7 [system] previous turn, user: Yes. I need a table for 8 people at 16:15 on the same day. | turn: I have you booked for 8 people at [[16:15]] on Monday. Your reference number is K4PZHB51.
+
+### E1#27  (mentions 8, distinct values 2)
+Examples:
+- E1#27:0 [system] previous turn, user: At 18:30, please. | turn: Your booking was successful. Your reference number is R3VOQJMB. The table will be reserved for [[15 minutes]].
+- E1#27:1 [system] previous turn, user: I'll take something that is cheap. | turn: There are a total of [[15]] restaurants that are cheap in the centre. Is there another type you would like to try?
+- E1#27:2 [system] previous turn, user: Lets try Hakka,can you book a table for 8 people at 16:30 on tuesday? | turn: It is booked! Your table will be reserved for [[15 minutes]] and your reference number is VWDBTAYR.
+- E1#27:3 [system] previous turn, user: Well how about 15:30 then? | turn: The booking was successful. The table will be reserved for [[15 minutes]]. Reference number is : OAEJMYOI.
+- E1#27:4 [system] previous turn, user: I need reservations for 5 people at 15:15 on Sunday. I'll need the reference number as well. | turn: Your table at Panahar has been reserved for [[15 minutes]] starting at 15:15 on Sunday. Your reference number is TIYE4F1Y. Can I help you with anything else?
+- E1#27:5 [system] previous turn, user: That sounds perfect. Could you book a table for 8 people at 19:30 on Friday? | turn: Ok, your table will be reserved for [[15 minutes]]. Reference number is 56AHCPLE.
+- E1#27:6 [system] previous turn, user: I perfer a moderate price range. Whatever you suggest. I need to book a table for 1 at 13:15 on Tuesday. | turn: Okay, I've booked a table at the Curry Prince for you. The reference number is NZ5WKZ9V. The table will be reserved for [[15 minutes]].
+- E1#27:7 [system] previous turn, user: How about 13:15? | turn: I was able to book the table for you. It will be reserved for [[15 minutes]]. The reference number is 97AAF776.
+
+### E1#70  (mentions 1, distinct values 1)
+Examples:
+- E1#70:0 [system] previous turn, user: How about choosing a famous one and give me the address, postcode and entrance fee. | turn: corpus christi is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is [[2 pounds]].
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#49, E1#11, E1#10, E1#27, E1#70) and its name as the value, like {"E1#49": "<name>"}.

@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E2#24:s0": "P1", "E2#24:s1": "P2"}}
+
+Cluster E2#24 of entity E2 (mentions 8, distinct values 4).
+Examples:
+- E2#24:s0 [system] previous turn, user: Is it also a guesthouse type of hotel? | turn: Yes, that's correct. Would you like to book a [[room]]?
+- E2#24:s1 [system] previous turn, user: I would like a 0 star hotel. | turn: There is one option available. It is [[cityroomz]]. Do you want to book?
+- E2#24:s2 [system] previous turn, user: I am looking for a hotel that can offer me both free wifi and free parking. | turn: There are 29 hotels that meet your criteria. Do you have a preferred location in the [[city]] so we can narrow down your choices?
+- E2#24:s3 [user] previous turn, system: Great, how many people will be staying? Also, how many days you will be staying? | turn: Wait, before we do that I should probably check on the prices. What sort of [[room rates]] am I looking at?
+- E2#24:s4 [user] previous turn, system: I have the hamilton lodge located in the north. | turn: Does it offer free parking? If yes, please book a [[room]] for 2 for 2 nights. We'll be checking in on Wednesday
+- E2#24:s5 [system] previous turn, user: I'd actually like a hotel instead of guesthouse and in the centre of town. | turn: i'd like to suggest to you [[cityroomz]]
+- E2#24:s6 [user] previous turn, system: The postcode is cb13js. Would you like to get a room reserved? | turn: Yes, please reserve the [[room]].
+- E2#24:s7 [system] previous turn, user: I will be staying for 3 nights. | turn: OK, and how many people will be staying in the [[room]]?
+
+Return the JSON object now.

@@ -1,0 +1,60 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 5 of 12 (59 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 13:15, 16:15, 19:30; cambridge, cambridge towninfo centre, cambidge; saturday, friday, sunday
+- E1: expensive, moderately priced, expensive price range; restaurant, hotel, j restaurant; city centre, centre, centre of town
+- E2: guesthouse, hotel, acorn guest house; 2 night, 4 night, 3 night; wednesday, friday, monday
+- E3: 14:45, 19:15, 06:45; 07032807056, 07048450899, 07083984796; restaurant, hotel, city stop restaurant
+
+### E4#48  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E4#48:0 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend [[Castle Galleries]], phone number 01223307402, postal code cb23bj, address unit su43, grande arcade, saint andrews street. It is free.
+- E4#48:1 [system] previous turn, user: Yes please. | turn: [[The cafe jello gallery]] has free admission and is located at 13 magdalene street, postcode cb30af. Would you like information on any others?
+
+### E4#11  (mentions 2, distinct values 2)
+Examples:
+- E4#11:0 [user] turn: I'm looking for information on [[Broughton house gallery]].
+- E4#11:1 [system] previous turn, user: I am looking for a museum. | turn: [[the broughton house gallery]] is a museum located in the centre.
+
+### E4#37  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E4#37:0 [system] previous turn, user: A museum sounds nice. Do you have a favorite? I need an address and entrance fee. | turn: My personal favorite is the [[Museum of Archaeology and Anthropology]] at University of Cambridge, Downing Street. It even has free admission!
+- E4#37:1 [user] previous turn, system: Are you interested in archaeology? Our Museum of Archaelogy and Anthropology might interest you. Or if you want to exercise, Parkside Pools would be a fun venue. | turn: [[The Museum of Archaelogy and Anthropology]] sounds good. Can I get the phone number?
+
+### E4#40  (mentions 1, distinct values 1)
+Examples:
+- E4#40:0 [system] previous turn, user: I need the address, entrance fee, and phone number. | turn: The address of Ballare is [[heidelberg gardens]], lion yard. The phone number is 01223364222. The entrance fee is 5 pounds.
+
+### E4#42  (mentions 2, distinct values 1)
+Examples:
+- E4#42:0 [system] previous turn, user: Do you have there address? | turn: The address of [[hughes hall]] is wollaston road.
+- E4#42:1 [system] previous turn, user: What types of college are they? | turn: May I recommend [[Hughes Hall]]. It is in the centre of town and has free entrance?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#48, E4#11, E4#37, E4#40, E4#42) and its name as the value, like {"E4#48": "<name>"}.

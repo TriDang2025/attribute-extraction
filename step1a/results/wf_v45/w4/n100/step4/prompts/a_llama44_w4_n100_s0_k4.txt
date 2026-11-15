@@ -1,0 +1,95 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table attraction (one row = one attraction), 17 columns:
+[attraction:1] address
+  values: text (share 1.00); 9 mentions in 6 dialogues
+  examples:
+    "hotel felix whitehouse lane" (in: "There address is Hotel Felix Whitehouse Lane Huntingdon Road postcode cb30lx....")
+    "10 king's parade" (in: "... number is 01223357708. It is at 10 King's Parade and the postcode is cb21sj.")
+[attraction:2] cinema name
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "the cineworld cinema" (in: "The cineworld cinema is the place!")
+[attraction:3] entrance fee
+  values: text (share 0.64); 11 mentions in 7 dialogues
+  examples:
+    "entrance fee" (in: "Do you have any information on their entrance fees?")
+    "free admission" (in: "...ology at University of Cambridge, Downing Street. It even has free admission!")
+[attraction:4] location
+  values: text (share 0.97); 75 mentions in 29 dialogues
+  examples:
+    "emmanuel college" (in: "There are 13 choices, how do you feel about Emmanuel College?")
+    "park" (in: "type are you looking for a church,or swimming or a park ?")
+[attraction:5] location details
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "cherry hinton hall and ground" (in: "Cherry Hinton hall and grounds is on the east part of town.")
+[attraction:6] location full
+  values: text (share 1.00); 12 mentions in 8 dialogues
+  examples:
+    "centre of town" (in: "There are many in the centre of town,what type are you looking for a church,o...")
+    "town" (in: "am looking for a college attraction to go to in town.")
+[attraction:7] location name
+  values: text (share 1.00); 5 mentions in 5 dialogues
+  examples:
+    "cambridge" (in: "I am looking for information in Cambridge")
+    "cambridge towninfo centre" (in: "Thank you for contacting Cambridge TownInfo centre. Goodbye!")
+[attraction:8] location str
+  values: text (share 1.00); 28 mentions in 14 dialogues
+  examples:
+    "centre" (in: "...re several colleges in either the centre or west part of town. Which area ...")
+    "museum" (in: "...s to do and places to go such as, museum's, nightclubs, parks and restaura...")
+[attraction:9] museum
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "museum of archaeology and anthropology" (in: "...l favorite is the Museum of Archaeology and Anthropology at University of ...")
+    "the museum of archaelogy and anthropology" (in: "The Museum of Archaelogy and Anthropology sounds good. Can I get the phone nu...")
+[attraction:10] park
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "gog magog hill" (in: "...park located wandlebury ring, gog magog hills, babraham? Postalcode is cb2...")
+[attraction:11] phone number
+  values: number (share 0.62); 16 mentions in 10 dialogues
+  examples:
+    "their phone number" (in: "Something located in the city centre. Also may I have their phone number?")
+    "01223314960" (in: "...e entrance. Their phone number is 01223314960. May I help find anything else?")
+[attraction:13] recommended college
+  values: text (share 1.00); 8 mentions in 4 dialogues
+  examples:
+    "christ" (in: "I honestly recommend visiting a famous college such as Christs or Magdalene.")
+    "christ's college" (in: "Yes, Christ's College is on Saint Andrew's Street and the post code is")
+[attraction:14] road
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cherry hinton" (in: "Cambridge Leisure Park Clifton Way Cherry Hinton 01223 244277")
+[attraction:15] str
+  values: id (share 1.00); 13 mentions in 12 dialogues
+  examples:
+    "cb23bu" (in: "is on Saint Andrew's Street and the post code is cb23bu. It's free admission.")
+    "cb11ln" (in: "Is the cb11ln the postcode?")
+[attraction:16] theatre
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "anglia ruskin enterprise" (in: "...heatre, it is located at Anglia Ruskin Enterprise, East Road in the Centre...")
+[attraction:17] uknown
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "uknown" (in: "The price is uknown at this time, and the postcode is cb18dw.")
+[attraction:18] venue info
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "the whale of a time" (in: "The Whale of a Time entertainment venue is a fun choice. We also have museums")
+
+Return the JSON object now.

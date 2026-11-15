@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#1/0: name: time str | description: time
+Examples:
+- 1 [user] previous turn, system: OK, what are your departure and arrival stations, and what time do you want to travel? | turn: I'd like to go to Cambridge via Broxbourne. I'd like to leave on Thursday and arrive no later than [[12:00]].
+- 2 [user] previous turn, system: This restaurant is of the moderate price range. Would you like to book a table? | turn: No thanks, but I do need some train info. I'll be leaving from Peterborough on Tuesday, sometime after [[15:15]].
+- 3 [system] previous turn, user: I could use your help finding a train for Saturday that leaves after 11:00. | turn: There are 278 trains that leave after [[11:00]] on Saturday. Do you have a particular departure and arrival location?
+- 4 [user] previous turn, system: What day are you traveling? | turn: I'm traveling on tuesday and I want to arrive by [[16:15]]
+- 5 [user] previous turn, system: I could do that for you. Can you give me a time ? | turn: Yes, we will be coming from bishops stortford on Monday. I would like to leave after [[19:30]].
+
+Columns (5):
+- name: date | examples: saturday; friday; next tuesday
+- name: time int | examples: 13:40; 14:45; 15:45
+- name: day of week | examples: sunday; tuesday; monday
+- name: price gbp | examples: 10.10 pound; 12.80 pound; 14.08 pound
+- name: price | examples: 17.89; 17.90; 37.79 gpb
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#1/0", "reason": "str", "same_as": "<column name or none>"}

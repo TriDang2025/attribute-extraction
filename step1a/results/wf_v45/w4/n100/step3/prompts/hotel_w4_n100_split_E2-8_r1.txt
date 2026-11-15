@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, give the parts: for each part a snake_case name, a short role, and the ids of the examples
+that belong to it. Every example must be in exactly one part. If it does not mix, give is_mixed false and
+no parts.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "is_mixed": true,
+ "parts": [{"name": "str", "role": "str", "examples": ["C#0:s0"]}]}
+
+Cluster E2#8 of entity E2 (mentions 9, distinct values 4).
+Examples:
+- E2#8:s0 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: The ashley hotel has [[2 stars]]. They're in the postcode cb41er.
+- E2#8:s1 [system] previous turn, user: I want to stay at a 3 star hotel with free parking. | turn: I'm sorry for the confusion. There are two expensive hotels with [[3 stars]] and parking. Do you prefer the centre or the south?
+- E2#8:s2 [user] previous turn, system: I don't have a 4 star in the moderate price range. Would you like me to look in a different price range? | turn: You don't have any [[4 stars]] in the moderate price range in any area?
+- E2#8:s3 [system] previous turn, user: Yes, please try 5-star hotels with free parking. | turn: Unfortunately, I couldn't find anything with [[5 stars]].
+- E2#8:s4 [user] previous turn, system: I have 3 guesthouses all in the moderate price range. Would you like me to choose one for you? | turn: I'm sorry. I changed my mind. I don't want a guesthouse. Are there any hotels with [[2 stars]]?
+- E2#8:s5 [user] previous turn, system: I'm not finding any guesthouses that meet your criteria. Would you like to try a different area, price range, or stars? | turn: So you can't find a moderately priced guesthouse with [[3 stars]] and free parking anywhere in cambridge at all? Area doesn't matter. Please try again?
+- E2#8:s6 [user] previous turn, system: Neither hotel appears to have three days available starting on Sunday for three people, can I look something else up for you? | turn: I may have been confusing you. Could you try and book a [[4 star]], expensive hotel for 3 nights, starting on Saturday? 3 people. Wifi please.
+- E2#8:s7 [system] previous turn, user: No, but I need free wifi and I would like a 2 star guesthouse please. | turn: There isn't a guesthouse with [[2 stars]] and free internet available. Is there another type of hotel I can look up for you?
+- E2#8:s8 [user] previous turn, system: There isn't a guesthouse with 2 stars and free internet available. Is there another type of hotel I can look up for you? | turn: Yes, how about a guesthouse with [[3 stars]] and free wifi instead?
+
+Return the JSON object now.

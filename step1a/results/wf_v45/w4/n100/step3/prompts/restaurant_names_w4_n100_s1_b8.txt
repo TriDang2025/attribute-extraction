@@ -1,0 +1,65 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 8 of 16 (78 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 13:15, 16:15, 19:30; cambridge, cambridge towninfo centre, cambidge; saturday, friday, sunday
+- E2: guesthouse, hotel, acorn guest house; 2 night, 4 night, 3 night; wednesday, friday, monday
+- E3: 14:45, 19:15, 06:45; 07032807056, 07048450899, 07083984796; restaurant, hotel, city stop restaurant
+- E4: centre, centre of town, town; museum, cinema, college; cb23bu, cb11ln, cb11pt
+
+### E1#60  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E1#60:0 [system] previous turn, user: Thank you. I am also interested in visiting colleges nearby. | turn: I have [[13 colleges]] available in the centre. Did yo have one particular in mind?
+- E1#60:1 [system] previous turn, user: I would like to visit a college in the same area as the noodle bar, can you find me one? | turn: There are [[13 colleges]] in the centre of town. Most are free, but some do charge an entrance fee. Any preference?
+
+### E1#23  (mentions 3, distinct values 1, low confidence)
+Examples:
+- E1#23:0 [system] previous turn, user: Actually, I want to visit a college. Somewhere in the centre. | turn: I would suggest downing [[college]], would you like the address?
+- E1#23:1 [user] previous turn, system: Jinling noodle bar, postcode cb23pp. Is there any more info I can give you? | turn: I would like to visit a [[college]] in the same area as the noodle bar, can you find me one?
+- E1#23:2 [user] previous turn, system: What type of food would you be interested in? | turn: Actually, I want to visit a [[college]]. Somewhere in the centre.
+
+### E1#25  (mentions 1, distinct values 1)
+Examples:
+- E1#25:0 [system] previous turn, user: Thank you. Do you have the postcode, please? | turn: The postcode for [[Downing College]] is cb21dq. Anything else I have help you with?
+
+### E1#31  (mentions 7, distinct values 2)
+Examples:
+- E1#31:0 [user] turn: I'm looking for a Chinese restaurant in the centre of [[Cambridge]].
+- E1#31:1 [system] previous turn, user: Thanks again. That was all I needed. | turn: You are welcome. Thank you for using [[Cambridge TownInfo centre]]. Goodbye.
+- E1#31:2 [user] turn: I'm hoping to find a french restaurant in [[Cambridge]].
+- E1#31:3 [user] turn: I am traveling to [[Cambridge]] and looking forward to try local restaurants.
+- E1#31:4 [system] previous turn, user: Thanks. That is all I need for now. | turn: enjoy your time in [[Cambridge]]!
+- E1#31:5 [user] turn: Is there any good Jamaican food in [[Cambridge]]?
+- E1#31:6 [user] turn: I want to find a Chinese restaurant in the centre of [[Cambridge]].
+
+### E1#68  (mentions 1, distinct values 1)
+Examples:
+- E1#68:0 [system] previous turn, user: How about choosing a famous one and give me the address, postcode and entrance fee. | turn: [[corpus christi]] is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is 2 pounds.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#60, E1#23, E1#25, E1#31, E1#68) and its name as the value, like {"E1#60": "<name>"}.

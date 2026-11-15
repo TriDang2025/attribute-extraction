@@ -1,0 +1,63 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 8 of 12 (59 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 13:15, 16:15, 19:30; cambridge, cambridge towninfo centre, cambidge; saturday, friday, sunday
+- E1: expensive, moderately priced, expensive price range; restaurant, hotel, j restaurant; city centre, centre, centre of town
+- E2: guesthouse, hotel, acorn guest house; 2 night, 4 night, 3 night; wednesday, friday, monday
+- E3: 14:45, 19:15, 06:45; 07032807056, 07048450899, 07083984796; restaurant, hotel, city stop restaurant
+
+### E4#14  (mentions 13, distinct values 12, low confidence)
+Examples:
+- E4#14:0 [system] previous turn, user: Could I have the address, entrance fee, and postcode. | turn: Christ's College is on Saint Andrew's Street and postcode [[CB23BU]]. There is no entrance fee. Can I help you with anything else?
+- E4#14:1 [user] previous turn, system: Certainly! It's a museum in the centre at 98 king street cb11ln with free entrance. Their phone number is 01223314960. May I help find anything else? | turn: Is the [[cb11ln]] the postcode?
+- E4#14:2 [system] previous turn, user: That sounds good, I like that. Could you tell me what the postcode is please? | turn: the postcode is [[cb11pt]]
+- E4#14:3 [system] previous turn, user: I'm interested in the one on the south side of town. Please provide me their postcode and phone number. | turn: Phone number is 01223511511, and postcode is [[cb17gx]]
+- E4#14:4 [system] previous turn, user: Okay how much does it cost? And where the postal code? | turn: The price is uknown at this time, and the postcode is [[cb18dw]].
+- E4#14:5 [system] previous turn, user: Do you have any other suggestions? | turn: You should check out Primavera. The phone number is 01223357708. It is at 10 King's Parade and the postcode is [[cb21sj]].
+- E4#14:6 [system] previous turn, user: I am looking for a park in the south. Any available that you could give me the postcode, entrance fee's if any and the address please? | turn: There are two parks that fit your description. Both are free. May I recommend Wandlebury country park located wandlebury ring, gog magog hills, babraham? Postalcode is [[cb223ae]].
+- E4#14:7 [system] previous turn, user: I wouldn't mind seeing Emmanuel College. Can you give me the postcode? | turn: Sure, Emmanuel College has a postcode of [[cb23ap]].
+
+### E4#47  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E4#47:0 [system] previous turn, user: Hello, could you tell me if Downing College is still operating? | turn: Yes, Downing College is still operating in the centre. They're located on regent street , [[post code cb21dq]]. You can visit them for free! Anything else you need?
+
+### E4#23  (mentions 1, distinct values 1)
+Examples:
+- E4#23:0 [system] previous turn, user: Can you tell me the address for The Whale of a Time entertainment venue? And is there an entrance fee to get in there? | turn: I do not have any information on an entrance fee but I can give you the address which is [[unit 8]], viking way, bar hill.
+
+### E4#51  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E4#51:0 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend Castle Galleries, phone number 01223307402, postal code cb23bj, [[address unit su43]], grande arcade, saint andrews street. It is free.
+
+### E4#26  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E4#26:0 [user] previous turn, system: We have nearly 80 different attractions in town. First off, is there a type of attraction you would prefer? Or an area of town to search in? | turn: Please recommend something in the [[South]].
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#14, E4#47, E4#23, E4#51, E4#26) and its name as the value, like {"E4#14": "<name>"}.

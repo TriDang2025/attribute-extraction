@@ -1,0 +1,49 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 1 of 1 (1 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 13:15, 16:15, 19:30; cambridge, cambridge towninfo centre, cambidge; saturday, friday, sunday
+- E2: guesthouse, hotel, acorn guest house; 2 night, 4 night, 3 night; wednesday, friday, monday
+- E3: 14:45, 19:15, 06:45; 07032807056, 07048450899, 07083984796; restaurant, hotel, city stop restaurant
+- E4: centre, centre of town, town; museum, cinema, college; cb23bu, cb11ln, cb11pt
+
+Names already used for this entity (use one of them when the cluster holds the same kind of value with the same role): address, cuisine, day, entrance_fee, food_type, location, party_size, phone_number, postcode, price_range, reference_number, restaurant_name, table_reservation, time_reservation, venue_address
+
+### E1#18  (mentions 14, distinct values 7, low confidence)
+Examples:
+- E1#18:0 [user] previous turn, system: How about stazione restaurant and coffee bar? | turn: Okay, that sounds good. I need a table for [[7]] at 11:30 on Thursday.
+- E1#18:1 [user] previous turn, system: No problem. And what day will that be for? | turn: That will be on Friday for [[2]] please.
+- E1#18:2 [system] previous turn, user: How about Indian food? | turn: I have [[4]] different indian places to eat. Two are moderately priced and two are expensive. Do you have a preference?
+- E1#18:3 [user] previous turn, system: I have 4 different indian places to eat. Two are moderately priced and two are expensive. Do you have a preference? | turn: I perfer a moderate price range. Whatever you suggest. I need to book a table for [[1]] at 13:15 on Tuesday.
+- E1#18:4 [system] previous turn, user: I want to find a Chinese restaurant in the centre of Cambridge. | turn: There are [[10 choices]] and we have cheap, moderate and expensive options, any preference?
+- E1#18:5 [system] previous turn, user: Hi there, can you help me find a good Chinese restaurant? I seriously need some egg rolls. | turn: There are [[17]] Chinese restaurants. Are you looking for any particular area or price range?
+- E1#18:6 [system] previous turn, user: Yes, I need to find a restaurant in the same area. | turn: I have [[9]] different restaurants in the south. Lets try to narrow it down. Do you have a preference on price range?
+- E1#18:7 [user] previous turn, system: I would suggest pizza express. | turn: Can you check if they would have a table for [[7]] at 17:45 on Sunday?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#18) and its name as the value, like {"E1#18": "<name>"}.

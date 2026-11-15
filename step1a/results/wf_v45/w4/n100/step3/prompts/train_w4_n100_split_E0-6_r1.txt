@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, give the parts: for each part a snake_case name, a short role, and the ids of the examples
+that belong to it. Every example must be in exactly one part. If it does not mix, give is_mixed false and
+no parts.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "is_mixed": true,
+ "parts": [{"name": "str", "role": "str", "examples": ["C#0:s0"]}]}
+
+Cluster E0#6 of entity E0 (mentions 9, distinct values 2).
+Examples:
+- E0#6:s0 [user] previous turn, system: The price is uknown at this time, and the postcode is cb18dw. | turn: I am also looking for a train for Thursday departing from [[Stevenage]].
+- E0#6:s1 [user] previous turn, system: Your booking at the Allenbell was successful. Your reference number is PV039AJH. | turn: I also need a train from [[Stevanage]] to Cambridge.
+- E0#6:s2 [user] previous turn, system: Most are free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50 pound fee, and Trinity has a 1 pound fee. | turn: I need a train that leaves at 20:45 from [[stevenage]] to cambridge
+- E0#6:s3 [user] turn: Can I catch a train to [[Stevenage]]?
+- E0#6:s4 [system] previous turn, user: I need arrive in stevenage by 15:00. | turn: TR2874 train arrives at [[stevenage]] at 14:10. Would you like more info or can I book it for you?
+- E0#6:s5 [system] previous turn, user: Can I catch a train to Stevenage? | turn: Yes, TR2515 departs on friday at 05:21 to [[stevenage]], would you like me to book it?
+- E0#6:s6 [system] previous turn, user: Yes please when is the arrival time? | turn: TR2515 arrives in [[Stevenage]] at 06:10, bright and early!
+- E0#6:s7 [user] previous turn, system: TR9448 leaves at 05:54 and arrives at 06:43. The travel time is 49 minutes. | turn: I've mixed up my locations. I actually need a train that departs from Cambridge and goes to [[Stevenage]].
+- E0#6:s8 [user] previous turn, system: Where will you be headed? | turn: I need arrive in [[stevenage]] by 15:00.
+
+Return the JSON object now.

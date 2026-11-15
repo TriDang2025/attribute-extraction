@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E1#15:s0": "P1", "E1#15:s1": "P2"}}
+
+Cluster E1#15 of entity E1 (mentions 58, distinct values 17).
+Examples:
+- E1#15:s0 [user] previous turn, system: There are 17 Chinese restaurants. Are you looking for any particular area or price range? | turn: I'd like it to be in the north, and [[expensive]] would be best.
+- E1#15:s1 [system] previous turn, user: I don't care about the cuisine but I want it to be in the west. | turn: We have prezzo. It is an italian restaurant located in the west. It is [[moderately priced]]. Would you like me to book it for you?
+- E1#15:s2 [user] turn: I am looking for a restaurant to book a reservation. I want asian oriental in the [[expensive price range]]
+- E1#15:s3 [system] previous turn, user: I would like to find a danish restaurant this is moderately priced. | turn: There are no Danish restaurants in the [[moderate price range]]. Would you like me to check for restaurants serving a different type of food?
+- E1#15:s4 [system] previous turn, user: I'll take something that is cheap. | turn: There are a total of 15 restaurants that are [[cheap]] in the centre. Is there another type you would like to try?
+- E1#15:s5 [user] previous turn, system: I'm sorry, there are no North Indian restaurants in the centre area. Would you like to check a different area? | turn: What about [[expensive restaurants]]?
+- E1#15:s6 [user] previous turn, system: Ok, to be clear, which price range do you prefer-- cheap, moderate or expensive? | turn: I am looking for a [[moderately priced restaurant]]
+- E1#15:s7 [system] previous turn, user: How about Indian food instead? | turn: There are two Indian restaurants in the north part of town. [[What price range]] are you looking for?
+- E1#15:s8 [system] previous turn, user: Is there anything else? | turn: Thanh binh is located in the west part of town and is in the [[cheap price range]]. Would you like their information?
+- E1#15:s9 [user] turn: I'm looking for a restaurant that serves asian oriental food in [[cheap range]].
+- E1#15:s10 [user] previous turn, system: Booking was successful, the total fee is 64.64 GBP payable at the station. Your reference number is: LTQHUT3Y. Can I assist with anything else today? | turn: Yeah, I'm looking for an [[expensive place]] to dine at in the southern area of the city.
+- E1#15:s11 [system] previous turn, user: I'm looking for a family friendly restaurant that is reasonably price and located in the center of town near attractions, hotels and easy access to transportation such as buses and taxis. | turn: Ok, to be clear, which price range do you prefer-- cheap, [[moderate]] or expensive?
+- E1#15:s12 [system] previous turn, user: What are the price ranges of the two available restaurants? | turn: One of them is cheap and the other is [[moderately price]].
+- E1#15:s13 [system] previous turn, user: That won't be necessary. What is the postcode? | turn: [[prezzo]]'s postcode is cb30ad.
+- E1#15:s14 [user] previous turn, system: There are two Indian restaurants in the north part of town. What price range are you looking for? | turn: What are the [[price ranges]] of the two available restaurants?
+- E1#15:s15 [user] turn: I'm looking for a family friendly restaurant that is [[reasonably price]] and located in the center of town near attractions, hotels and easy access to transportation such as buses and taxis.
+
+Return the JSON object now.

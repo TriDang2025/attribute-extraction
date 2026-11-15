@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E0#4:s0": "P1", "E0#4:s1": "P2"}}
+
+Cluster E0#4 of entity E0 (mentions 65, distinct values 8).
+Examples:
+- E0#4:s0 [system] previous turn, user: I'm departing from birmingham new street on Saturday and I'd like to leave after 12:45. | turn: How about TR8390 that leaves birmingham new street at 13:40 on [[Saturday]]. It arrives in cambridge at 16:23. The price is 60.08. Shall I book it?
+- E0#4:s1 [user] turn: I am looking for a train that leaves on [[Friday]] and goes to cambidge
+- E0#4:s2 [system] previous turn, user: hello. I'm trying to get to kings lynn on sunday. can you help? | turn: Of course. To be of better service can I ask your departure location and what time you would like to arrive on [[Sunday]]?
+- E0#4:s3 [system] previous turn, user: I am interested in booking a train to cambridge for next tuesday. | turn: There are several trains departing for Cambridge on [[Tuesday]]. One train departs every hour starting at 06:08
+- E0#4:s4 [user] previous turn, system: My personal favorite is the Museum of Archaeology and Anthropology at University of Cambridge, Downing Street. It even has free admission! | turn: I'll check that out. Can you also find me a train for [[Monday]] I'm leaving leicester?
+- E0#4:s5 [user] previous turn, system: Booking was successful. Reference number is : FC2BDIC9. | turn: I also need a train on [[Wednesday]], leaving from Kings Lynn.
+- E0#4:s6 [system] previous turn, user: I am also looking for a train for Thursday departing from Stevenage. | turn: There are many train departure options on [[Thursday]]. When do you want to leave and arrive by?
+- E0#4:s7 [user] turn: I am interested in booking a train to cambridge for [[next tuesday]].
+- E0#4:s8 [user] previous turn, system: I can help you with that. What is your departure site and day you would like to travel? | turn: I will be departing from Cambridge on [[Saturday]].
+- E0#4:s9 [user] turn: I need to find a train that leaves peterborough on [[friday]].
+- E0#4:s10 [user] previous turn, system: Can you please provide me with destination of the train so I can better assist you? | turn: Cambridge, and it will be on [[sunday]].
+- E0#4:s11 [user] previous turn, system: Okay what day will you be travelling and what time would you like to travel? | turn: [[Tuesday]], I want to arrive at 20:15.
+- E0#4:s12 [system] previous turn, user: Yes, we will be coming from bishops stortford on Monday. I would like to leave after 19:30. | turn: Their is a train that leaves [[Monday]] at 21:29. it costs 10.10 pounds and it's a 38 minute trip. Would you like me to book that for you?
+- E0#4:s13 [user] previous turn, system: Not a problem. Where are you departing from, and what day would you like to travel? | turn: I want to leave from cambridge on [[wednesday]].
+- E0#4:s14 [user] previous turn, system: The reference number is G7THDK3O. Is there anything else I can help you with. | turn: Yes, please. I need a train to Leicester on [[Thursday]], please. I need to get there by 16:15.
+- E0#4:s15 [system] previous turn, user: I need to go from leicester to cambridge. | turn: It looks like train TR6210 will be leaving Leicester at 11:09 on [[Saturday]] and will arrive to Cambridge at 12:54. Can I help you with anything else?
+
+Return the JSON object now.

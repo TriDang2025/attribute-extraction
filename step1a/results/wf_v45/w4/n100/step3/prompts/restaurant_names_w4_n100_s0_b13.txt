@@ -1,0 +1,65 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 13 of 16 (78 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 13:15, 16:15, 19:30; cambridge, cambridge towninfo centre, cambidge; saturday, friday, sunday
+- E2: guesthouse, hotel, acorn guest house; 2 night, 4 night, 3 night; wednesday, friday, monday
+- E3: 14:45, 19:15, 06:45; 07032807056, 07048450899, 07083984796; restaurant, hotel, city stop restaurant
+- E4: centre, centre of town, town; museum, cinema, college; cb23bu, cb11ln, cb11pt
+
+### E1#29  (mentions 3, distinct values 1)
+Examples:
+- E1#29:0 [system] previous turn, user: I am also looking for a vietnamese place to dine in the same price range as the hotel. | turn: I found [[Thanh Binh]]; would you like me to make you a reservation?
+- E1#29:1 [system] previous turn, user: Is there anything else? | turn: [[Thanh binh]] is located in the west part of town and is in the cheap price range. Would you like their information?
+- E1#29:2 [system] previous turn, user: Yes, please give me their address and phone number. | turn: [[thanh binh]] is located at 17 magdalene street city centre and its phone number is 01223315232. Is there anything else I can help you with?
+
+### E1#61  (mentions 1, distinct values 1)
+Examples:
+- E1#61:0 [system] previous turn, user: I'd like it to be in the north, and expensive would be best. | turn: I would recommend either [[Hakka]] or The Hotpot. Would you like for me to book a reservation for one of these restaurants?
+
+### E1#5  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#5:0 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is C.B 1, [[9 H.X]], and their phone number is 01223 249955.
+
+### E1#3  (mentions 4, distinct values 2)
+Examples:
+- E1#3:0 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street [[Cherry Hinton]] Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is 01223 249955.
+- E1#3:1 [system] previous turn, user: We eat Pizza Hut way to much. Can you try something with indian food? It is a special occasion so it can be expensive. | turn: There is Taj Tandoori which is located on [[64 Cherry Hinton Road]]. Would you like me to book a table for you?
+- E1#3:2 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton [[Cherry Hinton]], their postcode is C.B 1, 9 H.X, and their phone number is 01223 249955.
+- E1#3:3 [system] previous turn, user: Do any of the nine restaurants serve north american food? | turn: No, they do not. How about Pizza Hut [[Cherry Hinton]]? It is Italian but it is popular with the Americans here.
+
+### E1#51  (mentions 5, distinct values 1, low confidence)
+Examples:
+- E1#51:0 [system] previous turn, user: Tell me the address of the moderately priced one. | turn: The Nirala is located at 7 Milton Street [[Chesterton]].
+- E1#51:1 [system] previous turn, user: Thank you! I would like to go to an expensive restaurant, please. | turn: I would recommend Tandoori Palace at 68 Histon Road [[Chesterton]]. The food there is great. Would you like for me to book a reservation for you?
+- E1#51:2 [system] previous turn, user: Okay, thanks! Can you please give me the postcode and address? | turn: The Nirala is located at 7 Milton Road [[Chesterton]], cb41uy. How else can I help you today?
+- E1#51:3 [system] previous turn, user: Yes. I would like to eat Indian food. | turn: The tandoori palace meets your criteria. It is located at 68 Histon Road [[Chesterton]].
+- E1#51:4 [system] previous turn, user: Sure, how about one that serves indian food in that area. | turn: There are 5 results for restaurants serving indian food, the first is tandoori palace located at 68 Histon Road [[Chesterton]]. Would you like a reservation and for how many?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#29, E1#61, E1#5, E1#3, E1#51) and its name as the value, like {"E1#29": "<name>"}.

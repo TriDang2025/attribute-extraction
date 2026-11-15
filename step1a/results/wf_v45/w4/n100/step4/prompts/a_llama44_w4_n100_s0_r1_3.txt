@@ -1,0 +1,199 @@
+Below are two tables of a relational database design, each with its columns. Decide whether restaurant and taxi are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "restaurant -> taxi": one restaurant row has many taxi rows (each taxi row refers to one restaurant row)
+- "taxi -> restaurant": one taxi row has many restaurant rows (each restaurant row refers to one taxi row)
+- "many_to_many": a restaurant row can go with many taxi rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table restaurant (one row = one restaurant), 21 columns:
+[restaurant:1] address
+  values: text (share 1.00); 10 mentions in 9 dialogues
+  examples:
+    "c.b 2" (in: "The address is Corn Exchange Street and the postcode is C.B 2, 3QF")
+    "1 a.w" (in: "the address is 83 Regent Street, postcode is C.B 2, 1 A.W.")
+[restaurant:2] attraction name
+  values: text (share 1.00); 7 mentions in 4 dialogues
+  examples:
+    "attraction" (in: "...ated in the center of town near attractions, hotels and easy access to tra...")
+    "entree fee" (in: "is at king's parade. The post code cb21rh and the entree fee is 2 pounds.")
+[restaurant:3] cuisine
+  values: text (share 1.00); 69 mentions in 39 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+[restaurant:4] date
+  values: day (share 0.67); 18 mentions in 13 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+[restaurant:5] entity
+  values: text (share 1.00); 42 mentions in 31 dialogues
+  examples:
+    "restaurant" (in: "what is the food type of that restaurant ?")
+    "j restaurant" (in: "you! Do you have the reviews and address for the J Restaurant near there?")
+[restaurant:6] entrance fee
+  values: price (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 pound" (in: "parade. The post code cb21rh and the entree fee is 2 pounds.")
+[restaurant:7] food type
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "british food" (in: "...ange. The copper kettle serves british food and is moderately priced. Woul...")
+    "italian" (in: "I have five places. Do you prefer, Italian, Chinese, Mexican or Indian?")
+[restaurant:8] location
+  values: text (share 1.00); 90 mentions in 40 dialogues
+  examples:
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+[restaurant:9] location str
+  values: id (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "cb12as" (in: "... Phone is 01223311911 postcode is cb12as and they are at 100 Mill Rd City ...")
+    "cb17aa" (in: "Taj Tandoori's phone number is 01223412299 and the postcode is cb17aa.")
+[restaurant:10] num
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "15" (in: "There are a total of 15 restaurants that are cheap in the centre. Is there an...")
+[restaurant:11] num str
+  values: number (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "2" (in: "There are two. Both are expensive. One is in the north and")
+    "2 people" (in: "I want a reservation for 2 people at 17:30 on thursday. Sorry, I don't know w...")
+[restaurant:12] num word
+  values: number (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "4 people" (in: "...ght, now have a reservation for four people at the Tandoori Palace at 3:15...")
+    "3 people" (in: "...I need a reservation for Friday, 3 people at 13:45. Please include the ref...")
+[restaurant:13] num word cardinal
+  values: number (share 1.00); 19 mentions in 14 dialogues
+  examples:
+    "3" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "8 people" (in: "If so, book me a table there for Thursday for 8 people at 13:30 please.")
+[restaurant:15] phone number
+  values: number (share 0.71); 17 mentions in 15 dialogues
+  examples:
+    "01223367660" (in: "...xpensive. Their phone number is 01223367660. Would you like me to book for...")
+    "01223" (in: "01223 308871 Will that be all?")
+[restaurant:18] price range
+  values: text (share 1.00); 27 mentions in 21 dialogues
+  examples:
+    "north" (in: "... Both are expensive. One is in the north and one is in the centre. Do you ...")
+    "south" (in: "I have 9 different restaurants in the south. Lets try to narrow it down. Do y...")
+[restaurant:19] reference number
+  values: id (share 0.96); 24 mentions in 22 dialogues
+  examples:
+    "03:15" (in: "...r people at the Tandoori Palace at 3:15 on Wednesday. Is there anything el...")
+    "42xedgdf" (in: "...booked. Your reference number is 42XEDGDF. Is there anything else I can he...")
+[restaurant:20] reservation number
+  values: text (share 1.00); 10 mentions in 10 dialogues
+  examples:
+    "table" (in: "Yes I have three. When would you like the table reserved for and for how many?")
+    "your table" (in: "Your table was booked. Your reference number is 42XEDGDF. Is there anything")
+[restaurant:21] restaurant name
+  values: text (share 1.00); 59 mentions in 34 dialogues
+  examples:
+    "anatolia" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+    "graffiti" (in: "I'm also looking to eat at a restaurant called graffiti.")
+[restaurant:22] time
+  values: time (share 0.55); 60 mentions in 25 dialogues
+  examples:
+    "friday" (in: "would like the reservation for 5 people at 18:45 on Friday.")
+    "12:45" (in: "I would like a reservation for 2 at 12:45 please.")
+[restaurant:23] time str
+  values: time (share 0.70); 10 mentions in 9 dialogues
+  examples:
+    "13:15" (in: "suggest. I need to book a table for 1 at 13:15 on Tuesday.")
+    "what day" (in: "What day would you like to dine on ?")
+[restaurant:24] time unit
+  values: duration (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+
+Table taxi (one row = one taxi), 16 columns:
+[taxi:1] accommodation type
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "a guesthouse" (in: "A guesthouse has already been booked for you. Is there anything else")
+    "guest house" (in: "just confirm whether the Allenbell is a Hotel or a Guest House?")
+[taxi:2] admission fee
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "free admission" (in: "have a lovely architecture called all saints church it is free admission")
+[taxi:3] arrival time
+  values: text (share 0.60); 5 mentions in 3 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "friday" (in: "you book me a table for 4 at 16:15 on Friday?")
+[taxi:4] attraction type
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "all saint church" (in: "we have a lovely architecture called all saints church it is free admission")
+[taxi:5] car type
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "white ford" (in: "Booking completed! Booked car type : white ford Contact number : 07267142867")
+[taxi:6] contact number
+  values: number (share 1.00); 17 mentions in 16 dialogues
+  examples:
+    "07032807056" (in: "...a white tesla booked. The contact number is 07032807056. Anything else today?")
+    "07048450899" (in: "you need to contact the taxi company, you can call 07048450899.")
+[taxi:7] cuisine
+  values: text (share 1.00); 7 mentions in 2 dialogues
+  examples:
+    "british" (in: "...Lebanese, Turkish, international, British, European, and Chinese. Do any o...")
+    "chinese" (in: "... international, British, European, and Chinese. Do any of these interest you?")
+[taxi:8] destination
+  values: text (share 1.00); 12 mentions in 9 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "It's my pleasure. Thank you for using Cambridge TownInfo centre. Goodbye.")
+    "cambridge" (in: "Your welcome, enjoy your time in Cambridge.")
+[taxi:9] establishment
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "hotel" (in: "need to book a taxi to the restaurant from the hotel for the dinner reservation.")
+[taxi:10] location
+  values: text (share 1.00); 12 mentions in 8 dialogues
+  examples:
+    "restaurant" (in: "I want to leave the restaurant by 09:15. Please get me the contact number and...")
+    "allenbell" (in: "...But, can you book me a taxi from Allenbell to J Restaurant. I need to be t...")
+[taxi:11] pickup location
+  values: text (share 1.00); 11 mentions in 8 dialogues
+  examples:
+    "college" (in: "I also need a taxi to get from college to the restaurant. I need to arrive by...")
+    "downing college" (in: "I'll need a taxi to get me from downing college to pizza express by 17:45. ca...")
+[taxi:12] reference number
+  values: id (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "ddlkgevp" (in: "will be reserved for 15 minutes. Reference number is : DDLKGEVP.")
+    "pu74excq" (in: "That worked and I have a reference number for you: PU74EXCQ.")
+[taxi:13] reservation time
+  values: duration (share 0.50); 2 mentions in 2 dialogues
+  examples:
+    "15 minute" (in: "...l. The table will be reserved for 15 minutes. Reference number is : DDLKGEVP.")
+    "2 people" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+[taxi:14] table size
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "4" (in: "That's perfect, could you book me a table for 4 at 16:15 on Friday?")
+[taxi:15] time num
+  values: time (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "14:45" (in: "from college to the restaurant. I need to arrive by 14:45.")
+    "06:45" (in: "I will be leaving from leverton house arriving by 06:45.")
+[taxi:16] time str
+  values: time (share 1.00); 9 mentions in 6 dialogues
+  examples:
+    "19:15" (in: "I'd like to book a taxi from Ask, departing after 19:15.")
+    "14:15" (in: "have the car pick me up at the college at 2:15 p.m. instead.")
+
+Return the JSON object now.
