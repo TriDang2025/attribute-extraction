@@ -1,0 +1,72 @@
+Below are two tables of a relational database design, each with its columns. Decide whether hotel and attraction_2 are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "hotel -> attraction_2": one hotel row has many attraction_2 rows (each attraction_2 row refers to one hotel row)
+- "attraction_2 -> hotel": one attraction_2 row has many hotel rows (each hotel row refers to one attraction_2 row)
+- "many_to_many": a hotel row can go with many attraction_2 rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table hotel (one row = one hotel), 9 columns:
+[hotel:8] num days
+  values: number (share 0.73); 22 mentions in 14 dialogues
+  examples:
+    "2 night" (in: "I will arrive Friday and be there for 2 nights.")
+    "3 night" (in: "I will be staying for 3 nights.")
+[hotel:7] location
+  values: text (share 0.96); 26 mentions in 13 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+[hotel:1] area
+  values: text (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+    "north part of cambridge" (in: "...'m hoping to find a guesthouse in the north part of Cambridge. Are there any?")
+[hotel:15] price range
+  values: text (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "city centre north b and b" (in: "Okay! Would you like to stay at City Centre North B and B, or at Worth House?")
+    "moderately priced" (in: "...n your selected region. It's moderately priced and includes free internet ...")
+[hotel:4] entity
+  values: text (share 1.00); 10 mentions in 9 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+[hotel:9] num nights
+  values: number (share 1.00); 15 mentions in 10 dialogues
+  examples:
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+[hotel:10] num people
+  values: number (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+    "2 star" (in: "The ashley hotel has 2 stars. They're in the postcode cb41er.")
+[hotel:6] hotel name
+  values: text (share 1.00); 27 mentions in 14 dialogues
+  examples:
+    "hotel" (in: "Can you please confirm that the hotel you've booked for us offers free wi-fi?...")
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+[hotel:3] date
+  values: day (share 0.88); 24 mentions in 15 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+
+Table attraction_2 (one row = one attraction_2), 1 columns:
+[attraction_2:1] attraction name
+  values: text (share 0.75); 4 mentions in 3 dialogues
+  examples:
+    "all saint church" (in: "we have a lovely architecture called all saints church it is free admission")
+    "cambridge towninfo centre" (in: "It's my pleasure. Thank you for using Cambridge TownInfo centre. Goodbye.")
+
+Return the JSON object now.
