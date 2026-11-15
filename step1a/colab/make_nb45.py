@@ -29,6 +29,9 @@ Model: Llama-3.1-8B-Instruct, bf16, vLLM, temperature 0, guided JSON (setting `l
 - Cell 6: data check.
 - Cell 7: **W1** Step 4 v4.4 with "other" off on a_llama44 then c1 (dev50 + dev50b, seeds 0-2 + vote), score, freeze check. About 70 calls, 10-20 min (estimate).
 - Cell 8: **W2** the one command (`s1a/pipeline_v45.py`) on raw dev50 (corpus n50): Steps 3-4 on GPU (Step 1a-2 output `results/graph_v22_c_n50` comes from the laptop), then the dev50 check. Set STEP4 to the W1 freeze. About 450 calls, 30-40 min (estimate).
+- Cell 9: **W4** cost runs per corpus size, after the Step 1a notebook (`colab/S1A_wf45_step1a_colab.ipynb`) has uploaded the Step 1a-2 folders
+  to HF. One seed of the command per size, smallest first, push after each size. Calls grow with the clusters: roughly 450 (n50) to a few
+  thousand (n1000); total 2-5 h on an A100 (rough estimate; set SIZES to fewer sizes to stop early).
 - After a crash or disconnect: rerun cells 1, 3, 4, 5 and then the cell you were on. Answered calls are read from the cache.
 - Colab Secrets `HF_TOKEN` and `GH_TOKEN`, notebook access on. Never put a token in a cell.
 - When the GPU work is done: **Runtime > Disconnect and delete runtime**, so the paid GPU stops.
@@ -73,9 +76,37 @@ p = subprocess.run(["bash", "colab/sync.sh", "push-results", "wf_v45 W2 n50 end 
 print(p.stdout.strip() or p.stderr[-500:])
 print("W2 done: disconnect the runtime, then tell Claude 'W2 done'")
 """
+w4 = """#@title 9. W4: cost runs, one seed of the W2 command per corpus size (Step 1a-2 from the Step 1a notebook, via HF), smallest first
+STEP4 = "v44_other_off"  #@param ["v44_other_off", "v43"]
+SIZES = "50,100,200,300,500,1000"  #@param {type:"string"}
+import sys, json, subprocess
+from pathlib import Path
+sys.path.insert(0, "/content/attribute-extraction/step1a/scripts")
+from s1a import pipeline_v45 as PL, step3_v44 as S3
+import w4_step1a_v45 as W
+sizes = [int(x) for x in SIZES.split(",")]
+W.download(sizes)
+tok = llm.get_tokenizer()
+times = W.times()
+if "enc3" not in globals():
+    enc3 = S3.bge_m3_encoder()
+for n in sizes:
+    texts = [json.loads(l)["text"] for l in open(W.CORPORA / f"n{n}.jsonl", encoding="utf-8")] if (W.CORPORA / f"n{n}.jsonl").exists() else \\
+            [json.loads(l)["text"] for l in open(PL.CO.run_dir(W.set_name(n)) / "docs.jsonl", encoding="utf-8")]
+    corpus_tokens = sum(len(tok.encode(t, add_special_tokens=False)) for t in texts)
+    out = W.OUT / f"n{n}"
+    c = PL.run_pipeline(None, out, W.set_name(n), backend, enc3, None, PL.step4_config(STEP4), load_seconds=L44.load_time("results/wf_v45/model_load.json"),
+                        skip_1a=True)
+    c.update(dialogues=len(texts), corpus_tokens=corpus_tokens, step1a_2=times.get(n), step4_choice=STEP4)
+    (out / "cost.json").write_text(json.dumps(c, indent=1) + "\\n", encoding="utf-8")
+    print(n, "dialogues:", c["total_llm"], "| step 1a s:", (times.get(n) or {}).get("seconds"))
+    p = subprocess.run(["bash", "colab/sync.sh", "push-results", f"wf_v45 W4 n{n}", "wf_v45/w4"], capture_output=True, text=True)
+    print(p.stdout.strip() or p.stderr[-500:])
+print("W4 done: disconnect the runtime, then tell Claude 'W4 done'")
+"""
 nb = dict(src)
 nb["cells"] = [cell("markdown", intro), cell("code", c1), cells[2], cells[3], cells[4], cell("code", c4), cells[6], cell("code", data), cell("code", w1),
-               cell("code", w2)]
+               cell("code", w2), cell("code", w4)]
 out = step1a / "colab" / "S1A_wf45_colab.ipynb"
 out.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 print("wrote", out, len(nb["cells"]), "cells")

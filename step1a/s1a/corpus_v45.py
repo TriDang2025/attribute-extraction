@@ -22,8 +22,6 @@ from . import mentions as MN
 from . import paths
 from . import segment as SG
 
-sys.path.insert(0, str(paths.ROOT / "scripts"))
-import export_mentions as EM  # noqa: E402  (span_inputs, apply_variant)
 from chk.data import make_doc  # noqa: E402
 
 VARIANT = "F_m2_t06_bk"
@@ -62,17 +60,42 @@ def entity_names(instances, docs):
     return names
 
 
-def step1a(corpus, set_name, enc, root=paths.ROOT, log=print):
-    """Steps 1a-2 of the corpus into run_dir(set_name). Returns {"docs", "mentions", "clusters", "entities", "seconds"}."""
+def _gliner_on_gpu():
+    """spans.load with the model moved to CUDA when there is a GPU (same model and weights; the laptop stays on CPU)."""
+    from . import spans as SP
+    load = SP.load
+
+    def load_gpu():
+        m = load()
+        import torch
+        return m.to("cuda") if torch.cuda.is_available() else m
+    return SP, load, load_gpu
+
+
+def step1a(corpus, set_name, enc, root=paths.ROOT, log=print, fresh=False):
+    """Steps 1a-2 of the corpus into run_dir(set_name). fresh=True: empty run caches and the encoder's in-memory cache first, so the
+    time is that of this corpus alone. Returns {"docs", "mentions", "clusters", "entities", "seconds"}."""
     if not SET_RE.match(set_name):
         raise ValueError(f"set name {set_name!r}: lowercase letters, digits, _ only")
-    t0 = time.time()
+    sys.path.insert(0, str(paths.ROOT / "scripts"))
+    import export_mentions as EM   # Step 1a only (GLiNER, chunker): not loaded by the LLM session
     out = run_dir(set_name, root)
+    if fresh:
+        import shutil
+        shutil.rmtree(out / "cache", ignore_errors=True)
+        enc.cache.clear()
+    t0 = time.time()
     docs = read_corpus(corpus)
     MN.save_shared(out, docs, [], {})
     inp = MN.Inputs(mentions=[], tables={})
-    inp.spans, inp.segs = EM.span_inputs(docs, enc, out / "cache")
-    t_spans = time.time() - t0
+    SP, load, load_gpu = _gliner_on_gpu()
+    SP.load = load_gpu
+    try:
+        t_g = time.time()
+        inp.spans, inp.segs = EM.span_inputs(docs, enc, out / "cache")
+    finally:
+        SP.load = load
+    t_spans = time.time() - t_g
     EM.apply_variant(inp, VARIANT)
     e = MN.build("spans", docs, enc, SEED, inp=inp)
     MN.save(e, out / "spans")
