@@ -162,7 +162,8 @@ def cost(out, step1a_info, load_seconds=None):
 def outputs(out, set_name, step1a_info=None, load_seconds=None):
     """<out>/schema.sql (the voted Step 4 schema), attributes.json ({entity: [column names]} of the Step 3 final columns), cost.json."""
     out = Path(out)
-    st = B.read_json(out / "step4" / "final" / "status.json")
+    sp = out / "step4" / "final" / "status.json"
+    st = B.read_json(sp) if sp.exists() else []      # missing: Step 4 aborted before the assembly
     ok = {r["run"] for r in st if r["ok"]}
     # the voted schema, else the first finished seed; none finished -> no schema.sql, the chain errors go to cost.json
     run = next((r for r in [f"a_llama44_{set_name}_vote"] + [f"a_llama44_{set_name}_s{s}" for s in (0, 1, 2)] if r in ok), None)
@@ -230,8 +231,15 @@ def run_pipeline(corpus, out, set_name, backend, encoder, enc_1a, step4_cfg, loa
         log(f"step 3: {len(entmap)} entities {entmap}")
         step3(set_name, out / "step3", backend, encoder)
         log("step 4")
-        step4(set_name, out / "step4", backend4 or backend, out / "step3", step4_cfg)
+        aborted = None
+        try:
+            step4(set_name, out / "step4", backend4 or backend, out / "step3", step4_cfg)
+        except ValueError as e:      # the backend refuses a prompt over its token limit: Step 4 cannot run on this corpus
+            aborted = str(e)
+            log(f"step 4 aborted: {aborted}")
     c = outputs(out, set_name, info1, load_seconds)
+    if aborted:
+        c["step4_aborted"] = aborted
     c["wall_seconds"] = round(time.time() - t0, 1)
     B.write_json(out / "cost.json", c)
     return c
