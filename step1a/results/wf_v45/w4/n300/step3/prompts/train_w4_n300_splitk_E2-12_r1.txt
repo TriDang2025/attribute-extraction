@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E2#12:s0": "P1", "E2#12:s1": "P2"}}
+
+Cluster E2#12 of entity E2 (mentions 25, distinct values 10).
+Examples:
+- E2#12:s0 [system] previous turn, user: Yes that will work thank you. | turn: [[How many tickets]] would you like me to book for train TR5713?
+- E2#12:s1 [system] previous turn, user: Sunday,can you book it for me and I need a reference number,please | turn: Sure. Just to confirm, [[how many seats]] will you need?
+- E2#12:s2 [user] previous turn, system: The earliest leaves at 13:40 and the trains depart every hour through 23:40. If you'd like to choose one I can book it for you. | turn: That would be great. [[How much]] would it cost to travel to stansted from Cambridge?
+- E2#12:s3 [user] previous turn, system: Allright. TR0357 departs at 09:39. Would you like me to book you tickets? | turn: Can you give me the [[ticket price]]?
+- E2#12:s4 [system] previous turn, user: Yes please, just one ticket. Could I get the reference number for the train you book please? | turn: OK, I've booked you 1 ticket on TR0514, departing stansted airport at 7:24 and arriving cambridge at 7:52. The reference number is P1C2KKFQ. [[Total fee]] is 10.1 GBP.
+- E2#12:s5 [system] previous turn, user: I also need a train from birmingham new street on monday that goes to cambrige by 20:30. | turn: [[For how many people]]?
+- E2#12:s6 [system] previous turn, user: I'm going to be headed to Cambridge from Birmingham New Street on Monday. | turn: There are trains every hour starting at 05:40. Travel time is 163 minutes. Is there a time you want to depart or arrive by? [[How many people]] are traveling?
+- E2#12:s7 [system] previous turn, user: Yes, please book it and provide the reference number. | turn: [[How many train tickets]] would you like to book?
+- E2#12:s8 [user] previous turn, system: Okay I got that booked for you and the reference number is A08YI4V4. | turn: Can I get the departure time and the [[price of the ticket]] please?
+- E2#12:s9 [user] previous turn, system: There are trains every hour on the :16 that will get you there by noon, beginning at 5:16. Which would you prefer? | turn: How about 7:16? [[What is the price]]?
+- E2#12:s10 [system] previous turn, user: I'll be heading to Cambridge and I'd like to leave at or a little after 09:00, if possible. | turn: I have the tr1393 which leaves the station at 09:19, [[how many tickets]] would you like?
+- E2#12:s11 [system] previous turn, user: Alright. I'll take it! That train will be perfect. | turn: Ok, [[how many seats]] would you like to book?
+- E2#12:s12 [user] previous turn, system: I have trains departing every 2 hours on the :54's, TR3330 leaves at 9:54, would you like to book it? | turn: I don't think so but [[how much]] does that one cost?
+- E2#12:s13 [user] previous turn, system: travel time is 49 minutes. Is there anything else I can help with? | turn: Can you give me the [[ticket price]], please?
+- E2#12:s14 [system] previous turn, user: Just one seat. | turn: Your booking was successful! The reference number is 698RE4W1. The [[total fee]] of 17.89 is payable at the station.
+- E2#12:s15 [system] previous turn, user: Please book one. | turn: [[How many tickets]] do I need to reserve for your train?
+
+Return the JSON object now.

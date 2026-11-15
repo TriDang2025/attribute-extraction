@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#0/0: name: location str | description: area
+Examples:
+- 1 [user] previous turn, system: Yes the postcode is cb22ha and the address is 53 roseford road. Would you like me to book it for you? | turn: No thanks. Could you find a multiple sports attraction in the [[centre]]?
+- 2 [user] turn: I am looking for a college attraction to go to in [[town]].
+- 3 [user] previous turn, system: There are 25 possible attractions in the requested area. Are you looking for any specific types of attractions? | turn: No not really. Can you recommend me an attraction that's in the [[centre area]]? Can I also get the address, entrance fee, and phone number for it? Thanks!
+- 4 [system] previous turn, user: I would like to go to a nice nightclub | turn: We have ballare that's night, it's in the [[city centre]].
+- 5 [user] previous turn, system: I can definitely help you with that. Is there a specific type of attraction you are interested in or section of the city you were looking at? | turn: I'm looking for a theatre in any part of the [[city]]. Can you recommend one?
+
+Columns (5):
+- name: attraction name | examples: ballare; abbey pool; great saint mary
+- name: location | examples: theatre; emmanuel college; hotel
+- name: attraction type | examples: museum; cinema; attraction
+- name: number of theatres | examples: 1 theatre; 3 night; 4
+- name: other | examples: park; 01223 355166; 01223 413000
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#0/0", "reason": "str", "same_as": "<column name or none>"}

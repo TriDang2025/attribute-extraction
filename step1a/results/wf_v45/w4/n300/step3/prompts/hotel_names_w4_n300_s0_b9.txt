@@ -1,0 +1,67 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 9 of 12 (59 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; cb23bu, cb11ln, cb18dw; museum, theatre, cinema
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E3#50  (mentions 2, distinct values 1)
+Examples:
+- E3#50:0 [system] previous turn, user: get me the address, phone number, and area. i am also looking for a 4 start place to stay in the north | turn: [[Parkside pools]] is gonville place. The area is the centre and phone number is 01223446100.
+- E3#50:1 [system] previous turn, user: Actually, I think that what I really want is a hotel that is in the same area as a swimming pool. Are there any public swimming pools in town? | turn: [[Parkside Pools]] are in the centre of town, if that would be okay.
+
+### E3#51  (mentions 1, distinct values 1)
+Examples:
+- E3#51:0 [system] previous turn, user: It does not matter and please provide the entrance fee. | turn: I can suggest the [[Castle Galleries]] in the city centre. There is no entrance fee.
+
+### E3#53  (mentions 2, distinct values 2)
+Examples:
+- E3#53:0 [user] previous turn, system: It was successful. The booking number is WCRBSYUL. Is there anything else? | turn: Yes. What can you tell me about [[cherry hinton hall and grounds]]? I am interested in visiting it. Do I need to book a tour?
+- E3#53:1 [system] previous turn, user: I am looking for some places to go in the east of multiple sports. Can you help? | turn: [[The Cherry Hinton Village Centre]] sounds like exactly what you're looking for. Their phone number is 01223576412.
+
+### E3#32  (mentions 7, distinct values 4)
+Examples:
+- E3#32:0 [system] previous turn, user: I'm looking for a 2 star hotel in the north. | turn: I have two hotels meeting your criteria. Ashely Hotel located at [[74 Chesterton road]] and Lovell Lodge located at 365 Milton road.
+- E3#32:1 [system] previous turn, user: I actually don't need it booked, I just need the address. | turn: The address is [[154 chesterton road]].
+- E3#32:2 [system] previous turn, user: Thanks, no need to book for now, but can I get the postcode, phone number, and address? | turn: its phone number is 01223276653, address is [[144 thornton road]],cb30nd. anything else?
+- E3#32:3 [system] previous turn, user: I need a 3 star hotel in Cambridge, that offers a guesthouse, can you book it for me ? | turn: Yes, hamilton lodge is located on [[156 chesterton road]].
+- E3#32:4 [system] previous turn, user: i would like to hear about the ashley hotel please | turn: The Ashley Hotel in the north is located at [[74 chesterton road]] and offers free internet and parking, moderately priced, and has a rating of 2 stars.
+- E3#32:5 [system] previous turn, user: That would be perfect. | turn: I booked the Acorn Guest House in the north, the address: [[154 Chesterton road]]. How many days are you going to stay?
+- E3#32:6 [user] previous turn, system: I have two hotels meeting your criteria. Ashely Hotel located at 74 Chesterton road and Lovell Lodge located at 365 Milton road. | turn: I would like to book at [[74 Chesterton Road]].
+
+### E3#44  (mentions 4, distinct values 2)
+Examples:
+- E3#44:0 [system] previous turn, user: Okay, may I please have their address? | turn: The address is [[78-80 Milton Road]].
+- E3#44:1 [system] previous turn, user: I'm looking for a 2 star hotel in the north. | turn: I have two hotels meeting your criteria. Ashely Hotel located at 74 Chesterton road and Lovell Lodge located at [[365 Milton road]].
+- E3#44:2 [system] previous turn, user: Yes, I'm looking for the hotel Limehouse. | turn: limehouse is a moderate priced guesthouse in the north at [[78-80 milton road]]. Would you like to make a reservation?
+- E3#44:3 [system] previous turn, user: Great can I get their address, whether they have free parking, and internet? | turn: The address is [[78-80 milton road]]. They have free parking and internet.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#50, E3#51, E3#53, E3#32, E3#44) and its name as the value, like {"E3#50": "<name>"}.

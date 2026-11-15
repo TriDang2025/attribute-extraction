@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E2#28/0: name: location str | description: location
+Examples:
+- 1 [system] previous turn, user: Can you give me the ticket price? | turn: A ticket from [[London Liverpool Street]] to Cambridge is 13.28GBP.
+- 2 [user] previous turn, system: You're all booked. | turn: Is there a reference number for the hotel? I also need a train to london [[liverpool street]]. Can you help with that too?
+- 3 [user] previous turn, system: Okay, your booking was successful. Your reference number is P886DG7V. Your table will be reserved for 15 minutes. | turn: Great. Thank you so much. I also need information on a train to [[London Liverpool street]].
+- 4 [user] previous turn, system: where are you departing from? | turn: I want to depart from [[London Liverpool Street]] after 15:00.
+- 5 [user] previous turn, system: There are 2828 trains available Monday. Where are you traveling to? | turn: I am traveling to [[London Liverpool Street]] from Cambridge.
+
+Columns (5):
+- name: other str | examples: local restaurant; restaurant
+- name: time | examples: what time; leicester; morning
+- name: location station | examples: london; liverpool
+- name: location abbrev | examples: london
+- name: location snake | examples: broxbourne; birmingham new street; bishop stortford
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E2#28/0", "reason": "str", "same_as": "<column name or none>"}

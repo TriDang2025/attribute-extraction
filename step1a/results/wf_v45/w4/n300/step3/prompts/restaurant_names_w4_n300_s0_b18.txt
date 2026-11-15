@@ -1,0 +1,60 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 18 of 26 (127 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; cb23bu, cb11ln, cb18dw; museum, theatre, cinema
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+
+### E4#119  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E4#119:0 [system] previous turn, user: Can you please give me their address and phone number | turn: [[Cote]]'s phone number is 01223 311053 and they are located at Bridge Street City Centre. Is there anything else I can help you with today?
+- E4#119:1 [system] previous turn, user: How about a French restaurant in any price range? | turn: [[Cote]] is a French restaurant in the city centre in the expensive price range.
+
+### E4#115  (mentions 3, distinct values 1, low confidence)
+Examples:
+- E4#115:0 [user] previous turn, system: Yes, I have 5 places. What about cotto? | turn: [[Cotto]] is fine. I want to book a table for 1 person at 12:00 on Sunday.
+- E4#115:1 [system] previous turn, user: Are there any moderately priced places to eat with British styled food? | turn: Yes, I have 5 places. What about [[cotto]]?
+- E4#115:2 [system] previous turn, user: Cotto is fine. I want to book a table for 1 person at 12:00 on Sunday. | turn: [[Cotto]] is completely booked for Saturday at noon. Could I direct you to a different restaurant?
+
+### E4#95  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E4#95:0 [system] previous turn, user: What does Cambridge offer as far as expensive cantonese restaurants? | turn: I'm so sorry but we don't have any expensive [[cantonese]]. Would you like to try another type of food?
+
+### E4#73  (mentions 1, distinct values 1)
+Examples:
+- E4#73:0 [system] previous turn, user: How about choosing a famous one and give me the address, postcode and entrance fee. | turn: [[corpus christi]] is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is 2 pounds.
+
+### E4#101  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E4#101:0 [system] previous turn, user: I'm sorry. I'm only looking for a place that is moderately priced and serves Tuscan food. | turn: I apologize, but it appears [[tuscan]] with the moderate price range does not have any result.
+- E4#101:1 [user] turn: I'm interested in finding a restaurant that serves [[Tuscan food]]. Do you know of any in the moderate price range?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#119, E4#115, E4#95, E4#73, E4#101) and its name as the value, like {"E4#119": "<name>"}.

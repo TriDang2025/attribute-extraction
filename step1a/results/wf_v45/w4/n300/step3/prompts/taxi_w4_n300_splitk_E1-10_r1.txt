@@ -1,0 +1,30 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E1#10:s0": "P1", "E1#10:s1": "P2"}}
+
+Cluster E1#10 of entity E1 (mentions 15, distinct values 5).
+Examples:
+- E1#10:s0 [system] previous turn, user: Thanks now I need a taxi leaving the hotel by 23:30 going to the theatre. | turn: Where are you leaving from? What is the destination? [[What time]] do you want your taxi to arrive?
+- E1#10:s1 [user] previous turn, system: Thank you for using our service today? | turn: Actually, I will need to book a taxi to commute between the hotel and restaurant. I want to arrive at the restaurant by the [[booked time]].
+- E1#10:s2 [user] previous turn, system: No, I'm sorry. You'll have to call them for the entrance fee. The phone number is 01223304705. | turn: Thank you. I'm also looking to book a taxi to travel between the two. I need it to arrive to the restaurant by the [[reservation time]].
+- E1#10:s3 [system] previous turn, user: Thank you! I also need a taxi please. | turn: Certainly. What is your intended destination and [[travel time]]?
+- E1#10:s4 [system] previous turn, user: I am also looking for a train. | turn: I'll be happy to help you with that. [[What day]] would you like to travel and where would you like to depart from?
+- E1#10:s5 [system] previous turn, user: I need a taxi from the hotel to the restaurant please. | turn: I can book that for you. [[What time]] would you like to leave and what restaurant?
+- E1#10:s6 [user] previous turn, system: Ok great and what times do you prefer? | turn: I don't care about the departure time, I just need to be at the restaurant by the [[booked time]].
+- E1#10:s7 [system] previous turn, user: I also need a taxi. | turn: Where would you like to go and [[what time]] would you like to travel?
+- E1#10:s8 [user] previous turn, system: Phone is 01223420060. Do you need anything else? | turn: Yes, I would like a taxi to go from the two places and make sure it arrives to the restaurant by the [[booked time]].
+- E1#10:s9 [system] previous turn, user: Hello! I would like to book a taxi from hughes hall. | turn: Great. Where would you like to go and [[what time]] do you want to leave or arrive by?
+- E1#10:s10 [user] previous turn, system: Before I can book your taxi, what time are you wanting to leave or arrive by? | turn: I just want to be sure it arrives by the [[booked time]] at the restaurant.
+- E1#10:s11 [system] previous turn, user: Great I also need a taxi to commute between the two places. | turn: Where will you be leaving from? [[What time]] would you like to leave?
+- E1#10:s12 [user] previous turn, system: Where are you going? | turn: I need to commute between the guesthouse and the restaurant. Make sure it arrives by the [[booked time]] and send me the contact number and car type please.
+- E1#10:s13 [system] previous turn, user: Okay. Can you help me book a taxi to get to there from my hotel? | turn: Sure I can help you with that. [[What time]] do you want to leave or arrive by?
+- E1#10:s14 [system] previous turn, user: I'm gonna need a taxi to get from the club to the restaurant. Can you schedule that for me? | turn: [[What time]] would you like to leave the club by taxi?
+
+Return the JSON object now.

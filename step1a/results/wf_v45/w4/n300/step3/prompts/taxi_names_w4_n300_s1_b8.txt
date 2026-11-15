@@ -1,0 +1,57 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 8 of 12 (59 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; cb23bu, cb11ln, cb18dw; museum, theatre, cinema
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E1#23  (mentions 1, distinct values 1)
+Examples:
+- E1#23:0 [user] turn: I want to book a taxi to pick me up [[Travellers Rest]] to take me to Finches Bed and Breakfast.
+
+### E1#35  (mentions 1, distinct values 1)
+Examples:
+- E1#35:0 [system] previous turn, user: Yes can I please have the address? | turn: The address is sleeperz hotel, [[station road]]. Can I help you with anything else today?
+
+### E1#31  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#31:0 [user] previous turn, system: Sure, it's the lucky star Phone number is 01223244277, and postcode is cb17dy. Can I book a table for you? | turn: I can book it myself, thanks. However, I will need a taxi from great saint mary's church to the [[lucky star]].
+
+### E1#27  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E1#27:0 [system] previous turn, user: What about a restaurant that serves just indian food? | turn: How does the [[Curry Garden]] sound?
+- E1#27:1 [user] previous turn, system: The price range is moderate. | turn: Thanks! Now, can I get a taxi from the Cambridge Belfry to the [[Curry Prince]]? I need to leave the hotel by 4:00.
+
+### E1#29  (mentions 1, distinct values 1)
+Examples:
+- E1#29:0 [user] previous turn, system: That booking was successful. The reference number is KAY2S45O. Is there anything else I can do for you? | turn: Yes, I would like a reserve a taxi to commute between The Allenbell and [[Royal Spice]]. I really want to be on time for our dinner reservation.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#23, E1#35, E1#31, E1#27, E1#29) and its name as the value, like {"E1#23": "<name>"}.

@@ -1,0 +1,89 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 1 of 12 (59 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; cb23bu, cb11ln, cb18dw; museum, theatre, cinema
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E3#33  (mentions 12, distinct values 4)
+Examples:
+- E3#33:0 [system] previous turn, user: My party will consist of 5 people. May I please get a reference number? | turn: Your booking at the [[Allenbell]] was successful. Your reference number is PV039AJH.
+- E3#33:1 [user] previous turn, system: Hotel allenbell is what I found that is cheap and has parking. | turn: Could you get the postcode for [[Hotel Allenbell]] for me?
+- E3#33:2 [system] previous turn, user: Can you book it for 8 people for 4 nights starting on thursday? | turn: Ok I have you booked at [[The Allenbell]] for 4 nights for 8 people. Your reference number 7SN0BAAT. Do you need anything else?
+- E3#33:3 [system] previous turn, user: I will take a cheaper one please. | turn: [[The allenbell guesthouse]] have everything you are looking for. It is within your price range, on the east side with free wifi and parking. Would you like me to book it?
+- E3#33:4 [system] previous turn, user: I don't have a price range any one you recommend will be fine. | turn: I would recommend [[allenbell]].
+- E3#33:5 [system] previous turn, user: I'm looking for something cheap with free parking. | turn: [[Hotel allenbell]] is what I found that is cheap and has parking.
+- E3#33:6 [user] previous turn, system: The 3 guesthouses mentioned all have free wifi and parking. I recommend the Allenbell. | turn: [[The Allenbell]] sounds perfect. Can you book it for me for tuesday?
+- E3#33:7 [system] previous turn, user: What is the phone number for Allenbell? What are some places to go in town close to the hotel? | turn: The phone number for [[allenbell]] is 01223210353
+
+### E3#14  (mentions 18, distinct values 8)
+Examples:
+- E3#14:0 [system] previous turn, user: Oh, I really don't worry about the price, so long as it has four stars and free parking. | turn: Alright, might I suggest the [[Alexander Bed and Breakfast]] then?
+- E3#14:1 [system] previous turn, user: I need a guesthouse, including free parking. It should have a 4 star rating on Friday. Can I get the phone number and address? | turn: I recommend [[Carolina Bed and Breakfast]]. It's located close to where you'll be dining and is moderately priced. Their address is 138 Perne Road and their phone number is 01223247015.
+- E3#14:2 [system] previous turn, user: I'd like to stay in a good part of town. Can you please give me the phone number? | turn: [[The Alexander bed and breakfast]] is located in the centre. The phone number is 01223525725.
+- E3#14:3 [system] previous turn, user: That sounds great - I want to book it for 5 people for two nights starting Monday. | turn: Alright, I have your party booked at the [[Alexander]]. The reference number is : G2YMGI0L. Is there anything else I can do for you today?
+- E3#14:4 [system] previous turn, user: Not really. Would you see if the highest rated, least expensive guesthouse has rooms for 5 nights for 6 people, beginning Wednesday? | turn: I was able to book [[Rosa's Bed and Breakfast]] for you for 5 nights for 6 people starting on Wednesday. The reference number is RTITW2L5.
+- E3#14:5 [system] previous turn, user: Can I get more info on the Alexander bed and breakfast please? | turn: [[The alexander bed and breakfast guesthouse]]. It is located in the centre of town and is cheap priced with 4 stars. Would you like reservations?
+- E3#14:6 [system] previous turn, user: Is that 3 star with a moderate price? | turn: [[The Alpha-Minton Guest House]] sounds like it will be perfect for you. It's a moderately-priced, 3-star guesthouse in the north. Can I book a room for you?
+- E3#14:7 [user] turn: I'm looking for information on a hotel, [[the carolina bed and breakfast]].
+
+### E3#0  (mentions 161, distinct values 40, low confidence)
+Examples:
+- E3#0:0 [user] previous turn, system: I have 2 guesthouses matching your criteria. The Finches Bed and Breakfast guesthouse is 4 stars and includes free parking and internet. Would you be interested in this? | turn: I am looking for a [[guesthouse]] with 0 stars.
+- E3#0:1 [user] previous turn, system: I was able to book you a room for seven people for three nights, starting Monday, at Finches Bed and Breakfast. Reference number is CUL9VZ04. Is there anything else? | turn: Can you please confirm that the [[hotel]] you've booked for us offers free wi-fi? I need to be able to work while I'm there.
+- E3#0:2 [system] previous turn, user: Yes, I would like a hotel in the north please. | turn: There are two hotels in the north, [[Ashley Hotel]] and Lovell Lodge which would you like?
+- E3#0:3 [user] turn: I'm looking for a [[4 star hotel]], and it doesn't need to have free parking.
+- E3#0:4 [user] turn: I am looking for a place to stay. [[The hotel]] should be in the type of guesthouse and should include free parking
+- E3#0:5 [system] previous turn, user: Yes, I would like to find a hotel in the south. | turn: [[The Lensfield Hotel]] at 53-57 lensfield road is a fabulous 3 star hotel that offers internet and parking. Would you like me to book you a room there?
+- E3#0:6 [user] previous turn, system: There are about 5 options. All are hotels and expensive. They are located all over. Do you have a certain area in mind? | turn: I know this sounds crazy, but I'm looking for an [[expensive hotel]] with a 0 star rating. The area doesn't matter so much.
+- E3#0:7 [user] turn: I want to stay at a [[guest house]], in the south.
+
+### E3#4  (mentions 116, distinct values 18, low confidence)
+Examples:
+- E3#4:0 [system] previous turn, user: OK, can you accommodate 2 nights then? | turn: Unfortunately, neither guesthouse can accommodate [[2 nights]]. Is there another date you'd like to try for, or would you like to try for 1 night rather than 2?
+- E3#4:1 [user] previous turn, system: how about a and b guest house? it looks lovely | turn: Sure can you book that for 7 people for [[5 nights]] starting friday?
+- E3#4:2 [system] previous turn, user: Yes, I am looking to book a guesthouse in the cheap price range that includes free wifi. | turn: I was able to book you a room for seven people for [[three nights]], starting Monday, at Finches Bed and Breakfast. Reference number is CUL9VZ04. Is there anything else?
+- E3#4:3 [user] previous turn, system: Would you like me to book it for you? | turn: Yes, book it for 5 people for [[4 nights]] starting Thursday.
+- E3#4:4 [system] previous turn, user: I would like to stay in a guesthouse that is in the south. | turn: There are [[three guesthouses]] in the south with free parking in the moderate and cheap price ranges. Do you have a star or price range preference?
+- E3#4:5 [user] previous turn, system: ok for how long and how many people please | turn: For [[3 days]] and 2 people,I need a confirmation number too
+- E3#4:6 [system] previous turn, user: Our family lives in the east, so how about close by. | turn: Sure, we have 6 guesthouses and [[1 hotel]]. What is your price range?
+- E3#4:7 [user] previous turn, system: I'm sorry, that reservation wasn't available. Perhaps you could book another day, or a different length of stay? | turn: That's okay, see if you can make the booking for [[one night]] instead.
+
+### E3#29  (mentions 6, distinct values 6, low confidence)
+Examples:
+- E3#29:0 [user] previous turn, system: I'm sorry, as I previously mentioned neither guesthouse can accommodate that request. How about another area of town? | turn: Are you certain there is not either a guesthouse or hotel in the south with free parking for [[2 or 3 nights]] Sunday for 6 people?
+- E3#29:1 [system] previous turn, user: 3 people. Can I get the reference number please? | turn: I'm sorry, but there is nothing available at that time at either hotel. Would you like to try [[fewer nights]] or perhaps a different arrival day?
+- E3#29:2 [user] previous turn, system: The Alpha-Minton Guest House sounds like it will be perfect for you. It's a moderately-priced, 3-star guesthouse in the north. Can I book a room for you? | turn: Please do, for 1 person, [[for 5 nights]], starting Thursday.
+- E3#29:3 [system] previous turn, user: I prefer the expensive hotel. Can you book it for me for the same group of people? | turn: The Express by Holiday Inn Cambridge will fit your needs. [[How many nights]]?
+- E3#29:4 [user] previous turn, system: Yes, hamilton lodge is located on 156 chesterton road. | turn: If this guesthouse is available please book it for me. By the way, what is the [[price per night]]?
+- E3#29:5 [system] previous turn, user: I like nice places, so definitely something expensive. I do want it to have free wifi though. | turn: [[There are about 5 options]]. All are hotels and expensive. They are located all over. Do you have a certain area in mind?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#33, E3#14, E3#0, E3#4, E3#29) and its name as the value, like {"E3#33": "<name>"}.

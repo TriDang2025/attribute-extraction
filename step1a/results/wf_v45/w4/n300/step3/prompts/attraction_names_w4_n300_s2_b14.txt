@@ -1,0 +1,63 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 14 of 21 (105 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E0#48  (mentions 3, distinct values 2)
+Examples:
+- E0#48:0 [system] previous turn, user: I am looking for a park in the south. Any available that you could give me the postcode, entrance fee's if any and the address please? | turn: There are two parks that fit your description. Both are free. May I recommend [[Wandlebury country park]] located wandlebury ring, gog magog hills, babraham? Postalcode is cb223ae.
+- E0#48:1 [system] previous turn, user: I am looking for a park in the south. Any available that you could give me the postcode, entrance fee's if any and the address please? | turn: There are two parks that fit your description. Both are free. May I recommend Wandlebury country park located [[wandlebury ring]], gog magog hills, babraham? Postalcode is cb223ae.
+- E0#48:2 [system] previous turn, user: no, not really. What are entrance fees on the 8 attractions? | turn: Unfortunately, we do not have information on several of them. But, Byard Art, [[Wandlebury Country Park]], and Sheep's Green and Lammas Land Park are all free admission attractions.
+
+### E0#89  (mentions 2, distinct values 1)
+Examples:
+- E0#89:0 [system] previous turn, user: I need the Post Code as well. | turn: The Postcode for [[Addenbrookes Hospital]] is CB20QQ. Can I help with anything else?
+- E0#89:1 [user] turn: Where is the [[Addenbrookes Hospital]] located?
+
+### E0#103  (mentions 2, distinct values 2)
+Examples:
+- E0#103:0 [system] previous turn, user: I need information about Pembroke College. | turn: [[Pembroke]] is located the in centre area, they have free admission, anything else that I can help with?
+- E0#103:1 [user] turn: I need information about [[Pembroke College]].
+
+### E0#60  (mentions 1, distinct values 1)
+Examples:
+- E0#60:0 [user] previous turn, system: Jinling noodle bar looks like a good place. | turn: Can I have their phone number and address? Also, are there any trains that go from [[Peterborough]] to Cambridge?
+
+### E0#67  (mentions 4, distinct values 2)
+Examples:
+- E0#67:0 [system] previous turn, user: I am looking for an attraction called great saint mary's church. | turn: great saint mary's church is at [[Market Square]], their phone number is 01223350914, and their postcode is cb23pq. Do you need any more information?
+- E0#67:1 [system] previous turn, user: No, not really. What's your favorite thing to do in the centre of town? | turn: My favorite thing to do is look at the architecture at Holy Trinity Church. It's located on [[Market Street]] and it's free to get in. Does this work?
+- E0#67:2 [system] previous turn, user: I'm planning a trip to Cambridge and I would like some information on great saint mary's church. Where exactly is it located? | turn: It is located in the centre. The address is [[market square]]. Postcode is cb23pq. The entrance fee is 2 pounds.
+- E0#67:3 [system] previous turn, user: Please provide the address. | turn: The address is [[Market Square]] and the postcode is cb23pq. Is there anything else I can find for you?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#48, E0#89, E0#103, E0#60, E0#67) and its name as the value, like {"E0#48": "<name>"}.

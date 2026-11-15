@@ -1,0 +1,28 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E2#23:s0": "P1", "E2#23:s1": "P2"}}
+
+Cluster E2#23 of entity E2 (mentions 13, distinct values 2).
+Examples:
+- E2#23:s0 [user] previous turn, system: I have a train that arrives in cambridge by 18:07. It would be helpful to know your destination so I can serve you better. | turn: The train should leave from [[bishops stortford]] and go to cambridge and arrive by 19:30.
+- E2#23:s1 [user] previous turn, system: A guesthouse has already been booked for you. Is there anything else I can help you with today? | turn: I also need a train from [[Bishops Stafford]] to Cambridge.
+- E2#23:s2 [user] previous turn, system: It's listed as in the cheap price range. | turn: Ok, I am also looking for a train from Cambridge to [[Bishops Stortford]].
+- E2#23:s3 [system] previous turn, user: The train should depart from bishops stortford. | turn: There are oodles of trains from [[Bishops Stortford]] to Cambridge. What day and time would you like to travel?
+- E2#23:s4 [user] turn: am looking for a train it should leave on sunday and should depart from [[bishops stortford]]
+- E2#23:s5 [user] previous turn, system: I'll need to get some more information. Can you tell me your destination and when you will be travelling? | turn: I am going to [[bishops stortford]] at 12:45 on thursday.
+- E2#23:s6 [user] turn: I want a train that departs from [[bishops stortford]] on Thursday.
+- E2#23:s7 [user] previous turn, system: Alright, departure and destination? | turn: I need to go from [[bishops stortford]] to cambridge.
+- E2#23:s8 [user] previous turn, system: I'll be happy to help you with that. What day would you like to travel and where would you like to depart from? | turn: I need to leave from [[Bishops Stortford]] the same day I arrive at the hotel. I need to arrive close to 19:30.
+- E2#23:s9 [user] previous turn, system: I could do that for you. Can you give me a time ? | turn: Yes, we will be coming from [[bishops stortford]] on Monday. I would like to leave after 19:30.
+- E2#23:s10 [user] turn: Hello. I am looking for train schedules leaving from [[Bishops Stortford]]. Can you help me?
+- E2#23:s11 [system] previous turn, user: I am going to bishops stortford at 12:45 on thursday. | turn: You would like to leave [[bishops stortford]] at 12:45?
+- E2#23:s12 [user] previous turn, system: Yes, I can. Just to confirm, is your destination Cambridge or another city? | turn: The train should depart from [[bishops stortford]].
+
+Return the JSON object now.

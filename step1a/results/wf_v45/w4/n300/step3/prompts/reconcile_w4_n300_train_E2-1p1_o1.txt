@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E2#1/1: name: time int | description: time
+Examples:
+- 1 [system] previous turn, user: I need to arrive by 15:45. | turn: TR1931 will arrive by [[11:44]]
+- 2 [system] previous turn, user: I will be departing from stansted airport and want to leave after 18:15. | turn: TR5921 departs the airport at [[18:24]] and arrives by 18:52, does this suit your needs?
+- 3 [user] previous turn, system: What day and time do you need to travel? | turn: on friday and i need to get there by [[10:45]]
+- 4 [user] previous turn, system: Sure, there are 202 entries. Where would your destination be? | turn: Sure I want to go to london kings cross and would like to arrive by [[19:45]].
+- 5 [user] turn: I am looking for a train on Friday that leaves after [[21:45]].
+
+Columns (5):
+- name: time str | examples: king lynn; 08:15; 13:00
+- name: date | examples: tuesday; thursday; wednesday
+- name: travel time | examples: travel time; 10: 32; 28-minute
+- name: time | examples: what time; leicester; morning
+- name: price | examples: 13.28gbp; 17.89; 17.90
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E2#1/1", "reason": "str", "same_as": "<column name or none>"}

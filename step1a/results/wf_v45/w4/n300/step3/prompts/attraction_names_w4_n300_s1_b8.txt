@@ -1,0 +1,75 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 8 of 21 (105 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E0#32  (mentions 8, distinct values 4, low confidence)
+Examples:
+- E0#32:0 [user] previous turn, system: Oh I'm super excited for you! Anything in particular you'd like to check out? How about some architecture? | turn: Actually, I would prefer a [[nightclub]].
+- E0#32:1 [system] previous turn, user: Yes I would like more information on both museums. | turn: saint barnabas press gallery is located in the belfast yard, coldham's road , cb13ew and gallery at twelve a [[high street]] is at fulbourn,cb15dh
+- E0#32:2 [user] previous turn, system: I've successfully booked your table. The reference number is GK41EYSD. | turn: I would like to go to a [[nice nightclub]]
+- E0#32:3 [system] previous turn, user: I would like to go to a nice nightclub | turn: We have ballare that's [[night]], it's in the city centre.
+- E0#32:4 [system] previous turn, user: I am looking for places to on the south side of town. | turn: Alright. What type of places? Cambridge has a wide array of things to do and places to go such as, museum's, [[nightclubs]], parks and restaurants.
+- E0#32:5 [system] previous turn, user: Is there anything interesting to see in the centre of town? | turn: In addition to architecture, colleges, and museums, we also have boat attractions, [[nightclubs]], and theatres in the centre.
+- E0#32:6 [user] turn: I'm looking for a [[nightclub]] to go to. Are there any in the centre of town?
+- E0#32:7 [user] previous turn, system: Your booking was successful. Your reference number is OPAF3JMB. Is there anything else I can do for you today? | turn: Yes, I'm also looking for a [[nightclub]] to go to in the same area.
+
+### E0#102  (mentions 5, distinct values 1)
+Examples:
+- E0#102:0 [user] turn: I am looking for an attraction named [[Club Salsa]].
+- E0#102:1 [user] turn: I'm looking for place called [[club salsa]].
+- E0#102:2 [user] previous turn, system: Club Salsa is a nightclub located in the city centre. Is there any other information I can provide? | turn: Yes. Can you give me the postcode for [[Club Salsa]]?
+- E0#102:3 [system] previous turn, user: Yes. Can you give me the postcode for Club Salsa? | turn: The post code for [[Club Salsa]] is cb12jb. Is there anything else I can help you with?
+- E0#102:4 [system] previous turn, user: I am looking for an attraction named Club Salsa. | turn: [[Club Salsa]] is a nightclub located in the city centre. Is there any other information I can provide?
+
+### E0#23  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E0#23:0 [system] previous turn, user: I need a cinema to go to in the south. | turn: [[The cineworld cinema]] is the place!
+- E0#23:1 [system] previous turn, user: I'm going to be in the centre. Can you tell me a little about the one there? | turn: [[The Vue Cinema]] is in the centre of town. The address is The Grafton Centre on East Road, postcode cb11ps, and the phone number is 08712240240.
+- E0#23:2 [system] previous turn, user: please find me a good cinema to go | turn: what about [[vue cinema]]? It's located in the centre.
+
+### E0#87  (mentions 3, distinct values 2)
+Examples:
+- E0#87:0 [system] previous turn, user: I would also like the street address please. | turn: It's located at cambridge passenger cruisers, [[jubilee house]].
+- E0#87:1 [system] previous turn, user: Could you recommend something? | turn: Yes, [[the funky fun house]] is a great place.
+- E0#87:2 [system] previous turn, user: Yes. What attraction is good in the North? May I have the address? | turn: Riverboat georgina is located at cambridge passenger cruisers, [[jubilee house]]
+
+### E0#12  (mentions 5, distinct values 2, low confidence)
+Examples:
+- E0#12:0 [system] previous turn, user: I am looking for a museum. | turn: [[the broughton house gallery]] is a museum located in the centre.
+- E0#12:1 [user] turn: I'm looking for information on [[Broughton house gallery]].
+- E0#12:2 [system] previous turn, user: im looking for a museum in the centre. may i also have the postcode and phone number for them as well? | turn: [[The Broughton house gallery]] is in the centre. It's postcode is cb11ln. The phone number is 01223314960. Is there anything else I can help you with?
+- E0#12:3 [system] previous turn, user: How about one that is in the type of museum? | turn: Sure, we have 11 museums in the centre area, a few are [[broughton house gallery]], cambridge contemporary art, castle galleries and primavera. Any sound good?
+- E0#12:4 [system] previous turn, user: Can I get a postcode, entrance fee, and address of one of them? | turn: [[The Broughton House Gallery]] is located at 98 King Street, cb11ln. Their phone number is 01223314960, and it's free to get in.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#32, E0#102, E0#23, E0#87, E0#12) and its name as the value, like {"E0#32": "<name>"}.

@@ -1,0 +1,61 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 19 of 21 (105 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E0#33  (mentions 2, distinct values 1)
+Examples:
+- E0#33:0 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park [[Fen Causeway]] is located at Fen Causeway, Newnham road, postal code cb322ad.
+- E0#33:1 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park Fen Causeway is located at [[Fen Causeway]], Newnham road, postal code cb322ad.
+
+### E0#83  (mentions 1, distinct values 1)
+Examples:
+- E0#83:0 [system] previous turn, user: 3 nights starting on Saturday, can I get the reference number as well? We are also looking for an attraction called Camboats, can you help me? | turn: You are booked at [[Archway House]]. Your reference number is 2G8LC07R. Camboats is a boating attraction in the east. What other information do you need?
+
+### E0#2  (mentions 5, distinct values 1)
+Examples:
+- E0#2:0 [user] turn: I'm looking for some info on the abbey pool and [[astroturf pitch]]
+- E0#2:1 [system] previous turn, user: What are some attractions on the east side? Is there a swimming pool available? | turn: Yes we have the abbey pool and [[astroturf pitch]], is there anything else you need?
+- E0#2:2 [system] previous turn, user: are their any swimming pools in the east? | turn: Yes, there is a swimming pool at Abbey Pool and [[Astroturf Pitch]]. Would you like the address and phone number?
+- E0#2:3 [user] turn: I am looking to plan a trip I am looking to book some tickets at a place called Abbey pool and [[astroturf pitch]].
+- E0#2:4 [system] previous turn, user: No. Are there any swimming pools on the east side of town? | turn: Yes there is the abbey pool and [[astroturf pitch]] would you like their address?
+
+### E0#95  (mentions 1, distinct values 1)
+Examples:
+- E0#95:0 [system] previous turn, user: Yes, I am looking for cinemas and museums. | turn: There are no cinemas on the west side, but I have several museums. The [[Lynne Strover Gallery]] is a great place, and it's free to get in.
+
+### E0#74  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#74:0 [system] previous turn, user: Yes I would like more information on both museums. | turn: [[saint barnabas press gallery]] is located in the belfast yard, coldham's road , cb13ew and gallery at twelve a high street is at fulbourn,cb15dh
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#33, E0#83, E0#2, E0#95, E0#74) and its name as the value, like {"E0#33": "<name>"}.

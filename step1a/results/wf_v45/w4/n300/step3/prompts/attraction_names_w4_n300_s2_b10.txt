@@ -1,0 +1,80 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 10 of 21 (105 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E0#16  (mentions 13, distinct values 4, low confidence)
+Examples:
+- E0#16:0 [system] previous turn, user: Okay thanks. I'd like some information about a place to go next. | turn: There are many attractions in town. What type are you looking for - architecture, cinema, or a [[college]] perhaps?
+- E0#16:1 [system] previous turn, user: Can you look to see if there are colleges in that area? | turn: There are five colleges in the west. I recommend [[churchill college]].
+- E0#16:2 [user] turn: Hi, I'm trying to find a place to go in the centre. [[A college]] would be fun to visit!
+- E0#16:3 [system] previous turn, user: How about college attractions? | turn: Yes I have many [[famous colleges]] to visit and most of them are free. Would you like anything else?
+- E0#16:4 [system] previous turn, user: Hi, what are some fun attractions in west Cambridge? | turn: There are 13 places, [[colleges]], entertainment, and museums
+- E0#16:5 [system] previous turn, user: No particular college, but it must be in the western part of town. | turn: How about [[Churchill College]]?
+- E0#16:6 [system] previous turn, user: I am looking for a place to go on the west side maybe a cinema. | turn: There are no cinemas in the west would a [[college]] interest you?
+- E0#16:7 [system] previous turn, user: The attraction type is college? I think that's all the information that I needed, thanks. | turn: I have found gonville and [[college]]. It is free to get in.
+
+### E0#84  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E0#84:0 [system] previous turn, user: I need an attraction in the west part of town. Please provide the address and amount of the entrance fee so I can prepare. | turn: [[Queens' College]] is a wonderful play to visit. Their address is Silver Street. The entrance fee is 2.50 pounds. Is there anything else I can help you with?
+- E0#84:1 [system] previous turn, user: maybe, give me the address of one please | turn: There are several college's in the centre. How about [[Saint Catharine's College]]? It is on King's Parade and has free admission.
+
+### E0#29  (mentions 4, distinct values 3)
+Examples:
+- E0#29:0 [user] turn: Hello, could you tell me if [[Downing College]] is still operating?
+- E0#29:1 [system] previous turn, user: A museum sounds nice. Do you have a favorite? I need an address and entrance fee. | turn: My personal favorite is the Museum of Archaeology and Anthropology at University of Cambridge, [[Downing Street]]. It even has free admission!
+- E0#29:2 [system] previous turn, user: Surprise me and pick one for me! Just make sure to let me know what kind of attraction it is. | turn: How about a theater? Cineworld Cinema is showing all our the newest [[London]] films!
+- E0#29:3 [system] previous turn, user: Hello, could you tell me if Downing College is still operating? | turn: Yes, [[Downing College]] is still operating in the centre. They're located on regent street , post code cb21dq. You can visit them for free! Anything else you need?
+
+### E0#19  (mentions 34, distinct values 10)
+Examples:
+- E0#19:0 [system] previous turn, user: Where is the Addenbrookes Hospital located? | turn: The hospital is located at Hills Rd, [[Cambridge]].
+- E0#19:1 [system] previous turn, user: Yes, please provide the address, postcode, and phone number for Cambridge Arts Theatre. I also need to find a hotel to stay in. | turn: [[Cambridge arts theatre]] is located at 6 saint edward's passage, postcode cb23pj, and phone is 0122350333. Did you have any preferences for your place to stay?
+- E0#19:2 [system] previous turn, user: Can you tell me the address? | turn: The address is [[cambridge leisure park]], clifton way. Can I help with anything else?
+- E0#19:3 [system] previous turn, user: No, that's all I need. Thank you for your help! | turn: Thank you for contacting [[Cambridge TownInfo centre]]. Goodbye!
+- E0#19:4 [system] previous turn, user: Hi, I'll be traveling to cambridge and am excited to find some places to go. Can you help me? | turn: I will be more than happy to assist you. Please tell me what kind of attractions you are interested in? There are many categories of attractions in the [[Cambridge area]].
+- E0#19:5 [system] previous turn, user: Okay, That is all I need ton know. | turn: cb236bw Is the postcode for the [[Cambridge Belfry]]. Do you need to book this hotel?
+- E0#19:6 [user] turn: Do you have information on the Express by [[Holiday Inn Cambridge]]?
+- E0#19:7 [system] previous turn, user: It doesn't matter, anywhere will do. And can you get me the address? | turn: [[The Cambridge Arts Theatre]] is a popular attraction in the city centre. Does that sound good to you?
+
+### E0#62  (mentions 7, distinct values 4)
+Examples:
+- E0#62:0 [user] turn: Hi, I'll be traveling to [[cambridge]] and am excited to find some places to go. Can you help me?
+- E0#62:1 [system] previous turn, user: No, just an entertainment attraction in the same area as the restaurant. Can you make a suggestion? | turn: What about a museum? The [[cambridge contemporary art]] is a nice one.
+- E0#62:2 [system] previous turn, user: I would also like the street address please. | turn: It's located at [[cambridge passenger cruisers]], jubilee house.
+- E0#62:3 [system] previous turn, user: It doesn't matter. | turn: I would recommend the [[cambridge punter]], located in the centre of town at 251a chesterton road. Do you need anything else?
+- E0#62:4 [user] turn: Can you tell me what theatres are in [[cambridge]] please?
+- E0#62:5 [system] previous turn, user: How about one that is in the type of museum? | turn: Sure, we have 11 museums in the centre area, a few are broughton house gallery, [[cambridge contemporary art]], castle galleries and primavera. Any sound good?
+- E0#62:6 [system] previous turn, user: Yes. What attraction is good in the North? May I have the address? | turn: Riverboat georgina is located at [[cambridge passenger cruisers]], jubilee house
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#16, E0#84, E0#29, E0#19, E0#62) and its name as the value, like {"E0#16": "<name>"}.

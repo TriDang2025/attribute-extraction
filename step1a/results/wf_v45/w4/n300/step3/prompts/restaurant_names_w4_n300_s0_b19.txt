@@ -1,0 +1,72 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 19 of 26 (127 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; cb23bu, cb11ln, cb18dw; museum, theatre, cinema
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+
+### E4#48  (mentions 5, distinct values 2)
+Examples:
+- E4#48:0 [system] previous turn, user: Can I get a reservation for 7 at 14:00 this coming Friday? Please get me a reference number too, I've had trouble in the past with lost reservations. | turn: I have successfully booked your reservation at the [[Ugly Duckling]] for a party of 7 on Friday at 14:00. Your reference number is YNCEB914. Will this be all?
+- E4#48:1 [system] previous turn, user: Is the restaurant moderately priced? If so, please book a table for 5 at 18:00 and send me the reference number. | turn: No, I'm sorry [[the ugly duckling]] is in the expensive price range. The copper kettle serves british food and is moderately priced. Would you like a reservation for it?
+- E4#48:2 [system] previous turn, user: I also would like to find a chinese restaurant in the centre. | turn: What's your price range? I recommend the [[Ugly Duckling]], but it's expensive. Charlie Chan is a good, cheap place, and Lan Hong House is in the middle, price-wise.
+- E4#48:3 [system] previous turn, user: Chinese would be great. I would prefer it be in the centre. | turn: There are 4 that match your criteria. I just love the [[Ugly Duckling]], would you like to reserve a table there, or keep looking?
+- E4#48:4 [system] previous turn, user: Yes that would be great. I am also looking for a place to dine for the night. Do you have any suggestions? | turn: My recommendation would be the [[Ugly Duckling]], a Chinese restaurant in the centre of town. It is located at 12 St. Johns Street City Centre.
+
+### E4#70  (mentions 5, distinct values 3)
+Examples:
+- E4#70:0 [system] previous turn, user: Do you recommend a restaurant that is a little more different then the rest? | turn: I would recommend [[golden house]]
+- E4#70:1 [system] previous turn, user: I want a restaurant that is moderately priced. | turn: [[Golden Wok]] is located in the north part of town, and is moderately priced.
+- E4#70:2 [system] previous turn, user: I want a restaurant in the north part of town. | turn: The City Stop restaurant is in the north part of town. [[The Golden Wok]] is also located in the north part of town.
+- E4#70:3 [system] previous turn, user: Yes, what restaurants are there? | turn: There is the Charlie Chan, Rice House and [[Golden House]]. Would you like to book a table at one of these?
+- E4#70:4 [system] previous turn, user: What is their address and phone number? | turn: The address for [[Golden Wok]] is 191 Histon Road Chesterton and the phone number is 01223 350688.
+
+### E4#111  (mentions 2, distinct values 1)
+Examples:
+- E4#111:0 [system] previous turn, user: I also would like to find a chinese restaurant in the centre. | turn: What's your price range? I recommend the Ugly Duckling, but it's expensive. Charlie Chan is a good, cheap place, and [[Lan Hong House]] is in the middle, price-wise.
+- E4#111:1 [system] previous turn, user: Yes please. Is there another restaurant in the area in that price range that is available at that time? | turn: I have booked a reservation for you at the [[Lan Hong House]]. Your reference number is BMU049L6. DO you need anything else?
+
+### E4#121  (mentions 5, distinct values 3)
+Examples:
+- E4#121:0 [system] previous turn, user: Yes, I'm also looking for a restaurant called the rice boat. | turn: Rice boat is an expensive Indian food restaurant in the west, located at [[37 Newnham Road]] Newnham.
+- E4#121:1 [system] previous turn, user: As long as it serves indian we're good. I need the address and phone number | turn: I recommend India House! It's located at 31 Newnham Road [[Newnham]]. Their phone number is 01223461661. Can I do anything else for you?
+- E4#121:2 [system] previous turn, user: As long as it serves indian we're good. I need the address and phone number | turn: I recommend India House! It's located at [[31 Newnham Road]] Newnham. Their phone number is 01223461661. Can I do anything else for you?
+- E4#121:3 [system] previous turn, user: Any expensive Indian food in the west? | turn: I have 5 expensive indian restaurants in the west. i would suggest the rice boat. they are at [[37 newnham road]]. i can make a reservation if you like.
+- E4#121:4 [system] previous turn, user: Yes, I'm also looking for a restaurant called the rice boat. | turn: Rice boat is an expensive Indian food restaurant in the west, located at 37 Newnham Road [[Newnham]].
+
+### E4#99  (mentions 4, distinct values 3)
+Examples:
+- E4#99:0 [system] previous turn, user: Could I get the address of one of them? | turn: Absolutely. Curry Prince's address is [[451 Newmarket Road]] Fen Ditton. Is there anything else I can do for you?
+- E4#99:1 [system] previous turn, user: I would like to find a cheap restaurant in the east part of town. | turn: The Missing Sock serves International cuisine at a cheap price. They are in the east part of town at [[Finders Corner Newmarket Road]].
+- E4#99:2 [system] previous turn, user: Could you tell me what area Pipasha is in along with the post code? | turn: Pipasha is in the east. The full address is [[Newmarket Road]] Fen Ditton postal code cb58pa. Can I help you with anything else?
+- E4#99:3 [system] previous turn, user: I don't need a table, but can I get the address, postcode and price range for Curry Prince? | turn: Yes sure. The Curry Prince's telephone number is 01223566388. And their address and postcode are [[451 Newmarket Road]] Fen Ditton cb58jj.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#48, E4#70, E4#111, E4#121, E4#99) and its name as the value, like {"E4#48": "<name>"}.

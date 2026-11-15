@@ -1,0 +1,74 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 5 of 21 (105 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E0#51  (mentions 2, distinct values 2)
+Examples:
+- E0#51:0 [system] previous turn, user: No how about a type of museum? | turn: There's 7 one of my favorites is kettle's yard on [[castle street]] it has free admission. Would that interest you?
+- E0#51:1 [system] previous turn, user: Hello, could you tell me if Downing College is still operating? | turn: Yes, Downing College is still operating in the centre. They're located on [[regent street]] , post code cb21dq. You can visit them for free! Anything else you need?
+
+### E0#13  (mentions 2, distinct values 1)
+Examples:
+- E0#13:0 [system] previous turn, user: I'm looking for information on Broughton house gallery. | turn: Certainly! It's a museum in the centre at [[98 king street]] cb11ln with free entrance. Their phone number is 01223314960. May I help find anything else?
+- E0#13:1 [system] previous turn, user: Can I get a postcode, entrance fee, and address of one of them? | turn: The Broughton House Gallery is located at [[98 King Street]], cb11ln. Their phone number is 01223314960, and it's free to get in.
+
+### E0#59  (mentions 3, distinct values 3)
+Examples:
+- E0#59:0 [system] previous turn, user: Yes, what is the museum address and phone number? I am also curious about the entrance fee, please. | turn: The phone number is 01223357708. Its address is [[10 king s parade]]. It is free to visit. Anything further you need help with today?
+- E0#59:1 [system] previous turn, user: Do you have any other suggestions? | turn: You should check out Primavera. The phone number is 01223357708. It is at [[10 King's Parade]] and the postcode is cb21sj.
+- E0#59:2 [system] previous turn, user: maybe, give me the address of one please | turn: There are several college's in the centre. How about Saint Catharine's College? It is on [[King's Parade]] and has free admission.
+
+### E0#31  (mentions 10, distinct values 4)
+Examples:
+- E0#31:0 [system] previous turn, user: I am looking for places to on the south side of town. | turn: Alright. What type of places? Cambridge has a wide array of things to do and places to go such as, museum's, nightclubs, [[parks]] and restaurants.
+- E0#31:1 [system] previous turn, user: Yes are there any parks in the same area as the restaurant? | turn: Yes there is 1 park in the same area. It is [[Milton County Park]]. WOuld you like more information?
+- E0#31:2 [system] previous turn, user: no, not really. What are entrance fees on the 8 attractions? | turn: Unfortunately, we do not have information on several of them. But, Byard Art, Wandlebury Country Park, and Sheep's Green and [[Lammas Land Park]] are all free admission attractions.
+- E0#31:3 [system] previous turn, user: I don't have a preference. Can you recommend one and provide me some information on it? | turn: The first one on my list is adc theatre located on [[park street]]. I need some more information on your preferences
+- E0#31:4 [user] previous turn, system: Your booking was successful for 5 days at Archway House starting on Wednesday. Your reference number is UAUOPOBP. | turn: Great, thank you. I am looking for some sort of entertainment in the Centre, maybe a [[park]]. Can you help me with that?
+- E0#31:5 [user] previous turn, system: Ok. I booked four tickets for you. Your reference number is FRSZ5A8R. Can I help you with something else? | turn: Im also looking for a place by the name of [[milton county park]].
+- E0#31:6 [user] previous turn, system: Is there anything else I can help you with today? | turn: I am looking for a [[park]] in the south. Any available that you could give me the postcode, entrance fee's if any and the address please?
+- E0#31:7 [user] turn: i want to go to a [[park]]
+
+### E0#1  (mentions 13, distinct values 5)
+Examples:
+- E0#1:0 [user] previous turn, system: Yes there is the abbey pool and astroturf pitch would you like their address? | turn: Yes. May I have the address and postcode for the [[Abbey Pool]] please?
+- E0#1:1 [user] previous turn, system: There is no multiple sports attraction in the centre but there is one in the east. Are you interested? | turn: Well, maybe try a [[swimming pool]]. That might be better.
+- E0#1:2 [system] previous turn, user: I am not entirely sure. What would you recommend? | turn: Are you interested in archaeology? Our Museum of Archaelogy and Anthropology might interest you. Or if you want to exercise, [[Parkside Pools]] would be a fun venue.
+- E0#1:3 [system] previous turn, user: I am looking to plan a trip I am looking to book some tickets at a place called Abbey pool and astroturf pitch. | turn: [[Abbey pool and astroturf swimming pool]] east 12239020888 is free to get in there is not tickets for this
+- E0#1:4 [system] previous turn, user: Can you help me to locate a free attraction near the hotel? | turn: There are many in the centre of town,what type are you looking for a church,or [[swimming]] or a park ?
+- E0#1:5 [user] turn: I'm looking for some info on the [[abbey pool]] and astroturf pitch
+- E0#1:6 [user] previous turn, system: Booking is confirmed. Reference number is : I57N7Y29. May I assistance you with any additional assistance? | turn: What are some attractions on the east side? Is there a [[swimming pool]] available?
+- E0#1:7 [system] previous turn, user: Well, maybe try a swimming pool. That might be better. | turn: [[Parkside pools]] is available, address gonville place, postal cb11ly, prices vary by season and day, but you can call 01223446100 for more info. Any further questions?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#51, E0#13, E0#59, E0#31, E0#1) and its name as the value, like {"E0#51": "<name>"}.

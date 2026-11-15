@@ -1,0 +1,66 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 14 of 21 (105 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E0#74  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#74:0 [system] previous turn, user: Yes I would like more information on both museums. | turn: [[saint barnabas press gallery]] is located in the belfast yard, coldham's road , cb13ew and gallery at twelve a high street is at fulbourn,cb15dh
+
+### E0#18  (mentions 6, distinct values 4)
+Examples:
+- E0#18:0 [system] previous turn, user: Can you please give me the exact address. | turn: The address for emmanuel college is [[saint andrew]]'s street. Is there any other information I can provide?
+- E0#18:1 [system] previous turn, user: Could I have the address, entrance fee, and postcode. | turn: Christ's College is on [[Saint Andrew's Street]] and postcode CB23BU. There is no entrance fee. Can I help you with anything else?
+- E0#18:2 [system] previous turn, user: Are you sure that they have two locations? Can you tell me their address(es)? | turn: Nandos in the south is at Cambridge Leisure Park Clifton Way. Nandos City Centre is at [[33-34 Saint Andrews Street]]. Do you need additional information?
+- E0#18:3 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend Castle Galleries, phone number 01223307402, postal code cb23bj, address unit su43, grande arcade, [[saint andrews street]]. It is free.
+- E0#18:4 [system] previous turn, user: May I have the address? | turn: Absolutely! The address is [[saint andrew]]'s street. Postal code is cb23bu. Anything else I can help you with?
+- E0#18:5 [system] previous turn, user: How about a type of college? Could you provide me with the postcode, entrance fee and address? | turn: Yes, Christ's College is on [[Saint Andrew's Street]] and the post code is cb23bu. It's free admission.
+
+### E0#41  (mentions 2, distinct values 1)
+Examples:
+- E0#41:0 [system] previous turn, user: Yes can I get their address please? | turn: The address of the Cambridge Arts Theatre is [[6 Saint Edward's Passage]], postcode cb23pj.
+- E0#41:1 [system] previous turn, user: Yes, please provide the address, postcode, and phone number for Cambridge Arts Theatre. I also need to find a hotel to stay in. | turn: Cambridge arts theatre is located at [[6 saint edward's passage]], postcode cb23pj, and phone is 0122350333. Did you have any preferences for your place to stay?
+
+### E0#10  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#10:0 [system] previous turn, user: Not really, but what is the fee? | turn: Most are free, but Corpus Christi has a 2 pound fee, [[Saint John]]'s has a 2.50 pound fee, and Trinity has a 1 pound fee.
+
+### E0#72  (mentions 5, distinct values 2)
+Examples:
+- E0#72:0 [system] previous turn, user: I am coming to Cambridge and would like to see some architecture. Do you have any located in the centre? | turn: Yes, there are 5 places located in the centre. I recommend the [[All Saints Church]] on Jesus Lane.
+- E0#72:1 [system] previous turn, user: Anything you recommend. I just need the entrance fee, attraction type and phone number. | turn: [[Little Saint Mary's Church]] is an architecture attraction with no entrance fee. Their phone number is 01223366202.
+- E0#72:2 [system] previous turn, user: Whatever is the most popular attraction | turn: You should check out [[All Saints Church]]. It has great architecture and free entrance. It's located on Jesus Lane cb58bs. The phone is 01223452587. Would that work for you?
+- E0#72:3 [system] previous turn, user: Thanks great. Also I need to have the phone number for All Saints Church on Jesus Lane. | turn: Sure [[All Saints Church]]'s phone number is 01223452587. Anything else?
+- E0#72:4 [user] previous turn, system: Your booking was successful with a reference number of VZRQHFHP. Can I help you with anything else? | turn: Thanks great. Also I need to have the phone number for [[All Saints Church]] on Jesus Lane.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#74, E0#18, E0#41, E0#10, E0#72) and its name as the value, like {"E0#74": "<name>"}.

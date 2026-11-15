@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, give the parts: for each part a snake_case name, a short role, and the ids of the examples
+that belong to it. Every example must be in exactly one part. If it does not mix, give is_mixed false and
+no parts.
+Return ONLY one JSON object, nothing before or after it:
+{"cluster_id": "C#0", "is_mixed": true,
+ "parts": [{"name": "str", "role": "str", "examples": ["C#0:s0"]}]}
+
+Cluster E2#18 of entity E2 (mentions 9, distinct values 8).
+Examples:
+- E2#18:s0 [system] previous turn, user: No thats it thankl you | turn: Did you need the [[train number]] or price today?
+- E2#18:s1 [system] previous turn, user: No thanks, but I do need some train info. I'll be leaving from Peterborough on Tuesday, sometime after 15:15. | turn: [[The TR5933]] leaves peterborough at 15:19.
+- E2#18:s2 [system] previous turn, user: Is there another day you would like me to check? | turn: [[There are only 4 trains]] that leave on Saturday
+- E2#18:s3 [user] previous turn, system: The train ID was TR3330. Do you want to book a ticket? | turn: No, but I do need to know when the train [[TR 3330]] arrives, please.
+- E2#18:s4 [system] previous turn, user: Can you assist me with booking one? | turn: Lets narrow down the time a little, the [[TR 3802]] leaves at 17.40 and arrives at 20.23 so that gives you a little extra time, would you like me to book you?
+- E2#18:s5 [system] previous turn, user: No, but I do need the price. | turn: Alright. The price for [[TR 6357]] is 17.90 pounds. Anything else?
+- E2#18:s6 [user] turn: Hi, I am looking for information on a [[train]].
+- E2#18:s7 [system] previous turn, user: Yes please make a booking for 4 people. | turn: I am trying to book you on [[Train ID TR3211]] and the cost for one person is 13.2 pounds. Please may i have the data of the four passengers?
+- E2#18:s8 [user] previous turn, system: I have train TR3892 that leaves at 07:59 and will get you to London Liverpool Street at 09:27. Will that work for you? | turn: Yes, I actually just needed the [[train number]], so thank you.
+
+Return the JSON object now.

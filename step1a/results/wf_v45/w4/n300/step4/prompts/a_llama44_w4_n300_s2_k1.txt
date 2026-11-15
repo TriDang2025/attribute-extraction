@@ -1,0 +1,116 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table taxi (one row = one taxi), 21 columns:
+[taxi:4] attraction
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "all saint church" (in: "we have a lovely architecture called all saints church it is free admission")
+[taxi:22] time str
+  values: time (share 0.88); 52 mentions in 42 dialogues
+  examples:
+    "booked time" (in: "I just need to be at the restaurant by the booked time.")
+    "13:30" (in: "a taxi to and from the hotel that leaves by 13:30.")
+[taxi:2] architectural sight
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "architectural sight" (in: "...ight. I forgot to select an architectural sight that I wanted to visit. Co...")
+[taxi:14] location common
+  values: text (share 1.00); 9 mentions in 9 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "It's my pleasure. Thank you for using Cambridge TownInfo centre. Goodbye.")
+    "cambridge towninfo" (in: "Great! Thanks for using Cambridge TownInfo. Goodbye!")
+[taxi:16] location str
+  values: text (share 1.00); 56 mentions in 39 dialogues
+  examples:
+    "restaurant" (in: "I want to leave the restaurant by 09:15. Please get me the contact number and...")
+    "attraction" (in: "I need to leave the attraction by 21:00 please.")
+[taxi:18] pickup location
+  values: text (share 1.00); 50 mentions in 33 dialogues
+  examples:
+    "hughe hall" (in: "A white audi will pick you up at hughes hall at 14:45. The contact number is ...")
+    "allenbell" (in: "...But, can you book me a taxi from Allenbell to J Restaurant. I need to be t...")
+[taxi:10] destination
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "ali baba" (in: "I'm going to Ali Baba from Hughes Hall. I would like the taxi to arrive")
+[taxi:19] reference number
+  values: id (share 1.00); 5 mentions in 5 dialogues
+  examples:
+    "ddlkgevp" (in: "will be reserved for 15 minutes. Reference number is : DDLKGEVP.")
+    "gue0lwwa" (in: "Your reference number is GUE0LWWA")
+[taxi:13] location college
+  values: text (share 1.00); 8 mentions in 8 dialogues
+  examples:
+    "college" (in: "I also need a taxi to get from college to the restaurant. I need to arrive by...")
+    "pembroke college" (in: "I need to book a taxi to pembroke college from prezzo.")
+[taxi:7] contact phone number
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "01223 351707" (in: "is 20 Milton Road Chesterton and the phone number is 01223 351707.")
+    "contact phone number" (in: "Can I please get the taxi company's contact phone number?")
+[taxi:8] cuisine
+  values: text (share 1.00); 5 mentions in 1 dialogues
+  examples:
+    "british" (in: "...Lebanese, Turkish, international, British, European, and Chinese. Do any o...")
+    "chinese" (in: "... international, British, European, and Chinese. Do any of these interest you?")
+[taxi:3] arrival time
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "4 king parade" (in: "...ike to arrive by 17:45 to the 4 Kings Parade. Pick us up at the Alpha-Mino...")
+[taxi:15] location noun
+  values: text (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "hotel" (in: "need to book a taxi to the restaurant from the hotel for the dinner reservation.")
+    "the hotel" (in: "No, the attraction and the hotel was everything.")
+[taxi:20] restaurant
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "taj tandoori" (in: "to ask you about the restaurant. Can you look up Taj Tandoori for me?")
+[taxi:9] day of week
+  values: day (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "friday" (in: "you book me a table for 4 at 16:15 on Friday?")
+    "monday" (in: "book a table at Taj Tandoori for 6 people on Monday at 17:30")
+[taxi:12] intended destination
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "the attraction" (in: "Yes. I would like a taxi to take me from the attraction to the restaurant.")
+[taxi:17] party size
+  values: number (share 0.75); 4 mentions in 3 dialogues
+  examples:
+    "15 minute" (in: "...l. The table will be reserved for 15 minutes. Reference number is : DDLKGEVP.")
+    "2 people" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+[taxi:5] car type
+  values: number (share 1.00); 55 mentions in 53 dialogues
+  examples:
+    "01223412299" (in: "Sure, their number is 01223412299")
+    "07004136407" (in: "...k you up. The contact number is 07004136407. Anything else I can help you ...")
+[taxi:21] time
+  values: time (share 0.53); 19 mentions in 16 dialogues
+  examples:
+    "what time" (in: "Where would you like to go and what time would you like to travel?")
+    "17:45" (in: "...e from downing college to pizza express by 17:45. can you set that up for me?")
+[taxi:11] hotel name
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "lodege" (in: "I also need a hotel called lovell Lodege")
+[taxi:1] address
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "20 milton road" (in: "The address is 20 Milton Road Chesterton and the phone number is 01223 351707.")
+    "chesterton" (in: "The address is 20 Milton Road Chesterton and the phone number is 01223 351707.")
+
+Return the JSON object now.

@@ -1,0 +1,77 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 1 of 12 (59 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; cb23bu, cb11ln, cb18dw; museum, theatre, cinema
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E1#42  (mentions 1, distinct values 1)
+Examples:
+- E1#42:0 [user] previous turn, system: You did not read the directions of this hit. There is no Tampa bay area. Please read the directions next time. | turn: i'm sorry, dude. i'm from [[florida]] so i'm not very smart. i'm trying to get from cambridge to stevenage.
+
+### E1#20  (mentions 6, distinct values 6, low confidence)
+Examples:
+- E1#20:0 [user] turn: I'd like to book a taxi from [[Ask]], departing after 19:15.
+- E1#20:1 [system] previous turn, user: Do you have information on the Express by Holiday Inn Cambridge? | turn: I do, indeed! It is located in the [[east]], is a 2 star hotel, and has both free internet and parking.
+- E1#20:2 [user] previous turn, system: Your taxi is booked. Be expecting a red Skoda. Please call 07595199284 should you need them. | turn: that will be it for now. [[good day]]
+- E1#20:3 [system] previous turn, user: Go for it. | turn: Some options are Lebanese, Turkish, [[international]], British, European, and Chinese. Do any of these interest you?
+- E1#20:4 [system] previous turn, user: Great I also need a taxi to commute between the two places. | turn: [[Where]] will you be leaving from? What time would you like to leave?
+- E1#20:5 [user] turn: Can you help me find a train for my upcoming trip to [[your city]]?
+
+### E1#3  (mentions 65, distinct values 19, low confidence)
+Examples:
+- E1#3:0 [user] previous turn, system: Thank you for using our service today? | turn: Actually, I will need to book a taxi to commute between the hotel and restaurant. I want to arrive at the [[restaurant]] by the booked time.
+- E1#3:1 [user] previous turn, system: They are at 100 Mill Road City Centre and can be reached at 01223367660. Is there anything else I can assist you with? | turn: I would like a cab leaving the [[hotel]] by 8:00 going to the restaurant, I need contact number and car type please.
+- E1#3:2 [user] previous turn, system: Yes, what sort of place would you like to go to? | turn: I'd really like to visit a [[museum]].
+- E1#3:3 [system] previous turn, user: I'm gonna need a taxi to get from the club to the restaurant. Can you schedule that for me? | turn: What time would you like to leave the [[club]] by taxi?
+- E1#3:4 [user] previous turn, system: Where are you going? | turn: I need to commute between the [[guesthouse]] and the restaurant. Make sure it arrives by the booked time and send me the contact number and car type please.
+- E1#3:5 [user] previous turn, system: I'm sorry, but I don't think we determined which park you wanted to visit. Where will you be departing from? | turn: [[the hotel]] by 14:45.
+- E1#3:6 [user] previous turn, system: The address is 154 chesterton road. | turn: Thanks now I need a taxi leaving the hotel by 23:30 going to the [[theatre]].
+- E1#3:7 [system] previous turn, user: I will also need a place to stay. | turn: [[A guesthouse]] has already been booked for you. Is there anything else I can help you with today?
+
+### E1#28  (mentions 8, distinct values 5, low confidence)
+Examples:
+- E1#28:0 [user] previous turn, system: Certainly. What is your intended destination and travel time? | turn: I need to leave the [[attraction]] by 21:00 please.
+- E1#28:1 [user] previous turn, system: Do you need a taxi between the guesthouse and the park? I can handle that, also. | turn: No, [[the attraction]] and the hotel was everything.
+- E1#28:2 [user] previous turn, system: I can do that. I'm sorry, but can you clarify your departure site? It appears it would be a location in the centre? | turn: You're right. I forgot to select an [[architectural sight]] that I wanted to visit. Could you suggest one in the city centre.
+- E1#28:3 [user] previous turn, system: I recommend India House! It's located at 31 Newnham Road Newnham. Their phone number is 01223461661. Can I do anything else for you? | turn: Can I get a taxi to take me between the two? I need to leave the [[Cafe Jello attraction]] by 21:00. I need the contact Number and car type?
+- E1#28:4 [system] previous turn, user: Thank you! I also need a taxi please. | turn: Certainly. What is your [[intended destination]] and travel time?
+- E1#28:5 [user] previous turn, system: Sure I can help you with that. What time do you want to leave or arrive by? | turn: I want to leave the [[attraction]] by 16:15. Please send me the contact number and car type. Thank you!
+- E1#28:6 [user] previous turn, system: The address of the restaurant is 10 Homerton Street City Centre. The postcode is cb28nx. Can I assist with anything else? | turn: Yes. I would like a taxi to take me from [[the attraction]] to the restaurant.
+- E1#28:7 [user] previous turn, system: in order for me to get a cab for you I need the arrival and or departure times | turn: I need to get to the [[attraction]] by 22:15.
+
+### E1#13  (mentions 3, distinct values 3)
+Examples:
+- E1#13:0 [system] previous turn, user: That's perfect, could you book me a table for 4 at 16:15 on Friday? | turn: Booking was successful. The table will be reserved for [[15 minutes]]. Reference number is : DDLKGEVP.
+- E1#13:1 [user] previous turn, system: How does the Curry Garden sound? | turn: That sounds good. Please book for [[2 people]] at 11:45 on Saturday.
+- E1#13:2 [user] previous turn, system: Sure, their number is 01223412299 | turn: I'd like to book a table at Taj Tandoori for [[6 people]] on Monday at 17:30
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#42, E1#20, E1#3, E1#28, E1#13) and its name as the value, like {"E1#42": "<name>"}.

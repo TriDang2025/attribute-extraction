@@ -1,0 +1,208 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table hotel (one row = one hotel), 39 columns:
+[hotel:11] guest house name title
+  values: text (share 1.00); 9 mentions in 8 dialogues
+  examples:
+    "acorn guest house" (in: "guesthouses in the north. May I suggest the 4 star Acorn Guest house?")
+    "acorn guest lodge" (in: "... that. You are booked at the Acorn Guest Lodge. Reference number is : R68P...")
+[hotel:12] guest house name title with space
+  values: text (share 1.00); 17 mentions in 14 dialogues
+  examples:
+    "acorn guest house" (in: "Yes the phone number to the acorn guest house 01223353888 with a price range ...")
+    "the acorn guest house" (in: "The Acorn Guest House is moderately-priced, in the north. They offer free wif...")
+[hotel:25] num guests
+  values: text (share 0.52); 25 mentions in 18 dialogues
+  examples:
+    "how many people" (in: "OK, and how many people will be staying in the room?")
+    "3" (in: "I found 3 for you all in the expensive price range. Can you")
+[hotel:34] rating
+  values: text (share 0.80); 5 mentions in 5 dialogues
+  examples:
+    "carolina bed and breakfast" (in: "I recommend Carolina Bed and Breakfast. It's located close to where you'll be...")
+    "24" (in: "We have 24, do you care about price or part of town?")
+[hotel:27] num people
+  values: number (share 0.94); 69 mentions in 63 dialogues
+  examples:
+    "6 people" (in: "I'd like 3 nights for 6 people, please.")
+    "2 people" (in: "please book it for 5 nights starting on Wednesday for 2 people total.")
+[hotel:10] free wifi
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "the hotel" (in: "The hotel is found in the Northern part of town and it")
+    "2 star guesthouse" (in: "but I need free wifi and I would like a 2 star guesthouse please.")
+[hotel:30] price
+  values: text (share 1.00); 7 mentions in 4 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "Alright, might I suggest the Alexander Bed and Breakfast then?")
+    "alexander" (in: "... I have your party booked at the Alexander. The reference number is : G2YM...")
+[hotel:16] hotel name with article
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "hotel allenbell" (in: "Hotel allenbell is what I found that is cheap and has parking.")
+    "the allenbell guesthouse" (in: "The allenbell guesthouse have everything you are looking for. It is within your")
+[hotel:15] hotel name
+  values: text (share 1.00); 209 mentions in 96 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "hotel" (in: "Can you please confirm that the hotel you've booked for us offers free wi-fi?...")
+[hotel:38] star rating
+  values: number (share 0.91); 47 mentions in 35 dialogues
+  examples:
+    "4 star" (in: "You don't have any 4 stars in the moderate price range in any area?")
+    "3 star" (in: "...ere are two expensive hotels with 3 stars and parking. Do you prefer the c...")
+[hotel:3] arrival day
+  values: text (share 1.00); 6 mentions in 6 dialogues
+  examples:
+    "2 or 3 night" (in: "...r hotel in the south with free parking for 2 or 3 nights Sunday for 6 people?")
+    "fewer night" (in: "...r hotel. Would you like to try fewer nights or perhaps a different arrival...")
+[hotel:23] location proper
+  values: text (share 1.00); 46 mentions in 34 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+    "city centre north b and b" (in: "Okay! Would you like to stay at City Centre North B and B, or at Worth House?")
+[hotel:6] day
+  values: text (share 0.57); 28 mentions in 23 dialogues
+  examples:
+    "thursday" (in: "from Thursday.")
+    "how many day" (in: "I have begun a booking for you at Avalon. How many days will you be staying?")
+[hotel:35] room
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "room rate" (in: "I should probably check on the prices. What sort of room rates am I looking at?")
+[hotel:18] hotel reference
+  values: text (share 1.00); 6 mentions in 4 dialogues
+  examples:
+    "archway house" (in: "I need help finding a hotel called Archway House. Can you help me?")
+    "the archway house" (in: "The Archway House is a guesthouse in the north with four stars. It's")
+[hotel:14] hotel attribute
+  values: text (share 1.00); 11 mentions in 8 dialogues
+  examples:
+    "the cambridge belfry" (in: "The Cambridge Belfry fits your requirements, would you like to book a reserva...")
+    "cambridge belfry" (in: "Ok. So that is the cambridge belfry. Should I make a reservation for you?")
+[hotel:29] phone number
+  values: number (share 0.73); 26 mentions in 21 dialogues
+  examples:
+    "01223312843" (in: "Yes, the number is 01223312843")
+    "01223353888" (in: "...ne number to the acorn guest house 01223353888 with a price range of moderate")
+[hotel:39] stars
+  values: text (share 1.00); 23 mentions in 20 dialogues
+  examples:
+    "4 star hotel" (in: "Maybe. Is either one a 4 star hotel? If so, I'd like to book a room for")
+    "expensive hotel" (in: "...ld you try and book a 4 star, expensive hotel for 3 nights, starting on Sa...")
+[hotel:26] num options
+  values: number (share 1.00); 11 mentions in 10 dialogues
+  examples:
+    "23" (in: "We have 23 different options available. Is there an area you would prefer?")
+    "6" (in: "i found 6. what is your price range?")
+[hotel:28] other
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "university arm" (in: "...ott on the west side, and the University Arms in the center. Are you inter...")
+[hotel:37] side
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "east side" (in: "... within your price range, on the east side with free wifi and parking. Wou...")
+    "east side of town" (in: "... a guesthouse located on the east side of town in the moderate price range...")
+[hotel:17] hotel name with article and location
+  values: text (share 1.00); 7 mentions in 4 dialogues
+  examples:
+    "allenbell" (in: "mentioned all have free wifi and parking. I recommend the Allenbell.")
+    "the allenbell" (in: "The Allenbell sounds perfect. Can you book it for me for tuesday?")
+[hotel:40] train id
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "tr8167" (in: "Yes please, for 4 people. How about the TR8167 please.")
+[hotel:36] room rates
+  values: text (share 1.00); 14 mentions in 13 dialogues
+  examples:
+    "room" (in: "OK, and how many people will be staying in the room?")
+    "how many room" (in: "How many rooms do you need?")
+[hotel:8] direction
+  values: text (share 1.00); 24 mentions in 16 dialogues
+  examples:
+    "south" (in: "stars and parking. Do you prefer the centre or the south?")
+    "south of town" (in: "...expensive, 3-star hotel in the south of town, with internet and parking. W...")
+[hotel:31] price range
+  values: number (share 0.67); 3 mentions in 3 dialogues
+  examples:
+    "4 option" (in: "That narrows it down a bit to 4 options - 3 guesthouses and 1 hotel. Are you ...")
+    "9 possibility" (in: "There are 9 possibilities in either the cheap or moderate price range. Which do")
+[hotel:9] free amenities
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "free parking" (in: "Yes, I need internet and free parking.")
+    "free" (in: "Yes, the parking is free.")
+[hotel:2] amenities
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "a and b guest house" (in: "A and B guest house might fit your needs. Would you like me to book")
+    "a & b guesthouse" (in: "...ights starting Friday at the A & B guesthouse. Your reference number is AN...")
+[hotel:21] location
+  values: text (share 0.53); 177 mentions in 95 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "west" (in: "I need a hotel in the west with free parking please.")
+[hotel:19] how many
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "8 of us" (in: "...those sounds great. There will be 8 of us for 5 nights starting on Sunday....")
+[hotel:4] check in time
+  values: time (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "05:30" (in: "i would like to check in on monday at 5:30")
+    "16:00" (in: "...e book reservation for 2 people at 16:00 on Friday. Send me the reference ...")
+[hotel:7] day of week
+  values: day (share 0.89); 73 mentions in 56 dialogues
+  examples:
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+    "friday" (in: "I would like to book one starting Friday.")
+[hotel:13] hotel
+  values: text (share 1.00); 11 mentions in 9 dialogues
+  examples:
+    "university arm hotel" (in: "I have a hotel called university arms hotel located in the centre. Would you ...")
+    "the gonville hotel" (in: "...re two that might suit you. The Gonville Hotel is in the centre and The Le...")
+[hotel:1] address
+  values: text (share 1.00); 9 mentions in 7 dialogues
+  examples:
+    "56 saint barnaba road" (in: "The address is 56 saint barnabas road.")
+    "138 perne road" (in: "...tely priced. Their address is 138 Perne Road and their phone number is 012...")
+[hotel:22] location noun
+  values: text (share 1.00); 34 mentions in 26 dialogues
+  examples:
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+    "centre of town" (in: "actually like a hotel instead of guesthouse and in the centre of town.")
+[hotel:5] date
+  values: day (share 0.95); 37 mentions in 22 dialogues
+  examples:
+    "sunday" (in: "Will you try Sunday arrival?")
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+[hotel:24] num days
+  values: number (share 1.00); 8 mentions in 8 dialogues
+  examples:
+    "2" (in: "...king? If yes, please book a room for 2 for 2 nights. We'll be checking in ...")
+    "4" (in: "book it for the same day for a party of 4 for 4 nights.")
+[hotel:33] price range str
+  values: text (share 1.00); 68 mentions in 53 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "moderately priced" (in: "...n your selected region. It's moderately priced and includes free internet ...")
+[hotel:32] price range adj
+  values: text (share 1.00); 44 mentions in 32 dialogues
+  examples:
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+    "cheap price range" (in: "...ooking to book a guesthouse in the cheap price range that includes free wifi.")
+
+Return the JSON object now.

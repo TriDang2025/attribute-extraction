@@ -1,0 +1,67 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 6 of 26 (127 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; cb23bu, cb11ln, cb18dw; museum, theatre, cinema
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+
+### E4#43  (mentions 1, distinct values 1)
+Examples:
+- E4#43:0 [system] previous turn, user: I am craving Turkish food in the centre. Is there a restaurant available? | turn: I have pulled up 3. How about [[anatolia]], they are moderately priced.
+
+### E4#94  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E4#94:0 [system] previous turn, user: I'm looking for a restaurant called nandos. Are you aware of it? | turn: [[I am]]. It is a great portuguese place. They have two locations in town. One in the South and on in the city centre.
+- E4#94:1 [user] previous turn, system: There are five restaurants in the moderate price range. They sever british and asian oriental, which are you looking for? | turn: [[iam]] looking for something asian oriental and not so expensive restaurant.
+
+### E4#67  (mentions 4, distinct values 2)
+Examples:
+- E4#67:0 [system] previous turn, user: I'm looking for a place called hakka. | turn: [[Hakka]] is a chinese restaurant on the north side of town. Would you like to make a booking?
+- E4#67:1 [system] previous turn, user: I'm looking for a restaurant named hakka | turn: [[The hakka]] is a chinese restaurant in the north area. Would you like to make a booking today?
+- E4#67:2 [system] previous turn, user: I'd like it to be in the north, and expensive would be best. | turn: I would recommend either [[Hakka]] or The Hotpot. Would you like for me to book a reservation for one of these restaurants?
+- E4#67:3 [user] turn: I'm looking for a restaurant named [[hakka]]
+
+### E4#36  (mentions 5, distinct values 1)
+Examples:
+- E4#36:0 [system] previous turn, user: Do you have information on La Raza? | turn: [[La raza]] is a spanish restaurant in the centre area. It is considered cheap
+- E4#36:1 [system] previous turn, user: I don't care. | turn: [[La Raza]] is located int he centre of town and is in the cheap price range.
+- E4#36:2 [user] previous turn, system: Booked 1 ticket! Reference number: TFI0LLL4. Fee is 75.09 GBP to be paid at the station. | turn: Great! Is there a restaurant called [[la raza]] near by?
+- E4#36:3 [user] turn: Do you have information on [[La Raza]]?
+- E4#36:4 [user] previous turn, system: La Raza is located int he centre of town and is in the cheap price range. | turn: [[La Raza]] sounds lovely. May I have the number and postcode please?
+
+### E4#104  (mentions 4, distinct values 1)
+Examples:
+- E4#104:0 [user] previous turn, system: We have two: La Mimosa, and Shiraz Restaurant. | turn: Let's book it for [[La Mimosa]] for 3 people at 17:30 on Thursday.
+- E4#104:1 [system] previous turn, user: I prefer the expensive price range. | turn: [[la mimosa]] serves mediterranean food and is in the expensive price range. their phone number is 01223 362525 and they are located at Thompsons Lane Fen Ditton.
+- E4#104:2 [system] previous turn, user: Price doesn't matter, I would like the address, phone number and the postcode please | turn: [[La mimosa]] serves Mediterranean food. Their phone number is 01223 362525, their address is Thompsons Lane Fen Ditton and their postcode is C.B 5, 8 A.Q.
+- E4#104:3 [system] previous turn, user: What about mediterranean food? | turn: We have two: [[La Mimosa]], and Shiraz Restaurant.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#43, E4#94, E4#67, E4#36, E4#104) and its name as the value, like {"E4#43": "<name>"}.

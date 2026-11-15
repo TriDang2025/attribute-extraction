@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E2#15/0: name: location str | description: location
+Examples:
+- 1 [user] previous turn, system: I'll be happy to help you with that. What day would you like to travel and where would you like to depart from? | turn: I need to leave from Bishops Stortford the same day I arrive at the [[hotel]]. I need to arrive close to 19:30.
+- 2 [system] previous turn, user: What part of town is that on? I'll also need a train on Friday. | turn: Byard art is on the [[south end of town]].
+- 3 [user] previous turn, system: What day and time are you looking at? I can help you find a train if I know that. | turn: Can you give me the postcode to the [[museum]] and I will be traveling on tuesday.
+- 4 [user] previous turn, system: You are booked for two tickets, Reference number is : RJOUA7E1. | turn: I am also looking for places to go in [[town]].
+- 5 [system] previous turn, user: any expensive restaurant will suffice. Reserve it for 8 people at 18:30 on tuesday and I'll need the reservation number please. | turn: Booking was successful. The [[table]] will be reserved for 15 minutes. Reference number is : 51VEERAC.
+
+Columns (5):
+- name: other str | examples: local restaurant; restaurant
+- name: time | examples: what time; leicester; morning
+- name: location station | examples: london; liverpool
+- name: facility str | examples: station; airport
+- name: destination | examples: your destination; traveller rest; where is your destination
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E2#15/0", "reason": "str", "same_as": "<column name or none>"}

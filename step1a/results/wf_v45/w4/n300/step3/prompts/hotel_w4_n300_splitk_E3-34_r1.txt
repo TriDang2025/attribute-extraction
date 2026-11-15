@@ -1,0 +1,24 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#34:s0": "P1", "E3#34:s1": "P2"}}
+
+Cluster E3#34 of entity E3 (mentions 9, distinct values 2).
+Examples:
+- E3#34:s0 [system] previous turn, user: I would like it to be in the west. It doesn't matter if it has free parking or not. Thank you! | turn: There is the [[hobsons house]]. Would you like me to book it?
+- E3#34:s1 [system] previous turn, user: The hotel should be of the guesthouse type and should be located in the west area. | turn: [[The Hobsons House]] is a guesthouse that is available. Would you like any additional information?
+- E3#34:s2 [system] previous turn, user: That sounds good. Can I get a room for 6 people, 2 nights, starting Thursday? | turn: [[Hobsons house]] is booked for you. The reference number is JHQJLP4U.
+- E3#34:s3 [system] previous turn, user: What are my options on the west side of town? | turn: Just one, the [[Hobsons House]] is available.
+- E3#34:s4 [user] previous turn, system: Booking was successful, the total fee is 52.8 GBP payable at the station. Your reference number is L3RH9ZWP. Do you need anything else? | turn: I also need information on a hotel called [[hobsons house]].
+- E3#34:s5 [system] previous turn, user: I'd like to stay on the westside, at a place with free parking and WiFi. | turn: There is the [[Hobsons House]]. It is nice and is a 3 star guesthouse.
+- E3#34:s6 [system] previous turn, user: 2 people starting on tuesday. please find me the reference number | turn: I'm sorry, Allenbell was not in the west. [[Hobsons House]] meets your needs and I have booked you a room. Reference number is : CTYSXIVU.
+- E3#34:s7 [system] previous turn, user: Ok, let's go with that. ould you book it for 8 people starting wednesday? I need 5 nights. | turn: You booking for [[Hobsons House]] was successful, the confirmation number is BBSBEY5B. Can I help with anything else?
+- E3#34:s8 [system] previous turn, user: I also need information on a hotel called hobsons house. | turn: [[Hobsons House]] if a guesthouse located in the west and is moderately priced. It has a 3 star rating and is located at 96 Barton Rd. Book it for you?
+
+Return the JSON object now.

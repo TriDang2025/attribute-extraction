@@ -1,0 +1,62 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 13 of 21 (105 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E0#66  (mentions 5, distinct values 2)
+Examples:
+- E0#66:0 [user] turn: I am looking for an attraction called [[great saint mary]]'s church.
+- E0#66:1 [system] previous turn, user: I want to go to a particular attraction called great saint mary's church. Where is it? | turn: [[The great saint mary]]'s church is in city centre, the entrance fee is 2 pounds. Would you like more information?
+- E0#66:2 [user] turn: I'm planning a trip to Cambridge and I would like some information on [[great saint mary]]'s church. Where exactly is it located?
+- E0#66:3 [user] turn: I want to go to a particular attraction called [[great saint mary]]'s church. Where is it?
+- E0#66:4 [system] previous turn, user: I am looking for an attraction called great saint mary's church. | turn: [[great saint mary]]'s church is at Market Square, their phone number is 01223350914, and their postcode is cb23pq. Do you need any more information?
+
+### E0#58  (mentions 1, distinct values 1)
+Examples:
+- E0#58:0 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend Castle Galleries, phone number 01223307402, postal code cb23bj, address unit su43, [[grande arcade]], saint andrews street. It is free.
+
+### E0#88  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E0#88:0 [system] previous turn, user: I don't have a preference. Can you recommend one and provide me some information on it? | turn: The first one on my list is [[adc theatre]] located on park street. I need some more information on your preferences
+- E0#88:1 [system] previous turn, user: ADC Theatre will work. Can you tell me what part of town that is in? | turn: [[The ADC Theatre]] is in the center of town.
+
+### E0#36  (mentions 2, distinct values 1)
+Examples:
+- E0#36:0 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the [[Mumford theatre]], it is located at Anglia Ruskin Enterprise, East Road in the Centre area.
+- E0#36:1 [user] turn: Is the [[mumford theatre]] still in operation?
+
+### E0#75  (mentions 1, distinct values 1)
+Examples:
+- E0#75:0 [system] previous turn, user: Yes I would like more information on both museums. | turn: saint barnabas press gallery is located in the belfast yard, coldham's road , cb13ew and gallery at twelve a high street is at [[fulbourn]],cb15dh
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#66, E0#58, E0#88, E0#36, E0#75) and its name as the value, like {"E0#66": "<name>"}.

@@ -1,0 +1,284 @@
+Below are two tables of a relational database design, each with its columns. Decide whether attraction and taxi are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "attraction -> taxi": one attraction row has many taxi rows (each taxi row refers to one attraction row)
+- "taxi -> attraction": one taxi row has many attraction rows (each attraction row refers to one taxi row)
+- "many_to_many": a attraction row can go with many taxi rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table attraction (one row = one attraction), 35 columns:
+[attraction:25] location str
+  values: text (share 1.00); 60 mentions in 33 dialogues
+  examples:
+    "museum" (in: "...s to do and places to go such as, museum's, nightclubs, parks and restaura...")
+    "nightclub" (in: "... to do and places to go such as, museum's, nightclubs, parks and restaurants.")
+[attraction:10] cinema name
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "fulbourn" (in: "cb13ew and gallery at twelve a high street is at fulbourn,cb15dh")
+    "the cineworld cinema" (in: "The cineworld cinema is the place!")
+[attraction:33] phone number
+  values: number (share 0.91); 44 mentions in 42 dialogues
+  examples:
+    "01223314960" (in: "...e entrance. Their phone number is 01223314960. May I help find anything else?")
+    "01223245151" (in: "Sure, the telephone number is 01223245151 and the post code is CB20QQ.")
+[attraction:27] nightclub location
+  values: text (share 1.00); 5 mentions in 2 dialogues
+  examples:
+    "club salsa" (in: "I am looking for an attraction named Club Salsa.")
+[attraction:5] attraction name
+  values: text (share 1.00); 62 mentions in 37 dialogues
+  examples:
+    "ballare" (in: "...t nightclubs in that area. Might I suggest Ballare. Would you like more info?")
+    "abbey pool" (in: "Yes there is the abbey pool and astroturf pitch would you like their address?")
+[attraction:16] entity str
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge area" (in: "interested in? There are many categories of attractions in the Cambridge area.")
+[attraction:29] number
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "boat attraction" (in: "...s, and museums, we also have boat attractions, nightclubs, and theatres in...")
+[attraction:26] museum name
+  values: text (share 1.00); 13 mentions in 9 dialogues
+  examples:
+    "the broughton house gallery" (in: "the broughton house gallery is a museum located in the centre.")
+    "broughton house gallery" (in: "I'm looking for information on Broughton house gallery.")
+[attraction:8] booking reference
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "archway house" (in: "You are booked at Archway House. Your reference number is 2G8LC07R. Camboats ...")
+[attraction:34] postcode
+  values: id (share 0.95); 56 mentions in 48 dialogues
+  examples:
+    "cb23bu" (in: "is on Saint Andrew's Street and the post code is cb23bu. It's free admission.")
+    "cb11ln" (in: "Is the cb11ln the postcode?")
+[attraction:23] location name
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "cherry hinton water play" (in: "I am looking for information about the the Cherry Hinton Water Play")
+    "cherry hinton water play park" (in: "Cherry Hinton Water Play park in the east is an excellent place to keep cool")
+[attraction:1] address
+  values: text (share 0.91); 32 mentions in 20 dialogues
+  examples:
+    "clifton way" (in: "Cambridge Leisure Park Clifton Way Cherry Hinton 01223 244277")
+    "huntingdon road" (in: "...s Hotel Felix Whitehouse Lane Huntingdon Road postcode cb30lx. Is there an...")
+[attraction:28] num str
+  values: price (share 1.00); 9 mentions in 9 dialogues
+  examples:
+    "5 pound" (in: "yard. The phone number is 01223364222. The entrance fee is 5 pounds.")
+    "2 pound" (in: "It's the architecture type and there is a 2 pound entrance fee.")
+[attraction:31] number of museums
+  values: number (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "1 theatre" (in: "...tre's in the centre of town and one theatre on the south side. Do you have...")
+    "13 college" (in: "There are 13 colleges in the center of town. Does entrance fee matter to")
+[attraction:15] college proper
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "college" (in: "There are 13 places, colleges, entertainment, and museums")
+[attraction:18] establishment
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "hospital" (in: "me what the phone number and post code for the hospital is?")
+[attraction:12] college name apostrophe
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "christ" (in: "I honestly recommend visiting a famous college such as Christs or Magdalene.")
+    "corpus christi" (in: "Most are free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50")
+[attraction:17] entrance fee
+  values: text (share 1.00); 10 mentions in 10 dialogues
+  examples:
+    "free admission" (in: "...ology at University of Cambridge, Downing Street. It even has free admission!")
+    "free" (in: "street , post code cb21dq. You can visit them for free! Anything else you need?")
+[attraction:13] college name lower
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "churchill college" (in: "How about Churchill College?")
+    "famous college" (in: "Yes I have many famous colleges to visit and most of them are free. Would you")
+[attraction:21] location abbr
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "west cambridge" (in: "Hi, what are some fun attractions in west Cambridge?")
+[attraction:14] college noun
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "churchill college" (in: "There are five colleges in the west. I recommend churchill college.")
+[attraction:35] stay duration
+  values: day (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "saturday" (in: "3 nights starting on Saturday, can I get the reference number as well? We")
+[attraction:22] location address
+  values: text (share 1.00); 10 mentions in 7 dialogues
+  examples:
+    "cherry hinton hall and ground" (in: "Cherry Hinton hall and grounds is on the east part of town.")
+    "cherry hinton road" (in: "...ed at Cherry Hinton Hall on Cherry Hinton Road. Their phone number is 0122...")
+[attraction:19] fee
+  values: price (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2.50 pound" (in: "...ver Street. The entrance fee is 2.50 pounds. Is there anything else I can ...")
+[attraction:2] admission fee
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "entrance fee" (in: "Do you have any information on their entrance fees?")
+    "amount of the entrance fee" (in: ".... Please provide the address and amount of the entrance fee so I can prepare.")
+[attraction:30] number of attractions
+  values: number (share 1.00); 5 mentions in 5 dialogues
+  examples:
+    "11" (in: "Sure, we have 11 museums in the centre area, a few are broughton house")
+    "25" (in: "There are 25 possible attractions in the requested area. Are you looking for")
+[attraction:7] attraction type
+  values: text (share 1.00); 14 mentions in 11 dialogues
+  examples:
+    "college" (in: "to go in the centre area. I am looking for college.")
+    "attraction" (in: "Sorry, parking isn't something that is mentioned for attractions.")
+[attraction:32] other
+  values: text (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "park" (in: "type are you looking for a church,or swimming or a park ?")
+    "swimming" (in: "centre of town,what type are you looking for a church,or swimming or a park ?")
+[attraction:9] business address
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "11 pea hill city centre" (in: "sure no problem. Address is 11 Peas Hill City Centre and phone number is 0122...")
+    "hotel felix whitehouse lane" (in: "There address is Hotel Felix Whitehouse Lane Huntingdon Road postcode cb30lx....")
+[attraction:20] location
+  values: text (share 1.00); 178 mentions in 81 dialogues
+  examples:
+    "centre" (in: "...re several colleges in either the centre or west part of town. Which area ...")
+    "cambridge" (in: "I am looking for information in Cambridge")
+[attraction:11] college name
+  values: text (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "christ college" (in: "Christ college. What would you like to know?")
+    "christ's college" (in: "Yes, Christ's College is on Saint Andrew's Street and the post code is")
+[attraction:24] location phone number
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "parkside pool" (in: "...nterest you. Or if you want to exercise, Parkside Pools would be a fun venue.")
+[attraction:36] street address
+  values: text (share 1.00); 6 mentions in 5 dialogues
+  examples:
+    "their phone number" (in: "Something located in the city centre. Also may I have their phone number?")
+[attraction:6] attraction str
+  values: text (share 1.00); 8 mentions in 4 dialogues
+  examples:
+    "cambridge art theatre" (in: "The address of the Cambridge Arts Theatre is 6 Saint Edward's Passage, postco...")
+    "cambridge belfry" (in: "cb236bw Is the postcode for the Cambridge Belfry. Do you need to book this ho...")
+[attraction:4] attraction
+  values: text (share 1.00); 7 mentions in 5 dialogues
+  examples:
+    "all saint church" (in: "You should check out All Saints Church. It has great architecture and free en...")
+    "grande arcade" (in: "...ode cb23bj, address unit su43, grande arcade, saint andrews street. It is ...")
+
+Table taxi (one row = one taxi), 21 columns:
+[taxi:4] attraction
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "all saint church" (in: "we have a lovely architecture called all saints church it is free admission")
+[taxi:22] time str
+  values: time (share 0.88); 52 mentions in 42 dialogues
+  examples:
+    "booked time" (in: "I just need to be at the restaurant by the booked time.")
+    "13:30" (in: "a taxi to and from the hotel that leaves by 13:30.")
+[taxi:2] architectural sight
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "architectural sight" (in: "...ight. I forgot to select an architectural sight that I wanted to visit. Co...")
+[taxi:14] location common
+  values: text (share 1.00); 9 mentions in 9 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "It's my pleasure. Thank you for using Cambridge TownInfo centre. Goodbye.")
+    "cambridge towninfo" (in: "Great! Thanks for using Cambridge TownInfo. Goodbye!")
+[taxi:16] location str
+  values: text (share 1.00); 56 mentions in 39 dialogues
+  examples:
+    "restaurant" (in: "I want to leave the restaurant by 09:15. Please get me the contact number and...")
+    "attraction" (in: "I need to leave the attraction by 21:00 please.")
+[taxi:18] pickup location
+  values: text (share 1.00); 50 mentions in 33 dialogues
+  examples:
+    "hughe hall" (in: "A white audi will pick you up at hughes hall at 14:45. The contact number is ...")
+    "allenbell" (in: "...But, can you book me a taxi from Allenbell to J Restaurant. I need to be t...")
+[taxi:10] destination
+  values: text (share 1.00); 10 mentions in 6 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "ali baba" (in: "I'm going to Ali Baba from Hughes Hall. I would like the taxi to arrive")
+[taxi:19] reference number
+  values: id (share 1.00); 5 mentions in 5 dialogues
+  examples:
+    "ddlkgevp" (in: "will be reserved for 15 minutes. Reference number is : DDLKGEVP.")
+    "gue0lwwa" (in: "Your reference number is GUE0LWWA")
+[taxi:13] location college
+  values: text (share 1.00); 8 mentions in 8 dialogues
+  examples:
+    "college" (in: "I also need a taxi to get from college to the restaurant. I need to arrive by...")
+    "pembroke college" (in: "I need to book a taxi to pembroke college from prezzo.")
+[taxi:7] contact phone number
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "01223 351707" (in: "is 20 Milton Road Chesterton and the phone number is 01223 351707.")
+    "contact phone number" (in: "Can I please get the taxi company's contact phone number?")
+[taxi:8] cuisine
+  values: text (share 1.00); 5 mentions in 1 dialogues
+  examples:
+    "british" (in: "...Lebanese, Turkish, international, British, European, and Chinese. Do any o...")
+    "chinese" (in: "... international, British, European, and Chinese. Do any of these interest you?")
+[taxi:3] arrival time
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "4 king parade" (in: "...ike to arrive by 17:45 to the 4 Kings Parade. Pick us up at the Alpha-Mino...")
+[taxi:15] location noun
+  values: text (share 1.00); 19 mentions in 18 dialogues
+  examples:
+    "hotel" (in: "need to book a taxi to the restaurant from the hotel for the dinner reservation.")
+    "the hotel" (in: "No, the attraction and the hotel was everything.")
+[taxi:20] restaurant
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "taj tandoori" (in: "to ask you about the restaurant. Can you look up Taj Tandoori for me?")
+[taxi:9] day of week
+  values: day (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "friday" (in: "you book me a table for 4 at 16:15 on Friday?")
+    "monday" (in: "book a table at Taj Tandoori for 6 people on Monday at 17:30")
+[taxi:12] intended destination
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "the attraction" (in: "Yes. I would like a taxi to take me from the attraction to the restaurant.")
+[taxi:17] party size
+  values: number (share 0.75); 4 mentions in 3 dialogues
+  examples:
+    "15 minute" (in: "...l. The table will be reserved for 15 minutes. Reference number is : DDLKGEVP.")
+    "2 people" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+[taxi:5] car type
+  values: number (share 1.00); 55 mentions in 53 dialogues
+  examples:
+    "01223412299" (in: "Sure, their number is 01223412299")
+    "07004136407" (in: "...k you up. The contact number is 07004136407. Anything else I can help you ...")
+[taxi:21] time
+  values: time (share 0.53); 19 mentions in 16 dialogues
+  examples:
+    "what time" (in: "Where would you like to go and what time would you like to travel?")
+    "17:45" (in: "...e from downing college to pizza express by 17:45. can you set that up for me?")
+[taxi:11] hotel name
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "lodege" (in: "I also need a hotel called lovell Lodege")
+[taxi:1] address
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "20 milton road" (in: "The address is 20 Milton Road Chesterton and the phone number is 01223 351707.")
+    "chesterton" (in: "The address is 20 Milton Road Chesterton and the phone number is 01223 351707.")
+
+Return the JSON object now.

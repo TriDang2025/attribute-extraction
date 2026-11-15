@@ -1,0 +1,70 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 5 of 26 (127 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, centre of town, town; cb23bu, cb11ln, cb18dw; museum, theatre, cinema
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+
+### E4#10  (mentions 127, distinct values 40, low confidence)
+Examples:
+- E4#10:0 [user] previous turn, system: Okay, I can book your table at Eraina. They serve european food. How many in your party, what day and time please? | turn: I would like to book for Tuesday at [[12:45]].
+- E4#10:1 [user] previous turn, system: What time would you like to visit? | turn: How about [[13:15]]?
+- E4#10:2 [user] previous turn, system: I'm sorry, but I was unable to book either restaurant for 1330 on Tuesday either. Would you consider dining a little earlier or later? | turn: If neither restaurant is available for [[13:30]], can you try 14:30? It's later than I wished, but I guess that can't be helped.
+- E4#10:3 [system] previous turn, user: 16:30 on Thursday, please. | turn: We booked you for Thursday at [[16:30]], is their anything else I can assist you with?
+- E4#10:4 [user] previous turn, system: Tandoori Palace in the west is a wonderful Indian restaurant. Would you like their phone number or a reservation there, perhaps? | turn: book a table for 6 people at [[12:00]] on wednesday
+
+### E4#29  (mentions 35, distinct values 3)
+Examples:
+- E4#29:0 [system] previous turn, user: It's called Nandos and I'd like to book it for Monday at 15:00. There will be 6 people. | turn: No problem! I have your table reserved for 15:00 on Monday. They will hold your table for [[15 minutes]], your reference number is HVB51VAM.
+- E4#29:1 [system] previous turn, user: I'll take something that is cheap. | turn: There are a total of [[15]] restaurants that are cheap in the centre. Is there another type you would like to try?
+- E4#29:2 [system] previous turn, user: Yes thank you. Please give me the reference number for the restaurant. | turn: Your booking was successful. Your table will be reserved for [[15 mins]]. Reference number is : XLKZ4515. Anything else I can do for you?
+- E4#29:3 [system] previous turn, user: Yes please. For monday at 12:00 for 5 people. I'll need the reference number as well. | turn: your all set. Reference is T0MSA1QK. They will only hold the table for [[15 minutes]], so you might want to keep that in mind, anything else?
+- E4#29:4 [system] previous turn, user: I need help finding a book on italian food | turn: There are [[fifteen]] Italian restaurants in town. Do you want a specific part of town, or maybe a certain price range to narrow down the search?
+
+### E4#75  (mentions 1, distinct values 1)
+Examples:
+- E4#75:0 [system] previous turn, user: How about choosing a famous one and give me the address, postcode and entrance fee. | turn: corpus christi is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is [[2 pounds]].
+
+### E4#59  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E4#59:0 [system] previous turn, user: I want to find a Chinese restaurant in the centre of Cambridge. | turn: There are [[10 choices]] and we have cheap, moderate and expensive options, any preference?
+- E4#59:1 [system] previous turn, user: I prefer Chinese food | turn: great, i have [[three options]] for you to choose from!
+- E4#59:2 [system] previous turn, user: It should be expensive. | turn: There are [[four choices]] which match your requirements. Would you like to make a reservation at one of them?
+
+### E4#15  (mentions 159, distinct values 32, low confidence)
+Examples:
+- E4#15:0 [system] previous turn, user: Anything in the area would be fine | turn: Galleria is a nice restaurant serving European food, is in the centre of town and is [[moderately priced]].
+- E4#15:1 [system] previous turn, user: Hi, I'm trying to find out more about a restaurant called cocum. What can you tell me? | turn: It is an Indian restaurnat in the west part of town. It is [[expensive]].
+- E4#15:2 [user] turn: I need a restaurant that serves Indian food in the [[moderate price range]]
+- E4#15:3 [system] previous turn, user: Is there another restaurant in the same area that is in the same price range? | turn: Saigon City is also in the [[expensive price range]] and on the north side of town. They have asian oriental cuisine. Shall we try there?
+- E4#15:4 [system] previous turn, user: Is there one with Venetian food? | turn: Unfortunately, I do not have anything that offers [[cheap]] Venetian food in the west. Can I search another area or other type of food?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#10, E4#29, E4#75, E4#59, E4#15) and its name as the value, like {"E4#10": "<name>"}.

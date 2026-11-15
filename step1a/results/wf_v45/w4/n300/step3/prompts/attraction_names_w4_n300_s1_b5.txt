@@ -1,0 +1,65 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 5 of 21 (105 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 13:30, 13:15, 14:45; 01223412299, 07004136407, 07013573051
+- E2: 08:15, 18:45, 13:00; cambridge, cambridge towninfo centre, cambidge; saturday, tuesday, friday
+- E3: guesthouse, hotel, ashley hotel; 2 night, 5 night, 3 night; moderate price range, moderately priced, cheap
+- E4: moderately priced, expensive, moderate price range; centre, city centre, centre of town; 12:45, 13:15, 13:30
+
+### E0#20  (mentions 4, distinct values 2)
+Examples:
+- E0#20:0 [system] previous turn, user: could i have the address and phone number please? | turn: sure, pizza hut cherry hinton is located at G4 cambridge leisure park [[clifton way]] cherry hinton and the phone number is 01223 413000. Is there anything else I can help you with?
+- E0#20:1 [system] previous turn, user: Are you sure that they have two locations? Can you tell me their address(es)? | turn: Nandos in the south is at [[Cambridge Leisure Park Clifton Way]]. Nandos City Centre is at 33-34 Saint Andrews Street. Do you need additional information?
+- E0#20:2 [system] previous turn, user: Can I have the address of Lucky Star? | turn: Cambridge Leisure Park [[Clifton Way]] Cherry Hinton 01223 244277
+- E0#20:3 [system] previous turn, user: Can you tell me the address? | turn: The address is cambridge leisure park, [[clifton way]]. Can I help with anything else?
+
+### E0#35  (mentions 3, distinct values 1)
+Examples:
+- E0#35:0 [system] previous turn, user: No thanks, I just need the address please. | turn: There address is Hotel Felix Whitehouse Lane [[Huntingdon Road]] postcode cb30lx. Is there anything else I can assist you with today?
+- E0#35:1 [system] previous turn, user: Is there anything else? give me the address and postcode please. | turn: There is also the Cambridge Lodge Restaurant also has expensive european food in the centre area at Cambridge Lodge Hotel 139 [[Huntingdon Road]] City Centre postal code CB30DQ
+- E0#35:2 [system] previous turn, user: I am looking for the address for graffiti | turn: Their address is Hotel Felix Whitehouse Lane [[Huntingdon Road]]. Anything more I can help with?
+
+### E0#5  (mentions 3, distinct values 2)
+Examples:
+- E0#5:0 [system] previous turn, user: What is the address? | turn: The address is pool way, whitehill road, off [[newmarket road]].
+- E0#5:1 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park Fen Causeway is located at Fen Causeway, [[Newnham road]], postal code cb322ad.
+- E0#5:2 [system] previous turn, user: Yes. May I have the address and postcode for the Abbey Pool please? | turn: Yes, of course. They are located at Pool Way, Whitehill Road, off [[NewMarket Road]]. Their postcode is cb58nt. Is there anything else I can do for today?
+
+### E0#51  (mentions 2, distinct values 2)
+Examples:
+- E0#51:0 [system] previous turn, user: No how about a type of museum? | turn: There's 7 one of my favorites is kettle's yard on [[castle street]] it has free admission. Would that interest you?
+- E0#51:1 [system] previous turn, user: Hello, could you tell me if Downing College is still operating? | turn: Yes, Downing College is still operating in the centre. They're located on [[regent street]] , post code cb21dq. You can visit them for free! Anything else you need?
+
+### E0#13  (mentions 2, distinct values 1)
+Examples:
+- E0#13:0 [system] previous turn, user: I'm looking for information on Broughton house gallery. | turn: Certainly! It's a museum in the centre at [[98 king street]] cb11ln with free entrance. Their phone number is 01223314960. May I help find anything else?
+- E0#13:1 [system] previous turn, user: Can I get a postcode, entrance fee, and address of one of them? | turn: The Broughton House Gallery is located at [[98 King Street]], cb11ln. Their phone number is 01223314960, and it's free to get in.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#20, E0#35, E0#5, E0#51, E0#13) and its name as the value, like {"E0#20": "<name>"}.

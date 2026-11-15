@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#5:s0": "P1", "E3#5:s1": "P2"}}
+
+Cluster E3#5 of entity E3 (mentions 112, distinct values 8).
+Examples:
+- E3#5:s0 [user] previous turn, system: For what day would you like me to try booking for? | turn: I need it on [[Sunday]], for 3 nights.
+- E3#5:s1 [user] previous turn, system: What day do you need to check in? | turn: I'll arrive on [[Wednesday]].
+- E3#5:s2 [user] previous turn, system: There are 3 guesthouses that meet those requirements I recommend warkworth house. Would you like me to book it for you? | turn: Yes, please! 5 of us will be staying for 3 nights, and we're arriving on [[Friday]].
+- E3#5:s3 [user] previous turn, system: Ok I will book it for you | turn: I need it for 3 nights starting [[Thursday]]. There will be 5 of us.
+- E3#5:s4 [system] previous turn, user: That sounds perfect. Can I book it for 5 nights starting on Monday for 3 people? | turn: The Avalon doesn't have room for 5 nights starting [[Monday]]. How about a different day or a shorter stay?
+- E3#5:s5 [user] previous turn, system: Unfortunately, I don't have anything matching your criteria. Can I adjust the star rating or price range? | turn: How about a 4 star rating. I need it booked for 5 people, 4 nights starting from [[Tuesday]] and I will need the reference number.
+- E3#5:s6 [user] previous turn, system: the cambridge belfry is a hotel located in the west and is cheap. Has 4 stars and free internet and parking. | turn: I would like to make a reservation for this [[Saturday]] for 2 people for 4 nights please.
+- E3#5:s7 [user] previous turn, system: How about the Alexander bed and breakfast in the centre? It is a cheap 4 star guesthouse with free internet and wifi. | turn: That sounds like it might work. Could you check availability for two people [[this weekend]]?
+- E3#5:s8 [system] previous turn, user: Yes, can you try it for 3 nights, please. | turn: Neither hotel appears to have three days available starting on [[Sunday]] for three people, can I look something else up for you?
+- E3#5:s9 [user] previous turn, system: The Cambridge Belfry fits your requirements, would you like to book a reservation there? | turn: Please book it for 5 people and 5 nights starting from [[wednesday]].
+- E3#5:s10 [user] previous turn, system: The Express by Holiday Inn Cambridge will fit your needs. How many nights? | turn: I need it for 5 nights for 7 people starting [[friday]].
+- E3#5:s11 [user] previous turn, system: alexander bed and breakfast would meet those needs. could i look for something else? or can i book a stay here at this one? | turn: Please book it for 7 people for 5 nights starting [[Thursday]].
+- E3#5:s12 [user] previous turn, system: The city centre north b and b meets those criteria. Do you want to book it? | turn: Yes please, for 6 people and five nights on [[Monday]].
+- E3#5:s13 [user] previous turn, system: It does indeed, should we go ahead and book a room for you? | turn: Yes please, for 1 person 5 nights starting [[Tuesday]].
+- E3#5:s14 [user] previous turn, system: You could try the allenbell. | turn: All right, let's try that. May I get a reservation for Friday and [[Saturday]] night, 8 people each night?
+- E3#5:s15 [system] previous turn, user: Yes I'll need it for Sunday for 2 nights and 4 people. | turn: You are booked for 2 night for 4 people starting [[Sunday]] at the Lensfield Hotel. Your reference # is ICM07YWC. Can I help you with anything else today?
+
+Return the JSON object now.

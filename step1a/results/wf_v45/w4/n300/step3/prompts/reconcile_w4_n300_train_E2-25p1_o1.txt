@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E2#25/1: name: train id | description: train_id
+Examples:
+- 1 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: ... arriveBy price duration book (optional) TR1612 kings lynn cambridge friday 09:11 09:58 9.80 pounds 47 minutes TR1958 kings lynn cambridge friday 10:11 10:58 9.80 pounds 47 minutes TR3147 [[kings lynn cambridge]] friday 11:11 11:58 9.80 pounds 47 minutes TR6454 kings lynn cambridge friday 12:11 12:58 9.80 pounds 47 minutes TR0674 kings lynn cambridge friday 13:11 13:58 9.80 pounds 47 minutes
+- 2 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: ...riday 10:11 10:58 9.80 pounds 47 minutes TR3147 kings lynn cambridge friday 11:11 11:58 9.80 pounds 47 minutes TR6454 kings lynn cambridge friday 12:11 12:58 9.80 pounds 47 minutes TR0674 [[kings lynn cambridge]] friday 13:11 13:58 9.80 pounds 47 minutes
+- 3 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: ...ese are the possible options trainID departure destination day leaveAt arriveBy price duration book (optional) TR1612 kings lynn cambridge friday 09:11 09:58 9.80 pounds 47 minutes TR1958 [[kings lynn cambridge]] friday 10:11 10:58 9.80 pounds 47 minutes TR3147 kings lynn cambridge friday 11:11 11:58 9.80 pounds 47 minutes TR6454 kings lynn cambridge friday 12:11 12:58 9.80 pounds 47 minutes TR067...
+- 4 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: these are the possible options trainID departure destination day leaveAt arriveBy price duration book (optional) TR1612 [[kings lynn cambridge]] friday 09:11 09:58 9.80 pounds 47 minutes TR1958 kings lynn cambridge friday 10:11 10:58 9.80 pounds 47 minutes TR3147 kings lynn cambridge friday 11:11 11:58 9.80 pounds 47 minutes TR645...
+- 5 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: ...riday 09:11 09:58 9.80 pounds 47 minutes TR1958 kings lynn cambridge friday 10:11 10:58 9.80 pounds 47 minutes TR3147 kings lynn cambridge friday 11:11 11:58 9.80 pounds 47 minutes TR6454 [[kings lynn cambridge]] friday 12:11 12:58 9.80 pounds 47 minutes TR0674 kings lynn cambridge friday 13:11 13:58 9.80 pounds 47 minutes
+
+Columns (5):
+- name: location snake | examples: broxbourne; birmingham new street; bishop stortford
+- name: location str | examples: cambridge; london liverpool street; london king cross
+- name: location station | examples: london; liverpool
+- name: location str lower | examples: cambridge towninfo centre; cambridge help desk
+- name: location str mis spelled | examples: cmabridge
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E2#25/1", "reason": "str", "same_as": "<column name or none>"}

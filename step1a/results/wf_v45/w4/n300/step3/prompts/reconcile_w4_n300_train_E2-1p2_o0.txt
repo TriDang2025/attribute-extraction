@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E2#1/2: name: time str | description: time_constraint
+Examples:
+- 1 [system] previous turn, user: Hello, I need to take a train to Stansted airport, arriving by 20:30. | turn: The TR7213 gets you there at [[06:08]]. Need a ticket?
+- 2 [system] previous turn, user: I need to depart from london kings cross and go to cambridge. | turn: the TR9276 arrives by [[8:08]], will that be alright?
+- 3 [system] previous turn, user: I want to depart from London Liverpool Street after 15:00. | turn: There is a train leaving on that date from london liverpool to cambridge at 15:39, arrive at [[17:07]] with a price of 13.28 pounds. Would you like to book?
+- 4 [system] previous turn, user: Yes, I need 4 tickets please. Please send me the reference number. | turn: Your tickets have been reserved, and just to clarify, that train departs at 07:00, and arrives in London, Kings Cross at [[07:51]]. Wouldn't want you to miss the train! Ref#: AQDCG6N8
+- 5 [system] previous turn, user: Does it leave on Monday? | turn: Train TR3154 leaves cambridge at [[13:06]] and will arrive at peterborough at 13:56 on Monday. Would you like me to book a ticket?
+
+Columns (5):
+- name: time int | examples: 18:45; 18:15; 20:45
+- name: travel time | examples: travel time; 10: 32; 28-minute
+- name: price | examples: 13.28gbp; 17.89; 17.90
+- name: time | examples: what time; leicester; morning
+- name: day of week | examples: saturday; friday; sunday
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E2#1/2", "reason": "str", "same_as": "<column name or none>"}

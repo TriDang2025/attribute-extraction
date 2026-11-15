@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#0:s0": "P1", "E3#0:s1": "P2"}}
+
+Cluster E3#0 of entity E3 (mentions 161, distinct values 40).
+Examples:
+- E3#0:s0 [user] previous turn, system: I have 2 guesthouses matching your criteria. The Finches Bed and Breakfast guesthouse is 4 stars and includes free parking and internet. Would you be interested in this? | turn: I am looking for a [[guesthouse]] with 0 stars.
+- E3#0:s1 [user] previous turn, system: I was able to book you a room for seven people for three nights, starting Monday, at Finches Bed and Breakfast. Reference number is CUL9VZ04. Is there anything else? | turn: Can you please confirm that the [[hotel]] you've booked for us offers free wi-fi? I need to be able to work while I'm there.
+- E3#0:s2 [system] previous turn, user: Yes, I would like a hotel in the north please. | turn: There are two hotels in the north, [[Ashley Hotel]] and Lovell Lodge which would you like?
+- E3#0:s3 [user] turn: I'm looking for a [[4 star hotel]], and it doesn't need to have free parking.
+- E3#0:s4 [user] turn: I am looking for a place to stay. [[The hotel]] should be in the type of guesthouse and should include free parking
+- E3#0:s5 [system] previous turn, user: Yes, I would like to find a hotel in the south. | turn: [[The Lensfield Hotel]] at 53-57 lensfield road is a fabulous 3 star hotel that offers internet and parking. Would you like me to book you a room there?
+- E3#0:s6 [user] previous turn, system: There are about 5 options. All are hotels and expensive. They are located all over. Do you have a certain area in mind? | turn: I know this sounds crazy, but I'm looking for an [[expensive hotel]] with a 0 star rating. The area doesn't matter so much.
+- E3#0:s7 [user] turn: I want to stay at a [[guest house]], in the south.
+- E3#0:s8 [system] previous turn, user: The area doesn't matter, I just need to make sure I have a place to stay for 4 nights starting Saturday. | turn: All right, I can make a reservation at the [[Bridge Guest House]] if you tell me how many people are in your group.
+- E3#0:s9 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: [[The ashley hotel]] has 2 stars. They're in the postcode cb41er.
+- E3#0:s10 [user] previous turn, system: I'm sorry but there are no hotels that meet your criteria. Would you like to try another area? | turn: Let's try [[3 star hotels]], instead.
+- E3#0:s11 [system] previous turn, user: Yes I'll need it for Sunday for 2 nights and 4 people. | turn: You are booked for 2 night for 4 people starting Sunday at the [[Lensfield Hotel]]. Your reference # is ICM07YWC. Can I help you with anything else today?
+- E3#0:s12 [user] previous turn, system: All set. Your reservation for one is confirmed for Wednesday at 19:30. Your reference is HB2TWWH0. Is there anything else I can do for you today? | turn: I'm also looking for a hotel with free parking. It will be for just one person, like the [[restaurant]] booking.
+- E3#0:s13 [user] previous turn, system: I have six great options for you! | turn: Okay, I am looking for a [[1-star hotel]]. Are any of those options 1-star hotels?
+- E3#0:s14 [user] previous turn, system: Do you have a specific location you want to be? | turn: No, but I need free wifi and I would like a [[2 star guesthouse]] please.
+- E3#0:s15 [user] previous turn, system: Is there a particular area you would like to stay in? | turn: No, just any [[2-star hotel]] with free wifi will do.
+
+Return the JSON object now.

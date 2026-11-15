@@ -1,0 +1,154 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table train (one row = one train), 29 columns:
+[train:7] location abbr
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "stansted airport" (in: "Hello, I need to take a train to Stansted airport, arriving by 20:30.")
+[train:1] day
+  values: day (share 0.98); 86 mentions in 56 dialogues
+  examples:
+    "saturday" (in: "I would like to leave on Saturday.")
+    "friday" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+[train:2] day of week
+  values: text (share 1.00); 23 mentions in 22 dialogues
+  examples:
+    "what day" (in: "What day would you like to travel by train?")
+    "which day" (in: "I need to know where you are departing from and which day.")
+[train:4] duration str
+  values: duration (share 0.93); 15 mentions in 15 dialogues
+  examples:
+    "105 minute" (in: "...TR7610 leaves at 21:21 and is a 105 minute ride to Leicester. Would you li...")
+    "28 minute" (in: "departs at 12:24 and the duration of the trip is 28 minutes.")
+[train:33] train options
+  values: number (share 1.00); 5 mentions in 5 dialogues
+  examples:
+    "202" (in: "There are 202 options that day! Do you know what time you want")
+    "19" (in: "You bet! I have 19 to choose from. What time do you want to arrive?")
+[train:20] phone number
+  values: number (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "01223332360" (in: "Absolutely. The phone number is 01223332360, and the postal code is cb39al.")
+    "01223350914" (in: "Yes of course. Their telephone number is 01223350914.")
+[train:13] location str
+  values: text (share 1.00); 304 mentions in 118 dialogues
+  examples:
+    "cambridge" (in: "Maybe. I need to leave Cambridge on Friday. Will that train work?")
+    "broxbourne" (in: "I'd like to go to Cambridge via Broxbourne. I'd like to leave on Thursday and...")
+[train:11] location proper noun
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "stevenage" (in: "I need a train that leaves at 20:45 from stevenage to cambridge")
+    "stansted" (in: "be great. How much would it cost to travel to stansted from Cambridge?")
+[train:27] time str
+  values: day (share 0.72); 125 mentions in 77 dialogues
+  examples:
+    "tuesday" (in: "The train should go to Cambridge on Tuesday")
+    "sunday" (in: "Sunday,can you book it for me and I need a")
+[train:5] facility str
+  values: text (share 1.00); 48 mentions in 45 dialogues
+  examples:
+    "station" (in: "...otal fee is 66 GBP payable at the station . Your reference number is : P6G...")
+    "airport" (in: "do you need to leave cambridge and/or arrive at the airport?")
+[train:10] location full
+  values: text (share 1.00); 9 mentions in 8 dialogues
+  examples:
+    "stansted airport" (in: "get a train that leaves on Sunday and goes to stansted airport.")
+[train:3] departure location
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "where" (in: "Certainly. Where will you be leaving from and on what day?")
+[train:21] price
+  values: price (share 0.95); 37 mentions in 33 dialogues
+  examples:
+    "10.10 pound" (in: "The price for that ticket is 10.10 pounds. Would you like me to book it for you?")
+    "10.24 pound" (in: "Of course! The price is 10.24 pounds. Can I help you with anything else today?")
+[train:14] location str lower
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cmabridge" (in: "Cmabridge to Norwich.")
+[train:6] location
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "byard art" (in: "Byard art is on the south end of town.")
+    "clare hall" (in: "what about clare hall? it's free to visit")
+[train:29] train
+  values: id (share 0.96); 109 mentions in 84 dialogues
+  examples:
+    "tr3330" (in: "TR3330 will arrive at 10:43, would that work for you?")
+    "tr9016" (in: "...ave from Cambridge Wednesday. The TR9016 departs at 21:21 and the TR6387 d...")
+[train:24] that particular route
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "that particular route" (in: "That particular route is 12.80 pounds a ticket. Anything else I can help")
+[train:25] time
+  values: time (share 0.94); 338 mentions in 120 dialogues
+  examples:
+    "king lynn" (in: "Thanks! I'm also looking for a train from Cambridge to Kings Lynn.")
+    "08:15" (in: "I need to arrive by 08:15 in Cambridge please.")
+[train:23] reference number
+  values: id (share 0.94); 81 mentions in 72 dialogues
+  examples:
+    "iayfj8si" (in: "...es at 11:54. Reference number is IAYFJ8SI. Total is 102.4 GBP payable at t...")
+    "0es63ck2" (in: "... is TR2530 not 2630. Ref no is : 0ES63CK2. The total fee is 40.4 GBP payab...")
+[train:15] num adults
+  values: number (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "1 child" (in: "I need 2 adult and 1 child. Thank you.")
+    "2 adult" (in: "I need 2 adult and 1 child. Thank you.")
+[train:22] price num
+  values: price (share 1.00); 43 mentions in 42 dialogues
+  examples:
+    "40.4 gbp" (in: "...was successful, the total fee is 40.4 GBP payable at the station. Referenc...")
+    "52.8 gbp" (in: "...was successful, the total fee is 52.8 GBP payable at the station. Referenc...")
+[train:12] location station
+  values: text (share 1.00); 29 mentions in 22 dialogues
+  examples:
+    "ely" (in: "I am looking for a train departung after 8:30 from Ely.")
+    "london king cross" (in: "One ticket to London Kings Cross will cost 23.60 pounds. Would you like me to...")
+[train:34] travel time
+  values: text (share 0.90); 20 mentions in 14 dialogues
+  examples:
+    "travel time" (in: "yes, what is the travel time, train ID and price please per ticket")
+    "10: 32" (in: "...e train from Broxbourne leaves at 10: 32. Would you like to make a reserva...")
+[train:28] total fee
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[train:17] num trains
+  values: number (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "1 train" (in: "...arting for Cambridge on Tuesday. One train departs every hour starting at ...")
+    "12" (in: "There are twelve possible trains leaving after 12:15. Should I book you on")
+[train:9] location common noun
+  values: text (share 1.00); 13 mentions in 9 dialogues
+  examples:
+    "stevenage" (in: "need a train that departs from Cambridge and goes to Stevenage.")
+[train:16] num people
+  values: number (share 1.00); 22 mentions in 22 dialogues
+  examples:
+    "8 people" (in: "Yes. I will need it for eight people.")
+    "4 people" (in: "Yes please. for 4 people as well.")
+[train:30] train id
+  values: text (share 0.58); 12 mentions in 12 dialogues
+  examples:
+    "16.60 lbs" (in: "...t Wednesday arriving at 07:27. The price is 16.60 lbs. Can I book it for you?")
+    "23:12" (in: "...16 and the trainID that departs at 2312 is TR6387. Would you like me to bo...")
+[train:26] time int
+  values: time (share 1.00); 44 mentions in 31 dialogues
+  examples:
+    "18:45" (in: "I would like to leave on Saturday after 18:45.")
+    "18:15" (in: "just need to leave on Wednesday and should arrive by 18:15.")
+
+Return the JSON object now.
