@@ -1,0 +1,74 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 9 of 32 (157 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E0#114  (mentions 3, distinct values 3)
+Examples:
+- E0#114:0 [system] previous turn, user: I would like a recommendation. I will need to book a reservation. | turn: I can book you at [[The Gandhi]] in the centre. How does that sound?
+- E0#114:1 [system] previous turn, user: I don't have a particular price range in mind but would prefer something in the mid to low range | turn: [[The gardenia]] is cheap, can I book you or provide some info?
+- E0#114:2 [system] previous turn, user: No, where would you suggest? | turn: How about Camboats in the East? Their address is [[the plough]], green end, fen ditton.
+
+### E0#42  (mentions 9, distinct values 2)
+Examples:
+- E0#42:0 [system] previous turn, user: I am also looking for a restaurant. Are there any expensive restaurants in town that serve British food? | turn: Yes, I recommend [[Graffiti]]. It's a fine British restaurant on the west side of town.
+- E0#42:1 [system] previous turn, user: European food that is moderately priced please. | turn: [[galleria]] serves european food and is in the moderate price range. Would you like their location?
+- E0#42:2 [system] previous turn, user: I'm also looking to eat at a restaurant called graffiti. | turn: [[Graffiti]] is an excellent choice! It's an expensive British restaurant on the west side. Would you like a table there?
+- E0#42:3 [system] previous turn, user: Anything in the area would be fine | turn: [[Galleria]] is a nice restaurant serving European food, is in the centre of town and is moderately priced.
+- E0#42:4 [system] previous turn, user: Is one of those expensive? If so, book me a table there for Thursday for 8 people at 13:30 please. | turn: There's actually two expensive places, [[graffiti]] and travellers rest. Which would you prefer?
+
+### E0#93  (mentions 9, distinct values 3)
+Examples:
+- E0#93:0 [system] previous turn, user: I don't care what part of town it is in, I will need the postcode though. | turn: The restaurant [[Yu Garden]] has a postcode of cb58pa. Can I help you with anything else today?
+- E0#93:1 [system] previous turn, user: Are there any moderately priced restaurants near the botanic gardens? | turn: There are 4 moderately priced British restaurants in the same area as the [[botanic gardens]].
+- E0#93:2 [system] previous turn, user: I would like a Chinese restaurant the is expensive. | turn: [[The Yu Garden]] is highly recommended, shall I book a table for you?
+- E0#93:3 [user] previous turn, system: Cafe jello gallery postcode is cb30af and the entrance is free, is there anything else I can do for you? | turn: I am also looking for the restaurant [[Yu Garden]].
+- E0#93:4 [user] previous turn, system: Of course. The address listed is bateman street. | turn: Are there any moderately priced restaurants near the [[botanic gardens]]?
+
+### E0#70  (mentions 19, distinct values 6)
+Examples:
+- E0#70:0 [system] previous turn, user: Yes - are there any indian restaurants in town? Something moderately priced? | turn: There are 4 such restaurants. I recommend [[curry prince]].
+- E0#70:1 [system] previous turn, user: I need an indian restaurant in the centre. | turn: [[Curry garden]] has good reviews and serves Indian food in the centre of town.
+- E0#70:2 [system] previous turn, user: What type of restaurants are located in the city centre? | turn: I'm so sorry, I was mistaken, there are several expensive Indian restaurants in the centre of town. May I recommend [[Curry Queen]], at 106 Mill Road?
+- E0#70:3 [system] previous turn, user: Okay, then try a different price range. | turn: I apologize. We in fact have six expensive Indian restaurants in the center. [[The Curry Garden]] is a fave, would you like me to see if they have a table available?
+- E0#70:4 [user] previous turn, system: Yes sure. The Curry Prince's telephone number is 01223566388. And their address and postcode are 451 Newmarket Road Fen Ditton cb58jj. | turn: What is the price range for [[The Curry Prince]]?
+
+### E0#120  (mentions 5, distinct values 2, low confidence)
+Examples:
+- E0#120:0 [system] previous turn, user: Can I have the address for the restaurant. | turn: Absolutely! [[The Gourmet Burger Kitchen]] is located on Regent Street. Would you like the phone number? Or anything else?
+- E0#120:1 [user] turn: Can you tell me more about [[gourmet burger kitchen]]? Where is it?
+- E0#120:2 [system] previous turn, user: Yes, I'm looking for a restaurant that serves American food and is in the center of town. | turn: [[The Gourmet Burger Kitchen]] is located on Regent Street in City Centre.
+- E0#120:3 [system] previous turn, user: I just need something with American food. | turn: I have found [[Gourmet Burger Kitchen]], they serve north American food, although they are expensive. Would you be interested in booking here?
+- E0#120:4 [system] previous turn, user: North American, I would would like to eat in the centre area? | turn: [[The Gourmet Burger Kitchen]] would be perfect for you! It's at Regent Street City Centre. Would you like more information?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#114, E0#42, E0#93, E0#70, E0#120) and its name as the value, like {"E0#114": "<name>"}.

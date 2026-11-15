@@ -1,0 +1,70 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 7 of 27 (134 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+
+### E4#67  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E4#67:0 [system] previous turn, user: I am looking for some places to go in town. I'm so excited about seeing some of the local attractions. | turn: There are many to choose from! [[Almost 80]]. Can you tell me if you have a certain type of place you want to visit?
+- E4#67:1 [system] previous turn, user: How about a college instead? | turn: [[There are quite a few]]. Some have entrance fees while other are free. Do you have a preference?
+
+### E4#86  (mentions 2, distinct values 2)
+Examples:
+- E4#86:0 [user] previous turn, system: How long will you be staying? | turn: 3 nights starting on [[Saturday]], can I get the reference number as well? We are also looking for an attraction called Camboats, can you help me?
+- E4#86:1 [user] previous turn, system: The gardenia is cheap, can I book you or provide some info? | turn: What is the phone number and postcode for The Gardenia? I also need help finding a train leaving from Norwich on [[Wednesday]].
+
+### E4#33  (mentions 10, distinct values 4, low confidence)
+Examples:
+- E4#33:0 [user] turn: I need to find a [[nightclub]] to visit while in town.
+- E4#33:1 [system] previous turn, user: Yes I would like more information on both museums. | turn: saint barnabas press gallery is located in the belfast yard, coldham's road , cb13ew and gallery at twelve a [[high street]] is at fulbourn,cb15dh
+- E4#33:2 [user] previous turn, system: I've successfully booked your table. The reference number is GK41EYSD. | turn: I would like to go to a [[nice nightclub]]
+- E4#33:3 [system] previous turn, user: I would like to go to a nice nightclub | turn: We have ballare that's [[night]], it's in the city centre.
+- E4#33:4 [system] previous turn, user: I am looking for places to on the south side of town. | turn: Alright. What type of places? Cambridge has a wide array of things to do and places to go such as, museum's, [[nightclubs]], parks and restaurants.
+
+### E4#107  (mentions 8, distinct values 2)
+Examples:
+- E4#107:0 [system] previous turn, user: Yes. Can you give me the postcode for Club Salsa? | turn: The post code for [[Club Salsa]] is cb12jb. Is there anything else I can help you with?
+- E4#107:1 [system] previous turn, user: A nightclub sounds fun. Is there one in the centre of town? | turn: I have five. Would you like to try club salsa or the [[fez club]]?
+- E4#107:2 [user] turn: I'm looking for place called [[club salsa]].
+- E4#107:3 [system] previous turn, user: Sounds fun, can I get entrance fee, address, and postcode. | turn: Sure. Were you interested in [[club salsa]] or the fez club?
+- E4#107:4 [user] turn: I am looking for an attraction named [[Club Salsa]].
+
+### E4#1  (mentions 16, distinct values 5, low confidence)
+Examples:
+- E4#1:0 [user] turn: I am looking to plan a trip I am looking to book some tickets at a place called [[Abbey pool]] and astroturf pitch.
+- E4#1:1 [user] previous turn, system: Is there a specific type of attraction you're looking for? | turn: Yes, I need the address for a [[swimming pool]] please.
+- E4#1:2 [system] previous turn, user: I am looking to plan a trip I am looking to book some tickets at a place called Abbey pool and astroturf pitch. | turn: [[Abbey pool and astroturf swimming pool]] east 12239020888 is free to get in there is not tickets for this
+- E4#1:3 [system] previous turn, user: Where can I find a swimming pool in the north of town? | turn: I have two swimming pools listed north of town. The [[Jesus Green Outdoor Pool]] and the Kings Hedges Learner Pool. Do you have a preference?
+- E4#1:4 [system] previous turn, user: Can you help me to locate a free attraction near the hotel? | turn: There are many in the centre of town,what type are you looking for a church,or [[swimming]] or a park ?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#67, E4#86, E4#33, E4#107, E4#1) and its name as the value, like {"E4#67": "<name>"}.

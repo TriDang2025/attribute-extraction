@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E0#38:s0": "P1", "E0#38:s1": "P2"}}
+
+Cluster E0#38 of entity E0 (mentions 8, distinct values 3).
+Examples:
+- E0#38:s0 [system] previous turn, user: I am looking for a cheap restaurant in the centre part of town. | turn: You have lots of good cheap choices in that part of town! What type of food sounds good to you? There are Italian restaurants, Indian, Spanish, [[Chinese]], and more.
+- E0#38:s1 [user] previous turn, system: What kind of cuisine are you interested and do you have a price range in mind? | turn: I would like a cheap [[chinese place]].
+- E0#38:s2 [system] previous turn, user: I was also hoping to find a restaurant in the same part of town as the hotel. | turn: If you are looking for an inexpensive restaurant in the south there is a [[Chinese one]] and a Portuguese as well. Do you have a preference for price or style?
+- E0#38:s3 [user] previous turn, system: I don't have matches. Do you have any other food preferences? | turn: And I would like something Australasian, or if you can't find that, [[Chinese]], at least.
+- E0#38:s4 [user] previous turn, system: There are two restaurants fitting your description, one is Chinese cuisine and one is Indian cuisine. Do you have a preference? | turn: Please book a table for 4 at the [[Chinese place]] at 12:30 on Sunday and give me the reference number.
+- E0#38:s5 [user] previous turn, system: I have a lot of choices for you. Any preference on cuisine? | turn: [[Chinese]] would be great. I would prefer it be in the centre.
+- E0#38:s6 [user] previous turn, system: There are 10 choices and we have cheap, moderate and expensive options, any preference? | turn: I would like a suggestion of a moderately priced [[Chinese place]].
+- E0#38:s7 [system] previous turn, user: The restaurant should be in the expensive price range and should be in the south, i do not have a particular food preference. | turn: I have five places. Do you prefer, Italian, [[Chinese]], Mexican or Indian?
+
+Return the JSON object now.

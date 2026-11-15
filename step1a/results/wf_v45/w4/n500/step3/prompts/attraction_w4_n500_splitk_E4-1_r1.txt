@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E4#1:s0": "P1", "E4#1:s1": "P2"}}
+
+Cluster E4#1 of entity E4 (mentions 16, distinct values 5).
+Examples:
+- E4#1:s0 [user] turn: I am looking to plan a trip I am looking to book some tickets at a place called [[Abbey pool]] and astroturf pitch.
+- E4#1:s1 [user] previous turn, system: Is there a specific type of attraction you're looking for? | turn: Yes, I need the address for a [[swimming pool]] please.
+- E4#1:s2 [system] previous turn, user: I am looking to plan a trip I am looking to book some tickets at a place called Abbey pool and astroturf pitch. | turn: [[Abbey pool and astroturf swimming pool]] east 12239020888 is free to get in there is not tickets for this
+- E4#1:s3 [system] previous turn, user: Where can I find a swimming pool in the north of town? | turn: I have two swimming pools listed north of town. The [[Jesus Green Outdoor Pool]] and the Kings Hedges Learner Pool. Do you have a preference?
+- E4#1:s4 [system] previous turn, user: Can you help me to locate a free attraction near the hotel? | turn: There are many in the centre of town,what type are you looking for a church,or [[swimming]] or a park ?
+- E4#1:s5 [system] previous turn, user: I'm looking for swimmingpool located in the east,any suggestions? | turn: Yes, the [[Abbey Pool]] and Astroturf Pitch is a swimming pool on the east side. They're located on Pool Way and Whitehill Road off of NewMarket. Would you like more information?
+- E4#1:s6 [system] previous turn, user: I am looking for information about Cambridge. What kind of places can you go in town? | turn: I have colleges, museums, nightclubs, [[swimming pools]], etc? Is there something particular you would like to do and I can narrow it down.
+- E4#1:s7 [system] previous turn, user: What are some attractions on the east side? Is there a swimming pool available? | turn: Yes we have the [[abbey pool]] and astroturf pitch, is there anything else you need?
+- E4#1:s8 [user] previous turn, system: There is no multiple sports attraction in the centre but there is one in the east. Are you interested? | turn: Well, maybe try a [[swimming pool]]. That might be better.
+- E4#1:s9 [system] previous turn, user: No. Are there any swimming pools on the east side of town? | turn: Yes there is the [[abbey pool]] and astroturf pitch would you like their address?
+- E4#1:s10 [system] previous turn, user: I'm looking for some info on the abbey pool and astroturf pitch | turn: This is a [[swimming pool]] found in the East . Their phone number is 01223902088.
+- E4#1:s11 [system] previous turn, user: are their any swimming pools in the east? | turn: Yes, there is a swimming pool at [[Abbey Pool]] and Astroturf Pitch. Would you like the address and phone number?
+- E4#1:s12 [user] previous turn, system: The entrance fee is not listed I am afraid for the pool. For hotels, I have Autumn House and Leverton House for hotels, 4 stars and free parking. | turn: Is one of them located in the east. I would really like to be closer to [[swimming pool]].
+- E4#1:s13 [user] turn: I'm looking for some info on the [[abbey pool]] and astroturf pitch
+- E4#1:s14 [user] previous turn, system: Booking is confirmed. Reference number is : I57N7Y29. May I assistance you with any additional assistance? | turn: What are some attractions on the east side? Is there a [[swimming pool]] available?
+- E4#1:s15 [user] previous turn, system: Yes there is the abbey pool and astroturf pitch would you like their address? | turn: Yes. May I have the address and postcode for the [[Abbey Pool]] please?
+
+Return the JSON object now.

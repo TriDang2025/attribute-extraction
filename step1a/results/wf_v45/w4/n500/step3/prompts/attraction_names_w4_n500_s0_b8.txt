@@ -1,0 +1,71 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 8 of 27 (134 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+
+### E4#12  (mentions 8, distinct values 2)
+Examples:
+- E4#12:0 [system] previous turn, user: I have no particular area preference. Can you list a few for me to select from? | turn: There is Cafe Jello Gallery in the west, Cambridge Artworks in the east and [[Broughton House Gallery]] in the centre. Does any of those sound appealing?
+- E4#12:1 [system] previous turn, user: Can I get a postcode, entrance fee, and address of one of them? | turn: [[The Broughton House Gallery]] is located at 98 King Street, cb11ln. Their phone number is 01223314960, and it's free to get in.
+- E4#12:2 [system] previous turn, user: Fantastic. Could you provide me with the phone number for that museum? | turn: The phone number for the [[Broughton House Gallery]] is 01223314960. Can I help with anything else today?
+- E4#12:3 [system] previous turn, user: I am looking for a museum. | turn: [[the broughton house gallery]] is a museum located in the centre.
+- E4#12:4 [user] turn: I'm looking for information on [[Broughton house gallery]].
+
+### E4#82  (mentions 2, distinct values 1)
+Examples:
+- E4#82:0 [system] previous turn, user: I just want the phone number and entrance fee please | turn: The entrance fee is not showing up on my computer, the address is [[The Grafton Centre]], East Road. Is there anything else I can assist you with?
+- E4#82:1 [system] previous turn, user: I'm going to be in the centre. Can you tell me a little about the one there? | turn: The Vue Cinema is in the centre of town. The address is [[The Grafton Centre]] on East Road, postcode cb11ps, and the phone number is 08712240240.
+
+### E4#38  (mentions 3, distinct values 1)
+Examples:
+- E4#38:0 [user] turn: Is the [[mumford theatre]] still in operation?
+- E4#38:1 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the [[Mumford theatre]], it is located at Anglia Ruskin Enterprise, East Road in the Centre area.
+- E4#38:2 [system] previous turn, user: I'm looking for a theatre in the centre. | turn: We have four theatres to choose from, I personal recommend the [[mumford theatre]], would you like more information?
+
+### E4#65  (mentions 13, distinct values 8)
+Examples:
+- E4#65:0 [user] turn: Can you tell me what theatres are in [[cambridge]] please?
+- E4#65:1 [system] previous turn, user: No, just an entertainment attraction in the same area as the restaurant. Can you make a suggestion? | turn: What about a museum? The [[cambridge contemporary art]] is a nice one.
+- E4#65:2 [system] previous turn, user: I would also like the street address please. | turn: It's located at [[cambridge passenger cruisers]], jubilee house.
+- E4#65:3 [user] turn: I am injured I need a hospital that has the [[cambridge eye unit department]]
+- E4#65:4 [system] previous turn, user: It doesn't matter. | turn: I would recommend the [[cambridge punter]], located in the centre of town at 251a chesterton road. Do you need anything else?
+
+### E4#19  (mentions 79, distinct values 17)
+Examples:
+- E4#19:0 [system] previous turn, user: You misunderstood, I'm looking for a college to visit while I'm in Cambridge. | turn: There are 18 colleges in [[Cambridge]]. What part of town would you like it to be in?
+- E4#19:1 [system] previous turn, user: Actually, can you just send me the address? | turn: Their address is 2G [[Cambridge Leisure Park]] Cherry Hinton Road Cherry Hinton
+- E4#19:2 [system] previous turn, user: Yes can I get their address please? | turn: The address of the [[Cambridge Arts Theatre]] is 6 Saint Edward's Passage, postcode cb23pj.
+- E4#19:3 [system] previous turn, user: Thank you so much for all your help. You have a great day now. | turn: You too, and thank you for contacting the [[Cambridge TownInfo centre]]!
+- E4#19:4 [system] previous turn, user: I am looking for a museum in the east of town. | turn: [[Cambridge Artworks]] is a museum in the East. Would you like further information?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#12, E4#82, E4#38, E4#65, E4#19) and its name as the value, like {"E4#12": "<name>"}.

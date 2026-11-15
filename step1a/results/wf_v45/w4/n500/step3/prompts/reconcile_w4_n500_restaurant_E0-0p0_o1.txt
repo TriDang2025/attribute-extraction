@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#0/0: name: location | description: location
+Examples:
+- 1 [system] previous turn, user: Hi, yes, I'm trying to find a restaurant to go to. | turn: [[In what area of town]] would you like to dine?
+- 2 [system] previous turn, user: Hello, I am looking for a place to dine. I'd prefer it to be moderately priced and serve Indian food. | turn: We have 4 moderately priced Indian restaurants - 2 in the east, 1 in the north, and one in the [[west]]. Which area are you interested in?
+- 3 [system] previous turn, user: Yes, I also need a restaurant ina mdoerate range that serve modern european food. | turn: We've got 3 places serving modern european food in [[town]], 2 are in the city centre and one in the south. Do you have a preference?
+- 4 [system] previous turn, user: Just pick one in the same area as Queens' College, and can you book a table for 1 at 18:30 on Saturday please? | turn: How about Graffiti? It's an expensive restaurant that serves British food in the [[west area]].
+- 5 [user] previous turn, system: Yes do you have a preference for area of town or price range? | turn: I'd like it to be in the cheap price range and [[any area of town]].
+
+Columns (5):
+- name: location str | examples: centre; city centre; centre of town
+- name: address | examples: jinling noodle bar; 68 histon road; taj tandoori
+- name: restaurant name | examples: restaurant; j restaurant; charlie chan
+- name: location area | examples: north part of town; north; north area
+- name: location part | examples: east; east part of town; any area
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#0/0", "reason": "str", "same_as": "<column name or none>"}

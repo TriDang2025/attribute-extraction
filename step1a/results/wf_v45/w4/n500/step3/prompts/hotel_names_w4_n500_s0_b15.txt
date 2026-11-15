@@ -1,0 +1,66 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E2: batch 15 of 15 (74 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E2#45  (mentions 11, distinct values 5)
+Examples:
+- E2#45:0 [system] previous turn, user: I an you find me a 0 star guesthouse to stay in. | turn: city centre north b and b and [[el shaddai]] are 0 star guesthouses. Would you like to book one?
+- E2#45:1 [user] previous turn, system: There are five colleges in that area. Three have no entrance fees. Would you like additional information on any of these? | turn: No thank you. I am looking for information [[el shaddai hotel]].
+- E2#45:2 [system] previous turn, user: I am looking for a cheap place to stay. | turn: Can I recommend [[el shaddia guesthouse]]?
+- E2#45:3 [user] turn: What can you tell me about the [[hotel el shaddai]]?
+- E2#45:4 [system] previous turn, user: No thank you. I am looking for information el shaddai hotel. | turn: [[The El Shaddai]] is a guesthouse in the centre part of town. It has free internet, parking and has 0 stars. Would you like me to book it for you?
+- E2#45:5 [system] previous turn, user: I want it to be located in the centre. | turn: Great! I have two guesthouses in the Centre area; Alexander Bed and Breakfast with 4 stars and [[El Shaddai]] with 0. Would you like more information on either one?
+- E2#45:6 [user] previous turn, system: There are many results for hotels and guesthouses, could you be more specific on what price range you are looking for and what part of town? | turn: I would like to stay at the [[El Shaddai]]. I would like to book it for 1 person for 4 nights starting on Wednesday.
+- E2#45:7 [system] previous turn, user: Could you? That would be great. There are 5 of us and we plan to arrive on Thursday. We'd like to stay for 5 nights. | turn: Okay. I've got you booked for a 5-night stay at [[El Shaddai]] for 5 nights and 5 people. Can I help you with anything else today?
+
+### E2#61  (mentions 1, distinct values 1)
+Examples:
+- E2#61:0 [user] previous turn, system: The address is 78-80 Milton Road. | turn: [[Oakay]] great thank you for that info.
+
+### E2#35  (mentions 19, distinct values 4)
+Examples:
+- E2#35:0 [system] previous turn, user: A guesthouse in the east, please | turn: There are nine I recommend [[allenbell]] it's a 4 star guesthouse. Would you like the address and phone number or me to book it for you?
+- E2#35:1 [user] previous turn, system: Hotel allenbell is what I found that is cheap and has parking. | turn: Could you get the postcode for [[Hotel Allenbell]] for me?
+- E2#35:2 [system] previous turn, user: Can you book it for 8 people for 4 nights starting on thursday? | turn: Ok I have you booked at [[The Allenbell]] for 4 nights for 8 people. Your reference number 7SN0BAAT. Do you need anything else?
+- E2#35:3 [system] previous turn, user: I will take a cheaper one please. | turn: [[The allenbell guesthouse]] have everything you are looking for. It is within your price range, on the east side with free wifi and parking. Would you like me to book it?
+- E2#35:4 [system] previous turn, user: 2 people starting on tuesday. please find me the reference number | turn: I'm sorry, [[Allenbell]] was not in the west. Hobsons House meets your needs and I have booked you a room. Reference number is : CTYSXIVU.
+- E2#35:5 [system] previous turn, user: I'm looking for something cheap with free parking. | turn: [[Hotel allenbell]] is what I found that is cheap and has parking.
+- E2#35:6 [user] previous turn, system: The 3 guesthouses mentioned all have free wifi and parking. I recommend the Allenbell. | turn: [[The Allenbell]] sounds perfect. Can you book it for me for tuesday?
+- E2#35:7 [system] previous turn, user: I need something that includes free wifi as well. | turn: I'd like to suggest [[allenbell]]. Is there anything else I could help you with?
+
+### E2#65  (mentions 1, distinct values 1)
+Examples:
+- E2#65:0 [user] previous turn, system: Your trainID TR9733 has been booked to leave at 12:34. Than you. | turn: I also need a room in [[Peterborough]].
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E2#45, E2#61, E2#35, E2#65) and its name as the value, like {"E2#45": "<name>"}.

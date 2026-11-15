@@ -1,0 +1,66 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 16 of 32 (157 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E0#111  (mentions 2, distinct values 2)
+Examples:
+- E0#111:0 [system] previous turn, user: I prefer the expensive price range. | turn: la mimosa serves mediterranean food and is in the expensive price range. their phone number is 01223 362525 and they are located at [[Thompsons Lane]] Fen Ditton.
+- E0#111:1 [system] previous turn, user: Price doesn't matter, I would like the address, phone number and the postcode please | turn: La mimosa serves Mediterranean food. Their phone number is 01223 362525, their address is [[Thompsons Lane Fen Ditton]] and their postcode is C.B 5, 8 A.Q.
+
+### E0#56  (mentions 2, distinct values 1)
+Examples:
+- E0#56:0 [system] previous turn, user: No, I don't, actually. Surprise me with the type of food and give me the restaurant's address. | turn: The oak bistro is an excellent choice for british food. The address is [[6 Lensfield Road]].
+- E0#56:1 [system] previous turn, user: Yes, I would be. Can you list out several of them for me so I can pick? | turn: restaurant one seven is located at De Vere University Arms Regent Street City Centre and is moderately priced, the oak bistro is at [[6 Lensfield Road]] and is also moderately priced
+
+### E0#53  (mentions 6, distinct values 2)
+Examples:
+- E0#53:0 [system] previous turn, user: Sure, how about one that serves indian food in that area. | turn: There are 5 results for restaurants serving indian food, the first is tandoori palace located at [[68 Histon Road]] Chesterton. Would you like a reservation and for how many?
+- E0#53:1 [system] previous turn, user: I need to find a restaurant in Cambridge called the Golden Wok please. | turn: I have found a Golden Wok at [[191 Histon Road]] Chesterton.
+- E0#53:2 [system] previous turn, user: Yes. I would like to eat Indian food. | turn: The tandoori palace meets your criteria. It is located at [[68 Histon Road]] Chesterton.
+- E0#53:3 [system] previous turn, user: What is their address and phone number? | turn: The address for Golden Wok is [[191 Histon Road]] Chesterton and the phone number is 01223 350688.
+- E0#53:4 [system] previous turn, user: Oh what the heck money is no object, an expensive indian restaurant in the west. | turn: Tandoori Palace is the best one. It's at [[68 Histon Road]] Chesterton, cb43le. Would you like a table booked?
+
+### E0#41  (mentions 3, distinct values 2)
+Examples:
+- E0#41:0 [system] previous turn, user: i dont mind any | turn: Okay, how about Peking Restaurant located at [[10 Homerton Street]] City Centre? Would you like a reservation?
+- E0#41:1 [system] previous turn, user: Can you help me with finding a restaurant called backstreet bistro? | turn: Certainly. It is a gastropub located in the centre of town, and the address is [[2 Sturton Street]] City Centre.
+- E0#41:2 [system] previous turn, user: I don't need a reservation at the moment but could you send me the postcode and address of the restaurant. Thank you. | turn: The address of the restaurant is [[10 Homerton Street]] City Centre. The postcode is cb28nx. Can I assist with anything else?
+
+### E0#96  (mentions 3, distinct values 3)
+Examples:
+- E0#96:0 [system] previous turn, user: Okay, how about some European food? | turn: What about the hotel du vin and bistro at [[15 - 19 Trumpington Street]]?
+- E0#96:1 [system] previous turn, user: Ok, I'll have to speak with my friend to see if that price is acceptable. Can I please get the address to the restaurant Hotel Du Vin and Bistro? | turn: Absolutely, the address is [[15-19 Trumpington Street]]. Is there anything else I can assist you with today?
+- E0#96:2 [system] previous turn, user: I also need the postcode and address please. | turn: The address is [[51 Trumpington Street]] City Centre. The postcode is cb21rg.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#111, E0#56, E0#53, E0#41, E0#96) and its name as the value, like {"E0#111": "<name>"}.

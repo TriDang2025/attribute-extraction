@@ -1,0 +1,486 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+
+Entity E1: 80 clusters.
+
+Placement options (copy one exactly into "placement"):
+- current entity E1: the attribute belongs to E1
+- sub-entity of E1: a part of E1 that has attributes of its own
+- other entity E0: the attribute belongs to E0
+- other entity E2: the attribute belongs to E2
+- other entity E3: the attribute belongs to E3
+- other entity E4: the attribute belongs to E4
+- relationship(E1, E0): links E1 and E0
+- relationship(E1, E2): links E1 and E2
+- relationship(E1, E3): links E1 and E3
+- relationship(E1, E4): links E1 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E1#47  (mentions 2, distinct values 1)
+Examples:
+- E1#47:0 [user] previous turn, system: Where will you be departing from to get to the restaurant? | turn: From [[Pembroke college]]. Please give me the car type, and contact number as well please.
+- E1#47:1 [user] turn: I need to book a taxi to [[pembroke college]] from prezzo.
+
+### E1#55  (mentions 4, distinct values 2, low confidence)
+Examples:
+- E1#55:0 [system] previous turn, user: That is all, thank you for your help. | turn: Do you need a taxi between the guesthouse and the [[park]]? I can handle that, also.
+- E1#55:1 [system] previous turn, user: Can you point me to the nearest police station? | turn: Please call the [[Parkside police station]] at 01223358966. They will be able to assist you.
+- E1#55:2 [system] previous turn, user: i aslo want to book a taxi to commute between the two places. | turn: I'm sorry, but I don't think we determined which [[park]] you wanted to visit. Where will you be departing from?
+- E1#55:3 [user] previous turn, system: The Golden Curry is expensive and delicious. The postcode is cb12az. Would you like me to make a reservation? | turn: No, thank you. But can you book a taxi from the restaurant to the [[park]]?
+
+### E1#17  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E1#17:0 [user] previous turn, system: Certainly. What time would you like the taxi to arrive and for how many people? | turn: [[a taxi]] that arrives by 15:00, the taxi is just for me
+- E1#17:1 [system] previous turn, user: Yes please, I need to book a taxi to the restaurant from the hotel for the dinner reservation. | turn: Ok, a grey honda will pick you up at the hamilton lodge in time to arrive at restaurant alimentum for your 10:00 reservations. [[Taxi contact number]] is 07242149665. Anything else?
+- E1#17:2 [user] previous turn, system: Certainly. What time would you like the taxi to arrive and for how many people? | turn: a taxi that arrives by 15:00, [[the taxi]] is just for me
+
+### E1#34  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E1#34:0 [user] previous turn, system: Sure! the postcode is cb68nt and the entrance fee is not known. | turn: I would also like to book a taxi from the [[pool]] to the restaurant
+- E1#34:1 [system] previous turn, user: I would also like to book a taxi from the pool to the restaurant | turn: I can take care of that for you. Do you have a time you plan on leaving the [[pool]]?
+
+### E1#14  (mentions 3, distinct values 1)
+Examples:
+- E1#14:0 [user] previous turn, system: Your booking was successful with a reference number of VZRQHFHP. Can I help you with anything else? | turn: Thanks great. Also I need to have the phone number for [[All Saints Church]] on Jesus Lane.
+- E1#14:1 [system] previous turn, user: can you suggest any attractions in the same area? I need the entrance fee if any and attraction type | turn: we have a lovely architecture called [[all saints church]] it is free admission
+- E1#14:2 [system] previous turn, user: Thanks great. Also I need to have the phone number for All Saints Church on Jesus Lane. | turn: Sure [[All Saints Church]]'s phone number is 01223452587. Anything else?
+
+### E1#31  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#31:0 [user] previous turn, system: Sure, it's the lucky star Phone number is 01223244277, and postcode is cb17dy. Can I book a table for you? | turn: I can book it myself, thanks. However, I will need a taxi from great saint mary's church to the [[lucky star]].
+
+### E1#16  (mentions 5, distinct values 4)
+Examples:
+- E1#16:0 [system] previous turn, user: Yes please, I need to book a taxi to the restaurant from the hotel for the dinner reservation. | turn: Ok, a grey honda will pick you up at the [[hamilton lodge]] in time to arrive at restaurant alimentum for your 10:00 reservations. Taxi contact number is 07242149665. Anything else?
+- E1#16:1 [user] turn: I need a taxi that departs from [[hobsons house]] and arrives by 13:45.
+- E1#16:2 [user] previous turn, system: Okay, I will need to know where you are leaving from and what time you would like to leave. | turn: I will be leaving from [[leverton house]] arriving by 06:45.
+- E1#16:3 [user] previous turn, system: Sure! What is your departure site? | turn: I need to leave from [[lovell lodge]]
+- E1#16:4 [user] previous turn, system: Sure. Their postcode is cb43hl. Is there anything else I can help you with? | turn: Yes, can you book me a taxi from the [[Hamilton Lodge]] to the Golden Wok? I want to leave the lodge at 08:00.
+
+### E1#63  (mentions 1, distinct values 1)
+Examples:
+- E1#63:0 [system] previous turn, user: It doesn't matter. | turn: [[Yippee Noodle Bar]] meets your criteria, would you like their information?
+
+### E1#35  (mentions 4, distinct values 4, low confidence)
+Examples:
+- E1#35:0 [user] turn: Please book me a taxi to take me from Aylesbray Lodge Guest House to the [[London Liverpool Street Train Station]].
+- E1#35:1 [user] turn: Can you point me to the [[nearest police station]]?
+- E1#35:2 [system] previous turn, user: Can you book the 3 of us tickets? | turn: I have successfully booked your train reservation. The total fee is 13.2 GBP, payable at the [[station]]. Reference number is UHK3WFOA. Is there anything else I can help you with today?
+- E1#35:3 [system] previous turn, user: Yes can I please have the address? | turn: The address is sleeperz hotel, [[station road]]. Can I help you with anything else today?
+
+### E1#6  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#6:0 [user] turn: i want to book a taxi. The taxi should depart from la Margarita and should go to [[riverboat Georgina]].
+
+### E1#67  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#67:0 [system] previous turn, user: Can you book the 3 of us tickets? | turn: I have successfully booked your train reservation. The total fee is [[13.2 GBP]], payable at the station. Reference number is UHK3WFOA. Is there anything else I can help you with today?
+
+### E1#70  (mentions 1, distinct values 1)
+Examples:
+- E1#70:0 [user] previous turn, system: I can look it up, could you tell me where you would like to go please? | turn: I would like to go to [[la mimosa]].
+
+### E1#75  (mentions 2, distinct values 2)
+Examples:
+- E1#75:0 [system] previous turn, user: Great thanks. I need a taxi from Gonville Hotell to Cherry Hinton Hall and Grounds at 13:15. | turn: Your taxi was booked successfully. You will be picked up in a black Tesla by 13:15 at the [[Gonville Hotel]] and dropped off at Cherry Hinton Hall and Grounds.
+- E1#75:1 [user] previous turn, system: Leverton House is a 4 star guesthouse in the east part of town in the cheap price range with both internet and parking included. Is there anything else today? | turn: Great thanks. I need a taxi from [[Gonville Hotell]] to Cherry Hinton Hall and Grounds at 13:15.
+
+### E1#27  (mentions 3, distinct values 2, low confidence)
+Examples:
+- E1#27:0 [user] previous turn, system: Okay, great. And where will you be traveling to and from? | turn: The pick up place will be wandlebury country park and the drop off at [[curry prince]]
+- E1#27:1 [system] previous turn, user: What about a restaurant that serves just indian food? | turn: How does the [[Curry Garden]] sound?
+- E1#27:2 [user] previous turn, system: The price range is moderate. | turn: Thanks! Now, can I get a taxi from the Cambridge Belfry to the [[Curry Prince]]? I need to leave the hotel by 4:00.
+
+### E1#20  (mentions 3, distinct values 3)
+Examples:
+- E1#20:0 [user] previous turn, system: I'd be happy to help! Where are you coming from? | turn: I am actually leaving from [[cote]].
+- E1#20:1 [system] previous turn, user: Go for it. | turn: Some options are Lebanese, Turkish, [[international]], British, European, and Chinese. Do any of these interest you?
+- E1#20:2 [user] turn: I need to book a taxi to pembroke college from [[prezzo]].
+
+### E1#15  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E1#15:0 [user] previous turn, system: There are several available. Do you have a preference on if there is a fee or free? | turn: [[Free]] would be preferable. I also need a taxi.
+- E1#15:1 [system] previous turn, user: can you suggest any attractions in the same area? I need the entrance fee if any and attraction type | turn: we have a lovely architecture called all saints church it is [[free admission]]
+
+### E1#60  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E1#60:0 [user] previous turn, system: I certainly can. When and where would you like to be picked up? | turn: From [[chiquito restaurant bar]].
+- E1#60:1 [user] previous turn, system: Could you tell me when you would like to leave by and where from? | turn: I'd like to arrive at Saint Barnabas Press Gallery by 19:15, and I'm leaving from [[CHiquito Restaurant Bar]].
+
+### E1#52  (mentions 1, distinct values 1)
+Examples:
+- E1#52:0 [system] previous turn, user: Thanks, I would also like a taxi. I'll need one from the hotel to make it to my dinner reservation. | turn: I booked a car for you, it's a white honda, the contact number is 07776292730. Did you want me to book you at the [[University Arms]], or just the information?
+
+### E1#38  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E1#38:0 [system] previous turn, user: Could you recommend a nightclub from the previous search? | turn: Yeah, the ballare is great. It's in the [[centre of town]].
+- E1#38:1 [user] previous turn, system: I can do that. I'm sorry, but can you clarify your departure site? It appears it would be a location in the centre? | turn: You're right. I forgot to select an architectural sight that I wanted to visit. Could you suggest one in the [[city centre]].
+
+### E1#56  (mentions 1, distinct values 1)
+Examples:
+- E1#56:0 [user] previous turn, system: Your booking was successful with a reference number of VZRQHFHP. Can I help you with anything else? | turn: Thanks great. Also I need to have the phone number for All Saints Church on [[Jesus Lane]].
+
+### E1#76  (mentions 1, distinct values 1)
+Examples:
+- E1#76:0 [user] previous turn, system: Sure. Their postcode is cb43hl. Is there anything else I can help you with? | turn: Yes, can you book me a taxi from the Hamilton Lodge to the [[Golden Wok]]? I want to leave the lodge at 08:00.
+
+### E1#43  (mentions 1, distinct values 1)
+Examples:
+- E1#43:0 [user] previous turn, system: You did not read the directions of this hit. There is no Tampa bay area. Please read the directions next time. | turn: i'm sorry, dude. i'm from florida so i'm not very smart. i'm trying to get from cambridge to [[stevenage]].
+
+### E1#48  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#48:0 [system] previous turn, user: Do you have information on the Express by Holiday Inn Cambridge? | turn: I do, indeed! It is located in the [[east]], is a 2 star hotel, and has both free internet and parking.
+
+### E1#3  (mentions 105, distinct values 22, low confidence)
+Examples:
+- E1#3:0 [user] previous turn, system: Booking was successful, the total fee is 35.2 GBP payable at the station.Reference number is : T2N33CQB. | turn: Would you like to make a reservation for the [[restaurant]]?
+- E1#3:1 [user] previous turn, system: I recommend Carolina Bed and Breakfast. It's located close to where you'll be dining and is moderately priced. Their address is 138 Perne Road and their phone number is 01223247015. | turn: I also need a taxi from the restaurant to the [[hotel]], please. I need to leave the restaurant by 19:00.
+- E1#3:2 [user] previous turn, system: Yes, what sort of place would you like to go to? | turn: I'd really like to visit a [[museum]].
+- E1#3:3 [user] previous turn, system: The phone number is 01223363471 and the address is 40210 Millers Yard City Centre. | turn: Wonderful, now I will need a taxi to commute between the two. I want to leave the [[cinema]] by 20:45 to get to the restaurant.
+- E1#3:4 [user] previous turn, system: I can help with that. Do you have a departure or arrival time in mind? | turn: I would like to leave the [[church]] by 24:30.
+- E1#3:5 [system] previous turn, user: I'm gonna need a taxi to get from the club to the restaurant. Can you schedule that for me? | turn: What time would you like to leave the [[club]] by taxi?
+- E1#3:6 [user] previous turn, system: Where are you going? | turn: I need to commute between the [[guesthouse]] and the restaurant. Make sure it arrives by the booked time and send me the contact number and car type please.
+- E1#3:7 [system] previous turn, user: I would like to leave the restaurant by 14:45. | turn: Alright, I have your taxi booked to pick you up at [[Restaurant One Seven]] at 14:45 to go to the Cambridge University Botanical Gardens.
+
+### E1#71  (mentions 1, distinct values 1)
+Examples:
+- E1#71:0 [user] previous turn, system: Okay, great. And where will you be traveling to and from? | turn: The pick up place will be [[wandlebury country park]] and the drop off at curry prince
+
+### E1#45  (mentions 2, distinct values 2)
+Examples:
+- E1#45:0 [user] previous turn, system: Ballare is Heidelberg Gardens, Lion Yard, postcode cb23na and the entrance fee is 5 pounds. Is there anything else I can help you with? | turn: I am also going to need a taxi that goes from [[Ballare]] to Meghan and gets me to Meghan by 13:15 for my reservation.
+- E1#45:1 [system] previous turn, user: Could you recommend a nightclub from the previous search? | turn: Yeah, [[the ballare]] is great. It's in the centre of town.
+
+### E1#64  (mentions 3, distinct values 2)
+Examples:
+- E1#64:0 [system] previous turn, user: Great thanks. I need a taxi from Gonville Hotell to Cherry Hinton Hall and Grounds at 13:15. | turn: Your taxi was booked successfully. You will be picked up in a black Tesla by 13:15 at the Gonville Hotel and dropped off at [[Cherry Hinton Hall and Grounds]].
+- E1#64:1 [user] previous turn, system: I need to tell it where you're going from and to, and what time, before it can assign a specific car for you. Could you help me with that info? | turn: I apologize. I need to go from the [[Cherry Hinton Water Play]] to Backstreet Bistro by 15:15 please.
+- E1#64:2 [user] previous turn, system: Leverton House is a 4 star guesthouse in the east part of town in the cheap price range with both internet and parking included. Is there anything else today? | turn: Great thanks. I need a taxi from Gonville Hotell to [[Cherry Hinton Hall and Grounds]] at 13:15.
+
+### E1#19  (mentions 4, distinct values 4)
+Examples:
+- E1#19:0 [system] previous turn, user: Go for it. | turn: Some options are Lebanese, Turkish, international, [[British]], European, and Chinese. Do any of these interest you?
+- E1#19:1 [system] previous turn, user: Go for it. | turn: Some options are Lebanese, Turkish, international, British, European, and [[Chinese]]. Do any of these interest you?
+- E1#19:2 [system] previous turn, user: Go for it. | turn: Some options are Lebanese, Turkish, international, British, [[European]], and Chinese. Do any of these interest you?
+- E1#19:3 [system] previous turn, user: Go for it. | turn: Some options are Lebanese, [[Turkish]], international, British, European, and Chinese. Do any of these interest you?
+
+### E1#39  (mentions 1, distinct values 1)
+Examples:
+- E1#39:0 [system] previous turn, user: You're right. I forgot to select an architectural sight that I wanted to visit. Could you suggest one in the city centre. | turn: Sure thing. I would suggest the [[old schools]].
+
+### E1#22  (mentions 7, distinct values 6, low confidence)
+Examples:
+- E1#22:0 [system] previous turn, user: I will be needing to leave the hotel by 16:45. Can you arrange that? | turn: Certainly! I have booked you with a [[red skoda]], whose contact number is 07790176286. Is there anything else I can help you with?
+- E1#22:1 [system] previous turn, user: I need picked up at the hotel by 9:15 please. | turn: Your taxi is booked. Look for a [[blue ford]], their contact number is 07211297115. Is there anything else I can help you with?
+- E1#22:2 [system] previous turn, user: Great! I'll also be needing a taxi. Will you book one that will leave the college at 5:45? I'd also like the car type and their contact number. | turn: You got it, I booked a [[red tesla]] for you. The contact number is 07757471475
+- E1#22:3 [system] previous turn, user: Leaving from travelers rest | turn: Booking completed! Booked car type : [[white ford]] Contact number : 07267142867
+- E1#22:4 [system] previous turn, user: I would like to go to Christ's College, please. | turn: Booking completed! Booked car type : [[white skoda]] Contact number : 07192870240
+- E1#22:5 [system] previous turn, user: No, but I do need some information about a taxi between the two places. I'd like to leave the hotel by 16:30. | turn: OK, I have booked you a taxi per your requested, the contact number is 07831714545, it will be a [[white tesla]] picking you up.
+- E1#22:6 [system] previous turn, user: I need to get there by 1:30. | turn: Booking completed! Booked car type : [[red skoda]] Contact number : 07852042631
+
+### E1#54  (mentions 1, distinct values 1)
+Examples:
+- E1#54:0 [user] previous turn, system: The archway house's phone number is 01223575314, it's a moderately priced guesthouse. Can I get you any more information? | turn: I would also like to book a taxi from the [[Archway House]] to one of the nightclubs you mentioned. I would like to leave the hotel by 09:45.
+
+### E1#49  (mentions 2, distinct values 1)
+Examples:
+- E1#49:0 [user] previous turn, system: I can book that for you. What time would you like to leave and what restaurant? | turn: Oh, I seem to have forgotten to ask you about the restaurant. Can you look up [[Taj Tandoori]] for me?
+- E1#49:1 [user] previous turn, system: Sure, their number is 01223412299 | turn: I'd like to book a table at [[Taj Tandoori]] for 6 people on Monday at 17:30
+
+### E1#68  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#68:0 [system] previous turn, user: Thanks, I would like a taxi from the two places too. | turn: I have booked you a taxi from [[Alexander B&B]] to Whale of a Time. It leaves by 10:00 and arrives to Whale of a Time by 10:30. Is that good?
+
+### E1#24  (mentions 1, distinct values 1)
+Examples:
+- E1#24:0 [user] turn: I want to book a taxi to pick me up Travellers Rest to take me to [[Finches Bed and Breakfast]].
+
+### E1#33  (mentions 1, distinct values 1)
+Examples:
+- E1#33:0 [user] previous turn, system: Sure, the postcode is CB58SX. Is there anything else I can help you with? | turn: Can you book a taxi for me? I want to leave [[Camboats]] by 14:30 to head back to the hotel.
+
+### E1#73  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#73:0 [user] turn: Please book me a taxi to take me from [[Aylesbray Lodge Guest House]] to the London Liverpool Street Train Station.
+
+### E1#25  (mentions 4, distinct values 2)
+Examples:
+- E1#25:0 [user] previous turn, system: Could you tell me where your destination will be? | turn: I need to go to [[rice house]].
+- E1#25:1 [system] previous turn, user: Yes please. I am also looking for a particular restaurant, it's called the rice boat. | turn: I found the [[rice boat]] but did you still need that hotel booked?
+- E1#25:2 [system] previous turn, user: I need to go to rice house. | turn: Could you tell me when you would like to arrive at [[Rice House]]?
+- E1#25:3 [user] previous turn, system: Could you tell me when you would like to arrive at Rice House? | turn: It doesn't matter when I arrive at [[Rice House]] as long as the taxi leaves after 19:15.
+
+### E1#9  (mentions 11, distinct values 11)
+Examples:
+- E1#9:0 [system] previous turn, user: Yes, could you book a table for 4 people at 14:45 on sunday? | turn: I was able to do that. Your reference number is [[1CYX3L33]].
+- E1#9:1 [system] previous turn, user: That's perfect, could you book me a table for 4 at 16:15 on Friday? | turn: Booking was successful. The table will be reserved for 15 minutes. Reference number is : [[DDLKGEVP]].
+- E1#9:2 [system] previous turn, user: Can you book 8 people for 2 nights staring from Thursday for me? I will need a reference number as well. | turn: Your reference number is [[GUE0LWWA]]
+- E1#9:3 [system] previous turn, user: I'd like to book a table at Taj Tandoori for 6 people on Monday at 17:30 | turn: I have you booked the reference number is [[JQ0WQ39K]]. What else can I do for you?
+- E1#9:4 [system] previous turn, user: Yes please, a table for 6 people at 13:15 on Tuesday would be amazing. | turn: I have that table reserved. Your reference number is [[K94DWSQN]]. Can I help you with a taxi or hotel room?
+- E1#9:5 [system] previous turn, user: The reference number please! | turn: Your reference number is [[LPMF11YC]].
+- E1#9:6 [system] previous turn, user: Yes, could you try for one night? | turn: Very good, sir. That worked and I have a reference number for you: [[PU74EXCQ]].
+- E1#9:7 [system] previous turn, user: Yes please. Book the train for 2 people. Please include the reference number. | turn: Reference number is : [[PYPBSAXI]]. Is there anything else?
+
+### E1#28  (mentions 10, distinct values 4, low confidence)
+Examples:
+- E1#28:0 [user] previous turn, system: OK, your room is booked. The reference number is NZGYO251. Can I help you with anything else today? | turn: Yes I need a taxi to travel between the two places and would like to leave the [[attraction]] by 04:00 please.
+- E1#28:1 [user] previous turn, system: Do you need a taxi between the guesthouse and the park? I can handle that, also. | turn: No, [[the attraction]] and the hotel was everything.
+- E1#28:2 [user] previous turn, system: I can do that. I'm sorry, but can you clarify your departure site? It appears it would be a location in the centre? | turn: You're right. I forgot to select an [[architectural sight]] that I wanted to visit. Could you suggest one in the city centre.
+- E1#28:3 [user] previous turn, system: I recommend India House! It's located at 31 Newnham Road Newnham. Their phone number is 01223461661. Can I do anything else for you? | turn: Can I get a taxi to take me between the two? I need to leave the [[Cafe Jello attraction]] by 21:00. I need the contact Number and car type?
+- E1#28:4 [user] previous turn, system: Booking was successful and your reference number is LCF5IPER. | turn: Can you also book me a taxi to take me between the two places? I want to leave the [[attraction]] by 04:15.
+- E1#28:5 [user] previous turn, system: The address of the restaurant is 10 Homerton Street City Centre. The postcode is cb28nx. Can I assist with anything else? | turn: Yes. I would like a taxi to take me from [[the attraction]] to the restaurant.
+- E1#28:6 [user] previous turn, system: They are located at 40 newham road and the phone number is 01223694264. Where would you like the taxi to pick you up at? | turn: I would like for the taxi to go from the [[attraction]] to the restaurant and I would like to make sure I arrive in time for my reservation.
+- E1#28:7 [user] previous turn, system: Sure I can help you with that. What time do you want to leave or arrive by? | turn: I want to leave the [[attraction]] by 16:15. Please send me the contact number and car type. Thank you!
+
+### E1#61  (mentions 1, distinct values 1)
+Examples:
+- E1#61:0 [user] previous turn, system: Could you tell me when you would like to leave by and where from? | turn: I'd like to arrive at [[Saint Barnabas Press Gallery]] by 19:15, and I'm leaving from CHiquito Restaurant Bar.
+
+### E1#62  (mentions 1, distinct values 1)
+Examples:
+- E1#62:0 [user] previous turn, system: I'll be happy to help you with that. What day would you like to travel and where would you like to depart from? | turn: I need to leave from [[Bishops Stortford]] the same day I arrive at the hotel. I need to arrive close to 19:30.
+
+### E1#30  (mentions 1, distinct values 1)
+Examples:
+- E1#30:0 [user] previous turn, system: Sure, it's the lucky star Phone number is 01223244277, and postcode is cb17dy. Can I book a table for you? | turn: I can book it myself, thanks. However, I will need a taxi from [[great saint mary]]'s church to the lucky star.
+
+### E1#0  (mentions 28, distinct values 9)
+Examples:
+- E1#0:0 [system] previous turn, user: That was everything I needed, Thanks for everything and please take care! | turn: Happy to be of service, and thanks for using the [[Cambridge TownInfo centre]]. Have a wonderful day!
+- E1#0:1 [user] turn: I am planning a trip in [[Cambridge]]
+- E1#0:2 [user] turn: Yes im looking to book a taxi from [[Cambride TownInfo Centre]] to a fancy restraunt rated 5 Stars!
+- E1#0:3 [user] previous turn, system: Where are you leaving from? What is the destination? What time do you want your taxi to arrive? | turn: I will be leaving the hotel by 23:30 to the [[Cambridge Arts Theatre]].
+- E1#0:4 [user] previous turn, system: The price range is moderate. | turn: Thanks! Now, can I get a taxi from the [[Cambridge Belfry]] to the Curry Prince? I need to leave the hotel by 4:00.
+- E1#0:5 [user] previous turn, system: Okay, what is your destination? | turn: I am going to the [[Cambridge county fair]] next to the city tourist museum.
+- E1#0:6 [system] previous turn, user: thank you for your help | turn: Thank you for contacting [[Cambridge InfoCentre]] today! Enjoy your stay.
+- E1#0:7 [system] previous turn, user: No, That's all I need. Thank you. | turn: Great! Thanks for using [[Cambridge TownInfo]]. Goodbye!
+
+### E1#23  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E1#23:0 [system] previous turn, user: i also need to use a taxi | turn: Of course! To book a taxi, I'll need to know your destination, [[departure site]], and what time you would like to leave or arrive by.
+- E1#23:1 [system] previous turn, user: Thank you! I also need a taxi please. | turn: Certainly. What is your [[intended destination]] and travel time?
+- E1#23:2 [user] turn: I want to book a taxi to pick me up [[Travellers Rest]] to take me to Finches Bed and Breakfast.
+
+### E1#57  (mentions 1, distinct values 1)
+Examples:
+- E1#57:0 [system] previous turn, user: Yes, may I have the address and phone number please? | turn: The address is [[20 Milton Road]] Chesterton and the phone number is 01223 351707.
+
+### E1#7  (mentions 10, distinct values 5)
+Examples:
+- E1#7:0 [user] previous turn, system: You're all set with your booking with the taxi. Would you like a restaurant in the area for you as well? | turn: No, but you know what? We should probably have the car pick me up at the [[college]] at 2:15 p.m. instead.
+- E1#7:1 [user] previous turn, system: Okay! Just to clarify, from where will you be departing? | turn: I am so sorry. I don't know where my head has been. I need to leave the hotel by 13:30, going to [[Christ's College]].
+- E1#7:2 [user] previous turn, system: I can definitely help you with that. Where will you be departing from? | turn: I will be departing from [[jesus college]].
+- E1#7:3 [user] previous turn, system: Yes, they had a table available and I went ahead and booked it for you. Your reference number is HXSPEY9N. What else can I do for you? | turn: I'll need a taxi to get me from [[downing college]] to pizza express by 17:45. can you set that up for me?
+- E1#7:4 [user] turn: I need to book a taxi from [[Kings college]] to Pizza express Fen Ditton sometime after 17:15. I need the car type and contact number please.
+- E1#7:5 [user] previous turn, system: The address of hughes hall is wollaston road. | turn: I also need a taxi to get from [[college]] to the restaurant. I need to arrive by 14:45.
+- E1#7:6 [user] previous turn, system: Okay and what is the destination please? | turn: I would like to go to [[Christ's College]], please.
+- E1#7:7 [user] previous turn, system: We can make that happen, but first I'll need to know your departure and destination locations. | turn: I will be going to [[Jesus College]] from the Nirala.
+
+### E1#13  (mentions 4, distinct values 4)
+Examples:
+- E1#13:0 [system] previous turn, user: That's perfect, could you book me a table for 4 at 16:15 on Friday? | turn: Booking was successful. The table will be reserved for [[15 minutes]]. Reference number is : DDLKGEVP.
+- E1#13:1 [user] previous turn, system: How does the Curry Garden sound? | turn: That sounds good. Please book for [[2 people]] at 11:45 on Saturday.
+- E1#13:2 [user] previous turn, system: I found the rice boat but did you still need that hotel booked? | turn: Yes please. Also, can you book the restaurant for [[5 people]] at 17:30 this Thursday?
+- E1#13:3 [user] previous turn, system: Sure, their number is 01223412299 | turn: I'd like to book a table at Taj Tandoori for [[6 people]] on Monday at 17:30
+
+### E1#79  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#79:0 [user] turn: Yes im looking to book a taxi from Cambride TownInfo Centre to a fancy restraunt rated [[5 Stars]]!
+
+### E1#18  (mentions 1, distinct values 1)
+Examples:
+- E1#18:0 [system] previous turn, user: Go for it. | turn: Some options are [[Lebanese]], Turkish, international, British, European, and Chinese. Do any of these interest you?
+
+### E1#44  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#44:0 [user] previous turn, system: Postcode, cb21sj, and the type is museum. Is there anything else I may help you with? | turn: I need a taxi from [[Byard Art]] that will get us to the restaurant on time.
+
+### E1#4  (mentions 88, distinct values 87)
+Examples:
+- E1#4:0 [system] previous turn, user: I've been a victim of a robbery. Can you help me? | turn: Sure! I think you'll need the police. Their contact number is [[01223358966]].
+- E1#4:1 [system] previous turn, user: I need a hospital please! I've been hurt! | turn: Oh, I am sorry to hear that. You may want to call the Addenbrookes Hospital acute medical assessment unit at [[01223348314]].
+- E1#4:2 [system] previous turn, user: Oh, I seem to have forgotten to ask you about the restaurant. Can you look up Taj Tandoori for me? | turn: Sure, their number is [[01223412299]]
+- E1#4:3 [system] previous turn, user: I like free! What was their phone number? Might be in there, but it's all a bit smooshed together. Also, I'd like to book a car service or taxi. | turn: Their phone number is [[01223446100]] and where would like that taxi to pick you up?
+- E1#4:4 [system] previous turn, user: Thanks great. Also I need to have the phone number for All Saints Church on Jesus Lane. | turn: Sure All Saints Church's phone number is [[01223452587]]. Anything else?
+- E1#4:5 [system] previous turn, user: I'd like to arrive at Saint Barnabas Press Gallery by 19:15, and I'm leaving from CHiquito Restaurant Bar. | turn: Great! Look for a yellow toyota to pick you up. The contact number is [[07004136407]]. Anything else I can help you with?
+- E1#4:6 [system] previous turn, user: I need to commute between the guesthouse and the restaurant. Make sure it arrives by the booked time and send me the contact number and car type please. | turn: You are set, look for a white tesla, contact number is [[07013573051]], any other questions?
+- E1#4:7 [system] previous turn, user: I don't care about the departure time, I just need to be at the restaurant by the booked time. | turn: Your are all set, look for a grey volkswagon, if there are issues, the driver can be reached at [[07015859463]], can I assist with anything else?
+
+### E1#21  (mentions 5, distinct values 1)
+Examples:
+- E1#21:0 [system] previous turn, user: I'm going to Ali Baba from Hughes Hall. I would like the taxi to arrive at Hughes Hall at 2:45. | turn: It sounds like you wish to depart [[Hughes Hall]] and arrive at Ali Baba by 2:45, is this correct? If so, I've booked a black Ford for you, contact 07392863087.
+- E1#21:1 [system] previous turn, user: I also need a taxi to get from college to the restaurant. I need to arrive by 14:45. | turn: A white audi will pick you up at [[hughes hall]] at 14:45. The contact number is 07128258422.
+- E1#21:2 [user] turn: Hello! I would like to book a taxi from [[hughes hall]].
+- E1#21:3 [user] previous turn, system: Great. Where would you like to go and what time do you want to leave or arrive by? | turn: I'm going to Ali Baba from [[Hughes Hall]]. I would like the taxi to arrive at Hughes Hall at 2:45.
+- E1#21:4 [user] previous turn, system: Great. Where would you like to go and what time do you want to leave or arrive by? | turn: I'm going to Ali Baba from Hughes Hall. I would like the taxi to arrive at [[Hughes Hall]] at 2:45.
+
+### E1#37  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E1#37:0 [user] previous turn, system: Glad to be of assistance, have a great day! | turn: Thanks, take care [[buddy]]!
+- E1#37:1 [user] previous turn, system: You did not read the directions of this hit. There is no Tampa bay area. Please read the directions next time. | turn: i'm sorry, [[dude]]. i'm from florida so i'm not very smart. i'm trying to get from cambridge to stevenage.
+
+### E1#29  (mentions 1, distinct values 1)
+Examples:
+- E1#29:0 [user] previous turn, system: That booking was successful. The reference number is KAY2S45O. Is there anything else I can do for you? | turn: Yes, I would like a reserve a taxi to commute between The Allenbell and [[Royal Spice]]. I really want to be on time for our dinner reservation.
+
+### E1#1  (mentions 85, distinct values 45, low confidence)
+Examples:
+- E1#1:0 [system] previous turn, user: I need a taxi from Byard Art that will get us to the restaurant on time. | turn: I have booked you a taxi that will get you there by [[13:15]]. The car type is a blue Tesla and the contact number 07664553144. Can I do anything else?
+- E1#1:1 [system] previous turn, user: I also need a taxi to get from college to the restaurant. I need to arrive by 14:45. | turn: A white audi will pick you up at hughes hall at [[14:45]]. The contact number is 07128258422.
+- E1#1:2 [user] previous turn, system: Okay and where do you need the taxi to pick you up? | turn: I need it to arrive before the [[13:30]] at the restaurant. Can you give me a contact number and the car type that will pick me up?
+- E1#1:3 [user] previous turn, system: Ok, you're all set. Your reference number is : CUHVEUDG. Is there anything else I can help you with? | turn: I also need a taxi to get me to the restaurant by [[17:45]]
+- E1#1:4 [user] previous turn, system: Okay, I need more information. When are you wanting to leave and arrive? | turn: I want to get to Anatoilia by [[09:15]].
+- E1#1:5 [user] previous turn, system: Sure, the postcode is CB58SX. Is there anything else I can help you with? | turn: Can you book a taxi for me? I want to leave Camboats by [[14:30]] to head back to the hotel.
+- E1#1:6 [user] previous turn, system: When would you like to leave/arrive by? | turn: I will be needing to leave the hotel by [[16:45]]. Can you arrange that?
+- E1#1:7 [user] turn: I'd like to book a taxi from Ask, departing after [[19:15]].
+
+### E1#11  (mentions 1, distinct values 1)
+Examples:
+- E1#11:0 [user] previous turn, system: The address to Don Pasquale Pizzeria is 12 Market Hill at City Centre. Would you like the phone number too? | turn: That's perfect, could you book me a table for [[4]] at 16:15 on Friday?
+
+### E1#12  (mentions 4, distinct values 4)
+Examples:
+- E1#12:0 [user] previous turn, system: The address to Don Pasquale Pizzeria is 12 Market Hill at City Centre. Would you like the phone number too? | turn: That's perfect, could you book me a table for 4 at 16:15 on [[Friday]]?
+- E1#12:1 [user] previous turn, system: Sure, their number is 01223412299 | turn: I'd like to book a table at Taj Tandoori for 6 people on [[Monday]] at 17:30
+- E1#12:2 [user] previous turn, system: How does the Curry Garden sound? | turn: That sounds good. Please book for 2 people at 11:45 on [[Saturday]].
+- E1#12:3 [user] previous turn, system: I found the rice boat but did you still need that hotel booked? | turn: Yes please. Also, can you book the restaurant for 5 people at 17:30 this [[Thursday]]?
+
+### E1#66  (mentions 1, distinct values 1)
+Examples:
+- E1#66:0 [system] previous turn, user: I need a hospital please! I've been hurt! | turn: Oh, I am sorry to hear that. You may want to call the [[Addenbrookes Hospital]] acute medical assessment unit at 01223348314.
+
+### E1#65  (mentions 2, distinct values 2)
+Examples:
+- E1#65:0 [user] previous turn, system: I need to tell it where you're going from and to, and what time, before it can assign a specific car for you. Could you help me with that info? | turn: I apologize. I need to go from the Cherry Hinton Water Play to [[Backstreet Bistro]] by 15:15 please.
+- E1#65:1 [user] turn: I need to book a taxi leaving from [[The Oak Bistro]] please.
+
+### E1#5  (mentions 1, distinct values 1)
+Examples:
+- E1#5:0 [user] turn: i want to book a taxi. The taxi should depart from [[la Margarita]] and should go to riverboat Georgina.
+
+### E1#40  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#40:0 [user] previous turn, system: It is expensive, but very good. | turn: I also need a hotel called lovell [[Lodege]]
+
+### E1#10  (mentions 25, distinct values 9, low confidence)
+Examples:
+- E1#10:0 [system] previous turn, user: I need a taxi from the hotel to the restaurant please. | turn: I can book that for you. [[What time]] would you like to leave and what restaurant?
+- E1#10:1 [user] previous turn, system: Ok great and what times do you prefer? | turn: I don't care about the departure time, I just need to be at the restaurant by the [[booked time]].
+- E1#10:2 [user] previous turn, system: Your taxi is booked. Be expecting a red Skoda. Please call 07595199284 should you need them. | turn: that will be it for now. [[good day]]
+- E1#10:3 [system] previous turn, user: I am also looking for a train. | turn: I'll be happy to help you with that. [[What day]] would you like to travel and where would you like to depart from?
+- E1#10:4 [user] turn: I'd like to book a taxi from [[Ask]], departing after 19:15.
+- E1#10:5 [user] previous turn, system: Nandos is booked with the reference number 38RU5UDA.The table will be reserved for 15 minutes. May I help with something else? | turn: Yes, I need a taxi to the restaurant, I want to get there by the [[booking time]]. Nice car, no clunker please.
+- E1#10:6 [system] previous turn, user: Great, thank you. Could you also help me with booking a taxi to go from the hotel to the cinema? | turn: [[How many people]] will the taxi be for?
+- E1#10:7 [user] previous turn, system: No, I'm sorry. You'll have to call them for the entrance fee. The phone number is 01223304705. | turn: Thank you. I'm also looking to book a taxi to travel between the two. I need it to arrive to the restaurant by the [[reservation time]].
+
+### E1#58  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E1#58:0 [system] previous turn, user: Yes, may I have the address and phone number please? | turn: The address is 20 Milton Road [[Chesterton]] and the phone number is 01223 351707.
+
+### E1#8  (mentions 3, distinct values 3)
+Examples:
+- E1#8:0 [user] previous turn, system: Of course! To book a taxi, I'll need to know your destination, departure site, and what time you would like to leave or arrive by. | turn: I want to arrive at [[da vinci pizzeria]] by 15:00.
+- E1#8:1 [user] previous turn, system: Yes, they had a table available and I went ahead and booked it for you. Your reference number is HXSPEY9N. What else can I do for you? | turn: I'll need a taxi to get me from downing college to [[pizza express]] by 17:45. can you set that up for me?
+- E1#8:2 [user] turn: I need to book a taxi from Kings college to [[Pizza express Fen Ditton]] sometime after 17:15. I need the car type and contact number please.
+
+### E1#26  (mentions 4, distinct values 2)
+Examples:
+- E1#26:0 [user] previous turn, system: Your taxi was booked! The car type will be blue ford and the contact number is 07646890093. | turn: Thanks, I think that's all I need. Could you just confirm whether the [[Allenbell]] is a Hotel or a Guest House?
+- E1#26:1 [user] previous turn, system: That booking was successful. The reference number is KAY2S45O. Is there anything else I can do for you? | turn: Yes, I would like a reserve a taxi to commute between [[The Allenbell]] and Royal Spice. I really want to be on time for our dinner reservation.
+- E1#26:2 [system] previous turn, user: Thanks, I think that's all I need. Could you just confirm whether the Allenbell is a Hotel or a Guest House? | turn: [[Allenbell]] is a guesthouse.
+- E1#26:3 [user] previous turn, system: What day will you be checking in, and how many will you stay for? I assume it is for 2 people? | turn: Actually, on second thought. I should book it later. But, can you book me a taxi from [[Allenbell]] to J Restaurant. I need to be there by 13:15.
+
+### E1#74  (mentions 1, distinct values 1)
+Examples:
+- E1#74:0 [user] previous turn, system: We can make that happen, but first I'll need to know your departure and destination locations. | turn: I will be going to Jesus College from the [[Nirala]].
+
+### E1#78  (mentions 1, distinct values 1)
+Examples:
+- E1#78:0 [user] turn: i want to book a taxi. The taxi should leave after 02:30 and should go to [[Norwich train station]].
+
+### E1#53  (mentions 7, distinct values 4, low confidence)
+Examples:
+- E1#53:0 [user] previous turn, system: Okay. A blue volvo is booked for you. | turn: Great, I will also need [[their contact number]] please.
+- E1#53:1 [system] previous turn, user: Yes, may I have the address and phone number please? | turn: The address is 20 Milton Road Chesterton and the phone number is [[01223 351707]].
+- E1#53:2 [user] previous turn, system: Okay, I've got you booked with a grey Lexus. | turn: Can I please get the taxi company's [[contact phone number]]?
+- E1#53:3 [user] previous turn, system: That park has no entrance fee! Can I help you with anything else today? | turn: I like free! What was [[their phone number]]? Might be in there, but it's all a bit smooshed together. Also, I'd like to book a car service or taxi.
+- E1#53:4 [user] previous turn, system: Entrance is free, and the postcode is cb30ds | turn: Great! I'll also be needing a taxi. Will you book one that will leave the college at 5:45? I'd also like the car type and [[their contact number]].
+- E1#53:5 [system] previous turn, user: I just need to be leaving the restaurant by 06:15. | turn: I have successfully booked you a White Audi. Would you like [[their contact number]]?
+- E1#53:6 [user] previous turn, system: I have successfully booked you a White Audi. Would you like their contact number? | turn: Yes, I would like [[their contact number]] please.
+
+### E1#50  (mentions 1, distinct values 1)
+Examples:
+- E1#50:0 [user] previous turn, system: When you would like to leave or arrive by? What's your departure/destination? | turn: I would like to arrive by 17:45 to the [[4 Kings Parade]]. Pick us up at the Alpha-Minon Guesthouse.
+
+### E1#2  (mentions 1, distinct values 1)
+Examples:
+- E1#2:0 [user] turn: I need to book a taxi to come pick me up by 10:30 to take me to [[Midsummer House Restaurant]].
+
+### E1#42  (mentions 1, distinct values 1)
+Examples:
+- E1#42:0 [user] previous turn, system: You did not read the directions of this hit. There is no Tampa bay area. Please read the directions next time. | turn: i'm sorry, dude. i'm from [[florida]] so i'm not very smart. i'm trying to get from cambridge to stevenage.
+
+### E1#51  (mentions 1, distinct values 1)
+Examples:
+- E1#51:0 [user] previous turn, system: When you would like to leave or arrive by? What's your departure/destination? | turn: I would like to arrive by 17:45 to the 4 Kings Parade. Pick us up at the [[Alpha-Minon Guesthouse]].
+
+### E1#36  (mentions 1, distinct values 1)
+Examples:
+- E1#36:0 [user] turn: Help me reserve a taxi to take me to [[kambar]]
+
+### E1#69  (mentions 2, distinct values 1)
+Examples:
+- E1#69:0 [system] previous turn, user: Thanks, I would like a taxi from the two places too. | turn: I have booked you a taxi from Alexander B&B to Whale of a Time. It leaves by 10:00 and arrives to [[Whale of a Time]] by 10:30. Is that good?
+- E1#69:1 [system] previous turn, user: Thanks, I would like a taxi from the two places too. | turn: I have booked you a taxi from Alexander B&B to [[Whale of a Time]]. It leaves by 10:00 and arrives to Whale of a Time by 10:30. Is that good?
+
+### E1#72  (mentions 1, distinct values 1)
+Examples:
+- E1#72:0 [user] previous turn, system: Okay, I need more information. When are you wanting to leave and arrive? | turn: I want to get to [[Anatoilia]] by 09:15.
+
+### E1#32  (mentions 2, distinct values 1)
+Examples:
+- E1#32:0 [system] previous turn, user: I'm going to Ali Baba from Hughes Hall. I would like the taxi to arrive at Hughes Hall at 2:45. | turn: It sounds like you wish to depart Hughes Hall and arrive at [[Ali Baba]] by 2:45, is this correct? If so, I've booked a black Ford for you, contact 07392863087.
+- E1#32:1 [user] previous turn, system: Great. Where would you like to go and what time do you want to leave or arrive by? | turn: I'm going to [[Ali Baba]] from Hughes Hall. I would like the taxi to arrive at Hughes Hall at 2:45.
+
+### E1#41  (mentions 2, distinct values 1)
+Examples:
+- E1#41:0 [user] turn: Yes, Hi! I am looking for a hotel in the [[tampa bay area]].
+- E1#41:1 [system] previous turn, user: Yes, Hi! I am looking for a hotel in the tampa bay area. | turn: You did not read the directions of this hit. There is no [[Tampa bay area]]. Please read the directions next time.
+
+### E1#46  (mentions 2, distinct values 1)
+Examples:
+- E1#46:0 [user] previous turn, system: Ballare is Heidelberg Gardens, Lion Yard, postcode cb23na and the entrance fee is 5 pounds. Is there anything else I can help you with? | turn: I am also going to need a taxi that goes from Ballare to [[Meghan]] and gets me to Meghan by 13:15 for my reservation.
+- E1#46:1 [user] previous turn, system: Ballare is Heidelberg Gardens, Lion Yard, postcode cb23na and the entrance fee is 5 pounds. Is there anything else I can help you with? | turn: I am also going to need a taxi that goes from Ballare to Meghan and gets me to [[Meghan]] by 13:15 for my reservation.
+
+### E1#77  (mentions 1, distinct values 1)
+Examples:
+- E1#77:0 [system] previous turn, user: Yes, I need a taxi to the restaurant, I want to get there by the booking time. Nice car, no clunker please. | turn: I was able to book the taxi arriving at [[nandos]] by 14:30. It will be a yellow ford and the contact number is 07126119012.
+
+### E1#59  (mentions 1, distinct values 1)
+Examples:
+- E1#59:0 [system] previous turn, user: I would like to leave by 21:45 please. | turn: I have a yellow Lexus picking you up at [[Club Salsa]] at 21:45. The contact number is 07451777629. Can I help you with anything else today?
+
+Return the JSON object now.

@@ -1,0 +1,68 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 13 of 27 (134 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+
+### E4#59  (mentions 4, distinct values 3)
+Examples:
+- E4#59:0 [system] previous turn, user: How about one that is in the type of museum? | turn: Sure, we have 11 museums in the centre area, a few are broughton house gallery, cambridge contemporary art, [[castle galleries]] and primavera. Any sound good?
+- E4#59:1 [system] previous turn, user: Can I please have the phone number and address for that place? | turn: Certainly! The address for [[gallery]] at twelve a high street is fulbourn and the phone number is 01223295264. Can I help you with anything else?
+- E4#59:2 [system] previous turn, user: Yes, I am looking for cinemas and museums. | turn: There are no cinemas on the west side, but I have several museums. The [[Lynne Strover Gallery]] is a great place, and it's free to get in.
+- E4#59:3 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend [[Castle Galleries]], phone number 01223307402, postal code cb23bj, address unit su43, grande arcade, saint andrews street. It is free.
+
+### E4#56  (mentions 11, distinct values 6, low confidence)
+Examples:
+- E4#56:0 [system] previous turn, user: Yes could I have their postcode and entrance fee? | turn: [[Cafe jello gallery]] postcode is cb30af and the entrance is free, is there anything else I can do for you?
+- E4#56:1 [system] previous turn, user: Excellent. What is the postcode for both museums? | turn: [[Cafe Jello]] postcode is cb30af. Kettle's yard is cb30aq.
+- E4#56:2 [user] turn: I'm looking for [[cafe uno]], can you help me find where it is?
+- E4#56:3 [system] previous turn, user: I'm looking for cafe uno, can you help me find where it is? | turn: Absolutely! [[Caffe uno]] is located at 32 Bridge Street City Centre.
+- E4#56:4 [system] previous turn, user: Yes please. | turn: [[The cafe jello gallery]] has free admission and is located at 13 magdalene street, postcode cb30af. Would you like information on any others?
+
+### E4#90  (mentions 5, distinct values 2, low confidence)
+Examples:
+- E4#90:0 [system] previous turn, user: Excellent. What is the postcode for both museums? | turn: Cafe Jello postcode is cb30af. [[Kettle]]'s yard is cb30aq.
+- E4#90:1 [user] previous turn, system: There's 7 one of my favorites is kettle's yard on castle street it has free admission. Would that interest you? | turn: I wish I had been given more choices but I guess that one will be OK. What is the postcode for [[Kettle's Yard]]?
+- E4#90:2 [system] previous turn, user: I wish I had been given more choices but I guess that one will be OK. What is the postcode for Kettle's Yard? | turn: The post code for [[Kettle]]'s yard is cb30aq
+- E4#90:3 [system] previous turn, user: I need to change the venue then. Can you please select another venue for me in the West? | turn: Cafe Jello Gallery is free as is [[Kettle's Yard]]. They are both museums.
+- E4#90:4 [system] previous turn, user: No how about a type of museum? | turn: There's 7 one of my favorites is [[kettle]]'s yard on castle street it has free admission. Would that interest you?
+
+### E4#34  (mentions 2, distinct values 1)
+Examples:
+- E4#34:0 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park Fen Causeway is located at [[Fen Causeway]], Newnham road, postal code cb322ad.
+- E4#34:1 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park [[Fen Causeway]] is located at Fen Causeway, Newnham road, postal code cb322ad.
+
+### E4#125  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E4#125:0 [system] previous turn, user: I am looking for an attraction called camboats, can you get me the address and postcode? | turn: Yes, of course. The address of camboats is the plough, green end, [[fen ditton]], and the postcode is cb58sx.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#59, E4#56, E4#90, E4#34, E4#125) and its name as the value, like {"E4#59": "<name>"}.

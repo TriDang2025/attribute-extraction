@@ -1,0 +1,73 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 5 of 27 (134 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+
+### E4#36  (mentions 2, distinct values 1)
+Examples:
+- E4#36:0 [system] previous turn, user: No thanks, I just need the address please. | turn: There address is [[Hotel Felix Whitehouse Lane]] Huntingdon Road postcode cb30lx. Is there anything else I can assist you with today?
+- E4#36:1 [system] previous turn, user: I am looking for the address for graffiti | turn: Their address is [[Hotel Felix Whitehouse Lane]] Huntingdon Road. Anything more I can help with?
+
+### E4#77  (mentions 5, distinct values 3)
+Examples:
+- E4#77:0 [system] previous turn, user: I am coming to Cambridge and would like to see some architecture. Do you have any located in the centre? | turn: Yes, there are 5 places located in the centre. I recommend the All Saints Church on [[Jesus Lane]].
+- E4#77:1 [system] previous turn, user: no, please surprise me. | turn: I have the Cambridge Museum of Technology located in the east side of town. It's at the site of the Old Pumping Station on [[Cheddar's lane]]. Would you like more information?
+- E4#77:2 [system] previous turn, user: Hi, I am looking for a particular attraction. Have you heard of Scudamores Punting Co? | turn: Yes, Scudamores Punting Co is located in Granta Place, [[Mill Lane]] and their phone number is 01223359750. Anything else you want to know?
+- E4#77:3 [system] previous turn, user: Whatever is the most popular attraction | turn: You should check out All Saints Church. It has great architecture and free entrance. It's located on [[Jesus Lane]] cb58bs. The phone is 01223452587. Would that work for you?
+- E4#77:4 [system] previous turn, user: Alright, please tell me the phone number and address there, as well as the entrance fee | turn: You can reach them by phone at 01223452587. Entrance is free. The address is [[jesus lane]].
+
+### E4#8  (mentions 22, distinct values 6)
+Examples:
+- E4#8:0 [system] previous turn, user: I would like to know the entrance fee. | turn: It is free to enter the [[Christ]]'s college. Is there anything else I can help you with today?
+- E4#8:1 [system] previous turn, user: Not really, but what is the fee? | turn: Most are free, but [[Corpus Christi]] has a 2 pound fee, Saint John's has a 2.50 pound fee, and Trinity has a 1 pound fee.
+- E4#8:2 [system] previous turn, user: How about a type of college? Could you provide me with the postcode, entrance fee and address? | turn: Yes, [[Christ's College]] is on Saint Andrew's Street and the post code is cb23bu. It's free admission.
+- E4#8:3 [system] previous turn, user: None, what you recommend, I will go with. | turn: [[christs college]] is a nice attraction,do you want the phone number ?
+- E4#8:4 [user] previous turn, system: Your taxi is booked. Your car type is a grey tesla and the contact number is 07621703476 | turn: I will be need a taxi also to get from [[Corpus Christi College]] to the restaurant.
+
+### E4#16  (mentions 34, distinct values 5, low confidence)
+Examples:
+- E4#16:0 [system] previous turn, user: Any interesting attractions in that part of town? | turn: There are 13 attractions, ranging from [[colleges]], to entertainment, to museums. Do you have a type preference?
+- E4#16:1 [system] previous turn, user: I would like to get some information about colleges to visit? | turn: There is Christ's College, [[Churchill College]], Clare College, Clare Hall, Corpus Christi, Downing College, Emmanuel College, and Huges Hall. Would you like me to list more?
+- E4#16:2 [user] turn: Hi, I'm trying to find a place to go in the centre. [[A college]] would be fun to visit!
+- E4#16:3 [system] previous turn, user: How about college attractions? | turn: Yes I have many [[famous colleges]] to visit and most of them are free. Would you like anything else?
+- E4#16:4 [system] previous turn, user: Cam you tell me more about the place? | turn: [[The college]] is on saint andrew's street. Can I help you with anything else today?
+
+### E4#7  (mentions 6, distinct values 4, low confidence)
+Examples:
+- E4#7:0 [system] previous turn, user: The centre please. | turn: There are [[13 colleges]] in the center of town. Does entrance fee matter to you?
+- E4#7:1 [system] previous turn, user: You misunderstood, I'm looking for a college to visit while I'm in Cambridge. | turn: There are [[18 colleges]] in Cambridge. What part of town would you like it to be in?
+- E4#7:2 [system] previous turn, user: What about colleges in the west? | turn: There are [[five colleges]] in that area. Three have no entrance fees. Would you like additional information on any of these?
+- E4#7:3 [system] previous turn, user: Can you give me some information about colleges that I can visit while I am in town? | turn: I see we have a total of [[79 colleges]].
+- E4#7:4 [system] previous turn, user: Im sorry for being so loop, how about a college in that area, whatever you recommend. | turn: There are [[13 colleges]] in the centre, but I personally recommend corpus christi. Can I do anything else for you?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#36, E4#77, E4#8, E4#16, E4#7) and its name as the value, like {"E4#36": "<name>"}.

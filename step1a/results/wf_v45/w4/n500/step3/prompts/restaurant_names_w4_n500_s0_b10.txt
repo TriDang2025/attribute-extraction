@@ -1,0 +1,69 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 10 of 32 (157 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E0#33  (mentions 6, distinct values 4)
+Examples:
+- E0#33:0 [system] previous turn, user: I want to find an expensive restaurant in the centre of town. | turn: [[The cambridge chop house]] serves british food, it is in the centre of town and is in the expensive price range.
+- E0#33:1 [system] previous turn, user: I don't care what cuisine. I would like a table for 1 at 12:30 on Thursday. I will need a reference number also. | turn: Sure. I booked you into the [[Cambridge Chop House]] on Thursday at 12:30. Your reference number is 8NI5A15M.
+- E0#33:2 [system] previous turn, user: get me its post code | turn: The postcode for the [[Cambridge Lodge Restaurant]] is cb30dq. Can I help with anything else today?
+- E0#33:3 [system] previous turn, user: I'm sorry I meant to say west before. I am looking for a European place that is expensive in the west. | turn: That I can do! [[The cambridge lodge restaurant]] is excellent. Can I book you a table?
+- E0#33:4 [system] previous turn, user: British food. And some where in the Centre. | turn: I have 3 places to choose from. All are expensive. I have Fitzbillies, [[The Cambridge Chop House]] and Midsummer House Restaurant. Can I reserve a table for you?
+
+### E0#108  (mentions 5, distinct values 4)
+Examples:
+- E0#108:0 [system] previous turn, user: I feel like having Italian for dinner. Are there any cheap restaurants with good Italian in town? | turn: Sure, how about [[zizzi cambridge]], they offer cheap Italian food in the town centre.
+- E0#108:1 [user] turn: I am looking for a restaurant that serves british food in [[cambridge]] in the moderate price range
+- E0#108:2 [system] previous turn, user: Great. Now I need somewhere to stay. I want an expensive place with 2 stars plus parking and wifi too. | turn: express by [[holiday inn cambridge]] is the only available hotel we have. Would you like me to make the reservation?
+- E0#108:3 [user] turn: I am looking for a mexican restaurant in [[south cambridge]]
+- E0#108:4 [system] previous turn, user: Sounds great. Can I get their number? | turn: Certainly, the phone number at [[zizzi cambridge]] is 01223365599. May I help with anything else?
+
+### E0#151  (mentions 2, distinct values 1)
+Examples:
+- E0#151:0 [system] previous turn, user: Great, thanks for that. I'm also looking for information about a restaurant called mahal of cambridge. | turn: Okay, the [[Mahal of Cambridge]] serves indian food and is located in the centre. Would you like me to make a reservation for you?
+- E0#151:1 [user] previous turn, system: Your booking was successful reference number is 1QVLVD25 | turn: Great, thanks for that. I'm also looking for information about a restaurant called [[mahal of cambridge]].
+
+### E0#103  (mentions 2, distinct values 1)
+Examples:
+- E0#103:0 [system] previous turn, user: The price range doesn't matter. Can you give me a few names to choose from? | turn: The choices are Curry Prince, Pipasha Restaurant, [[Rajmahal]], and Sitar Tandoori. Would you like to book a table at one of these?
+- E0#103:1 [system] previous turn, user: ok, what are they? | turn: curry prince and [[rajmahal]] which both serve indian food. And pizza hut fen ditton serves italian food.
+
+### E0#40  (mentions 4, distinct values 2, low confidence)
+Examples:
+- E0#40:0 [system] previous turn, user: The restaurant should be in the expensive price range and should be in the south, i do not have a particular food preference. | turn: I have five places. Do you prefer, Italian, Chinese, Mexican or [[Indian]]?
+- E0#40:1 [system] previous turn, user: As long as it serves indian we're good. I need the address and phone number | turn: I recommend [[India House]]! It's located at 31 Newnham Road Newnham. Their phone number is 01223461661. Can I do anything else for you?
+- E0#40:2 [system] previous turn, user: I am looking for a cheap restaurant in the centre part of town. | turn: You have lots of good cheap choices in that part of town! What type of food sounds good to you? There are Italian restaurants, [[Indian]], Spanish, Chinese, and more.
+- E0#40:3 [system] previous turn, user: I need the address of an expensive restaurant in the east part of town. | turn: Would you prefer British, [[Indian]], or Chinese food, or a gastropub?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#33, E0#108, E0#151, E0#103, E0#40) and its name as the value, like {"E0#33": "<name>"}.

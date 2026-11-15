@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#0/2: name: location area | description: location_area
+Examples:
+- 1 [user] previous turn, system: Booking was successful, the total fee is 49.5 GBP payable at the station . Reference number is : Y3MAVYRQ. | turn: Thank you so much, now can you please recommend a restaurant in the [[north]] with a moderate price range? Any type of food will do.
+- 2 [system] previous turn, user: Whichever one is fine, surprise me! | turn: I would recommend Royal Spice in the [[north end]]. Would you like me to make a reservation there for you?
+- 3 [system] previous turn, user: I'm looking for a restaurant named hakka | turn: The hakka is a chinese restaurant in the [[north area]]. Would you like to make a booking today?
+- 4 [system] previous turn, user: I am interested in a restaurant located in the north part of town that specializes in Indonesian food, please. | turn: There are no restaurants serving Indonesian food in the [[north part of town]]. Would you like me to look in another part of town?
+- 5 [user] previous turn, system: The phone number and postcode is: 01223333200 cb21tl | turn: Great! I'm also looking for a moderately priced restaurant in the [[north area of town]]. Can you help me with that?
+
+Columns (5):
+- name: location str | examples: centre; city centre; centre of town
+- name: restaurant name | examples: restaurant; j restaurant; charlie chan
+- name: location part | examples: east; east part of town; any area
+- name: address | examples: jinling noodle bar; 68 histon road; taj tandoori
+- name: location | examples: cambridge; town; west
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#0/2", "reason": "str", "same_as": "<column name or none>"}

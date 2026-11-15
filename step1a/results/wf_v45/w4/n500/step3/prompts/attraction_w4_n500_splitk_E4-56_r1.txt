@@ -1,0 +1,26 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E4#56:s0": "P1", "E4#56:s1": "P2"}}
+
+Cluster E4#56 of entity E4 (mentions 11, distinct values 6).
+Examples:
+- E4#56:s0 [system] previous turn, user: Yes could I have their postcode and entrance fee? | turn: [[Cafe jello gallery]] postcode is cb30af and the entrance is free, is there anything else I can do for you?
+- E4#56:s1 [system] previous turn, user: Excellent. What is the postcode for both museums? | turn: [[Cafe Jello]] postcode is cb30af. Kettle's yard is cb30aq.
+- E4#56:s2 [user] turn: I'm looking for [[cafe uno]], can you help me find where it is?
+- E4#56:s3 [system] previous turn, user: I'm looking for cafe uno, can you help me find where it is? | turn: Absolutely! [[Caffe uno]] is located at 32 Bridge Street City Centre.
+- E4#56:s4 [system] previous turn, user: Yes please. | turn: [[The cafe jello gallery]] has free admission and is located at 13 magdalene street, postcode cb30af. Would you like information on any others?
+- E4#56:s5 [user] previous turn, system: It is free, and located at cafe jello gallery, 13 magdalene street | turn: Okay. That was in the [[West Cafe Jello Gallery]] at 13 magdalene street and it's free. Thank you. Goodbye.
+- E4#56:s6 [system] previous turn, user: I want to find a museum located in the west. | turn: how about [[cafe jello gallery]]? it's gotten great reviews.
+- E4#56:s7 [system] previous turn, user: Can I get the postcode for that museum please? | turn: [[Cafe jello gallery]]'s post code is cb30af.
+- E4#56:s8 [system] previous turn, user: I have no particular area preference. Can you list a few for me to select from? | turn: There is [[Cafe Jello Gallery]] in the west, Cambridge Artworks in the east and Broughton House Gallery in the centre. Does any of those sound appealing?
+- E4#56:s9 [system] previous turn, user: I need to change the venue then. Can you please select another venue for me in the West? | turn: [[Cafe Jello Gallery]] is free as is Kettle's Yard. They are both museums.
+- E4#56:s10 [system] previous turn, user: What is the entrance fee and address? | turn: It is free, and located at [[cafe jello gallery]], 13 magdalene street
+
+Return the JSON object now.

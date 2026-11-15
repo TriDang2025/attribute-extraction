@@ -1,0 +1,60 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 8 of 11 (51 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E3#39  (mentions 1, distinct values 1)
+Examples:
+- E3#39:0 [system] previous turn, user: I want a train leaving on thursday. | turn: I show [[404]] rail departures on Thursday, can I get something specific for you?
+
+### E3#43  (mentions 3, distinct values 2, low confidence)
+Examples:
+- E3#43:0 [system] previous turn, user: I also need a train. | turn: [[Where]] will you be departing from and what will be your departing time?
+- E3#43:1 [user] previous turn, system: Those would be TR0922, 51 minutes, and 14:08. How else may I help you? | turn: I'd like to find somewhere to stay that is moderately priced, [[in the east]], and with internet included
+- E3#43:2 [system] previous turn, user: Hello, I'd like some information on a train going to Kings Lynn. | turn: Certainly. [[Where]] will you be leaving from and on what day?
+
+### E3#34  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#34:0 [user] previous turn, system: I have five places, what type would you prefer? | turn: [[Italian]] would be great. I also need a train to Cambridge that arrives on Tuesday by 15:30.
+- E3#34:1 [system] previous turn, user: Italian would be great. I also need a train to Cambridge that arrives on Tuesday by 15:30. | turn: There are no [[Italian places]] to dine, is there another food you would prefer before we book the train?
+
+### E3#49  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#49:0 [user] previous turn, system: Sure. Were you interested in club salsa or the fez club? | turn: I think [[Club Salsa]] would be perfect. I am also looking for a train to depart from Cambridge and go to London Kings Cross.
+
+### E3#41  (mentions 2, distinct values 2)
+Examples:
+- E3#41:0 [system] previous turn, user: Thank you! Can you tell me about places to go in the West? | turn: what about [[clare hall]]? it's free to visit
+- E3#41:1 [user] previous turn, system: Booked! At the station you will pay 66 pounds. Reference number: JQ91RH6X. | turn: Great I also need to find a [[concerthall]] to visit in the south.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#39, E3#43, E3#34, E3#49, E3#41) and its name as the value, like {"E3#39": "<name>"}.

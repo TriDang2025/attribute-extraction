@@ -1,0 +1,24 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E2#50:s0": "P1", "E2#50:s1": "P2"}}
+
+Cluster E2#50 of entity E2 (mentions 9, distinct values 5).
+Examples:
+- E2#50:s0 [user] previous turn, system: Booking was successful. The table will be reserved for 15 minutes. Reference number is : HPRELBW9. now let's find you a hotel! | turn: The hotel should be in the east and should have a [[star of 4]] in the cheap price range and should include free wifi
+- E2#50:s1 [system] previous turn, user: That doesn't matter as long as it's in the north. | turn: I have Acorn Guest House located in the North that has a [[4 start rating]] would you like me to book it for you?
+- E2#50:s2 [system] previous turn, user: No, but I am looking for a place to stay that is cheap. | turn: I can recommend three guesthouses, [[all four star]], in the east. May I book a room for you and your family?
+- E2#50:s3 [user] previous turn, system: Cityroomz is the only place that matches your criteria. | turn: [[How many stars]] is Cityroomz?
+- E2#50:s4 [user] previous turn, system: Their address is 2G Cambridge Leisure Park Cherry Hinton Road Cherry Hinton | turn: I am needing a place to stay with a [[star of 3]] and free wifi please.
+- E2#50:s5 [user] previous turn, system: Absolutely - King's College is located on King's Parade, postcode cb21st. Will you be needing anything else today? | turn: I am also looking for a place to stay that has a [[star of 4]] and free parking.
+- E2#50:s6 [user] previous turn, system: still no hotels match your criteria | turn: Can you check to see if there is a guesthouse available instead of hotel? Something in the North with a [[star of 4]] and free wifi.
+- E2#50:s7 [user] turn: Hi, I'd like a hotel with a [[star of 4]] on the east side of town.
+- E2#50:s8 [user] previous turn, system: We have many guesthouses and hotels in town. Are you looking for something specific? | turn: the hotel should have a [[star of 4]] and should be in the cheap price range. The hotel should be in the east and should include free wifi
+
+Return the JSON object now.

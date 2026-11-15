@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#13:s0": "P1", "E3#13:s1": "P2"}}
+
+Cluster E3#13 of entity E3 (mentions 17, distinct values 10).
+Examples:
+- E3#13:s0 [user] previous turn, system: The TR7877 arrives by 13:09. Would you like to book that one? | turn: Yes please. I need [[5]] tickets.
+- E3#13:s1 [system] previous turn, user: I'm looking to book a train that goes to ely and leaves on sunday please. | turn: There are [[10]] trains leaving from Cambridge to Ely. Is there a particular departure or arrival time you would prefer?
+- E3#13:s2 [system] previous turn, user: I am looking for a train that will depart from Norwich on Sunday | turn: There are trains every hour on the :16 that will get you there by noon, beginning at 5:[[16]]. Which would you prefer?
+- E3#13:s3 [user] previous turn, system: How many tickets will you need? | turn: I need [[6]] tickets. Please give me the train details.
+- E3#13:s4 [user] previous turn, system: There are several college's in the centre. How about Saint Catharine's College? It is on King's Parade and has free admission. | turn: Thank you. I also need a train to London Kings cross, arriving by [[9]]
+- E3#13:s5 [system] previous turn, user: The train should leave after 13:45. | turn: There are [[107]] trains leaving after 13:45. If you give me your destination I can narrow down the choices.
+- E3#13:s6 [system] previous turn, user: I'll be going from cambridge to broxbourne. | turn: I have [[14]] trains that match your preferences, leaving one minute after the hour every hour starting at 05:01 and ending at 18:01. Which train would you like to book?
+- E3#13:s7 [user] previous turn, system: How many train tickets would you like to book? | turn: [[2]] please and I need a ref. number.
+- E3#13:s8 [user] previous turn, system: I'd be happy to make your reservation. What day and time would you like to make it for? | turn: I would like to book a table for [[3]] on Saturday at 13:30. Are there any trains that go to Broxbourne on Sunday?
+- E3#13:s9 [user] previous turn, system: TR1997 leaves Cambridge at 09:01 on Saturday and arrives in broxbourne at 10:01. Will that work for you? | turn: Great can you get me [[8]] tickets please?
+- E3#13:s10 [user] previous turn, system: TR3637 will arrive at 13:52 would that work? | turn: Yes, that's wonderful! I need [[5]] tickets please.
+- E3#13:s11 [system] previous turn, user: I want to go to Stevenage on Sunday. | turn: There are [[10]] trains departing Cambridge to Stevenage on Sunday. The first one leaves at 05:21. They run every two hours.
+- E3#13:s12 [system] previous turn, user: I am looking for a train that will depart from Norwich on Sunday | turn: There are trains every hour on the :[[16]] that will get you there by noon, beginning at 5:16. Which would you prefer?
+- E3#13:s13 [system] previous turn, user: Wednesday after 13:15 would be great. | turn: I have [[6]] trains leaving between 13:17 and 23:17. Would you like me to book a seat for you?
+- E3#13:s14 [system] previous turn, user: Travelling to Cambridge, I need to arrive by 14:45. | turn: We have [[9]] such trips. Any preference on leaving?
+- E3#13:s15 [user] previous turn, system: There are hourly trains on that route every day from 5:01. Do you know what day and time you'd like to travel? | turn: Oh, I need to leave on Tuesday and need to arrive in Broxbourne by 18:30. I need to book for [[5]], with a reference number please.
+
+Return the JSON object now.

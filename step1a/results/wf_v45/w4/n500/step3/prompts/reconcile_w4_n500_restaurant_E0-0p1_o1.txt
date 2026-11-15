@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#0/1: name: location part | description: location_part
+Examples:
+- 1 [system] previous turn, user: Actually, I would just like the address, postcode and phone number instead at this time. | turn: Here is that information,phone-01223302010 post code-cb11bg Address-183 [[East Road]] City Centre
+- 2 [system] previous turn, user: I'm also looking for info on a restaurant called pipasha. | turn: Pipasha is an expensive restaurant serving Indian food in the [[east part of town]]. Do you need more information?
+- 3 [system] previous turn, user: Hi, I am traveling to Cambridge and am looking forward to trying some local restaurants. Can you help me with a great place to dine? | turn: [[What area]] and what price range would you be interested in?
+- 4 [user] previous turn, system: Reference number is : EZ8L6J51. Anything else? | turn: are their any swimming pools in the [[east]]?
+- 5 [user] previous turn, system: I cannot complete this booking. Would you like to find another restaurant? | turn: That's disappointing. Is there anything else moderately priced in [[that area]]?
+
+Columns (5):
+- name: restaurant name | examples: restaurant; j restaurant; charlie chan
+- name: address | examples: jinling noodle bar; 68 histon road; taj tandoori
+- name: cuisine str | examples: chinese place; british
+- name: location area | examples: north part of town; north; north area
+- name: location | examples: cambridge; town; west
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#0/1", "reason": "str", "same_as": "<column name or none>"}

@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#20:s0": "P1", "E3#20:s1": "P2"}}
+
+Cluster E3#20 of entity E3 (mentions 32, distinct values 3).
+Examples:
+- E3#20:s0 [system] previous turn, user: The train should depart from cambridge and should go to peterborough, please. | turn: Train TR1492 departs from Cambridge at 10:34 on Sunday and arrives at [[Peterborough]] by 11:24. Would you like me to book you a ticket?
+- E3#20:s1 [user] previous turn, system: Okay, I've booked you at the Avalon. Your reference number is ZG7G439M. Can I further assist you? | turn: Yes, I need a train to [[peterbourough]] on Sunday.
+- E3#20:s2 [user] previous turn, system: Absolutely! The address is saint andrew's street. Postal code is cb23bu. Anything else I can help you with? | turn: Yes, I was also hoping to find a train to Cambridge from [[Petersborough]].
+- E3#20:s3 [system] previous turn, user: I need to get there by 21:30. | turn: There are 32 trains travelling to [[peterborough]] on Sunday departing from cambridge. The closest arrival time is 21:24, would you like to book a seat?
+- E3#20:s4 [user] turn: I am looking for a train. The train should depart from [[peterborough]] and should arrive by 13:00.
+- E3#20:s5 [system] previous turn, user: I'd like to leave after 09:00 and head to Peterborough. | turn: I have train TR3211 that leaves at 09:06 and will have you in [[Peterborough]] at 09:56. Would that work for you?
+- E3#20:s6 [user] previous turn, system: I sure can. Which stations will you be using? | turn: I need to get to Cambridge from [[Peterborough]] by 13:15 on the the same day as my reservation.
+- E3#20:s7 [system] previous turn, user: I will be leaving monday, it will be to Cambridge. | turn: TR1553 Leaves [[Peterborough]] Monday at 21:48 and arrives in Cambridge at 22:38. Would you like me to book that for you?
+- E3#20:s8 [user] turn: Good morning! I'm trying to buy a train ticket that goes from [[Peterborough]] to Cambridge. Can you help me do this?
+- E3#20:s9 [user] turn: I need to find a train that leaves [[peterborough]] on friday.
+- E3#20:s10 [user] previous turn, system: Your booking was successful! Your reference number is EV4ADBI9. | turn: I want a train that goes to [[peterborough]] and leaves after 13:00
+- E3#20:s11 [user] turn: I am traveling to [[peterborough]] and need to get there by 08:00.
+- E3#20:s12 [user] previous turn, system: Yes, Where will you be arrive from and going to? I also need a date and time. | turn: I want to go to [[peterborough]] and depart from cambridge.
+- E3#20:s13 [system] previous turn, user: I would like to leave on Tuesday. | turn: The TR0017 train leaves [[Peterborough]] at 16:48. Would you like me to book you a seat on it?
+- E3#20:s14 [user] previous turn, system: Thank you for waiting. Your reservation has been made. Your reference number is G9EWB5NN. Is there anything else I can help you with? | turn: I also need a train on Sunday from Cambridge to [[Peterborough]] leaving after 14:15.
+- E3#20:s15 [user] previous turn, system: This restaurant is of the moderate price range. Would you like to book a table? | turn: No thanks, but I do need some train info. I'll be leaving from [[Peterborough]] on Tuesday, sometime after 15:15.
+
+Return the JSON object now.

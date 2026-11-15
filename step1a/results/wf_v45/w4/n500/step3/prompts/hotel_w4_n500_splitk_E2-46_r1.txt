@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E2#46:s0": "P1", "E2#46:s1": "P2"}}
+
+Cluster E2#46 of entity E2 (mentions 8, distinct values 1).
+Examples:
+- E2#46:s0 [system] previous turn, user: That would be fine with me | turn: [[Lovell lodge]] does not have availability on Friday either. Would you like to try another guesthouse? Does the area matter? We could try kirkwood house, it is in the north.
+- E2#46:s1 [system] previous turn, user: Can you give me the postcode and star rating for Lovell Lodge and tell me if they have wifi? | turn: [[lovell lodge]] is in postcode area cb41sr, and is a 2 star location with free wifi.
+- E2#46:s2 [system] previous turn, user: I'm looking for a 2 star hotel in the north. | turn: I have two hotels meeting your criteria. Ashely Hotel located at 74 Chesterton road and [[Lovell Lodge]] located at 365 Milton road.
+- E2#46:s3 [system] previous turn, user: Yes, I would like a hotel in the north please. | turn: There are two hotels in the north, Ashley Hotel and [[Lovell Lodge]] which would you like?
+- E2#46:s4 [system] previous turn, user: Is there anything in the north? | turn: In the north, I have 2 places. The first is the Ashley Hotel and the other is the [[Lovell Lodge]]. Did you need me to book you a room?
+- E2#46:s5 [user] previous turn, system: Yes they are. | turn: Can you give me the postcode and star rating for [[Lovell Lodge]] and tell me if they have wifi?
+- E2#46:s6 [system] previous turn, user: Are there any other hotels available? | turn: How about we try the [[Lovell Lodge]], if that's okay?
+- E2#46:s7 [system] previous turn, user: Can you help me find a hotel in the north that includes free parking? | turn: There are two matching results for your needs. The Ashley Hotel and [[Lovell Lodge]].
+
+Return the JSON object now.

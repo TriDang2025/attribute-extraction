@@ -1,0 +1,66 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 21 of 27 (134 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+
+### E4#44  (mentions 10, distinct values 1, low confidence)
+Examples:
+- E4#44:0 [system] previous turn, user: I'm open to anything. Surprise me with your favorite please. Just make sure you tell me what kind of attraction it is. | turn: I'm a fan of [[Ballare]], it's a nightclub in the centre. Is there anything else I can help you with today?
+- E4#44:1 [system] previous turn, user: I think I would like a nightclub in the centre of town please. | turn: There are 5 different nightclubs in that area. Might I suggest [[Ballare]]. Would you like more info?
+- E4#44:2 [system] previous turn, user: I am looking for ballare. I need the area, attraction type and entrance fee | turn: [[Ballare]] is a nightclub in the center of town. There is a 5 pound entrance fee.
+- E4#44:3 [system] previous turn, user: I would like to go to a nice nightclub | turn: We have [[ballare]] that's night, it's in the city centre.
+- E4#44:4 [system] previous turn, user: I need to find a nightclub to visit while in town. | turn: Our night life is so much fun! How about [[ballare]] in the centre? Their phone number is 01223364222.
+
+### E4#62  (mentions 6, distinct values 4)
+Examples:
+- E4#62:0 [system] previous turn, user: I would like one with free admission. | turn: primavera has free admission. Their address is [[10 king s parade]]
+- E4#62:1 [system] previous turn, user: maybe, give me the address of one please | turn: There are several college's in the centre. How about Saint Catharine's College? It is on [[King's Parade]] and has free admission.
+- E4#62:2 [system] previous turn, user: Do you have any other suggestions? | turn: You should check out Primavera. The phone number is 01223357708. It is at [[10 King's Parade]] and the postcode is cb21sj.
+- E4#62:3 [system] previous turn, user: Thanks, what's their phone number and address? | turn: They are located at [[14 King's Parade]]. You can reach them at 01223464646. Anything else I can help with?
+- E4#62:4 [system] previous turn, user: Yes, what is the museum address and phone number? I am also curious about the entrance fee, please. | turn: The phone number is 01223357708. Its address is [[10 king s parade]]. It is free to visit. Anything further you need help with today?
+
+### E4#13  (mentions 3, distinct values 1)
+Examples:
+- E4#13:0 [system] previous turn, user: I'm looking for information on Broughton house gallery. | turn: Certainly! It's a museum in the centre at [[98 king street]] cb11ln with free entrance. Their phone number is 01223314960. May I help find anything else?
+- E4#13:1 [system] previous turn, user: Can I get a postcode, entrance fee, and address of one of them? | turn: The Broughton House Gallery is located at [[98 King Street]], cb11ln. Their phone number is 01223314960, and it's free to get in.
+- E4#13:2 [system] previous turn, user: Something in the centre of town. Do you have any suggestions for a museum maybe? | turn: I'd suggest broughton house gallery on [[98 king street]], cb11ln. Anything else?
+
+### E4#120  (mentions 1, distinct values 1)
+Examples:
+- E4#120:0 [system] previous turn, user: I'm looking for cafe uno, can you help me find where it is? | turn: Absolutely! Caffe uno is located at [[32 Bridge Street]] City Centre.
+
+### E4#64  (mentions 1, distinct values 1)
+Examples:
+- E4#64:0 [system] previous turn, user: Can I have their phone number and address? Also, are there any trains that go from Peterborough to Cambridge? | turn: sure no problem. Address is [[11 Peas Hill City Centre]] and phone number is 01223566188. Would you like to book a reservation?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#44, E4#62, E4#13, E4#120, E4#64) and its name as the value, like {"E4#44": "<name>"}.

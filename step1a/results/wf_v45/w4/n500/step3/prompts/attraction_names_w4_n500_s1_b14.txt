@@ -1,0 +1,70 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 14 of 27 (134 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+
+### E4#45  (mentions 4, distinct values 3)
+Examples:
+- E4#45:0 [system] previous turn, user: I need the address, entrance fee, and phone number. | turn: The address of Ballare is [[heidelberg gardens]], lion yard. The phone number is 01223364222. The entrance fee is 5 pounds.
+- E4#45:1 [system] previous turn, user: Great, thank you. I am looking for some sort of entertainment in the Centre, maybe a park. Can you help me with that? | turn: I can I've found [[botanic gardens]] in the centre area postcode is cb21jf and has an entrance fee of 4 pounds. will there be anything else?
+- E4#45:2 [system] previous turn, user: Perhaps. I'm also looking for a place to go.. maybe a park in the centre? | turn: We have [[cambridge university botanic gardens]]. Could you like more information on them?
+- E4#45:3 [system] previous turn, user: Okay, what is the address and entrance fee for it? | turn: Ballare is [[Heidelberg Gardens]], Lion Yard, postcode cb23na and the entrance fee is 5 pounds. Is there anything else I can help you with?
+
+### E4#46  (mentions 3, distinct values 2)
+Examples:
+- E4#46:0 [system] previous turn, user: I need the address, entrance fee, and phone number. | turn: The address of Ballare is heidelberg gardens, [[lion yard]]. The phone number is 01223364222. The entrance fee is 5 pounds.
+- E4#46:1 [system] previous turn, user: Yes I would like more information on both museums. | turn: saint barnabas press gallery is located in the [[belfast yard]], coldham's road , cb13ew and gallery at twelve a high street is at fulbourn,cb15dh
+- E4#46:2 [system] previous turn, user: Okay, what is the address and entrance fee for it? | turn: Ballare is Heidelberg Gardens, [[Lion Yard]], postcode cb23na and the entrance fee is 5 pounds. Is there anything else I can help you with?
+
+### E4#84  (mentions 5, distinct values 3)
+Examples:
+- E4#84:0 [user] previous turn, system: Unfortunately, we do not have information on several of them. But, Byard Art, Wandlebury Country Park, and Sheep's Green and Lammas Land Park are all free admission attractions. | turn: How about the postcode and attraction type for [[Byard Art]]?
+- E4#84:1 [system] previous turn, user: Yes, could you help me find a nice museum to visit. | turn: There's the [[byard art museum]]. It's in the same area and is free.
+- E4#84:2 [system] previous turn, user: Can you recommend any good museums there? | turn: [[The byard art]] is the only museum in the south and the entrance fee is free.
+- E4#84:3 [system] previous turn, user: Could you give me a recommendation? | turn: I would suggest [[byard art]].
+- E4#84:4 [system] previous turn, user: no, not really. What are entrance fees on the 8 attractions? | turn: Unfortunately, we do not have information on several of them. But, [[Byard Art]], Wandlebury Country Park, and Sheep's Green and Lammas Land Park are all free admission attractions.
+
+### E4#61  (mentions 2, distinct values 1)
+Examples:
+- E4#61:0 [system] previous turn, user: I would like to visit a nice museum. Please give me the address, entrance fee and phone number. | turn: How about the castle galleries? They are located at unit su43, [[grande arcade]], saint andrews street. Phone number is 01223307402. Admission is free.
+- E4#61:1 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend Castle Galleries, phone number 01223307402, postal code cb23bj, address unit su43, [[grande arcade]], saint andrews street. It is free.
+
+### E4#70  (mentions 6, distinct values 2)
+Examples:
+- E4#70:0 [system] previous turn, user: I am looking for an attraction called great saint mary's church. | turn: [[great saint mary]]'s church is at Market Square, their phone number is 01223350914, and their postcode is cb23pq. Do you need any more information?
+- E4#70:1 [system] previous turn, user: I want to go to a particular attraction called great saint mary's church. Where is it? | turn: [[The great saint mary]]'s church is in city centre, the entrance fee is 2 pounds. Would you like more information?
+- E4#70:2 [user] turn: I'm planning a trip to Cambridge and I would like some information on [[great saint mary]]'s church. Where exactly is it located?
+- E4#70:3 [system] previous turn, user: As long as it is in the same area it doesn't matter, please recommend one. I want its postcode and entrance fee as well | turn: I recommend [[great saint mary]]'s church. Its postcode is cb23pq and the entrance fee is 2 pounds.
+- E4#70:4 [user] turn: I want to go to a particular attraction called [[great saint mary]]'s church. Where is it?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#45, E4#46, E4#84, E4#61, E4#70) and its name as the value, like {"E4#45": "<name>"}.

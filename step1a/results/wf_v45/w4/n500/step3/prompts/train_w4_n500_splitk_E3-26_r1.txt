@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#26:s0": "P1", "E3#26:s1": "P2"}}
+
+Cluster E3#26 of entity E3 (mentions 42, distinct values 5).
+Examples:
+- E3#26:s0 [system] previous turn, user: Depart from cambridge and arriving by 0930 please | turn: TR8042 will depart cambridge Sunday at 8:11 and arrive in [[Kings Lynn]] at 8:58. How many tickets would you like to book?
+- E3#26:s1 [user] previous turn, system: I'll be glad to help with that. Where would you like to depart from and arrive at? | turn: I need to depart from [[london kings cross]] and go to cambridge.
+- E3#26:s2 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: ...riday 09:11 09:58 9.80 pounds 47 minutes TR1958 kings lynn cambridge friday 10:11 10:58 9.80 pounds 47 minutes TR3147 kings lynn cambridge friday 11:11 11:58 9.80 pounds 47 minutes TR6454 [[kings lynn cambridge]] friday 12:11 12:58 9.80 pounds 47 minutes TR0674 kings lynn cambridge friday 13:11 13:58 9.80 pounds 47 minutes
+- E3#26:s3 [user] previous turn, system: Just to clarify a train from Cambridge, correct? Where will it be to and what date & time? | turn: I'm going to London's [[Kings Cross]] on Monday.
+- E3#26:s4 [user] previous turn, system: Where would you be departing from? | turn: I'll be leaving from [[King's Lynn]] and I need to get to Cambridge by 8:45.
+- E3#26:s5 [user] previous turn, system: Cafe Jello postcode is cb30af. Kettle's yard is cb30aq. | turn: I will need to know the entrance fee as well. Once I get that I also need help finding a train leaving Cambridge to [[kings lynn]] after 16:45.
+- E3#26:s6 [user] previous turn, system: Sure. Were you interested in club salsa or the fez club? | turn: I think Club Salsa would be perfect. I am also looking for a train to depart from Cambridge and go to [[London Kings Cross]].
+- E3#26:s7 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: these are the possible options trainID departure destination day leaveAt arriveBy price duration book (optional) TR1612 [[kings lynn cambridge]] friday 09:11 09:58 9.80 pounds 47 minutes TR1958 kings lynn cambridge friday 10:11 10:58 9.80 pounds 47 minutes TR3147 kings lynn cambridge friday 11:11 11:58 9.80 pounds 47 minutes TR645...
+- E3#26:s8 [system] previous turn, user: Yes, I need 4 tickets please. Please send me the reference number. | turn: Your tickets have been reserved, and just to clarify, that train departs at 07:00, and arrives in London, [[Kings Cross]] at 07:51. Wouldn't want you to miss the train! Ref#: AQDCG6N8
+- E3#26:s9 [user] turn: I need to find a train out of [[King's Lynn]] that will arrive by 17:45.
+- E3#26:s10 [user] previous turn, system: and where would you like to go? | turn: I would like to go to [[Kings Lynn]], please.
+- E3#26:s11 [user] previous turn, system: Sure! The phone number is 01223259988. The address is Doubletree by Hilton Cambridge Granta Place Mill Lane postcode cb21rt. Is there anything else I can help you with? | turn: Yes I need a train for Thursday that leaves [[London Kings Cross]] and arrives in Cambridge by 14:00.
+- E3#26:s12 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: ...ese are the possible options trainID departure destination day leaveAt arriveBy price duration book (optional) TR1612 kings lynn cambridge friday 09:11 09:58 9.80 pounds 47 minutes TR1958 [[kings lynn cambridge]] friday 10:11 10:58 9.80 pounds 47 minutes TR3147 kings lynn cambridge friday 11:11 11:58 9.80 pounds 47 minutes TR6454 kings lynn cambridge friday 12:11 12:58 9.80 pounds 47 minutes TR067...
+- E3#26:s13 [system] previous turn, user: I am looking for a train departing from Cambridge leaving on Tuesday. | turn: I have trains departing long [[kings cross]] to cambridge on Tuesday every two hours starting at 5:00, would you like to make a reservation?
+- E3#26:s14 [user] previous turn, system: Certainly. Where will you be leaving from and on what day? | turn: I'm coming from Cambridge and would like to arrive at [[Kings Lynn]] by 8 p.m. Monday.
+- E3#26:s15 [system] previous turn, user: okay well then do so, I don't have all day | turn: Actually, Train TR2471 leaves [[London Kings Cross]] at 23:17 at a cost of 23.60 pounds. I have booked one seat, reference number XNIAW5CW.
+
+Return the JSON object now.

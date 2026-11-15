@@ -1,0 +1,65 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 23 of 27 (134 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+
+### E4#51  (mentions 1, distinct values 1)
+Examples:
+- E4#51:0 [system] previous turn, user: I am looking for a park in the south. Any available that you could give me the postcode, entrance fee's if any and the address please? | turn: There are two parks that fit your description. Both are free. May I recommend Wandlebury country park located wandlebury ring, [[gog magog hills]], babraham? Postalcode is cb223ae.
+
+### E4#113  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E4#113:0 [user] previous turn, system: A table is booked for Saturday for 15:45 at 8 and for 8 people. Reference number is B00KVHN | turn: I'm also looking for a place called cambridge and [[country folk museum]].
+- E4#113:1 [system] previous turn, user: I'm also looking for a place called cambridge and country folk museum. | turn: [[The Cambridge and Country folk museum]] is located in the west. It has an entrance fee of 3.50 pounds. Can I tell you anything else about it?
+
+### E4#94  (mentions 3, distinct values 2)
+Examples:
+- E4#94:0 [system] previous turn, user: I don't have a preference. Can you recommend one and provide me some information on it? | turn: The first one on my list is [[adc theatre]] located on park street. I need some more information on your preferences
+- E4#94:1 [system] previous turn, user: ADC Theatre will work. Can you tell me what part of town that is in? | turn: [[The ADC Theatre]] is in the center of town.
+- E4#94:2 [system] previous turn, user: I need a theatre in the centre of town. | turn: I found four theaters. Would you like to try the [[ADC Theatre]]?
+
+### E4#96  (mentions 13, distinct values 3)
+Examples:
+- E4#96:0 [system] previous turn, user: How would I find TR6247 in Cambridge? | turn: Sorry for the mix-up the full address for [[Addenbrookes Hospital]] is (including postcode): Hills Rd, Cambridge, CB20QQ and their number is 01223245151. Can I help with anything else?
+- E4#96:1 [system] previous turn, user: Yes please. Can you tell me where Addenbrookes Hospital is? | turn: [[Addenbrookes]] is located on HIlls Rd, Cambridge. Do you also need the postcode or phone number?
+- E4#96:2 [system] previous turn, user: Hi, I am looking for a hospital that offers medicine for the elderly | turn: [[Addensbrookes Hospital]] offers medicine for the elderly. Would you like more information about it?
+- E4#96:3 [user] turn: I am looking for the [[Addenbrookes Hospital]] with hepatology department
+- E4#96:4 [system] previous turn, user: I'm hurt and I need the nearest hospital. | turn: The nearest hospital is [[Addenbrookes Hospital]].
+
+### E4#50  (mentions 3, distinct values 2)
+Examples:
+- E4#50:0 [system] previous turn, user: I am looking for a park in the south. Any available that you could give me the postcode, entrance fee's if any and the address please? | turn: There are two parks that fit your description. Both are free. May I recommend [[Wandlebury country park]] located wandlebury ring, gog magog hills, babraham? Postalcode is cb223ae.
+- E4#50:1 [system] previous turn, user: I am looking for a park in the south. Any available that you could give me the postcode, entrance fee's if any and the address please? | turn: There are two parks that fit your description. Both are free. May I recommend Wandlebury country park located [[wandlebury ring]], gog magog hills, babraham? Postalcode is cb223ae.
+- E4#50:2 [system] previous turn, user: no, not really. What are entrance fees on the 8 attractions? | turn: Unfortunately, we do not have information on several of them. But, Byard Art, [[Wandlebury Country Park]], and Sheep's Green and Lammas Land Park are all free admission attractions.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#51, E4#113, E4#94, E4#96, E4#50) and its name as the value, like {"E4#51": "<name>"}.

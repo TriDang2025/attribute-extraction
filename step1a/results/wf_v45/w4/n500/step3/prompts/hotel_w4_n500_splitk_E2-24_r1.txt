@@ -1,0 +1,24 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E2#24:s0": "P1", "E2#24:s1": "P2"}}
+
+Cluster E2#24 of entity E2 (mentions 9, distinct values 4).
+Examples:
+- E2#24:s0 [system] previous turn, user: I would also like to book at a guest house named Aylesbray Lodge, starting Monday. | turn: I'm starting to book your reservation at [[Aylesbray Lodge]] starting on Monday, how many days will you be staying?
+- E2#24:s1 [user] previous turn, system: The booking was successful and your reference number is 2KELM023. | turn: i am also looking for a hotel called [[aylesbray lodge guest house]].
+- E2#24:s2 [user] turn: I am looking for a hotel named [[alyesbray lodge guest house]].
+- E2#24:s3 [system] previous turn, user: Thank you! I'm also looking for a hotel called aylesbray lodge guest house. | turn: [[The aylesbray guest house]] is a 4 start guest house located in the south area of town and it is moderate in price.
+- E2#24:s4 [system] previous turn, user: I need it for 3 nights starting Thursday. There will be 5 of us. | turn: You're all set I've booked the [[Aylesbray lodge]] guesthouse for 3 nights 5 people starting Thursday. Your reference # is DTX3QITL. Is there anything else I can help you with?
+- E2#24:s5 [user] previous turn, system: The postcode is cb21dq, and the address is regent street. | turn: Thank you! I'm also looking for a hotel called [[aylesbray lodge guest house]].
+- E2#24:s6 [system] previous turn, user: Yes. Please book 4 people for 5 nights starting thursday. | turn: I was able to get a room for you at [[aylesbray lodge]]. Your reference number is bb07ctao. Anything else?
+- E2#24:s7 [system] previous turn, user: Somewhere South, mid price range and preferably a guesthouse type of hotel. | turn: I've found the [[aylesbray lodge guest house]]. It has a moderate price and 4 stars. It offers free internet and parking. Shall I book it for you?
+- E2#24:s8 [user] previous turn, system: the postcode is cb11pt | turn: I would also like to book at a guest house named [[Aylesbray Lodge]], starting Monday.
+
+Return the JSON object now.

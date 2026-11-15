@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#6:s0": "P1", "E3#6:s1": "P2"}}
+
+Cluster E3#6 of entity E3 (mentions 30, distinct values 2).
+Examples:
+- E3#6:s0 [system] previous turn, user: Yes, on Thursday, arriving by around 17:45. | turn: How about the TR1596 train? It leaves [[Stevenage]] at 15:54 and arrives in Cambridge at 16:43.
+- E3#6:s1 [user] previous turn, system: Your booking at the Allenbell was successful. Your reference number is PV039AJH. | turn: I also need a train from [[Stevanage]] to Cambridge.
+- E3#6:s2 [user] previous turn, system: Most are free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50 pound fee, and Trinity has a 1 pound fee. | turn: I need a train that leaves at 20:45 from [[stevenage]] to cambridge
+- E3#6:s3 [user] previous turn, system: Where are you departing from? | turn: I'm departing from [[Stevenage]] on Thursday.
+- E3#6:s4 [user] previous turn, system: Yes. Can you help me narrow down the choices with a day to leave and destination? | turn: I'm looking for one that goes to [[Stevenage]] on Saturday.
+- E3#6:s5 [user] previous turn, system: Where will you be departing from and what will be your departing time? | turn: I need to get to Cambridge by 09:00 on Sunday. I'll be leaving from [[Stevenage]].
+- E3#6:s6 [system] previous turn, user: Can I catch a train to Stevenage? | turn: Yes, TR2515 departs on friday at 05:21 to [[stevenage]], would you like me to book it?
+- E3#6:s7 [system] previous turn, user: I'll be leaving from cambridge. | turn: TR4765 will arrive in [[stevenage]] by 18:10 on Thursday, do you want to book a ticket?
+- E3#6:s8 [user] previous turn, system: Where will you be headed? | turn: I need arrive in [[stevenage]] by 15:00.
+- E3#6:s9 [system] previous turn, user: I would like to leave on Sunday and arrive by 18:45. I need tickets for 8 people. Could you make the reservation and provide a reference number? | turn: I can get you on TR0523 arriving at [[Stevenage]] by 14:10. How many tickets will you need?
+- E3#6:s10 [user] previous turn, system: Your booking was successful. Your table will be reserved for 15 mins. Reference number is : XLKZ4515. Anything else I can do for you? | turn: I also need a train departing from cambridge going to [[stevenage]] leaving on Saturday after 19:45
+- E3#6:s11 [user] turn: I need to book a train to cambridge from a train leaving from [[stevenage]].
+- E3#6:s12 [system] previous turn, user: I want to go to Stevenage on Sunday. | turn: There are 10 trains departing Cambridge to [[Stevenage]] on Sunday. The first one leaves at 05:21. They run every two hours.
+- E3#6:s13 [user] previous turn, system: Booking was successful. The table will be reserved for 15 minutes. Reference number is : 51VEERAC. | turn: I also need a train to Cambridge departing from [[Stevenage]].
+- E3#6:s14 [system] previous turn, user: Wednesday, and I would like to be there by 08:00. | turn: Yes, you'll want to take TR9448. It will leave [[Stevenage]] at 5:54 and arrive by 06:43.
+- E3#6:s15 [user] previous turn, system: OK, I'll be here! | turn: I'm sorry, I lied about having a wife. I just need to know if there are any trains to [[stevenage]] available on monday.
+
+Return the JSON object now.

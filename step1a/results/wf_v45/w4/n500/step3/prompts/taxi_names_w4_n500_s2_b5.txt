@@ -1,0 +1,74 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 5 of 16 (80 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E1#17  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E1#17:0 [user] previous turn, system: Certainly. What time would you like the taxi to arrive and for how many people? | turn: [[a taxi]] that arrives by 15:00, the taxi is just for me
+- E1#17:1 [system] previous turn, user: Yes please, I need to book a taxi to the restaurant from the hotel for the dinner reservation. | turn: Ok, a grey honda will pick you up at the hamilton lodge in time to arrive at restaurant alimentum for your 10:00 reservations. [[Taxi contact number]] is 07242149665. Anything else?
+- E1#17:2 [user] previous turn, system: Certainly. What time would you like the taxi to arrive and for how many people? | turn: a taxi that arrives by 15:00, [[the taxi]] is just for me
+
+### E1#22  (mentions 7, distinct values 6, low confidence)
+Examples:
+- E1#22:0 [system] previous turn, user: I will be needing to leave the hotel by 16:45. Can you arrange that? | turn: Certainly! I have booked you with a [[red skoda]], whose contact number is 07790176286. Is there anything else I can help you with?
+- E1#22:1 [system] previous turn, user: I need picked up at the hotel by 9:15 please. | turn: Your taxi is booked. Look for a [[blue ford]], their contact number is 07211297115. Is there anything else I can help you with?
+- E1#22:2 [system] previous turn, user: Great! I'll also be needing a taxi. Will you book one that will leave the college at 5:45? I'd also like the car type and their contact number. | turn: You got it, I booked a [[red tesla]] for you. The contact number is 07757471475
+- E1#22:3 [system] previous turn, user: Leaving from travelers rest | turn: Booking completed! Booked car type : [[white ford]] Contact number : 07267142867
+- E1#22:4 [system] previous turn, user: I would like to go to Christ's College, please. | turn: Booking completed! Booked car type : [[white skoda]] Contact number : 07192870240
+- E1#22:5 [system] previous turn, user: No, but I do need some information about a taxi between the two places. I'd like to leave the hotel by 16:30. | turn: OK, I have booked you a taxi per your requested, the contact number is 07831714545, it will be a [[white tesla]] picking you up.
+- E1#22:6 [system] previous turn, user: I need to get there by 1:30. | turn: Booking completed! Booked car type : [[red skoda]] Contact number : 07852042631
+
+### E1#37  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E1#37:0 [user] previous turn, system: Glad to be of assistance, have a great day! | turn: Thanks, take care [[buddy]]!
+- E1#37:1 [user] previous turn, system: You did not read the directions of this hit. There is no Tampa bay area. Please read the directions next time. | turn: i'm sorry, [[dude]]. i'm from florida so i'm not very smart. i'm trying to get from cambridge to stevenage.
+
+### E1#27  (mentions 3, distinct values 2, low confidence)
+Examples:
+- E1#27:0 [user] previous turn, system: Okay, great. And where will you be traveling to and from? | turn: The pick up place will be wandlebury country park and the drop off at [[curry prince]]
+- E1#27:1 [system] previous turn, user: What about a restaurant that serves just indian food? | turn: How does the [[Curry Garden]] sound?
+- E1#27:2 [user] previous turn, system: The price range is moderate. | turn: Thanks! Now, can I get a taxi from the Cambridge Belfry to the [[Curry Prince]]? I need to leave the hotel by 4:00.
+
+### E1#7  (mentions 10, distinct values 5)
+Examples:
+- E1#7:0 [user] previous turn, system: You're all set with your booking with the taxi. Would you like a restaurant in the area for you as well? | turn: No, but you know what? We should probably have the car pick me up at the [[college]] at 2:15 p.m. instead.
+- E1#7:1 [user] previous turn, system: Okay! Just to clarify, from where will you be departing? | turn: I am so sorry. I don't know where my head has been. I need to leave the hotel by 13:30, going to [[Christ's College]].
+- E1#7:2 [user] previous turn, system: I can definitely help you with that. Where will you be departing from? | turn: I will be departing from [[jesus college]].
+- E1#7:3 [user] previous turn, system: Yes, they had a table available and I went ahead and booked it for you. Your reference number is HXSPEY9N. What else can I do for you? | turn: I'll need a taxi to get me from [[downing college]] to pizza express by 17:45. can you set that up for me?
+- E1#7:4 [user] turn: I need to book a taxi from [[Kings college]] to Pizza express Fen Ditton sometime after 17:15. I need the car type and contact number please.
+- E1#7:5 [user] previous turn, system: The address of hughes hall is wollaston road. | turn: I also need a taxi to get from [[college]] to the restaurant. I need to arrive by 14:45.
+- E1#7:6 [user] previous turn, system: Okay and what is the destination please? | turn: I would like to go to [[Christ's College]], please.
+- E1#7:7 [user] previous turn, system: We can make that happen, but first I'll need to know your departure and destination locations. | turn: I will be going to [[Jesus College]] from the Nirala.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#17, E1#22, E1#37, E1#27, E1#7) and its name as the value, like {"E1#17": "<name>"}.

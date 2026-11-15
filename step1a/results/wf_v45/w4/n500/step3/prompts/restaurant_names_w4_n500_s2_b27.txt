@@ -1,0 +1,67 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 27 of 32 (157 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E0#138  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E0#138:0 [system] previous turn, user: What about an expensive restaurant in the centre? | turn: Sure I have many types of cuisine to choose from: [[African]], French, Asian Oriental, British, European..any preference?
+- E0#138:1 [user] previous turn, system: What type of food would you like to eat? | turn: I would love to try some [[African food]].
+
+### E0#141  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#141:0 [user] turn: Hello. I'm trying to find an inexpensive restaurant that serves [[Moroccan food]]. Can you help me?
+
+### E0#136  (mentions 3, distinct values 1)
+Examples:
+- E0#136:0 [system] previous turn, user: I'm looking for a restaurant called saffron brasserie. | turn: There is a [[Saffron Brasserie]] in the centre. It is an expensive Indian place. Would you like the phone number?
+- E0#136:1 [user] previous turn, system: Booking was successful. Your reference number is : 5Z9LQBDL. Did you need anything else today? | turn: I'm looking for a restaurant called [[saffron brasserie]].
+- E0#136:2 [system] previous turn, user: Yes, please. I'd also like to know what area of town it's in and what type of food it serves. | turn: [[Saffron Brasserie]] is in the center of town, and it's an expensive Indian restaurant. Their phone number is 01223354679. Would you like to make a reservation?
+
+### E0#102  (mentions 6, distinct values 2)
+Examples:
+- E0#102:0 [user] previous turn, system: fitzbillies restaurant, the cambridge chop house, and midsummer house restaurant. do any of those interest you? | turn: [[Fitzbillies]] will be fine. Can I get the contact information, please?
+- E0#102:1 [system] previous turn, user: No, but I want the most expensive one. | turn: I would suggest [[Fitzbillies Restaurant]]. Would you like me to book a table now?
+- E0#102:2 [user] previous turn, system: I have your reservation for tuesday at 17:00 with 5 people, your reference number is UAZUXKIR. Can I help you with anything else? | turn: Since I'll already be in town, I'd like to check out some colleges in the same area as the [[Fitzbillies]]
+- E0#102:3 [system] previous turn, user: I apologize, disregard what was said before, I will actually just need the expensive british ones, in the centre area | turn: [[fitzbillies restaurant]], the cambridge chop house, and midsummer house restaurant. do any of those interest you?
+- E0#102:4 [user] previous turn, system: I have 3 places to choose from. All are expensive. I have Fitzbillies, The Cambridge Chop House and Midsummer House Restaurant. Can I reserve a table for you? | turn: [[Fitzbillies]] sounds unique, can you book me for 5 people at 17:00 on tuesday?
+
+### E0#48  (mentions 6, distinct values 2)
+Examples:
+- E0#48:0 [system] previous turn, user: Chinese would be great. I would prefer it be in the centre. | turn: There are 4 that match your criteria. I just love the [[Ugly Duckling]], would you like to reserve a table there, or keep looking?
+- E0#48:1 [system] previous turn, user: Is the restaurant moderately priced? If so, please book a table for 5 at 18:00 and send me the reference number. | turn: No, I'm sorry [[the ugly duckling]] is in the expensive price range. The copper kettle serves british food and is moderately priced. Would you like a reservation for it?
+- E0#48:2 [system] previous turn, user: I also would like to find a chinese restaurant in the centre. | turn: What's your price range? I recommend the [[Ugly Duckling]], but it's expensive. Charlie Chan is a good, cheap place, and Lan Hong House is in the middle, price-wise.
+- E0#48:3 [system] previous turn, user: I would like it be located in the Centre area. I like expensive chinese food. | turn: I have 4 different restaurants. If you would like a recommendation, [[The Ugly Duckling]] is often known as the best in town.
+- E0#48:4 [system] previous turn, user: Yes that would be great. I am also looking for a place to dine for the night. Do you have any suggestions? | turn: My recommendation would be the [[Ugly Duckling]], a Chinese restaurant in the centre of town. It is located at 12 St. Johns Street City Centre.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#138, E0#141, E0#136, E0#102, E0#48) and its name as the value, like {"E0#138": "<name>"}.

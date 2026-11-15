@@ -1,0 +1,67 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E2: batch 12 of 15 (74 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E2#44  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E2#44:0 [system] previous turn, user: What are my options on the west side of town? | turn: [[Just one]], the Hobsons House is available.
+- E2#44:1 [system] previous turn, user: I do not. Are any of those places located in the centre? | turn: [[Only one]] is located in the centre. The cityroomz which also has free wifi. Would you be interested in booking this hotel?
+
+### E2#67  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E2#67:0 [user] turn: [[I meed]] a moderately priced place to stay.
+- E2#67:1 [user] previous turn, system: I have 7 moderately priced guesthouses and 2 moderately priced hotels in the north, all with free parking. | turn: Great! [[Id]]'s like information on one of the hotels please.
+
+### E2#73  (mentions 1, distinct values 1)
+Examples:
+- E2#73:0 [system] previous turn, user: I need a french restaurant in the same area as well. | turn: There's one restaurant called [[Cote]], but it's expensive. Would this be fine?
+
+### E2#49  (mentions 3, distinct values 2)
+Examples:
+- E2#49:0 [system] previous turn, user: I would like it to be cheap. | turn: I have one listing for [[rosa]]'s bed and breakfast, would you like other information or like me to make a booking?
+- E2#49:1 [system] previous turn, user: Not really. Would you see if the highest rated, least expensive guesthouse has rooms for 5 nights for 6 people, beginning Wednesday? | turn: I was able to book [[Rosa's Bed and Breakfast]] for you for 5 nights for 6 people starting on Wednesday. The reference number is RTITW2L5.
+- E2#49:2 [system] previous turn, user: Yes, I would also like free parking and prefer a guesthouse. | turn: I found [[Rosa]]'s Bed and Breakfast matching your request. Would you like me to book that for you now?
+
+### E2#36  (mentions 16, distinct values 3)
+Examples:
+- E2#36:0 [system] previous turn, user: I didn't. Are any of them in the moderate price range? | turn: I have 3 guesthouses available. The Bridge Guest House is in the south. The Hamilton Lodge is in the north. And the [[Hobsons House]] is in the west.
+- E2#36:1 [system] previous turn, user: The hotel should be of the guesthouse type and should be located in the west area. | turn: [[The Hobsons House]] is a guesthouse that is available. Would you like any additional information?
+- E2#36:2 [system] previous turn, user: What are my choices for a moderately priced hotel in the west please? | turn: [[The Hobsons House guesthouse]] is in the west and is moderately priced. They are a 3 star establishment offering free wifi and parking. Would you like to make a reservation?
+- E2#36:3 [system] previous turn, user: A three star would be OK as long as it's got free parking. | turn: There are 3 moderately priced guesthouses with a 3 star rating that offers parking. They are the Bridge Guest House, Hamilton Lodge and [[Hobsons House]].
+- E2#36:4 [system] previous turn, user: What are my options on the west side of town? | turn: Just one, the [[Hobsons House]] is available.
+- E2#36:5 [system] previous turn, user: Yes, please find another moderate guesthouse with free parking and wifi to book. | turn: I'm sorry, I have tried the [[Hobsons House]] and The acorn guest house for 3 nights. Could you possibly book a different day to check in?
+- E2#36:6 [system] previous turn, user: I also need information on a hotel called hobsons house. | turn: [[Hobsons House]] if a guesthouse located in the west and is moderately priced. It has a 3 star rating and is located at 96 Barton Rd. Book it for you?
+- E2#36:7 [system] previous turn, user: I think I would prefer the Hobsons House. Can I get the postcode and phone number? | turn: The address for [[Hobsons House]] is 96 Barton Road and the postcode is cb39lh, would you like me to book a reservation?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E2#44, E2#67, E2#73, E2#49, E2#36) and its name as the value, like {"E2#44": "<name>"}.

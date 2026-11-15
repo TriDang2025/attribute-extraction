@@ -1,0 +1,67 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 14 of 32 (157 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E0#70  (mentions 19, distinct values 6)
+Examples:
+- E0#70:0 [system] previous turn, user: Yes - are there any indian restaurants in town? Something moderately priced? | turn: There are 4 such restaurants. I recommend [[curry prince]].
+- E0#70:1 [system] previous turn, user: I need an indian restaurant in the centre. | turn: [[Curry garden]] has good reviews and serves Indian food in the centre of town.
+- E0#70:2 [system] previous turn, user: What type of restaurants are located in the city centre? | turn: I'm so sorry, I was mistaken, there are several expensive Indian restaurants in the centre of town. May I recommend [[Curry Queen]], at 106 Mill Road?
+- E0#70:3 [system] previous turn, user: Okay, then try a different price range. | turn: I apologize. We in fact have six expensive Indian restaurants in the center. [[The Curry Garden]] is a fave, would you like me to see if they have a table available?
+- E0#70:4 [user] previous turn, system: Yes sure. The Curry Prince's telephone number is 01223566388. And their address and postcode are 451 Newmarket Road Fen Ditton cb58jj. | turn: What is the price range for [[The Curry Prince]]?
+
+### E0#93  (mentions 9, distinct values 3)
+Examples:
+- E0#93:0 [system] previous turn, user: I don't care what part of town it is in, I will need the postcode though. | turn: The restaurant [[Yu Garden]] has a postcode of cb58pa. Can I help you with anything else today?
+- E0#93:1 [system] previous turn, user: Are there any moderately priced restaurants near the botanic gardens? | turn: There are 4 moderately priced British restaurants in the same area as the [[botanic gardens]].
+- E0#93:2 [system] previous turn, user: I would like a Chinese restaurant the is expensive. | turn: [[The Yu Garden]] is highly recommended, shall I book a table for you?
+- E0#93:3 [user] previous turn, system: Cafe jello gallery postcode is cb30af and the entrance is free, is there anything else I can do for you? | turn: I am also looking for the restaurant [[Yu Garden]].
+- E0#93:4 [user] previous turn, system: Of course. The address listed is bateman street. | turn: Are there any moderately priced restaurants near the [[botanic gardens]]?
+
+### E0#133  (mentions 2, distinct values 2)
+Examples:
+- E0#133:0 [system] previous turn, user: I need a restaurant that serves Thai food, that is expensive and is in Cambridge please | turn: Bangkok City is located at [[24 Green Street]] City Centre. Their number is 01223354382
+- E0#133:1 [system] previous turn, user: I'm not ready to reserve a table just yet, but could you give me the address, phone, and postcode for The Slug and Lettuce, just because its name is so awesome? | turn: Their address is [[34 - 35 Green Street]], cb23ju. There is no phone number listed. I can reserve a table for you if you'd like.
+
+### E0#130  (mentions 2, distinct values 2)
+Examples:
+- E0#130:0 [system] previous turn, user: I'm looking for a restaurant in Cambridge called Nandos City Centre. | turn: Nandos city centre is located at [[33-34 Saint Andrews Street]].
+- E0#130:1 [system] previous turn, user: Yes, I'd like to find a Japanese place in the centre. | turn: There is wagamama in [[36 Saint Andrews Street]], would you like me to book for you?
+
+### E0#49  (mentions 2, distinct values 2)
+Examples:
+- E0#49:0 [system] previous turn, user: I love pizza that will work can I get the address? | turn: The address to Don Pasquale Pizzeria is [[12 Market Hill]] at City Centre. Would you like the phone number too?
+- E0#49:1 [system] previous turn, user: Yes that would be great. I am also looking for a place to dine for the night. Do you have any suggestions? | turn: My recommendation would be the Ugly Duckling, a Chinese restaurant in the centre of town. It is located at [[12 St. Johns Street]] City Centre.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#70, E0#93, E0#133, E0#130, E0#49) and its name as the value, like {"E0#70": "<name>"}.

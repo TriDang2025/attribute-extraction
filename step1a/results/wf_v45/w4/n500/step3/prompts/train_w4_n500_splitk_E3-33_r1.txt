@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#33:s0": "P1", "E3#33:s1": "P2"}}
+
+Cluster E3#33 of entity E3 (mentions 8, distinct values 2).
+Examples:
+- E3#33:s0 [system] previous turn, user: I am also looking for a train that goes to broxbourne on monday. | turn: There are [[19]] trains to broxbourne on Monday leaving every hour starting at 05:01. Is there a specific time you'd like?
+- E3#33:s1 [system] previous turn, user: Not at this time. I am also looking for a train leaving from cambridge on wednesday. | turn: There are [[202]] trains departing from Cambridge that day. What time would you like to leave?
+- E3#33:s2 [system] previous turn, user: That's okay, I can book later. Can you help me find a train departing from Leicester on Tuesday? | turn: You bet! I have [[19]] to choose from. What time do you want to arrive?
+- E3#33:s3 [system] previous turn, user: Do you happen to know of any trains leaving for Cambridge this wednesday? | turn: Yes. There are a total of [[202]] trains leaving for Cambridge on Wednesday. Where will you be departing from?
+- E3#33:s4 [system] previous turn, user: I will leave from Stansted Airport. | turn: There are [[19]] trains from stansted airport to cambridge on saturday. is there a particular time you'd like to leave?
+- E3#33:s5 [system] previous turn, user: I want to take a train to Cambridge on Friday, what's available? | turn: I found [[202]] trains. What is your departure station?
+- E3#33:s6 [system] previous turn, user: I need to take a train into Norwich on Monday. | turn: We have [[19]] trains heading to Norwich on Monday. What would be your point of departure on that day?
+- E3#33:s7 [system] previous turn, user: Well, I want to leave on Saturday. You tell me the best options. | turn: There are [[202]] options that day! Do you know what time you want to leave or arrive?
+
+Return the JSON object now.

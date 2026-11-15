@@ -1,0 +1,69 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 4 of 32 (157 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E0#100  (mentions 4, distinct values 4, low confidence)
+Examples:
+- E0#100:0 [system] previous turn, user: I'm looking for a restaurant called nandos. Are you aware of it? | turn: [[I am]]. It is a great portuguese place. They have two locations in town. One in the South and on in the city centre.
+- E0#100:1 [user] previous turn, system: There are five restaurants in the moderate price range. They sever british and asian oriental, which are you looking for? | turn: [[iam]] looking for something asian oriental and not so expensive restaurant.
+- E0#100:2 [system] previous turn, user: Can you check for british food instead? | turn: I have 5 would you like [[m]] to recommend one?
+- E0#100:3 [system] previous turn, user: Yes, I'd like to find a Japanese place in the centre. | turn: There is [[wagamama]] in 36 Saint Andrews Street, would you like me to book for you?
+
+### E0#32  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E0#32:0 [system] previous turn, user: Is there an expensive French restaurant in town? | turn: I show two french restaurants. Cote and Restaurant [[two two]].
+- E0#32:1 [system] previous turn, user: I'm hoping to find a french restaurant in Cambridge. | turn: There are two. [[Both]] are expensive. One is in the north and one is in the centre. Do you have a preference?
+- E0#32:2 [user] previous turn, system: There are 9 available. What price range do you prefer? | turn: [[II]]'d like a moderately priced place.
+
+### E0#79  (mentions 1, distinct values 1)
+Examples:
+- E0#79:0 [system] previous turn, user: How about choosing a famous one and give me the address, postcode and entrance fee. | turn: corpus christi is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is [[2 pounds]].
+
+### E0#51  (mentions 8, distinct values 4, low confidence)
+Examples:
+- E0#51:0 [system] previous turn, user: I need a restaurant in the west at a moderate price range. | turn: Okay I have an italian, a [[british]] and an indian restaurant. Do you have a preference?
+- E0#51:1 [user] previous turn, system: There are 21 restaurants that fit that criteria. Is there a specific type of food you want to eat? | turn: Yes please - I'm craving [[British food]].
+- E0#51:2 [user] previous turn, system: There are 4 moderately priced British restaurants in the same area as the botanic gardens. | turn: I'm sorry - I'd really like the name of a [[British restaurant]] in city center, I don't mind what price but please do tell me what the price is.
+- E0#51:3 [system] previous turn, user: No particular price range. Which one do you recommend? | turn: [[Royal Standard]] is a great gastropub located on the east side. Would you like me to reserve you a table?
+- E0#51:4 [system] previous turn, user: What about an expensive restaurant in the centre? | turn: Sure I have many types of cuisine to choose from: African, French, Asian Oriental, [[British]], European..any preference?
+
+### E0#39  (mentions 5, distinct values 5, low confidence)
+Examples:
+- E0#39:0 [system] previous turn, user: What about an expensive restaurant in the centre? | turn: Sure I have many types of cuisine to choose from: African, [[French]], Asian Oriental, British, European..any preference?
+- E0#39:1 [user] previous turn, system: What food type could you like? | turn: Let's try [[Lebanese]].
+- E0#39:2 [system] previous turn, user: The restaurant should be in the expensive price range and should be in the south, i do not have a particular food preference. | turn: I have five places. Do you prefer, Italian, Chinese, [[Mexican]] or Indian?
+- E0#39:3 [system] previous turn, user: I was also hoping to find a restaurant in the same part of town as the hotel. | turn: If you are looking for an inexpensive restaurant in the south there is a Chinese one and a [[Portuguese]] as well. Do you have a preference for price or style?
+- E0#39:4 [system] previous turn, user: I am looking for a cheap restaurant in the centre part of town. | turn: You have lots of good cheap choices in that part of town! What type of food sounds good to you? There are Italian restaurants, Indian, [[Spanish]], Chinese, and more.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#100, E0#32, E0#79, E0#51, E0#39) and its name as the value, like {"E0#100": "<name>"}.

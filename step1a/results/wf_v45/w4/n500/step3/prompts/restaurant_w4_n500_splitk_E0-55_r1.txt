@@ -1,0 +1,25 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E0#55:s0": "P1", "E0#55:s1": "P2"}}
+
+Cluster E0#55 of entity E0 (mentions 10, distinct values 5).
+Examples:
+- E0#55:s0 [system] previous turn, user: Yeah, could you recommend a good gastropub? | turn: [[Backstreet Bistro]]. It's expensive though. There is a moderately priced one called The Cow Pizza Kitchen and Bar if preferred.
+- E0#55:s1 [system] previous turn, user: Any is fine, can I get the phone number and postcode of one you'd recommend? | turn: i'd recommend the [[oak bistro]]. their phone number is 01223323361. their postcode is cb21eg.
+- E0#55:s2 [system] previous turn, user: No, I don't, actually. Surprise me with the type of food and give me the restaurant's address. | turn: [[The oak bistro]] is an excellent choice for british food. The address is 6 Lensfield Road.
+- E0#55:s3 [user] previous turn, system: A ticket from London Liverpool Street to Cambridge is 13.28GBP. | turn: Ok, I'll have to speak with my friend to see if that price is acceptable. Can I please get the address to the restaurant [[Hotel Du Vin and Bistro]]?
+- E0#55:s4 [system] previous turn, user: Thanks! Now can you help me find an expensive gastropub restaurant in the centre please? | turn: There are two that meet your criteria. [[The Backstreet Bistro]], and The Slug and Lettuce. Would you like me to book one of those for you?
+- E0#55:s5 [user] turn: Can you help me with finding a restaurant called [[backstreet bistro]]?
+- E0#55:s6 [system] previous turn, user: Three people please, on Monday at 18:30. | turn: Booked you a table at the [[oak bistro]]. Your reference number is SSUTW528.
+- E0#55:s7 [system] previous turn, user: Could you see if there is a restaurant that serves British food in the same area as the hotel? | turn: Certainly, we have either restaurant one seven, [[the oak bistro]], the copper kettle, cotto. Can I book a table at one, if so how many will be dining?
+- E0#55:s8 [user] previous turn, system: Backstreet Bistro. It's expensive though. There is a moderately priced one called The Cow Pizza Kitchen and Bar if preferred. | turn: I would like to book a table at the [[Backstreet Bistro]] for 5 people at 16:00 on Thursday.
+- E0#55:s9 [system] previous turn, user: Yes, I would be. Can you list out several of them for me so I can pick? | turn: restaurant one seven is located at De Vere University Arms Regent Street City Centre and is moderately priced, the [[oak bistro]] is at 6 Lensfield Road and is also moderately priced
+
+Return the JSON object now.

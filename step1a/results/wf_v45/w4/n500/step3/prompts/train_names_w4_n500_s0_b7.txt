@@ -1,0 +1,91 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 7 of 11 (51 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E1: restaurant, hotel, museum; 01223358966, 01223348314, 01223412299; 13:15, 14:45, 13:30
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E3#29  (mentions 41, distinct values 5)
+Examples:
+- E3#29:0 [user] previous turn, system: Can you tell me where you are leaving from and going to? | turn: Of course, silly me. I'd like to travel from Cambridge to [[London Liverpool Street]] on Saturday, and I need to get there by 19:00 please.
+- E3#29:1 [user] previous turn, system: No problem! Where will you be going to and on what day? | turn: I'd like to go to [[london]] liverpool street on Sunday. I need to get there by 21:00.
+- E3#29:2 [user] previous turn, system: Booking was successful. Reference number is : WX6QA7D0. | turn: Thanks. I also need to find a train to london [[liverpool street]].
+- E3#29:3 [system] previous turn, user: I want to depart from London Liverpool Street after 15:00. | turn: There is a train leaving on that date from london [[liverpool]] to cambridge at 15:39, arrive at 17:07 with a price of 13.28 pounds. Would you like to book?
+- E3#29:4 [user] previous turn, system: Your Reference number is : EHNOQL7E. I can help with the train as well. Can you give me a little more information on your trip? | turn: I need to get to [[liverpool st]] on saturday, but I can't leave cambridge until after 13:45
+- E3#29:5 [user] previous turn, system: the tr8272 leaves at 05:00 | turn: I need it to leave after 09:15 from [[London Liverpool Street]]. Can you find me a train and book it for 1 person?
+- E3#29:6 [user] turn: I'm going to Cambridge from [[london]] liverpool street. I need to leave on tuesday.
+- E3#29:7 [user] turn: I need a train from cambridge to go to london [[liverpool street]]
+
+### E3#28  (mentions 33, distinct values 5)
+Examples:
+- E3#28:0 [user] previous turn, system: Where are you leaving from? | turn: I am departing from Cambridge and would like to be in [[Birmingham New Street]] by 20:45 at the latest.
+- E3#28:1 [user] previous turn, system: The entrance fee is free. | turn: Sounds great! I'm also looking for a train to [[birmingham]] new street. Are there any that leave after noon on saturday?
+- E3#28:2 [user] previous turn, system: I certainly can! Where would you be coming from and what day and time? | turn: I am leaving birmingham [[new street]] and going to cambridge; I need to travel on Friday and arrive by 13:15.
+- E3#28:3 [user] previous turn, system: Yes, there are 404 trains. Would you like to tell me more to narrow your search? | turn: Leaving [[Birmignham New Street]], to Cambridge.
+- E3#28:4 [user] previous turn, system: I have several possibilities for Monday. Can you specify your destination so I can narrow down my search? | turn: I am going to Cambridge, from [[Birmimgnham New Street]].
+- E3#28:5 [user] previous turn, system: Where are headed? | turn: I'll be departing from [[birmingham new street]] and going to cambridge. I'd like to arrive by 18:45.
+- E3#28:6 [user] turn: Can you help me find a train departing from [[birmingham]] new street going to cambridge?
+- E3#28:7 [user] previous turn, system: Yes of course. Their telephone number is 01223350914. | turn: I also need a train from birmingham [[new street]] on monday that goes to cambrige by 20:30.
+
+### E3#26  (mentions 42, distinct values 5)
+Examples:
+- E3#26:0 [system] previous turn, user: Depart from cambridge and arriving by 0930 please | turn: TR8042 will depart cambridge Sunday at 8:11 and arrive in [[Kings Lynn]] at 8:58. How many tickets would you like to book?
+- E3#26:1 [user] previous turn, system: I'll be glad to help with that. Where would you like to depart from and arrive at? | turn: I need to depart from [[london kings cross]] and go to cambridge.
+- E3#26:2 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: ...riday 09:11 09:58 9.80 pounds 47 minutes TR1958 kings lynn cambridge friday 10:11 10:58 9.80 pounds 47 minutes TR3147 kings lynn cambridge friday 11:11 11:58 9.80 pounds 47 minutes TR6454 [[kings lynn cambridge]] friday 12:11 12:58 9.80 pounds 47 minutes TR0674 kings lynn cambridge friday 13:11 13:58 9.80 pounds 47 minutes
+- E3#26:3 [user] previous turn, system: Just to clarify a train from Cambridge, correct? Where will it be to and what date & time? | turn: I'm going to London's [[Kings Cross]] on Monday.
+- E3#26:4 [user] previous turn, system: Where would you be departing from? | turn: I'll be leaving from [[King's Lynn]] and I need to get to Cambridge by 8:45.
+- E3#26:5 [user] previous turn, system: Cafe Jello postcode is cb30af. Kettle's yard is cb30aq. | turn: I will need to know the entrance fee as well. Once I get that I also need help finding a train leaving Cambridge to [[kings lynn]] after 16:45.
+- E3#26:6 [user] previous turn, system: Sure. Were you interested in club salsa or the fez club? | turn: I think Club Salsa would be perfect. I am also looking for a train to depart from Cambridge and go to [[London Kings Cross]].
+- E3#26:7 [system] previous turn, user: No thank you, I would like a train that is leaving on Thursday and departing from Kings Lynn. | turn: these are the possible options trainID departure destination day leaveAt arriveBy price duration book (optional) TR1612 [[kings lynn cambridge]] friday 09:11 09:58 9.80 pounds 47 minutes TR1958 kings lynn cambridge friday 10:11 10:58 9.80 pounds 47 minutes TR3147 kings lynn cambridge friday 11:11 11:58 9.80 pounds 47 minutes TR645...
+
+### E3#3  (mentions 312, distinct values 6)
+Examples:
+- E3#3:0 [system] previous turn, user: I need to know if any trains are running to Broxbourne on Saturday that arrive by 10:30. | turn: TR1997 leaves [[Cambridge]] at 09:01 on Saturday and arrives in broxbourne at 10:01. Will that work for you?
+- E3#3:1 [system] previous turn, user: Great that's all I needed today thank you. | turn: Thank you for contacting the [[Cambridge TownInfo centre]]. Goodbye
+- E3#3:2 [user] previous turn, system: Yes of course. Their telephone number is 01223350914. | turn: I also need a train from birmingham new street on monday that goes to [[cambrige]] by 20:30.
+- E3#3:3 [user] turn: I am looking for a train that leaves on Friday and goes to [[cambidge]]
+- E3#3:4 [system] previous turn, user: I am leaving from Cambridge. | turn: Since this is the [[cambridge help desk]], I assumed that, I really need the date and time to get you booked.
+- E3#3:5 [user] previous turn, system: I can help with that. What are your departure and destination choices? | turn: [[Cmabridge]] to Norwich.
+- E3#3:6 [system] previous turn, user: It doesn't need to leave at 16:45, but after. Sorry about that. | turn: TR5473 leaves [[Cambridge]] at 17:06 and arrives in peterborough at 17:56. Will that work for you?
+- E3#3:7 [system] previous turn, user: Yes. Have a nice day. | turn: Thank you for using [[Cambridge TownInfo Centre]]. Have a nice day!
+
+### E3#11  (mentions 20, distinct values 1)
+Examples:
+- E3#11:0 [system] previous turn, user: I need to go from leicester to cambridge. | turn: It looks like train TR6210 will be leaving [[Leicester]] at 11:09 on Saturday and will arrive to Cambridge at 12:54. Can I help you with anything else?
+- E3#11:1 [user] previous turn, system: Adc theatre's phone is 01223300085. There are 819 trains departing cambridge. Could you be more specific on your destination and what day you'd like to leave on? | turn: I would like to travel to [[Leicester]] on Sunday. Can you arrange this trip?
+- E3#11:2 [system] previous turn, user: I need to leave after 21:00. | turn: The TR7610 leaves at 21:21 and is a 105 minute ride to [[Leicester]]. Would you like me to book you seats?
+- E3#11:3 [user] previous turn, system: There are several. Is there a certain time you had in mind? | turn: I'm looking for one that leaves after 12:00 going to [[leicester]]
+- E3#11:4 [user] turn: Can you help me find a train going to [[leicester]] that arrives by 15:15?
+- E3#11:5 [system] previous turn, user: Sure, for 8 people please. | turn: TR4170 leaves [[leicester]] at 9:09 and arrives in cambridge on Friday at 10:54. 8 tickets are booked, reference #: CL4V2583. Do you need further help?
+- E3#11:6 [user] previous turn, system: There are 107 trains leaving after 13:45. If you give me your destination I can narrow down the choices. | turn: I'm heading to [[leicester]].
+- E3#11:7 [system] previous turn, user: Okay. Can you purchase tickets for me. There will 6 of us. | turn: Your reservation was successful. Your reference number is SCKIYN5Q. You depart from [[Leicester]] at 11:09, arriving in Cambridge at 12:54. Would that be all for you today?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#29, E3#28, E3#26, E3#3, E3#11) and its name as the value, like {"E3#29": "<name>"}.

@@ -1,0 +1,61 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 8 of 16 (80 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: centre, city centre, centre of town; moderately priced, expensive, moderate price range; 11:15, 12:15, 18:15
+- E2: guesthouse, hotel, 4 star hotel; 2 night, 5 night, 3 night; moderately priced, moderate price range, cheap
+- E3: 13:15, 09:00, 15:30; cambridge, cambridge towninfo centre, cambrige; saturday, sunday, tuesday
+- E4: centre, centre of town, town; cb20qq, cb23bu, cb21sj; 01223245151, 01223314960, 01223358966
+
+### E1#65  (mentions 2, distinct values 2)
+Examples:
+- E1#65:0 [user] previous turn, system: I need to tell it where you're going from and to, and what time, before it can assign a specific car for you. Could you help me with that info? | turn: I apologize. I need to go from the Cherry Hinton Water Play to [[Backstreet Bistro]] by 15:15 please.
+- E1#65:1 [user] turn: I need to book a taxi leaving from [[The Oak Bistro]] please.
+
+### E1#2  (mentions 1, distinct values 1)
+Examples:
+- E1#2:0 [user] turn: I need to book a taxi to come pick me up by 10:30 to take me to [[Midsummer House Restaurant]].
+
+### E1#25  (mentions 4, distinct values 2)
+Examples:
+- E1#25:0 [user] previous turn, system: Could you tell me where your destination will be? | turn: I need to go to [[rice house]].
+- E1#25:1 [system] previous turn, user: Yes please. I am also looking for a particular restaurant, it's called the rice boat. | turn: I found the [[rice boat]] but did you still need that hotel booked?
+- E1#25:2 [system] previous turn, user: I need to go to rice house. | turn: Could you tell me when you would like to arrive at [[Rice House]]?
+- E1#25:3 [user] previous turn, system: Could you tell me when you would like to arrive at Rice House? | turn: It doesn't matter when I arrive at [[Rice House]] as long as the taxi leaves after 19:15.
+
+### E1#63  (mentions 1, distinct values 1)
+Examples:
+- E1#63:0 [system] previous turn, user: It doesn't matter. | turn: [[Yippee Noodle Bar]] meets your criteria, would you like their information?
+
+### E1#60  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E1#60:0 [user] previous turn, system: I certainly can. When and where would you like to be picked up? | turn: From [[chiquito restaurant bar]].
+- E1#60:1 [user] previous turn, system: Could you tell me when you would like to leave by and where from? | turn: I'd like to arrive at Saint Barnabas Press Gallery by 19:15, and I'm leaving from [[CHiquito Restaurant Bar]].
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#65, E1#2, E1#25, E1#63, E1#60) and its name as the value, like {"E1#65": "<name>"}.

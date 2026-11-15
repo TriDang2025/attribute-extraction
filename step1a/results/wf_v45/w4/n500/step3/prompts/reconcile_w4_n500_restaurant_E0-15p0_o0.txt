@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#15/0: name: price range str | description: price
+Examples:
+- 1 [user] turn: I need a restaurant in the west at a [[moderate price range]].
+- 2 [system] previous turn, user: I don't have a preference. | turn: Out of the 21 restaurant choices, one is the Yippee Noodle Bar which is [[moderately priced]] in the centre of town. Would you like to make a reservation?
+- 3 [system] previous turn, user: I am looking for a restaurant in the centre of town serving italian food. | turn: There are 9 available. [[What price range]] do you prefer?
+- 4 [system] previous turn, user: a restaurant in the moderately priced range, please | turn: There is a lot of restaurants in the [[moderate priced range]]. Please tell me the area or the food you would like today.
+- 5 [user] previous turn, system: Booking was successful, the total fee is 600.79 GBP payable at the station. Reference number is : HL9K5T9V. Anything else I can help with? | turn: Thanks so much! Can you also help me find a restaurant in the centre that's [[mid-priced]]?
+
+Columns (5):
+- name: entrance fee | examples: free; 2 pound; entree fee
+- name: location | examples: cambridge; town; west
+- name: restaurant name | examples: restaurant; j restaurant; charlie chan
+- name: price range adj | examples: expensive; expensive price range; cheap
+- name: price range | examples: cheap restaurant; 3 cheap italian restaurant; 4 cheap indian place
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#15/0", "reason": "str", "same_as": "<column name or none>"}

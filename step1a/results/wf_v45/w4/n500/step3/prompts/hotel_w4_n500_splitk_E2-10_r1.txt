@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E2#10:s0": "P1", "E2#10:s1": "P2"}}
+
+Cluster E2#10 of entity E2 (mentions 16, distinct values 3).
+Examples:
+- E2#10:s0 [system] previous turn, user: I do want a hotel, not a guesthouse, and I would like someplace expensive. | turn: great! there are two options for you. huntingdon marriott hotel or [[university arms hotel]]
+- E2#10:s1 [system] previous turn, user: Well then I need a hotel that has free parking and a 4 star rating. | turn: I've found three hotels matching your preferences. [[The University Arms Hotel]] is in the expensive price range and is located in the centre of town if you are interested.
+- E2#10:s2 [system] previous turn, user: Is there a possibly a hotel instead then? | turn: Okay. I have the [[University Arms]] that is in the center, rated 4 stars and is in the expensive price range. Would you like me to book that for you?
+- E2#10:s3 [system] previous turn, user: How about a 4 star rating. I need it booked for 5 people, 4 nights starting from Tuesday and I will need the reference number. | turn: No problem! I booked you the [[University Arms Hotel]] located in the Centre, reference number 9DOCJURL. May I help with something else?
+- E2#10:s4 [system] previous turn, user: Thank you, I also need a 4 star hotel in that area for 3 people, 2 nights, starting Friday evening. | turn: [[The University Arms Hotel]] fits your specifications, would you like me to book it for you?
+- E2#10:s5 [system] previous turn, user: How about something with 4 stars and something expensive. | turn: I have 2 options for you - The Huntingdon Marriott on the west side, and the [[University Arms]] in the center. Are you interested in one of these?
+- E2#10:s6 [system] previous turn, user: Thanks Can you help me find a hotel called the university aims no university arms hotel. | turn: I have a hotel called [[university arms hotel]] located in the centre. Would you like to make reservations?
+- E2#10:s7 [system] previous turn, user: What is the price range for that? | turn: [[The University Arms Hotel]] is an expensive hotel that has a 4 star rating. Would that work for you?
+- E2#10:s8 [user] turn: I'm looking for the [[University Arms Hotel]].
+- E2#10:s9 [system] previous turn, user: I don't have a preference. | turn: [[The University Arms hotel]] fits all of your criteria, would you like me to book a room?
+- E2#10:s10 [system] previous turn, user: I would like four stars and quite expensive. | turn: How about the [[University Arms Hotel]]? They have free wifi as well as free parking.
+- E2#10:s11 [system] previous turn, user: Can I get one that has free parking? | turn: Both offer free parking. [[The University Arms Hotel]] has 4 stars. Would you like me to book that for you?
+- E2#10:s12 [system] previous turn, user: It should be a hotel type with free parking. | turn: I have found [[University Arms Hotel]] on regent street with a 4 star rating and free parking and internet. Would you like to book?
+- E2#10:s13 [system] previous turn, user: I'm looking for the University Arms Hotel. | turn: [[The University Arms Hotel]] is located on regent street. Would you like their phone number?
+- E2#10:s14 [user] previous turn, system: great! there are two options for you. huntingdon marriott hotel or university arms hotel | turn: Let's go with the [[university arms hotel]]. I'd like it for 2 people starting sunday. We'd like to stay for 3 nights.
+- E2#10:s15 [system] previous turn, user: Yes, I also need a place to stay. Same price range as the restaurant and in the centre of town, please. | turn: ok i found 2 hotels in that area gonville hotel and [[university arms hotel]] which one would you like
+
+Return the JSON object now.

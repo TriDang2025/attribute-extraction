@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E0#123:s0": "P1", "E0#123:s1": "P2"}}
+
+Cluster E0#123 of entity E0 (mentions 8, distinct values 1).
+Examples:
+- E0#123:s0 [system] previous turn, user: Not yet.. just needed the ID. Also, looking for a place to dine in the center of town at a moderate price range. | turn: I have many delicious options. How does [[Cotto]] sound? It's British food.
+- E0#123:s1 [user] previous turn, system: Yes, I have 5 places. What about cotto? | turn: [[Cotto]] is fine. I want to book a table for 1 person at 12:00 on Sunday.
+- E0#123:s2 [system] previous turn, user: I am looking for a restaurant that serves british food in cambridge in the moderate price range | turn: We have several options, and most are in the center of town. I recommend [[Cotto]]!
+- E0#123:s3 [system] previous turn, user: You seem to have cut off? Anyway, can you book a table on Wednesday? It'll be 8 of us and we'll be coming in at 18:15. | turn: Your reservation for [[cotto]] is all set! Your reference number is DXADBU6Q. Is there anything else I can help you with?
+- E0#123:s4 [system] previous turn, user: Could you see if there is a restaurant that serves British food in the same area as the hotel? | turn: Certainly, we have either restaurant one seven, the oak bistro, the copper kettle, [[cotto]]. Can I book a table at one, if so how many will be dining?
+- E0#123:s5 [system] previous turn, user: Are there any moderately priced places to eat with British styled food? | turn: Yes, I have 5 places. What about [[cotto]]?
+- E0#123:s6 [system] previous turn, user: Yes please - I'm craving British food. | turn: I recommend [[Cotto]], they're found on
+- E0#123:s7 [system] previous turn, user: Cotto is fine. I want to book a table for 1 person at 12:00 on Sunday. | turn: [[Cotto]] is completely booked for Saturday at noon. Could I direct you to a different restaurant?
+
+Return the JSON object now.
