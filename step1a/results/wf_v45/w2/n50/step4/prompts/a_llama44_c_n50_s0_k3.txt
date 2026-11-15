@@ -1,0 +1,86 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table attraction (one row = one attraction), 15 columns:
+[attraction:1] address
+  values: text (share 0.79); 14 mentions in 8 dialogues
+  examples:
+    "clifton way" (in: "Cambridge Leisure Park Clifton Way Cherry Hinton 01223 244277")
+    "huntingdon road" (in: "...s Hotel Felix Whitehouse Lane Huntingdon Road postcode cb30lx. Is there an...")
+[attraction:2] attraction name
+  values: text (share 1.00); 12 mentions in 7 dialogues
+  examples:
+    "ballare" (in: "...t nightclubs in that area. Might I suggest Ballare. Would you like more info?")
+    "cherry hinton water play" (in: "I am looking for information about the the Cherry Hinton Water Play")
+[attraction:3] attraction type
+  values: text (share 1.00); 7 mentions in 3 dialogues
+  examples:
+    "museum" (in: "...s to do and places to go such as, museum's, nightclubs, parks and restaura...")
+    "church" (in: "...centre of town,what type are you looking for a church,or swimming or a park ?")
+[attraction:4] bed and breakfast
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast is ideal for you.")
+[attraction:5] cinema name
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "the cineworld cinema" (in: "The cineworld cinema is the place!")
+[attraction:6] entrance fee
+  values: price (share 0.57); 7 mentions in 3 dialogues
+  examples:
+    "1 pound fee" (in: "John's has a 2.50 pound fee, and Trinity has a 1 pound fee.")
+    "2 pound fee" (in: "... free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50 pound...")
+[attraction:7] favorite museum
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "museum of archaeology and anthropology" (in: "...l favorite is the Museum of Archaeology and Anthropology at University of ...")
+[attraction:8] location
+  values: text (share 1.00); 32 mentions in 11 dialogues
+  examples:
+    "emmanuel college" (in: "There are 13 choices, how do you feel about Emmanuel College?")
+    "cambridge" (in: "I am looking for information in Cambridge")
+[attraction:9] location abbr
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "theatre" (in: "I'm looking for a theatre in any part of the city. Can you recommend one?")
+[attraction:10] location area
+  values: text (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "centre of town" (in: "There are many in the centre of town,what type are you looking for a church,o...")
+    "center of town" (in: "There are 13 colleges in the center of town. Does entrance fee matter to you?")
+[attraction:11] location full
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "centre area" (in: "Yes. I am looking for places to go in the centre area. I am looking for college.")
+    "centre" (in: "...re several colleges in either the centre or west part of town. Which area ...")
+[attraction:12] location str
+  values: text (share 1.00); 7 mentions in 5 dialogues
+  examples:
+    "town" (in: "am looking for a college attraction to go to in town.")
+    "cambridge leisure park" (in: "Cambridge Leisure Park Clifton Way Cherry Hinton 01223 244277")
+[attraction:13] postcode
+  values: id (share 1.00); 5 mentions in 5 dialogues
+  examples:
+    "cb11ln" (in: "Is the cb11ln the postcode?")
+    "cb11pt" (in: "the postcode is cb11pt")
+[attraction:14] street name
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "saint andrew" (in: "...ddress for emmanuel college is saint andrew's street. Is there any other i...")
+[attraction:15] venue
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cinema" (in: "I need a cinema to go to in the south.")
+
+Return the JSON object now.
