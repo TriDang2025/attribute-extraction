@@ -28,6 +28,7 @@ Model: Llama-3.1-8B-Instruct, bf16, vLLM, temperature 0, guided JSON (setting `l
 - Cells 1-5: setup (as the wf_v4.4 notebook; cell 4 logs the loading time to `results/wf_v45/model_load.json`).
 - Cell 6: data check.
 - Cell 7: **W1** Step 4 v4.4 with "other" off on a_llama44 then c1 (dev50 + dev50b, seeds 0-2 + vote), score, freeze check. About 70 calls, 10-20 min (estimate).
+- Cell 8: **W2** the one command (`s1a/pipeline_v45.py`) on raw dev50 (corpus n50): Steps 3-4 on GPU (Step 1a-2 output `results/graph_v22_c_n50` comes from the laptop), then the dev50 check. Set STEP4 to the W1 freeze. About 450 calls, 30-40 min (estimate).
 - After a crash or disconnect: rerun cells 1, 3, 4, 5 and then the cell you were on. Answered calls are read from the cache.
 - Colab Secrets `HF_TOKEN` and `GH_TOKEN`, notebook access on. Never put a token in a cell.
 - When the GPU work is done: **Runtime > Disconnect and delete runtime**, so the paid GPU stops.
@@ -52,8 +53,29 @@ p = subprocess.run(["bash", "colab/sync.sh", "push-results", "wf_v45 W1 scores",
 print(p.stdout.strip() or p.stderr[-500:])
 print("W1 done: disconnect the runtime, then tell Claude 'W1 done'")
 """
+w2 = """#@title 8. W2: one command on raw dev50 (n50 corpus; Step 1a-2 output from the laptop) -> results/wf_v45/w2/n50, dev50 check
+STEP4 = "v44_other_off"  #@param ["v44_other_off", "v43"]
+import sys, json, subprocess
+from pathlib import Path
+sys.path.insert(0, "/content/attribute-extraction/step1a/scripts")
+from s1a import pipeline_v45 as PL, step3_v44 as S3
+OUT = Path("results/wf_v45/w2/n50")
+enc3 = S3.bge_m3_encoder()
+c = PL.run_pipeline("data/wf_v45_corpora/n50.jsonl", OUT, "c_n50", backend, enc3, None, PL.step4_config(STEP4),
+                    load_seconds=L44.load_time("results/wf_v45/model_load.json"), skip_1a=True)   # the corpus file is not read with skip_1a
+print(json.dumps(c, indent=1))
+rows = PL.compare_step3(OUT, "c_n50")
+d = PL.score_step4_as(OUT, "c_n50")
+(OUT / "dev50_check.md").write_text("# W2 dev50 check\\n\\nStep 4: " + STEP4 + "\\n\\n## Step 3 final columns vs frozen wf_v4.4 T4\\n\\n" + "\\n".join(rows)
+                                     + "\\n\\n## Step 4 scored as dev50\\n\\n" + (d / "summary.md").read_text(encoding="utf-8"), encoding="utf-8")
+print((OUT / "dev50_check.md").read_text(encoding="utf-8")[:5000])
+p = subprocess.run(["bash", "colab/sync.sh", "push-results", "wf_v45 W2 n50 end to end", "wf_v45/w2"], capture_output=True, text=True)
+print(p.stdout.strip() or p.stderr[-500:])
+print("W2 done: disconnect the runtime, then tell Claude 'W2 done'")
+"""
 nb = dict(src)
-nb["cells"] = [cell("markdown", intro), cell("code", c1), cells[2], cells[3], cells[4], cell("code", c4), cells[6], cell("code", data), cell("code", w1)]
+nb["cells"] = [cell("markdown", intro), cell("code", c1), cells[2], cells[3], cells[4], cell("code", c4), cells[6], cell("code", data), cell("code", w1),
+               cell("code", w2)]
 out = step1a / "colab" / "S1A_wf45_colab.ipynb"
 out.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 print("wrote", out, len(nb["cells"]), "cells")
