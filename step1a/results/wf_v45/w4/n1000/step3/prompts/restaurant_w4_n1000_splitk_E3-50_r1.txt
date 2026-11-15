@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#50:s0": "P1", "E3#50:s1": "P2"}}
+
+Cluster E3#50 of entity E3 (mentions 20, distinct values 3).
+Examples:
+- E3#50:s0 [user] previous turn, system: Do you prefer a particular type of food or are you looking at a specific price range? | turn: I would like [[British food]]. I have no preference of price range.
+- E3#50:s1 [system] previous turn, user: I need a restaurant in the west at a moderate price range. | turn: Okay I have an italian, a [[british]] and an indian restaurant. Do you have a preference?
+- E3#50:s2 [user] turn: Can you book me a moderately priced [[British restaurant]]?
+- E3#50:s3 [user] previous turn, system: There are 21 restaurants that fit that criteria. Is there a specific type of food you want to eat? | turn: Yes please - I'm craving [[British food]].
+- E3#50:s4 [system] previous turn, user: I'm looking for an expensive restaurant in the west. | turn: There are 9 expensive restaurants in the west. There are [[British]], European, Indian, and Thai food to choose from. Which would you prefer?
+- E3#50:s5 [user] previous turn, system: There is nothing that meets that criteria, shall I run another search? | turn: How about a [[British restaurant]] instead?
+- E3#50:s6 [system] previous turn, user: Can you check for one with British food? | turn: I have about 7 different options in [[British food]]. Do you have a price range you prefer?
+- E3#50:s7 [system] previous turn, user: What about an expensive restaurant in the centre? | turn: Sure I have many types of cuisine to choose from: African, French, Asian Oriental, [[British]], European..any preference?
+- E3#50:s8 [user] turn: Please find me a [[british restaurant]] in the expensive price range?
+- E3#50:s9 [system] previous turn, user: What food type does it have? Can you also provide me their phone number? | turn: They serve [[British food]] and their phone is 01223359506. Would you like to book a table?
+- E3#50:s10 [system] previous turn, user: It should be in the west part of town. | turn: Do you have a preference on food type? There are three restaurants with the following food types: indian, italian, and [[british]].
+- E3#50:s11 [system] previous turn, user: Hmm, well maybe british food if you have anything. | turn: I have found several [[British restaurants]]. Do you have any other criteria?
+- E3#50:s12 [user] previous turn, system: Unfortunately, I don't have any expensive Hungarian restaurants listed. Is there a different price range or food type that I can find for you? | turn: How about [[british food]] then. expensive british food.
+- E3#50:s13 [system] previous turn, user: I would like a moderately priced restaurant in the west part of town | turn: There are three moderately priced restaurants in the west part of town. Do you prefer indian, italian, or [[british]]?
+- E3#50:s14 [user] previous turn, system: There are 4 moderately priced British restaurants in the same area as the botanic gardens. | turn: I'm sorry - I'd really like the name of a [[British restaurant]] in city center, I don't mind what price but please do tell me what the price is.
+- E3#50:s15 [user] turn: I'm looking for a restaurant that offers [[British food]] in a moderate price range, can you help me with that?
+
+Return the JSON object now.

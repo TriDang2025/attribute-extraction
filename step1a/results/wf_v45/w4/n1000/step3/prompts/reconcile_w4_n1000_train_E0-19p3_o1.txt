@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#19/3: name: arrival time | description: time
+Examples:
+- 1 [system] previous turn, user: I would like to go to Norwich on Monday. | turn: Trains leave hourly to Norwich. The closest time available is TR8495, departing 09:36 and arriving 10:55, with [[duration]] 79 minutes and price 17.60 pounds. Would you like to book this one?
+- 2 [user] previous turn, system: these are the possible options trainID departure destination day leaveAt arriveBy price duration book (optional) TR1612 kings lynn cambridge friday 09:11 09:58 9.80 pounds 47 minutes TR1958 kings lynn | turn: Please pick a train that leaves after 8:15 and going to cambridge. I need the [[travel time]] and price.
+- 3 [user] previous turn, system: Great I have tran that ik get you there by 15:35. Would you like to book that? | turn: Just please get me the train ID and [[total travel time]].
+- 4 [system] previous turn, user: I don't have a departure time. I just need to be in Cambridge by 10:30. | turn: I suggest the TR8092 that will arrive in Cambridge at 08:58. This will give you [[ample time]]. Do you want me to book this?
+- 5 [user] previous turn, system: TR5693 meets all your criteria and arrives by 10:35. Will that work for you? | turn: That sounds good. What's the [[travel duration]] on that one?
+
+Columns (5):
+- name: num trains | examples: 10 train; 4 train; 9 train
+- name: time interval | examples: anytime; each 1; every 2 hour
+- name: destination | examples: departure site; where is your destination; your destination
+- name: duration unit | examples: 2 hour; 2 day
+- name: departure time | examples: 39; 48; departing time
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#19/3", "reason": "str", "same_as": "<column name or none>"}

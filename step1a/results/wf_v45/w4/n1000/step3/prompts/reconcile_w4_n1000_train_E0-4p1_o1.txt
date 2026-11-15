@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#4/1: name: date | description: date
+Examples:
+- 1 [system] previous turn, user: I will need the train ID also please. | turn: TR7878 leaves leicester [[Friday]] at 16:09. Would you like to book a seat?
+- 2 [user] previous turn, system: Okay, do you know the day you want to travel? | turn: Yes, I need to leave on [[Sunday]] and arrive at Kings Lynn by 08:45 for a meeting.
+- 3 [user] previous turn, system: I can attempt to book a reservation for you. What date are you looking for? | turn: [[Saturday]] at 15:15. The reservation is for 1 person. I also need a train departing from Cambridge that will arrive at my destination by 16:30.
+- 4 [user] turn: I am interested in booking a train to cambridge for [[next tuesday]].
+- 5 [user] previous turn, system: We have 19 different trains along that route for Sunday. Do you have a specific time in mind? | turn: Yes I need to leave after 18:30 on [[sunday]] and I need to make a reservation for 8 people. Can you give me a reference number for the booking?
+
+Columns (5):
+- name: day of week | examples: thursday; wednesday; monday
+- name: day | examples: teusday; thur; wed
+- name: location str | examples: peterborough; norwich; leicester
+- name: time interval | examples: anytime; each 1; every 2 hour
+- name: num people | examples: 8 people; 3 people; 4 people
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#4/1", "reason": "str", "same_as": "<column name or none>"}

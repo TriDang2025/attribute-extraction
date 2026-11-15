@@ -1,0 +1,67 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 14 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#3  (mentions 5, distinct values 1)
+Examples:
+- E4#3:0 [system] previous turn, user: What is the address? | turn: The address is pool way, [[whitehill road]], off newmarket road.
+- E4#3:1 [system] previous turn, user: Yes. May I have the address and postcode for the Abbey Pool please? | turn: Yes, of course. They are located at Pool Way, [[Whitehill Road]], off NewMarket Road. Their postcode is cb58nt. Is there anything else I can do for today?
+- E4#3:2 [system] previous turn, user: I'm looking for swimmingpool located in the east,any suggestions? | turn: Yes, the Abbey Pool and Astroturf Pitch is a swimming pool on the east side. They're located on Pool Way and [[Whitehill Road]] off of NewMarket. Would you like more information?
+- E4#3:3 [system] previous turn, user: Please give me their address and postcode. | turn: The address is Pool Way, [[Whitehill Road]], off Newmarket Road. Postcode cb58nt
+- E4#3:4 [system] previous turn, user: I would love to get some information on the abbey pool and astroturf pitch | turn: Of course, Abbey Pool and Astroturf Pitch is located in the east at Pool Way, [[Whitehill Road]], off Newmarket Road. Phone number 01223902088. Anything else I can help you with?
+
+### E4#121  (mentions 4, distinct values 1)
+Examples:
+- E4#121:0 [system] previous turn, user: I'm looking for some information please. What can you tell me about Clare Hall? | turn: Clare Hall is on [[Herschel Road]] and has free admission.
+- E4#121:1 [system] previous turn, user: Whichever you recommend is great | turn: I recommend clare hall located at [[herschel road]] and has free entrance.
+- E4#121:2 [system] previous turn, user: I am looking for college attractions to go to in town. | turn: How about Clare Hall on [[Herschel Road]]?
+- E4#121:3 [system] previous turn, user: In what part of the city is Clare Hall, and what is the address? | turn: It's in the west, it's address is [[herschel road]] postcode cb39al.
+
+### E4#169  (mentions 1, distinct values 1)
+Examples:
+- E4#169:0 [system] previous turn, user: Great. I also need a restaurant in the same price range. I'd like it to be a british place. | turn: May I suggest the Oak Bistro located at [[6 Lensfield Road]].
+
+### E4#152  (mentions 1, distinct values 1)
+Examples:
+- E4#152:0 [system] previous turn, user: Does such a place exist? If so, I would like some information on it, like the postcode. | turn: sure the address is [[53 roseford road]] and the postcode is cb22ha. anything else?
+
+### E4#100  (mentions 9, distinct values 3)
+Examples:
+- E4#100:0 [system] previous turn, user: That sounds interesting. Could you give me the address? | turn: The address is [[5 greens road]], cb13ef is the postcode. Is there anything else I can help you with?
+- E4#100:1 [system] previous turn, user: Nothing specific, please just send me the address, phone number and postcode of the one you would suggest. | turn: Ok Williams art and antiques is pretty universally enjoyed, gwydir street, [[no. 5]] dale's brewery, postal cb12lj, phone, 01223311687, free admission, so that's good for the wallet.
+- E4#100:2 [system] previous turn, user: no, not really. What are entrance fees on the 8 attractions? | turn: Unfortunately, we do not have information on several of them. But, Byard Art, Wandlebury Country Park, and [[Sheep's Green]] and Lammas Land Park are all free admission attractions.
+- E4#100:3 [system] previous turn, user: Cambridge artworks sounds nice. Can you tell me their phone number, address, and type? | turn: Yes, the phone number is 01223902168. Their address is [[5 Greens road]] and the type is a museum. Can I help you find anything else?
+- E4#100:4 [system] previous turn, user: Yes, I'm visiting Cambridge and want to know about Cambridge Artworks in town? | turn: It is a museum in the eas part of town on [[5 greens road]], is there more you would like to know?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#3, E4#121, E4#169, E4#152, E4#100) and its name as the value, like {"E4#3": "<name>"}.

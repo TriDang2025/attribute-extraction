@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#0/2: name: star str | description: star
+Examples:
+- 1 [system] previous turn, user: I don't have a preference. | turn: Ok. How about the [[Bridge Guest House]]. I'm happy to book that for you. I just need to know what day you'll be arriving.
+- 2 [system] previous turn, user: That sounds nice but I would like to see about a guesthouse with free wifi. | turn: There at [[10 guest houses]] in the north offering free wifi. Are you looking for a particular price range?
+- 3 [user] previous turn, system: Do you have a specific location you want to be? | turn: No, but I need free wifi and I would like a [[2 star guesthouse]] please.
+- 4 [user] turn: Hi, I am planning my upcoming trip and am looking for a [[place to stay]]. Can you recommend something for me?
+- 5 [system] previous turn, user: Ok great, I need a room booked for 8 and for 5 nights starting on the Monday. | turn: I'd be happy to help with your request, [[which place]] did you want to book a room at? There are 18 results and all have free wifi.
+
+Columns (5):
+- name: hotel str | examples: hotel; 4 star hotel; the cambridge belfry
+- name: guesthouse str | examples: guesthouse; ashley hotel; the ashley hotel
+- name: num days | examples: 3 guesthouse; 2 hotel; 1 hotel
+- name: hotel name lower | examples: acorn guest house; autumn house; the acorn guest house
+- name: hotel name | examples: acorn guest house; gonville hotel; university arm hotel
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#0/2", "reason": "str", "same_as": "<column name or none>"}

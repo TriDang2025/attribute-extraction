@@ -1,0 +1,73 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 17 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#3  (mentions 16, distinct values 4)
+Examples:
+- E3#3:0 [system] previous turn, user: Find me a moderately priced place to eat in the South | turn: I have two options available Pizza Hut [[Cherry Hinton]] serving Italian and Restaurant Alimentum which serves modern european. Which would you prefer?
+- E3#3:1 [system] previous turn, user: I don't need a reservation yet. May I have Taj Tandoori's address, postcode, and phone number, please? | turn: Okay, sure. The address is [[64 Cherry Hinton Road]] Cherry Hinton. The post code is cb17aa, and the phone number is 01223412299. Do you need anything else?
+- E3#3:2 [system] previous turn, user: Yes, I need the reference number. I am also looking for a place to eat in the south area, preferable italian. | turn: There are two restaurants that are Italian, [[Pizza Hut Cherry Hinton]], and Franky and Bennys. The reference number for your train is 0EG8EWWR.
+- E3#3:3 [system] previous turn, user: Hi I am looking for some information on the good luck chinese food takeaway. | turn: Yes, we can help you with that. It is located at [[82 Cherry Hinton Road]] Cherry Hinton. The phone number is 01223244149. Is there anything else you would like to know?
+- E3#3:4 [system] previous turn, user: Yes, may I have the address for restaurants in the south part of town. Preferably something moderately priced. | turn: There are two options. Pizza Hut [[Cherry Hinton]] serves Italian food and is located at G4 Cambridge Leisure Park Clifton Way Cherry Hinton. Restaurant Alimentum serves Modern European food and is located at 152 - 154 Hills Road. Anything else I can help you with today?
+
+### E3#104  (mentions 14, distinct values 2)
+Examples:
+- E3#104:0 [system] previous turn, user: yes. I would like their address and phone number please. | turn: Rajmahal is located at 7 Barnwell Road [[Fen Ditton]] and the phone number is 01223 244955. Will that be all?
+- E3#104:1 [system] previous turn, user: I'm looking for a restaurant that serves italian food in the moderate price range. The restaurant should be in the east. | turn: I have one place. It is the [[Pizza Hut Fen Ditton]]. They are located on Cambridge Retail Park Newmarket Road Fen Ditton. Can I reserve you a table?
+- E3#104:2 [system] previous turn, user: Yes, please give me their address. | turn: Their address is Grafton Hotel 619 Newmarket Road [[Fen Ditton]]
+- E3#104:3 [system] previous turn, user: Any area is fine. Please just recommend a restaurant, and send me the address and postcode. Thanks in advance! | turn: Rajmahal is very popular. Their address is 7 Barnwell Road [[Fen Ditton]] and their post code is cb58rg. Will that be all today?
+- E3#104:4 [system] previous turn, user: I'm looking for an Italian restaurant in the east. | turn: There is Pizza Hut [[fen ditton]]. It's moderately priced. Would you like a reservation?
+
+### E3#111  (mentions 2, distinct values 2)
+Examples:
+- E3#111:0 [system] previous turn, user: I prefer the expensive price range. | turn: la mimosa serves mediterranean food and is in the expensive price range. their phone number is 01223 362525 and they are located at [[Thompsons Lane]] Fen Ditton.
+- E3#111:1 [system] previous turn, user: Price doesn't matter, I would like the address, phone number and the postcode please | turn: La mimosa serves Mediterranean food. Their phone number is 01223 362525, their address is [[Thompsons Lane Fen Ditton]] and their postcode is C.B 5, 8 A.Q.
+
+### E3#129  (mentions 5, distinct values 2)
+Examples:
+- E3#129:0 [system] previous turn, user: Great, can I have the phone number and address for Erania please? | turn: Sure, their phone is 01223368786 and their address is [[Free School Lane]] City Centre cb23rh. May I help with anything else?
+- E3#129:1 [system] previous turn, user: On second thought, can I just get the phone number, address and postcode for Riverside? | turn: Sure! The phone number is 01223259988. The address is Doubletree by Hilton Cambridge Granta Place [[Mill Lane]] postcode cb21rt. Is there anything else I can help you with?
+- E3#129:2 [system] previous turn, user: The area doesn't matter. Can you make a recommendation, please? | turn: I would recommend Eraina, it is at [[Free School Lane]] City Centre.
+- E3#129:3 [system] previous turn, user: What is the address? | turn: Riverside Brasseri, located at Doubletree by Hilton Cambridge Granta Place [[Mill Lane]]. Will there be anything else?
+- E3#129:4 [system] previous turn, user: Oh darn it. How about one that offers european food? | turn: There are 3 options in the centre area with european food. Eraina is located at [[Free School Lane]] City Centre, postcode cb23rh. Would you like info on the others also?
+
+### E3#78  (mentions 6, distinct values 3)
+Examples:
+- E3#78:0 [system] previous turn, user: Thank you very much. I am also looking for a place to stay in the same price range as the restaurant with free parking. Can you help with this as well? | turn: How about The Copper Kettle. The are located in the Centre at [[4 Kings Parade]] City Centre. May I book a table for you?
+- E3#78:1 [system] previous turn, user: Yes, that would be great! | turn: You should try the the copper kettle at [[4 Kings Parade City Centre]]. Would you like me to make a reservation for you there?
+- E3#78:2 [system] previous turn, user: get me the address please. | turn: It is at cb21rh [[King's Parade]].
+- E3#78:3 [system] previous turn, user: I would like British food. I have no preference of price range. | turn: There are 7 restaurants which meet your needs. The Copper Kettle is located at [[4 Kings Parade]] and serves moderate priced meals. would you like to make reservations?
+- E3#78:4 [system] previous turn, user: Yes, please look in another part of town. | turn: The Copper Kettle is in centre. Phone number is 01223365098 and address is [[4 Kings Parade City Centre]]. Would you like to make a reservation?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#3, E3#104, E3#111, E3#129, E3#78) and its name as the value, like {"E3#3": "<name>"}.

@@ -1,0 +1,66 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 15 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#129  (mentions 3, distinct values 1)
+Examples:
+- E4#129:0 [system] previous turn, user: I am looking for an attraction called camboats, can you get me the address and postcode? | turn: Yes, of course. The address of camboats is the plough, [[green end]], fen ditton, and the postcode is cb58sx.
+- E4#129:1 [system] previous turn, user: what is their phone number and address? | turn: They are located at the plough, [[green end]], fen ditton. Do you need any other information?
+- E4#129:2 [system] previous turn, user: Sure, the one in the east please. | turn: I have the camboats located at the plough, [[green end]], fen ditton.
+
+### E4#157  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E4#157:0 [system] previous turn, user: That'll be all, thanks for all your help today! | turn: I am glad to help thank you and [[ghoodbye]]
+
+### E4#79  (mentions 14, distinct values 4)
+Examples:
+- E4#79:0 [system] previous turn, user: Ok, how about a swimming pool in the centre of town? | turn: Parkside Pools is located at [[Gonville Place]], postcode cb11ly. The phone number is 01223446100.
+- E4#79:1 [user] previous turn, system: OK, you're booked on TR7062, leaving at 16:40 and arriving by 17:08, reference number 1MSVTP4G. The price will be 10.10 at the station. Can I help you with anything else? | turn: Yes, I was wondering if you could help me find ou abou an attraction called [[gonville and caius college]].
+- E4#79:2 [system] previous turn, user: What is the phone number? | turn: You can reach the [[Gonville Hotel]] at 01223366611.
+- E4#79:3 [system] previous turn, user: The attraction type is college? I think that's all the information that I needed, thanks. | turn: I have found [[gonville]] and college. It is free to get in.
+- E4#79:4 [system] previous turn, user: Do you have any swimming pools? | turn: Yes, its called parkside pools, located at [[gonville place]].
+
+### E4#97  (mentions 1, distinct values 1)
+Examples:
+- E4#97:0 [system] previous turn, user: Hi, I am looking for a particular attraction. Have you heard of Scudamores Punting Co? | turn: Yes, Scudamores Punting Co is located in [[Granta Place]], Mill Lane and their phone number is 01223359750. Anything else you want to know?
+
+### E4#86  (mentions 7, distinct values 2, low confidence)
+Examples:
+- E4#86:0 [system] previous turn, user: I need to change the venue then. Can you please select another venue for me in the West? | turn: Cafe Jello Gallery is free as is [[Kettle's Yard]]. They are both museums.
+- E4#86:1 [system] previous turn, user: No how about a type of museum? | turn: There's 7 one of my favorites is [[kettle]]'s yard on castle street it has free admission. Would that interest you?
+- E4#86:2 [user] previous turn, system: Their number is 01223748100.They are located on Castle Street and their postcode is cb30aq | turn: What is the entrance fee for [[Kettle's Yard]]?
+- E4#86:3 [system] previous turn, user: I wish I had been given more choices but I guess that one will be OK. What is the postcode for Kettle's Yard? | turn: The post code for [[Kettle]]'s yard is cb30aq
+- E4#86:4 [user] previous turn, system: There's 7 one of my favorites is kettle's yard on castle street it has free admission. Would that interest you? | turn: I wish I had been given more choices but I guess that one will be OK. What is the postcode for [[Kettle's Yard]]?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#129, E4#157, E4#79, E4#97, E4#86) and its name as the value, like {"E4#129": "<name>"}.

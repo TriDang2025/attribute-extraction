@@ -1,0 +1,67 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 23 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#24  (mentions 4, distinct values 2, low confidence)
+Examples:
+- E3#24:0 [user] previous turn, system: Jinling noodle bar, postcode cb23pp. Is there any more info I can give you? | turn: I would like to visit a [[college]] in the same area as the noodle bar, can you find me one?
+- E3#24:1 [user] previous turn, system: There are nine restaurants that fit your requirements. What type of food are you interested in? | turn: Just pick one in the same area as [[Queens' College]], and can you book a table for 1 at 18:30 on Saturday please?
+- E3#24:2 [system] previous turn, user: Actually, I want to visit a college. Somewhere in the centre. | turn: I would suggest downing [[college]], would you like the address?
+- E3#24:3 [user] previous turn, system: What type of food would you be interested in? | turn: Actually, I want to visit a [[college]]. Somewhere in the centre.
+
+### E3#27  (mentions 1, distinct values 1)
+Examples:
+- E3#27:0 [system] previous turn, user: Thank you. Do you have the postcode, please? | turn: The postcode for [[Downing College]] is cb21dq. Anything else I have help you with?
+
+### E3#125  (mentions 1, distinct values 1)
+Examples:
+- E3#125:0 [system] previous turn, user: I would like the one in the west. | turn: [[Meghan]] is in that area and serves Indian food would you like to make a reservation
+
+### E3#112  (mentions 11, distinct values 2)
+Examples:
+- E3#112:0 [system] previous turn, user: I also need the phone number for the restaurant that you booked for me, the Meghna. | turn: The phone number to [[Meghna]] is 01223727410. Is there anything else I can help you with?
+- E3#112:1 [system] previous turn, user: Let's review. I am looking for an Indian restaurant in the west with a moderate price range. Once chosen, the restaurant booking is for Monday. | turn: Ok great.[[The Meghna]] will fit your needs. How many people and what day?
+- E3#112:2 [system] previous turn, user: I'd like to look at the one in the west, please. | turn: That place goes by the name of [[meghna]], the address is 205 Victoria Road Chesterton, they can be reached at 01223727410, would you like me too book you?
+- E3#112:3 [system] previous turn, user: I am looking for something in the moderate price range, please. | turn: I would recommend the [[Meghna]] for you. Should I make a booking for you?
+- E3#112:4 [system] previous turn, user: Okay, would it help to narrow it down to the west part of town? I am having trouble deciding what I want to eat today. | turn: [[Meghna]] is an Italian restaurant in the west part of town, and is in the moderate price range.
+
+### E3#99  (mentions 11, distinct values 2)
+Examples:
+- E3#99:0 [system] previous turn, user: I don't have a preference. | turn: Okay, I can book your table at [[Eraina]]. They serve european food. How many in your party, what day and time please?
+- E3#99:1 [user] previous turn, system: There are 2 restaurants that meet your criteria; Eraina and Michaelhouse Cafe. They are both in the centre of town. | turn: Great, can I have the phone number and address for [[Erania]] please?
+- E3#99:2 [system] previous turn, user: Yes I suppose, how about 16:45 instead? | turn: You have a reservation for 2 at [[Eraina]] on Thursday at 16:45. Your reference number is 80V5LKSU.
+- E3#99:3 [system] previous turn, user: What do you recommend? | turn: I personally recommend [[Eraina]]. Would you like a table booked?
+- E3#99:4 [system] previous turn, user: I was thinking maybe trying something european. | turn: [[Eraina]] is an expensive European restaurant in the city centre, would you like me to book that for you?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#24, E3#27, E3#125, E3#112, E3#99) and its name as the value, like {"E3#24": "<name>"}.

@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E2#10/1: name: time | description: reservation_time
+Examples:
+- 1 [user] previous turn, system: I have booked you a reservation on saturday at the cambridge chop house. Your reservation number is 28XENSML. Can I help you with anything else? | turn: I need a taxi to make sure it arrives the restaurant by the [[booked time]].
+- 2 [user] previous turn, system: Nandos is booked with the reference number 38RU5UDA.The table will be reserved for 15 minutes. May I help with something else? | turn: Yes, I need a taxi to the restaurant, I want to get there by the [[booking time]]. Nice car, no clunker please.
+- 3 [user] previous turn, system: Can you tell me what time you would like to leave or arrive by? | turn: I would like to arrive at the restaurant at the [[booked time]], please.
+- 4 [user] previous turn, system: I was able to book that for you. Your reference number is SSCJDA5F. | turn: Great! I want to make sure the taxi arrives at the restaurant by the [[booked time]].
+- 5 [user] previous turn, system: Thank you for using our service today? | turn: Actually, I will need to book a taxi to commute between the hotel and restaurant. I want to arrive at the restaurant by the [[booked time]].
+
+Columns (5):
+- name: time str | examples: 13:00; 17:00; 04:00
+- name: location str | examples: restaurant; cambridge towninfo centre; cambridge
+- name: pickup location | examples: pool; hughe hall; ali baba
+- name: destination location | examples: departure site; intended destination; traveller rest
+- name: departure location | examples: primavera; town; centre of town
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E2#10/1", "reason": "str", "same_as": "<column name or none>"}

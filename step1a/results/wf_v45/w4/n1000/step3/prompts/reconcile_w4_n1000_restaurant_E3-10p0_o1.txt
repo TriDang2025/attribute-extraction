@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E3#10/0: name: time str | description: time
+Examples:
+- 1 [user] previous turn, system: Yes, it's an african restaurant in the centre. Would you like a booking? | turn: Yes. Can I book for 8 people on Saturday at [[16:00]]?
+- 2 [system] previous turn, user: Yes please for 7 people at 12:15 on thursday please. I will need the reference number too | turn: I have booked a reservation at [[12:15]] for 7 people on Thursday. The reference number is KLOFPFUM. Is there anything else I can do for you?
+- 3 [user] previous turn, system: Yes, 4. stazione restaurant and coffee bar, clowns cafe, don pasquale pizzeria, and cafe uno. | turn: Caffe Uno sounds good. Could you book a table for 5 people at [[19:30]] on monday?
+- 4 [user] previous turn, system: I was not able to book you there, anything else that I can look up for you? | turn: Are you able to book [[10:00]] instead?
+- 5 [system] previous turn, user: Sure. I would like to book a table for 5 people at 11:00 on Saturday. | turn: I'm booking you a table for 5 at [[11:00]] Saturday at Charlie Chan. What name should I place this under?
+
+Columns (5):
+- name: num str | examples: 1; 6; 2
+- name: time int | examples: 17:00; 20:00; 12:45
+- name: time | examples: 6 people; 3 people; 5 people
+- name: people | examples: another day; anniversary; same amount of people
+- name: location | examples: cambridge; south; town
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E3#10/0", "reason": "str", "same_as": "<column name or none>"}

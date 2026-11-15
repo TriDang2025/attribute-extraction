@@ -1,0 +1,46 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 1 of 1 (1 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+Names already used for this entity (use one of them when the cluster holds the same kind of value with the same role): address, attraction_name, booking_time, business_name, college_name, cuisine, day_of_week, departure_location, destination, entrance_fee, food_option, food_type, gastropub_name, hotel_rating, location, location_area, number_of_options, number_of_people, number_of_restaurants, number_of_results, phone_number, pickup_location, postcode, price_range, reference_number, restaurant_address, restaurant_name
+
+### E3#4  (mentions 7, distinct values 3, low confidence)
+Examples:
+- E3#4:0 [system] previous turn, user: What is the address, phone number, and postcode? | turn: The Gourmet Burger Kitchen's phone number is 01223 312598 , they are loated at Regent Street City Centre, and there post code is .[[C.B 2]], 1 A.B
+- E3#4:1 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is [[C.B 1]], 9 H.X, and their phone number is 01223 249955.
+- E3#4:2 [system] previous turn, user: Price doesn't matter, I would like the address, phone number and the postcode please | turn: La mimosa serves Mediterranean food. Their phone number is 01223 362525, their address is Thompsons Lane Fen Ditton and their postcode is [[C.B 5, 8 A.Q.]]
+- E3#4:3 [system] previous turn, user: I need the address, phone number and postcode for a moderately priced restaurant serving international food. | turn: How about the varsity restaurant, they are located at 35 Saint Andrews Street City Centre, postcode [[C.B 2]], 3 A.R, phone number is 01223 356060.
+- E3#4:4 [system] previous turn, user: Can I get the phone number and postcode, please? | turn: bloomsbury restaurant's phone number is 0871 942 9180, their postcode is [[C.B 2]], 3 D.T
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#4) and its name as the value, like {"E3#4": "<name>"}.

@@ -1,0 +1,68 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 26 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#119  (mentions 7, distinct values 1)
+Examples:
+- E3#119:0 [system] previous turn, user: Yes please. Is there another restaurant in the area in that price range that is available at that time? | turn: I have booked a reservation for you at the [[Lan Hong House]]. Your reference number is BMU049L6. DO you need anything else?
+- E3#119:1 [system] previous turn, user: What are they? | turn: I have the [[Lan Hong House]], Jinling Noodle Bar and the Shanghi Family Restaurant that are all moderately priced and serving Chinese food.
+- E3#119:2 [system] previous turn, user: Yes, what are my three choices before we make a reservation? | turn: The restaurants are: jinling noodle bar, [[lan hong house]] and shanghai family restaurant.
+- E3#119:3 [system] previous turn, user: I also would like to find a chinese restaurant in the centre. | turn: What's your price range? I recommend the Ugly Duckling, but it's expensive. Charlie Chan is a good, cheap place, and [[Lan Hong House]] is in the middle, price-wise.
+- E3#119:4 [user] turn: Hello, is [[lan hong house]] still in operation?
+
+### E3#152  (mentions 1, distinct values 1)
+Examples:
+- E3#152:0 [user] previous turn, system: I'm sorry, can you tell me what type of business that is? | turn: Oops, sorry. [[Ian Hong]] is a restaurant.
+
+### E3#191  (mentions 2, distinct values 1)
+Examples:
+- E3#191:0 [system] previous turn, user: I don't care about the price range. Can you just pick a good one for me? | turn: If money is no concern, I would definitely recommend [[HK Fusion]]. It's in the centre of town and expensive. It's located at 21 Burleigh Street, City Centre. How does that sound?
+- E3#191:1 [system] previous turn, user: Is 11:15 on Saturday available? | turn: That booking was successful. A reservation was made for 6 people at [[HK Fusion]] on Saturday at 11:15. Reference is ARWFXLDL. Can I help with anything else?
+
+### E3#68  (mentions 15, distinct values 4)
+Examples:
+- E3#68:0 [system] previous turn, user: Yes, I would prefer an expensive one. | turn: In expensive restaurants, I have two options in the north. There is [[Hakka]] and there is The Hotspot. In my opinion, Hakka is a great chinese restaurant.
+- E3#68:1 [system] previous turn, user: I'm looking for a restaurant named hakka | turn: [[The hakka]] is a chinese restaurant in the north area. Would you like to make a booking today?
+- E3#68:2 [system] previous turn, user: The Hakka restaurant is located at 24 Milton Road Cambridge Cambridgeshire CB4 1JY. The average cost is approximately 30 per person. | turn: Looks like you're doing my job for me! Did you want to know about the [[Hakka Restaurant]] then?
+- E3#68:3 [user] previous turn, system: Do you know the name of this restaurant? | turn: [[The Hakka restaurant]] is located at 24 Milton Road Cambridge Cambridgeshire CB4 1JY. The average cost is approximately 30 per person.
+- E3#68:4 [system] previous turn, user: Yes, I do. I would like it to be in the north. | turn: May I suggest [[Hakka]], a very nice Chinese Restaurant in the north part of town. Shall I provide you with more information?
+
+### E3#159  (mentions 4, distinct values 2)
+Examples:
+- E3#159:0 [system] previous turn, user: I want a restaurant in the centre and serves japanese food. What is the address? | turn: [[Wagamama]] serves Japanese food and is in the center area of town. The address is 36 Saint Andrews Street.
+- E3#159:1 [system] previous turn, user: Great, can you also find me a Japanese food restaurant in the expensive price range? | turn: [[Wagamana]] is good fit. Would you like me to make a reservation for you?
+- E3#159:2 [system] previous turn, user: Hello, I am looking for a restaurant that serves Japanese food. | turn: [[Wagamama]] is a Japanese restaurant that's in the centre part of town.
+- E3#159:3 [system] previous turn, user: Yes, I'd like to find a Japanese place in the centre. | turn: There is [[wagamama]] in 36 Saint Andrews Street, would you like me to book for you?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#119, E3#152, E3#191, E3#68, E3#159) and its name as the value, like {"E3#119": "<name>"}.

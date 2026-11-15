@@ -1,0 +1,24 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E1#59:s0": "P1", "E1#59:s1": "P2"}}
+
+Cluster E1#59 of entity E1 (mentions 9, distinct values 2).
+Examples:
+- E1#59:s0 [system] previous turn, user: Yes, I'm looking for the hotel Limehouse. | turn: [[limehouse]] is a moderate priced guesthouse in the north at 78-80 milton road. Would you like to make a reservation?
+- E1#59:s1 [system] previous turn, user: i am also looking for a hotel called limehouse | turn: [[The Limehouse]] is a moderately priced 4 star guesthouse located in the North, would you like their contact information and address, or would you like to book a room?
+- E1#59:s2 [system] previous turn, user: As long as there is available parking I'd like to book my reservation there please. | turn: I can book you at the [[Limehouse]]. when would you like the reservation?
+- E1#59:s3 [user] turn: Can you help me find a hotel called [[Limehouse]]? Thanks.
+- E1#59:s4 [user] previous turn, system: Certainly, the phone number is 01223248882. Is there anything else I can do? Reserve a table for you, perhaps? | turn: i am also looking for a hotel called [[limehouse]]
+- E1#59:s5 [user] previous turn, system: The Limehouse is a moderately priced 4 star guesthouse located in the North, would you like their contact information and address, or would you like to book a room? | turn: Can you tell me if [[Limehouse]] has internet access?
+- E1#59:s6 [user] turn: Yes, I'm looking for the hotel [[Limehouse]].
+- E1#59:s7 [system] previous turn, user: I am looking for a moderate price placed to say in the North side of the city please. | turn: There are several that fit the bill. I could recommend [[Limehouse]]. Would you like me to help you book there, or are there other factors you'd like to consider?
+- E1#59:s8 [system] previous turn, user: Can you help me find a hotel called Limehouse? Thanks. | turn: [[Limehouse]] phone number is 01223300552. Would like you to make a reservation?
+
+Return the JSON object now.

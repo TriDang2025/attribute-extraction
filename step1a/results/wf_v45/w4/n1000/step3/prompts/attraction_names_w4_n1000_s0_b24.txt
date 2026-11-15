@@ -1,0 +1,73 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 24 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#23  (mentions 8, distinct values 3)
+Examples:
+- E4#23:0 [system] previous turn, user: how about some entertainment? | turn: I do have one entertainment venue. It is called [[Whale of a Time]]. From what I hear, it is very popular. They are located at Unit 8, Viking Way, Bar Hill.
+- E4#23:1 [user] previous turn, system: The Whale of a Time entertainment venue is a fun choice. We also have museums and colleges to visit, if you'd like something quieter. | turn: Can you tell me the address for [[The Whale of a Time]] entertainment venue? And is there an entrance fee to get in there?
+- E4#23:2 [system] previous turn, user: I am also looking for a attraction called whale of a time. Do you have more information on that? | turn: [[Whale of Time]] is an entertainment venue in the West. The phone number is 01954781018. Do you need more information?
+- E4#23:3 [system] previous turn, user: If you could find me a good one, just tell me the area and I need a postcode | turn: [[Whale of a Time]] is a great place! It is in the West and the post code is cb238el. Do you need more information?
+- E4#23:4 [system] previous turn, user: I'm looking for things to do in the west. Can you recommend anything? | turn: [[The Whale of a Time]] entertainment venue is a fun choice. We also have museums and colleges to visit, if you'd like something quieter.
+
+### E4#135  (mentions 5, distinct values 2, low confidence)
+Examples:
+- E4#135:0 [system] previous turn, user: I really wanted a concerthall in the centre area, are you certain there isn't one? | turn: Actually, it looks like there is one named [[The Man on the Moon]]. Would you like more information about it?
+- E4#135:1 [system] previous turn, user: Sure, how about one that is in the type of entertainment? | turn: There is the [[Man on the Moon]] in the Centre located at 2 Nofolk St. Their phone number is 01223474144
+- E4#135:2 [user] previous turn, system: The man on the moon is in the centre part of town. It's address is 2 norfolk street. Would you like me to reserve a ticket? | turn: Can you tell me the entrance fee and postcode for [[The Man on the Moon]]?
+- E4#135:3 [system] previous turn, user: No I want to stay in the centre. Can you check if there are any concerthalls? | turn: [[The man on the moon]] is in the centre part of town. It's address is 2 norfolk street. Would you like me to reserve a ticket?
+- E4#135:4 [system] previous turn, user: Can you tell me the entrance fee and postcode for The Man on the Moon? | turn: The postcode for [[The Man on the Moon]] is cb12lf. You will need to give them a call at 01223474144 to find out the entrance fee.
+
+### E4#78  (mentions 2, distinct values 1)
+Examples:
+- E4#78:0 [system] previous turn, user: I just want the phone number and entrance fee please | turn: The entrance fee is not showing up on my computer, the address is [[The Grafton Centre]], East Road. Is there anything else I can assist you with?
+- E4#78:1 [system] previous turn, user: I'm going to be in the centre. Can you tell me a little about the one there? | turn: The Vue Cinema is in the centre of town. The address is [[The Grafton Centre]] on East Road, postcode cb11ps, and the phone number is 08712240240.
+
+### E4#39  (mentions 8, distinct values 1)
+Examples:
+- E4#39:0 [system] previous turn, user: I'm looking for a theatre in the centre. | turn: We have four theatres to choose from, I personal recommend the [[mumford theatre]], would you like more information?
+- E4#39:1 [system] previous turn, user: Not particularly. Which do you recommend? If you can provide an address, and info on entrance fees for your favorite, that would be great, thanks. | turn: There is a nice theatre in the centre called [[Mumford Theatre]] at Anglia Ruskin Enterprise, East Road. There are no entrance fee's listed. Would you like the phone number?
+- E4#39:2 [system] previous turn, user: Can you find me a theatre? | turn: Would you like the [[mumford theatre]]?
+- E4#39:3 [user] previous turn, system: Sure, there are 4 theatres in the centre of town. I suggest the Mumford Theatre at Anglia Ruskin Enterprise, East Road. Is there any other information you need? | turn: Yes, could you also give me the postcode and entrance fee for the [[Mumford Theatre]]?
+- E4#39:4 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the [[Mumford theatre]], it is located at Anglia Ruskin Enterprise, East Road in the Centre area.
+
+### E4#90  (mentions 6, distinct values 2)
+Examples:
+- E4#90:0 [system] previous turn, user: I am also looking for a theater in the same area. | turn: I would suggest the [[ADC Theatre]]. It is in the centre area.
+- E4#90:1 [system] previous turn, user: ADC Theatre will work. Can you tell me what part of town that is in? | turn: [[The ADC Theatre]] is in the center of town.
+- E4#90:2 [system] previous turn, user: Yes that would be great, thank you | turn: I'd recommend [[adc theatre]]. Would you like more information on it?
+- E4#90:3 [system] previous turn, user: I need a theatre in the centre of town. | turn: I found four theaters. Would you like to try the [[ADC Theatre]]?
+- E4#90:4 [system] previous turn, user: Can you give me the address, phone number and postcode for one in the centre area? | turn: [[adc theatre]] can be called at 01223300085. Their postcode is cb58as, and their address is park street. Anything else today?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#23, E4#135, E4#78, E4#39, E4#90) and its name as the value, like {"E4#23": "<name>"}.

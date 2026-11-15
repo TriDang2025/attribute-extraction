@@ -1,0 +1,28 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E1#46:s0": "P1", "E1#46:s1": "P2"}}
+
+Cluster E1#46 of entity E1 (mentions 13, distinct values 3).
+Examples:
+- E1#46:s0 [system] previous turn, user: Perfect. will you please give me the address, area, and phone number? | turn: Yes, their address is [[63 milton road]]. It is in the North par of town. Their phone number is 01223311625.
+- E1#46:s1 [system] previous turn, user: Can you give me the address, hotel type, and phone number for either of the hotels? | turn: Sure. The Lovell is indeed a hotel, not a guesthouse. You can find it at [[365 milton road]]. Their phone number is 01223425478.
+- E1#46:s2 [system] previous turn, user: No, thank you. I'll just need to know the hotel type and address, please? | turn: The Avalon is a guesthouse. The address is [[78-80 Milton Road]]. Can I help you with anything else?
+- E1#46:s3 [system] previous turn, user: Are there any hotels in the expensive price range in the north? | turn: name type area pricerange stars internet parking phone postcode address book (optional) alpha-milton guest house guesthouse north moderate 3 no no 01223311625 cb41xa [[63 milton road]] avalon guesthouse north moderate 4 yes no 01223353071 cb43pd 62 gilbert road are the available options
+- E1#46:s4 [system] previous turn, user: I need it to be in the north, and be an actual hotel and free parking. | turn: i recommend lovell lodge which has a moderate price range. its located in [[365 milton road]], cb41sr. phone number 01223425478. can i book for you?
+- E1#46:s5 [system] previous turn, user: Yes, I'm looking for the hotel Limehouse. | turn: limehouse is a moderate priced guesthouse in the north at [[78-80 milton road]]. Would you like to make a reservation?
+- E1#46:s6 [system] previous turn, user: No thank you but I do need the address please? | turn: Sure, the address is: [[63 milton road]], postcode cb41xa. Anything else I can get you?
+- E1#46:s7 [system] previous turn, user: I'm looking for a 2 star hotel in the north. | turn: I have two hotels meeting your criteria. Ashely Hotel located at 74 Chesterton road and Lovell Lodge located at [[365 Milton road]].
+- E1#46:s8 [system] previous turn, user: Great can I get their address, whether they have free parking, and internet? | turn: The address is [[78-80 milton road]]. They have free parking and internet.
+- E1#46:s9 [system] previous turn, user: The hotel should be in the north and doesn't need to include internet.and should be in the moderate price range | turn: I recommend the Alpha-Milton Guest House on [[63 milton road]]. Would you like me to go ahead and book you a room?
+- E1#46:s10 [system] previous turn, user: I need a hotel to stay in the north part of the town. | turn: Sure, there are 2 of them. I would recommend the Lovell Lodge at [[365 Milton Road]]. Can I book it for you?
+- E1#46:s11 [system] previous turn, user: Okay, may I please have their address? | turn: The address is [[78-80 Milton Road]].
+- E1#46:s12 [system] previous turn, user: I'm looking for a guesthouse. But I won't have a car with me, so I don't need any rigamarole with "free" parking. | turn: Sure! There is a three-star guesthouse without free parking at [[63 Milton Road]]. Would you like me to book the hotel for you?
+
+Return the JSON object now.

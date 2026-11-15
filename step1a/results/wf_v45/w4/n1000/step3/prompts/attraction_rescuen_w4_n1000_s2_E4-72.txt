@@ -1,0 +1,46 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 1 of 1 (1 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+Names already used for this entity (use one of them when the cluster holds the same kind of value with the same role): address, arrival_time, attraction_name, attraction_type, cinema_name, college, college_name, dropoff_location, entertainment_name, entrance_fee, hotel_name, location, location_name, location_postcode, medical_department, museum_name, nightclub_name, number_of_colleges, number_of_options, number_of_results, park_name, phone_number, place_name, place_type, postcode, price_range, reference_number, restaurant_name, stay_duration, swimming_pool, theatre_name, time, time_period, weather_condition
+
+### E4#72  (mentions 13, distinct values 3)
+Examples:
+- E4#72:0 [system] previous turn, user: Just give me a recommendation please. | turn: [[all saints church]] is very nice can I give you information on that one?
+- E4#72:1 [system] previous turn, user: Old churches would be nice thank you | turn: Okay, there are 5. I recommend [[All Saint's Church]] on Jesus Lane.
+- E4#72:2 [system] previous turn, user: I don't have a preference. Do you have any suggestions of stuff near the restaurant? | turn: How about the [[All Saint]]'s Church? Admission is free.
+- E4#72:3 [user] previous turn, system: Your booking was successful with a reference number of VZRQHFHP. Can I help you with anything else? | turn: Thanks great. Also I need to have the phone number for [[All Saints Church]] on Jesus Lane.
+- E4#72:4 [system] previous turn, user: Can you please provide me with the address, telephone number and the cost of admission. | turn: How about [[All Saint's Church]] at 01223452587 in the centre? It's free.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#72) and its name as the value, like {"E4#72": "<name>"}.

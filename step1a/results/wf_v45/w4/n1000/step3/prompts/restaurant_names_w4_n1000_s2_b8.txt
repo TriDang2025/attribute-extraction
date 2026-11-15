@@ -1,0 +1,71 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 8 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#12  (mentions 300, distinct values 273)
+Examples:
+- E3#12:0 [system] previous turn, user: Tell me about the Portuguese restaurant | turn: The restaurant is Nandos. I think you'll really like it. It's cheap and in the south area of town at Cambridge Leisure Park Clifton Way, post code [[cb17dy]].
+- E3#12:1 [system] previous turn, user: Great can I just get their address? | turn: Sure, prezzo is located at 21 - 24 Northampton Road postcode [[cb30ad]], would you also like their phone number?
+- E3#12:2 [system] previous turn, user: Any is fine, can I get the phone number and postcode of one you'd recommend? | turn: i'd recommend the oak bistro. their phone number is 01223323361. their postcode is [[cb21eg]].
+- E3#12:3 [system] previous turn, user: Oh what the heck money is no object, an expensive indian restaurant in the west. | turn: Tandoori Palace is the best one. It's at 68 Histon Road Chesterton, [[cb43le]]. Would you like a table booked?
+- E3#12:4 [system] previous turn, user: That sounds good. Can I get the postcode please? | turn: The postcode is [[cb43lf]], anything else?
+
+### E3#182  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#182:0 [system] previous turn, user: That sounds fine! Can I get their phone number, address, and postcode? | turn: You can reach Clare Hall at 01223 332 360, and their address is Herschel Road, [[CB3 9AL]]. Can I help you with anything else today?
+- E3#182:1 [user] previous turn, system: Do you know the name of this restaurant? | turn: The Hakka restaurant is located at 24 Milton Road Cambridge Cambridgeshire [[CB4 1JY]]. The average cost is approximately 30 per person.
+
+### E3#64  (mentions 6, distinct values 2)
+Examples:
+- E3#64:0 [system] previous turn, user: I would like a gastropub then if you have one open. | turn: I would suggest The Cow Pizza Kitchen and Bar. Great food. It is located on [[Corn Exchange Street]].
+- E3#64:1 [system] previous turn, user: No I do not have a price range but it does need to be located in the centre. | turn: I have found seven restaurants available in the moderate to expensive price range. Is there a [[street]] you would like to be near?
+- E3#64:2 [system] previous turn, user: No. How about gastropub type food? May I please have the address, phone number, and area? | turn: The cow pizza kitchen and bar serves gastropub food, is located in the centre part of town and is in the moderate price range. Their phone number is 01223 308871. The address is [[Corn Exchange Street]] and the postcode is C.B 2, 3QF
+- E3#64:3 [system] previous turn, user: Let's go with the moderately priced option. Can I please have the phone number? | turn: In the moderate price range, I have one place. It's called the Cow Pizza Kitchen and Bar. It's located on [[Corn Exchange Street]]. Do you need a reservation?
+- E3#64:4 [system] previous turn, user: I need the address of a restaurant that serves gastropub food. | turn: The cow pizza kitchen and bar serves Gastropub food. Their address is [[Corn Exchange Street]] in the centre area.
+
+### E3#25  (mentions 25, distinct values 5)
+Examples:
+- E3#25:0 [system] previous turn, user: Yes, that would be great. Can you also give me the entrance fee and postcode for that college? | turn: The address is [[regent street]] and there is no entry fee.
+- E3#25:1 [system] previous turn, user: I'm not sure if I would like to book one yet. Can you please tell me the address, phone number and postcdode? | turn: Address is De Vere University Arms [[Regent Street City Centre]], phone number 01223337766, and postcode cb21ab.
+- E3#25:2 [system] previous turn, user: Yes, that would be great and can you give me the postcode and their address please? | turn: The address is [[83 Regent Street]], postcode cb21aw. What day and time would you like to book?
+- E3#25:3 [system] previous turn, user: No, can you just get me the address, post code and phone number. | turn: The address is [[106 Regent Street]] City Centre, the post code is cb21dp and the phone number is 01223302330.
+- E3#25:4 [system] previous turn, user: Hello I am looking for a restaurant called J restaurant | turn: J restaurant is an asian oriental restaurant in the centre of town. It is cheap and located at [[86 Regent Street]] City Centre.
+
+### E3#80  (mentions 3, distinct values 2)
+Examples:
+- E3#80:0 [system] previous turn, user: How about Indian food? Can I have the address and phone number? | turn: cocum serves indian food. its address is [[71 castle street]] city centre and the phone number is 01223 366668, is there anything else I can help you with?
+- E3#80:1 [system] previous turn, user: The restaurant should be in the expensive price range | turn: Maharajah tandoori restaurant on 41518 [[Castle Street]] City Centre is a good fit for you.
+- E3#80:2 [system] previous turn, user: Let's try the west part of town. | turn: There are 5 in the West. You might want to try Cocum on [[71 Castle Street]] City Centre.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#12, E3#182, E3#64, E3#25, E3#80) and its name as the value, like {"E3#12": "<name>"}.

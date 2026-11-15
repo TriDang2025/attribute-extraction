@@ -1,0 +1,72 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 5 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#19  (mentions 11, distinct values 4)
+Examples:
+- E4#19:0 [system] previous turn, user: could i have the address and phone number please? | turn: sure, pizza hut cherry hinton is located at G4 cambridge leisure park [[clifton way]] cherry hinton and the phone number is 01223 413000. Is there anything else I can help you with?
+- E4#19:1 [system] previous turn, user: Are you sure that they have two locations? Can you tell me their address(es)? | turn: Nandos in the south is at [[Cambridge Leisure Park Clifton Way]]. Nandos City Centre is at 33-34 Saint Andrews Street. Do you need additional information?
+- E4#19:2 [system] previous turn, user: I would like Nusha. Can you give me the phone number and address for Nusha? | turn: The address for Nashua is unit g6, Cambridge leisure park, [[clifton road]]. Phone number is 01223902158.
+- E4#19:3 [system] previous turn, user: May I have the address and phone number of the Italian restaurant? | turn: That would be the Pizza Hut Cherry Hinton at [[G4 Cambridge Leisure Park Clifton Way]] Cherry Hinton, and they can be reached at 01223 323737. Can I help you with anything else today?
+- E4#19:4 [system] previous turn, user: Can I have the address of Lucky Star? | turn: Cambridge Leisure Park [[Clifton Way]] Cherry Hinton 01223 244277
+
+### E4#38  (mentions 6, distinct values 2)
+Examples:
+- E4#38:0 [system] previous turn, user: Can I have the address and phone number? | turn: The address is Cambridge Lodge Hotel 139 [[Huntingdon Road]] City Centre, postcode C.B 3, 0 d.Q, phone is 01223 355166
+- E4#38:1 [system] previous turn, user: I would like the phone number and the address of the expensive one. | turn: The Huntingdon Marriott Hotel is located at Kingfisher Way, Hinchinbrook Business Park, [[Huntingdon]], with a phone number of 01480446000. Would you like to book it?
+- E4#38:2 [system] previous turn, user: I am looking for the address for graffiti | turn: Their address is Hotel Felix Whitehouse Lane [[Huntingdon Road]]. Anything more I can help with?
+- E4#38:3 [system] previous turn, user: I would like the phone number and the address of the expensive one. | turn: The [[Huntingdon]] Marriott Hotel is located at Kingfisher Way, Hinchinbrook Business Park, Huntingdon, with a phone number of 01480446000. Would you like to book it?
+- E4#38:4 [system] previous turn, user: Is there anything else? give me the address and postcode please. | turn: There is also the Cambridge Lodge Restaurant also has expensive european food in the centre area at Cambridge Lodge Hotel 139 [[Huntingdon Road]] City Centre postal code CB30DQ
+
+### E4#20  (mentions 26, distinct values 7)
+Examples:
+- E4#20:0 [system] previous turn, user: I am also looking for a park in the east. Do you have any suggestions? | turn: [[cherry hinton]] water play park east 01223446100 cb18dw cherry hinton hall, cherry hinton road free
+- E4#20:1 [system] previous turn, user: That would be good. Can you make a recommendation? | turn: [[cherry hinton hall and grounds]] is an entertainment attraction in the east part of town.
+- E4#20:2 [system] previous turn, user: I am looking for information about the the Cherry Hinton Water Play | turn: That is a free park on the east side of town. They are located at Cherry Hinton Hall on [[Cherry Hinton Road]]. Their phone number is 01223446100.
+- E4#20:3 [user] previous turn, system: You're welcome! Is there anything else I can help you with? | turn: Yes, what type of attraction is [[Cherry Hinton Water Play]]?
+- E4#20:4 [system] previous turn, user: I am looking for information about the the Cherry Hinton Water Play | turn: That is a free park on the east side of town. They are located at [[Cherry Hinton Hall]] on Cherry Hinton Road. Their phone number is 01223446100.
+
+### E4#164  (mentions 1, distinct values 1)
+Examples:
+- E4#164:0 [system] previous turn, user: I would like the phone number and the address of the expensive one. | turn: The Huntingdon Marriott Hotel is located at Kingfisher Way, [[Hinchinbrook Business Park]], Huntingdon, with a phone number of 01480446000. Would you like to book it?
+
+### E4#92  (mentions 28, distinct values 4)
+Examples:
+- E4#92:0 [system] previous turn, user: How would I find TR6247 in Cambridge? | turn: Sorry for the mix-up the full address for [[Addenbrookes Hospital]] is (including postcode): Hills Rd, Cambridge, CB20QQ and their number is 01223245151. Can I help with anything else?
+- E4#92:1 [system] previous turn, user: I need to find the nearest hospital. | turn: The nearest hospital is [[Addenbrookes]]. The phone number is 01223245151. Do you need a specific department?
+- E4#92:2 [system] previous turn, user: Hi, I am looking for a hospital that offers medicine for the elderly | turn: [[Addensbrookes Hospital]] offers medicine for the elderly. Would you like more information about it?
+- E4#92:3 [system] previous turn, user: Good evening, where would I find a hospital in town please? | turn: [[The Addenbrookes Hospital]] is on Hills Rd., in Cambridge.
+- E4#92:4 [system] previous turn, user: am looking for the Addenbrookes Hospital | turn: [[Addenbrookes Hospital]] is located at Hills Rd, Cambridge, postcode CB20QQ. Is there a particular department you're looking for?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#19, E4#38, E4#20, E4#164, E4#92) and its name as the value, like {"E4#19": "<name>"}.

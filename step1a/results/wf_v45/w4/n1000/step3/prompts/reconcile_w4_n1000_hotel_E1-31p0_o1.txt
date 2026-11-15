@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#31/0: name: hotel name | description: entity_name
+Examples:
+- 1 [system] previous turn, user: A three star would be OK as long as it's got free parking. | turn: There are 3 moderately priced guesthouses with a 3 star rating that offers parking. They are the Bridge Guest House, [[Hamilton Lodge]] and Hobsons House.
+- 2 [user] previous turn, system: The postcode for the Hamilton Lodge is cb41da and the phone number is 01223365664. | turn: Can you tell me if the [[Hamilton]] is a hotel or guesthouse?
+- 3 [system] previous turn, user: How about 2 nights? And needs to start on Thursday? | turn: I have successfully booked your guesthouse at the [[Hamilton Lodge]] for two nights for 8 people, reference number 1TVIC54F. Is there anything else I can help you with?
+- 4 [system] previous turn, user: On Tuesday please. | turn: I've booked your room for two at [[Hamilton Lodge]]. You'll be staying for 2 nights beginning Tuesday. Your reference number is 3NT2B4SP. Can I help you find anything else today?
+- 5 [user] previous turn, system: hamilton lodge is in the north and has free wifi. Want me to book? | turn: Is [[Hamilton Lodge]] a hotel or guesthouse?
+
+Columns (5):
+- name: location str | examples: centre; cambridge; cambridge towninfo centre
+- name: star str | examples: bridge guest house; place to stay; 2 star guesthouse
+- name: location | examples: north; east; west
+- name: address | examples: warkworth house; 56 saint barnaba road; lensfield
+- name: proper noun | examples: hobson house; a & b guesthouse; a and b guest house
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#31/0", "reason": "str", "same_as": "<column name or none>"}

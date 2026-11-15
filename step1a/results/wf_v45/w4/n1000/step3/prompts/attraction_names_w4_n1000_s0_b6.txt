@@ -1,0 +1,75 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 6 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#33  (mentions 73, distinct values 7)
+Examples:
+- E4#33:0 [system] previous turn, user: I need to find the Parkside Police Station | turn: Here is the information for [[Parkside]] Police Station Telephone:01223358966 Address :Parkside, Cambridge Postcode :CB11JG
+- E4#33:1 [system] previous turn, user: I'd like to find some place to go on the east side of town. | turn: I can certainly suggest something for you. I have 10 options. Do you prefer an entertainment venue, or perhaps a museum or [[park]], etc?
+- E4#33:2 [system] previous turn, user: This heatwave is killing me and the kids are screaming about being too hot, can I get info on pools in the centre area? | turn: [[parkside pools]] is a nice place to cool your screaming kids off.
+- E4#33:3 [user] turn: Am looking for the [[Parkside Police Station]]
+- E4#33:4 [system] previous turn, user: Can you give me the address, phone number and postcode for one in the centre area? | turn: adc theatre can be called at 01223300085. Their postcode is cb58as, and their address is [[park street]]. Anything else today?
+
+### E4#1  (mentions 39, distinct values 10)
+Examples:
+- E4#1:0 [system] previous turn, user: I am looking for information about Cambridge. What kind of places can you go in town? | turn: I have colleges, museums, nightclubs, [[swimming pools]], etc? Is there something particular you would like to do and I can narrow it down.
+- E4#1:1 [user] turn: I am looking to plan a trip I am looking to book some tickets at a place called [[Abbey pool]] and astroturf pitch.
+- E4#1:2 [system] previous turn, user: Please give me their address and postcode. | turn: The address is [[Pool Way]], Whitehill Road, off Newmarket Road. Postcode cb58nt
+- E4#1:3 [system] previous turn, user: Where can I find a swimming pool in the north of town? | turn: I have two swimming pools listed north of town. The [[Jesus Green Outdoor Pool]] and the Kings Hedges Learner Pool. Do you have a preference?
+- E4#1:4 [system] previous turn, user: What attractions are nearby? | turn: Okay. There are boats, a park, and [[pools]]. Would like more information on any of this?
+
+### E4#98  (mentions 13, distinct values 6, low confidence)
+Examples:
+- E4#98:0 [system] previous turn, user: I'm looking for place to go, do you have any ideas? | turn: Were you interested more in something like night clubs or museums, or [[boats]]? Or something totally different?
+- E4#98:1 [system] previous turn, user: I don't see it. Is there any other attraction types it's listed under? | turn: No, that is the attraction type listed in our database. It is listed as a [[boat attraction]].
+- E4#98:2 [system] previous turn, user: Yes I am looking for a particular attraction called Jesus Green Outdoor Pool. | turn: It is in the north area address between victoria road and the [[river]], postcode cb43px and phone 01223302579. Despite the name the water is clear blue.
+- E4#98:3 [system] previous turn, user: The outdoor pool please. | turn: jesus green outdoor pool is located between victoria road and [[the river]], cb43px. Phone number is 01223302579. I'm afraid I don't have an entrance fee listed though.
+- E4#98:4 [system] previous turn, user: I am looking for attractions in the north, please. | turn: I have a couple of swimming pools, a [[boat area]], and a park that fit your description. Do you want any more information on any of these 3?
+
+### E4#84  (mentions 4, distinct values 1, low confidence)
+Examples:
+- E4#84:0 [user] previous turn, system: what would you like to know? | turn: I am looking for an attraction called [[camboats]], can you get me the address and postcode?
+- E4#84:1 [system] previous turn, user: 3 nights starting on Saturday, can I get the reference number as well? We are also looking for an attraction called Camboats, can you help me? | turn: You are booked at Archway House. Your reference number is 2G8LC07R. [[Camboats]] is a boating attraction in the east. What other information do you need?
+- E4#84:2 [system] previous turn, user: Oh my, I got ahead of myself. First, I need a place to go in the east for a boat attraction. Can you help? | turn: I have the [[camboats]] located in the east.
+- E4#84:3 [user] previous turn, system: How long will you be staying? | turn: 3 nights starting on Saturday, can I get the reference number as well? We are also looking for an attraction called [[Camboats]], can you help me?
+
+### E4#114  (mentions 8, distinct values 2)
+Examples:
+- E4#114:0 [user] turn: Hello, I am looking for information on [[kambar]]. What do you know about that attraction?
+- E4#114:1 [system] previous turn, user: get phone number, area, and postcode of Kambar. | turn: [[Kambar nightclub]] is in the centre area. The phone# is 01223842725 and the postcode is cb23qb.
+- E4#114:2 [user] turn: Hi! I'm looking for an attraction named [[Kambar]].
+- E4#114:3 [system] previous turn, user: Please give me their postcode | turn: The postcode for [[Kambar]] is CB23QB.
+- E4#114:4 [user] previous turn, system: We have 6 nightclubs in town. Most of them are in the center, and Kambar, at 1 Wheeler St., is my favorite. | turn: get phone number, area, and postcode of [[Kambar]].
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#33, E4#1, E4#98, E4#84, E4#114) and its name as the value, like {"E4#33": "<name>"}.

@@ -1,0 +1,64 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 16 of 20 (100 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E1#89  (mentions 1, distinct values 1)
+Examples:
+- E1#89:0 [system] previous turn, user: Man, we are just not having much luck tonight, huh? Okay, can you see if there are any available for one night? | turn: I was able to book you at [[Charlie Chan]]'s. Your reference # is ZWMR0D97. I also found you a room at Worth House for 1 night. Reference # is 0HEBRY1Y.
+
+### E1#17  (mentions 16, distinct values 3)
+Examples:
+- E1#17:0 [system] previous turn, user: I do not have a preference on area. | turn: I can suggest the [[avalon]] located in the north it is moderately priced with 4 stars. Would you like to make reservations?
+- E1#17:1 [system] previous turn, user: I'd like it to be moderate, any will do. And I'd like to book it for 5 people and 4 nights, starting on the same day. | turn: I have the [[avalon guesthouse]] in the north area. Would you like that one booked?
+- E1#17:2 [system] previous turn, user: I would like free wifi. | turn: [[The Avalon]] may be a good choice.
+- E1#17:3 [user] turn: I'm planning a trip with an Arthurian theme. I've heard there's a hotel called [[Avalon]] there in Cambridge. Is that right?
+- E1#17:4 [system] previous turn, user: what area of town? what's the price? | turn: Alpha-milton guest house has a moderate price range in the north, as is [[Avalon guesthouse]]. a and b is in the east, also moderate.
+- E1#17:5 [system] previous turn, user: That sounds perfect. Can I book it for 5 nights starting on Monday for 3 people? | turn: [[The Avalon]] doesn't have room for 5 nights starting Monday. How about a different day or a shorter stay?
+
+### E1#81  (mentions 2, distinct values 2)
+Examples:
+- E1#81:0 [user] previous turn, system: I have the TR8241 leaving at 13:11. Will that work? | turn: That's perfect please make a booking for 5 and then let me have the reference number. Also can you help me find an [[architecture attraction]]?
+- E1#81:1 [user] turn: Hello, i'm looking for a cheap hotel in the cambridge area close to [[local attractions]]. I don't need internet or parking. Can you help?
+
+### E1#55  (mentions 2, distinct values 2)
+Examples:
+- E1#55:0 [system] previous turn, user: Can you look for a nice museum instead? | turn: There's 7 museums in the west and I highly recommend the [[cafe jello gallery]]. Would you like more information?
+- E1#55:1 [system] previous turn, user: It does not matter and please provide the entrance fee. | turn: I can suggest the [[Castle Galleries]] in the city centre. There is no entrance fee.
+
+### E1#54  (mentions 2, distinct values 1)
+Examples:
+- E1#54:0 [system] previous turn, user: Actually, I think that what I really want is a hotel that is in the same area as a swimming pool. Are there any public swimming pools in town? | turn: [[Parkside Pools]] are in the centre of town, if that would be okay.
+- E1#54:1 [system] previous turn, user: get me the address, phone number, and area. i am also looking for a 4 start place to stay in the north | turn: [[Parkside pools]] is gonville place. The area is the centre and phone number is 01223446100.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#89, E1#17, E1#81, E1#55, E1#54) and its name as the value, like {"E1#89": "<name>"}.

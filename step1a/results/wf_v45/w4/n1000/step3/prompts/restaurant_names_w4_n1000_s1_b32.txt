@@ -1,0 +1,66 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 32 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#146  (mentions 6, distinct values 3)
+Examples:
+- E3#146:0 [system] previous turn, user: The cuisine doesn't really matter, but I guess I should try some British food while I'm there? | turn: I found the [[saint johns chop house]]. Would you like more information?
+- E3#146:1 [system] previous turn, user: Yes, I would like the address and phone number. | turn: [[saint johns]] chop house phone number is 01223 353110 and is located at 21 - 24 Northampton Street
+- E3#146:2 [system] previous turn, user: I would like to get information about moderately priced. | turn: I have [[st johns chop house]] within the moderate price range. Can I book it for you?
+- E3#146:3 [system] previous turn, user: Let's try the west. | turn: I have one in the west called [[Saint Johns Chop House]]. Would you like a reservation here?
+- E3#146:4 [system] previous turn, user: British sounds good. What's it called? | turn: [[Saint johns chop house]] serves british food in the west part of town and is in the moderate price range. Would you like their location?
+
+### E3#168  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#168:0 [system] previous turn, user: Thanks. I also need information about a specific restaurant called michaelhouse cafe. What can you tell me about it? | turn: It's an expensive european place in the centre at [[St. Michael's Church]] Trinity Street City Centre cb21su with phone 01223309147. Would you like to book a table?
+
+### E3#77  (mentions 2, distinct values 1)
+Examples:
+- E3#77:0 [system] previous turn, user: How about choosing a famous one and give me the address, postcode and entrance fee. | turn: [[corpus christi]] is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is 2 pounds.
+- E3#77:1 [system] previous turn, user: I'm looking for colleges in town, are there any in the same area as La Raza? | turn: Yes, there are 13. I'd recommend [[Corpus Christi]]. Would you like more information?
+
+### E3#178  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#178:0 [user] previous turn, system: Absolutely. What sort of cuisine would you like? | turn: I'd like [[modern American]] in the moderate price range, if possible?
+- E3#178:1 [user] previous turn, system: I have none that match your criteria. May I suggest a different area or food type? | turn: If you don't have any [[Modern American places]], maybe Modern European?
+
+### E3#166  (mentions 7, distinct values 2, low confidence)
+Examples:
+- E3#166:0 [system] previous turn, user: What about an expensive restaurant in the centre? | turn: Sure I have many types of cuisine to choose from: African, French, Asian Oriental, British, [[European]]..any preference?
+- E3#166:1 [system] previous turn, user: How about something just in the cheap price range? | turn: There are a number of cheap options, though none of them serve Austrian food. There are Asian Oriental, Chinese, Indian, Italian, Mediterranean, [[Modern European]], Portuguese, and Spanish.
+- E3#166:2 [system] previous turn, user: How about european food? | turn: Would you prefer European or modern [[European]] food?
+- E3#166:3 [system] previous turn, user: I am looking for a moderately priced restaurant in the south part of town. | turn: There are two moderately priced restaurants in the south. Would you prefer Italian or [[Modern European]]?
+- E3#166:4 [system] previous turn, user: I'm looking for an expensive restaurant in the west. | turn: There are 9 expensive restaurants in the west. There are British, [[European]], Indian, and Thai food to choose from. Which would you prefer?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#146, E3#168, E3#77, E3#178, E3#166) and its name as the value, like {"E3#146": "<name>"}.

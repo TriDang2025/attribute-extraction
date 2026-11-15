@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E4#39:s0": "P1", "E4#39:s1": "P2"}}
+
+Cluster E4#39 of entity E4 (mentions 8, distinct values 1).
+Examples:
+- E4#39:s0 [system] previous turn, user: I'm looking for a theatre in the centre. | turn: We have four theatres to choose from, I personal recommend the [[mumford theatre]], would you like more information?
+- E4#39:s1 [system] previous turn, user: Not particularly. Which do you recommend? If you can provide an address, and info on entrance fees for your favorite, that would be great, thanks. | turn: There is a nice theatre in the centre called [[Mumford Theatre]] at Anglia Ruskin Enterprise, East Road. There are no entrance fee's listed. Would you like the phone number?
+- E4#39:s2 [system] previous turn, user: Can you find me a theatre? | turn: Would you like the [[mumford theatre]]?
+- E4#39:s3 [user] previous turn, system: Sure, there are 4 theatres in the centre of town. I suggest the Mumford Theatre at Anglia Ruskin Enterprise, East Road. Is there any other information you need? | turn: Yes, could you also give me the postcode and entrance fee for the [[Mumford Theatre]]?
+- E4#39:s4 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the [[Mumford theatre]], it is located at Anglia Ruskin Enterprise, East Road in the Centre area.
+- E4#39:s5 [user] turn: Is the [[mumford theatre]] still in operation?
+- E4#39:s6 [system] previous turn, user: Hi, I need help planning a trip to Cambridge. I'd like to go to the theatre while I'm in town, and I'll be in the city centre. Is there one there? | turn: I actually have 4 different ones. If I may suggest one, the [[Mumford Theatre]] is new and really fun.
+- E4#39:s7 [system] previous turn, user: No, but are there any theatres in the center of town? | turn: Sure, there are 4 theatres in the centre of town. I suggest the [[Mumford Theatre]] at Anglia Ruskin Enterprise, East Road. Is there any other information you need?
+
+Return the JSON object now.

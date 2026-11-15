@@ -1,0 +1,27 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E2#6:s0": "P1", "E2#6:s1": "P2"}}
+
+Cluster E2#6 of entity E2 (mentions 12, distinct values 6).
+Examples:
+- E2#6:s0 [user] previous turn, system: They are located at the plough, green end, fen ditton. Do you need any other information? | turn: Their phone number would be super and then I need to book a taxi for getting to and from the [[camboats]] to the restaurant on time.
+- E2#6:s1 [user] previous turn, system: I can help with that! What time do you need that taxi? And will you need to be picked up at the riverboat or the hotel? | turn: I need a taxi that will take me from the [[riverboat]] to the hotel. I want to leave the riverboat at 04:00.
+- E2#6:s2 [user] previous turn, system: Camboats is located at the plough, green end, fen ditton, in the east side of town. | turn: ok! Thank you! Can you get me a taxi to [[cambots]]?
+- E2#6:s3 [system] previous turn, user: Yes please. I am also looking for a particular restaurant, it's called the rice boat. | turn: I found the [[rice boat]] but did you still need that hotel booked?
+- E2#6:s4 [user] turn: i want to book a taxi. The taxi should depart from la Margarita and should go to [[riverboat Georgina]].
+- E2#6:s5 [user] previous turn, system: It's at cambridge passenger cruisers, jubilee house. Would you like any other information about it, or can I help you with anything else? | turn: I'd like to book a taxi to go between [[the boat]] and the hotel.
+- E2#6:s6 [user] previous turn, system: Sure, the postcode is CB58SX. Is there anything else I can help you with? | turn: Can you book a taxi for me? I want to leave [[Camboats]] by 14:30 to head back to the hotel.
+- E2#6:s7 [system] previous turn, user: I'd like to book a taxi to go between the boat and the hotel. | turn: I can help with that! What time do you need that taxi? And will you need to be picked up at the [[riverboat]] or the hotel?
+- E2#6:s8 [system] previous turn, user: no, what the address and area of town, also I will be needing a cab as well. | turn: [[Camboats]] is located at the plough, green end, fen ditton, in the east side of town.
+- E2#6:s9 [user] previous turn, system: I can help with that! What time do you need that taxi? And will you need to be picked up at the riverboat or the hotel? | turn: I need a taxi that will take me from the riverboat to the hotel. I want to leave the [[riverboat]] at 04:00.
+- E2#6:s10 [user] previous turn, system: what will be your depature site? | turn: Sorry, actually I need to go from [[Camboats]] to The Copper Kettle. I want to get there by 18:15.
+- E2#6:s11 [user] previous turn, system: Absolutely! Just let me know where you'd like to depart from, and either what time you want to leave or arrive by. | turn: I need to be at [[Camboats]] by 8:15
+
+Return the JSON object now.

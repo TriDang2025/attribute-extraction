@@ -1,0 +1,81 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 12 of 20 (100 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E1#46  (mentions 13, distinct values 3)
+Examples:
+- E1#46:0 [system] previous turn, user: Perfect. will you please give me the address, area, and phone number? | turn: Yes, their address is [[63 milton road]]. It is in the North par of town. Their phone number is 01223311625.
+- E1#46:1 [system] previous turn, user: Can you give me the address, hotel type, and phone number for either of the hotels? | turn: Sure. The Lovell is indeed a hotel, not a guesthouse. You can find it at [[365 milton road]]. Their phone number is 01223425478.
+- E1#46:2 [system] previous turn, user: No, thank you. I'll just need to know the hotel type and address, please? | turn: The Avalon is a guesthouse. The address is [[78-80 Milton Road]]. Can I help you with anything else?
+- E1#46:3 [system] previous turn, user: Are there any hotels in the expensive price range in the north? | turn: name type area pricerange stars internet parking phone postcode address book (optional) alpha-milton guest house guesthouse north moderate 3 no no 01223311625 cb41xa [[63 milton road]] avalon guesthouse north moderate 4 yes no 01223353071 cb43pd 62 gilbert road are the available options
+- E1#46:4 [system] previous turn, user: I need it to be in the north, and be an actual hotel and free parking. | turn: i recommend lovell lodge which has a moderate price range. its located in [[365 milton road]], cb41sr. phone number 01223425478. can i book for you?
+- E1#46:5 [system] previous turn, user: Yes, I'm looking for the hotel Limehouse. | turn: limehouse is a moderate priced guesthouse in the north at [[78-80 milton road]]. Would you like to make a reservation?
+
+### E1#60  (mentions 9, distinct values 5)
+Examples:
+- E1#60:0 [system] previous turn, user: Any area is fine are there any with a 3 star rating? I don't need free parking or internet. | turn: [[alpha-milton guest house]] is in the north. Would you like me to book you a room?
+- E1#60:1 [system] previous turn, user: Okay. Could you also help me with a a place to stay. I am looking for a guesthouse with 3 stars. | turn: [[Alpha Milton Guest House]] is a nice place,do you want more information?>
+- E1#60:2 [system] previous turn, user: I would prefer something in the north part of town. | turn: I have the [[alpha-milton guesthouse]] and the hamilton lodge. Both moderately priced. Will you need internet?
+- E1#60:3 [system] previous turn, user: Could I get the stars of the hotel and phone numbers? | turn: [[the alpha-milton guest house]] is a three star location in the moderate price range. their phone number is 122 331 1625.
+- E1#60:4 [system] previous turn, user: Is that 3 star with a moderate price? | turn: [[The Alpha-Minton Guest House]] sounds like it will be perfect for you. It's a moderately-priced, 3-star guesthouse in the north. Can I book a room for you?
+- E1#60:5 [system] previous turn, user: what area of town? what's the price? | turn: [[Alpha-milton guest house]] has a moderate price range in the north, as is Avalon guesthouse. a and b is in the east, also moderate.
+
+### E1#22  (mentions 21, distinct values 6)
+Examples:
+- E1#22:0 [user] previous turn, system: The postcode is cb21dq, and the address is regent street. | turn: Thank you! I'm also looking for a hotel called [[aylesbray lodge guest house]].
+- E1#22:1 [system] previous turn, user: i would like to stay somewhere that has free parking | turn: There are 14 hotels in the area that match your criteria, would you be interested in the [[Arbury Lodge Guesthouse]]?
+- E1#22:2 [system] previous turn, user: I need it for 3 nights starting Thursday. There will be 5 of us. | turn: You're all set I've booked the [[Aylesbray lodge]] guesthouse for 3 nights 5 people starting Thursday. Your reference # is DTX3QITL. Is there anything else I can help you with?
+- E1#22:3 [user] turn: I am looking for a hotel named [[alyesbray lodge guest house]].
+- E1#22:4 [system] previous turn, user: No that does not matter. Please make a suggestion and book it for 1 people and 4 nights starting from sunday. | turn: how about [[arbury lodge]] guesthouse?
+- E1#22:5 [system] previous turn, user: Thank you! I'm also looking for a hotel called aylesbray lodge guest house. | turn: [[The aylesbray guest house]] is a 4 start guest house located in the south area of town and it is moderate in price.
+
+### E1#31  (mentions 32, distinct values 3)
+Examples:
+- E1#31:0 [user] turn: I'm looking for a hotel called [[hamilton lodge]].
+- E1#31:1 [system] previous turn, user: Yes please book it for 6 people and 5 nights starting from wednesday. | turn: [[The Hamilton Lodge]] was unable to accommodate your request for 5 nights. Would you like to try a different day or a shorter stay?
+- E1#31:2 [user] previous turn, system: The postcode for the Hamilton Lodge is cb41da and the phone number is 01223365664. | turn: Can you tell me if the [[Hamilton]] is a hotel or guesthouse?
+- E1#31:3 [system] previous turn, user: Yes please that sounds great! | turn: i recommend [[hamilton lodge]]. can i give you their contact?
+- E1#31:4 [system] previous turn, user: Let's try the guesthouse, could you provide me with their telephone number? | turn: [[The Hamilton Lodge]] is a guesthouse. Their phone number is 01223365664. Can I book a room for you there?
+- E1#31:5 [system] previous turn, user: Wednesday, 6 people, for five nights, please. | turn: I am sorry, the Hamilton is already booked. Would you be interested in the Bridge Guest House instead? It is the same as the [[Hamilton]] but is in the Southern area.
+
+### E1#28  (mentions 15, distinct values 10)
+Examples:
+- E1#28:0 [system] previous turn, user: I need to find a hotel in the west of town and have at least a 4 star rating. | turn: Both the [[Huntingdon Marriott]] and the Cambridge Belfry fit that criteria. Would you like me to make a reservation?
+- E1#28:1 [user] previous turn, system: Your booking has been successfully made. The reference number is K87KE3LM. Enjoy your meal! | turn: Thank you! I'm also looking for information on a hotel called [[Huntington Marriott Hotel]] please.
+- E1#28:2 [system] previous turn, user: I may have been confusing you. Could you try and book a 4 star, expensive hotel for 3 nights, starting on Saturday? 3 people. Wifi please. | turn: Sure. I was able to book you for the [[Huntingdon Marriott Hotel]]. Reference #IHGCTXH9. Anything else I can help with?
+- E1#28:3 [system] previous turn, user: I ned it to be a hotel in the west please. | turn: I would recommend the 4 star [[Hungtington Marriott Hotel]]. It does have free parking and internet. Would you like to make a reservation?
+- E1#28:4 [user] previous turn, system: I am happy to help, what was the name of the place? | turn: Its the [[huntingdon marriot]]. I'd like to book it for 8 people on 2 nights starting on wednesday, and I'll need a reference number.
+- E1#28:5 [system] previous turn, user: Is that an expensive restaraunt? I really need someplace expensive, it is a special occasion for me. | turn: I'd suggest cambridge lodge restaurant on Cambridge Lodge Hotel 139 [[Huntingdon Road]] City Centre, cb30dq. Would you like me to make a reservation?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#46, E1#60, E1#22, E1#31, E1#28) and its name as the value, like {"E1#46": "<name>"}.

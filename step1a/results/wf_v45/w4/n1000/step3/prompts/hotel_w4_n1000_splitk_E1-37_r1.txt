@@ -1,0 +1,26 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E1#37:s0": "P1", "E1#37:s1": "P2"}}
+
+Cluster E1#37 of entity E1 (mentions 11, distinct values 10).
+Examples:
+- E1#37:s0 [user] previous turn, system: I need to know for what day and time and for how many people please | turn: Make the reservation for 3 people on Friday at [[20:00]]. Thank you!
+- E1#37:s1 [user] previous turn, system: Sure can! What day are you checking in? | turn: i would like to check in on monday at [[5:30]]
+- E1#37:s2 [user] previous turn, system: Booking was successful. Reference number is : FBDR5BNR. | turn: So you need to arrive on Thursday after [[11:00 am]] to check-in.
+- E1#37:s3 [system] previous turn, user: No, can you give me the travel time, departure time, and train ID for the train you mentioned? | turn: TR1590 leaves at [[11:32]] and the duration is 60 minutes.
+- E1#37:s4 [user] previous turn, system: How many people will be staying? Also, when would you like to check in? | turn: Sure, just me. Monday at [[12:00]] is fine.
+- E1#37:s5 [system] previous turn, user: No. I'm all set. Thanks again. | turn: I remind you that you can check-in in this guesthouse after [[3:00 pm]]. You can leave your suitcases anytime.
+- E1#37:s6 [user] previous turn, system: I have located the grafton hotel restaurant, would you like more info or a booking? | turn: Please book reservation for 2 people at [[16:00]] on Friday. Send me the reference number.
+- E1#37:s7 [user] previous turn, system: My apologies. Allenbell is not in the south. However, I highly recommend the 4 star Aylesbray Lodge located in the south and moderately priced. Can I help you with your booking? | turn: How many stars, also the postcode and address? I will also need a taxi and want it to arrive by [[17:00]]. Contact number and car type.
+- E1#37:s8 [user] previous turn, system: How many people should I reserve for and at what time? | turn: a table for 2 at [[17:15]] and give me reference number. also find me a hotel in the east side and should have a star of 4
+- E1#37:s9 [user] previous turn, system: How many nights would you like to stay? | turn: monday and I actually meant [[17:30]] and for 6 people. Sorry, things are hectic and im a little scatterbrained.
+- E1#37:s10 [system] previous turn, user: Make the reservation for 3 people on Friday at 20:00. Thank you! | turn: I've got it booked for you at [[20:00]] on Friday for 3 people. They'll hold your table for 15 minutes. Your reference number is Y2C9CD1C.
+
+Return the JSON object now.

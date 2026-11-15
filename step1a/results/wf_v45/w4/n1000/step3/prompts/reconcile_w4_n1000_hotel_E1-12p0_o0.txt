@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#12/0: name: day | description: length_of_stay
+Examples:
+- 1 [system] previous turn, user: Can you choose one of the moderately priced ones for me, please? | turn: Absolutely, [[what day]] would you like to book this for?
+- 2 [system] previous turn, user: Yes, can you book that for me and send me a reference number please? | turn: I can certainly help you book a room. I will just need to know how many guests, [[how many days]] you are staying, and what day you plan to arrive.
+- 3 [user] previous turn, system: That's a lovely 4 star guesthouse in the south part of town. What would you like to know? | turn: Yes please book it for the same group of people and 2 nights starting from the [[same day]].
+- 4 [system] previous turn, user: Yes, book one night please. What is the star rating by the way? Also what parks are in the west area? | turn: its a 4-star. from [[which day]] should i book?
+- 5 [system] previous turn, user: No the area doesn't matter as much, please provide me with the reference number. | turn: [[What date]] are you checking in and how many are in your party?
+
+Columns (5):
+- name: date | examples: sunday; friday; thursday
+- name: num nights | examples: 4 night; 2 night; 2
+- name: num people | examples: 3 night; 6 people; 3 people
+- name: day of week | examples: thursday; tuesday
+- name: duration | examples: duration; short period; staying for 2 night
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#12/0", "reason": "str", "same_as": "<column name or none>"}

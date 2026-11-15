@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E1#31:s0": "P1", "E1#31:s1": "P2"}}
+
+Cluster E1#31 of entity E1 (mentions 32, distinct values 3).
+Examples:
+- E1#31:s0 [user] turn: I'm looking for a hotel called [[hamilton lodge]].
+- E1#31:s1 [system] previous turn, user: Yes please book it for 6 people and 5 nights starting from wednesday. | turn: [[The Hamilton Lodge]] was unable to accommodate your request for 5 nights. Would you like to try a different day or a shorter stay?
+- E1#31:s2 [user] previous turn, system: The postcode for the Hamilton Lodge is cb41da and the phone number is 01223365664. | turn: Can you tell me if the [[Hamilton]] is a hotel or guesthouse?
+- E1#31:s3 [system] previous turn, user: Yes please that sounds great! | turn: i recommend [[hamilton lodge]]. can i give you their contact?
+- E1#31:s4 [system] previous turn, user: Let's try the guesthouse, could you provide me with their telephone number? | turn: [[The Hamilton Lodge]] is a guesthouse. Their phone number is 01223365664. Can I book a room for you there?
+- E1#31:s5 [system] previous turn, user: Wednesday, 6 people, for five nights, please. | turn: I am sorry, the Hamilton is already booked. Would you be interested in the Bridge Guest House instead? It is the same as the [[Hamilton]] but is in the Southern area.
+- E1#31:s6 [system] previous turn, user: Are they all guesthouses? | turn: Yes, they are all guesthouses. Can I suggest the [[hamilton lodge]], a 3 star, moderately priced guesthouse with wifi, in the north area?
+- E1#31:s7 [system] previous turn, user: The hotel name I am looking for is named Hamilton Lodge. | turn: [[The Hamilton Lodge]] is a guesthouse located in the north. They are moderately priced and have a 3-star rating. They offer both free wifi and free parking.
+- E1#31:s8 [system] previous turn, user: Wednesday, 6 people, for five nights, please. | turn: I am sorry, the [[Hamilton]] is already booked. Would you be interested in the Bridge Guest House instead? It is the same as the Hamilton but is in the Southern area.
+- E1#31:s9 [system] previous turn, user: Do you have one in the north with free wifi? | turn: [[hamilton lodge]] is in the north and has free wifi. Want me to book?
+- E1#31:s10 [system] previous turn, user: Do you know if they offer internet and free parking? | turn: Yes [[the hamilton lodge]] offers both free parking and internet. Would you like to make a reservation?
+- E1#31:s11 [system] previous turn, user: How about 2 nights? And needs to start on Thursday? | turn: I have successfully booked your guesthouse at the [[Hamilton Lodge]] for two nights for 8 people, reference number 1TVIC54F. Is there anything else I can help you with?
+- E1#31:s12 [system] previous turn, user: Well what about helping me find something to visit in Cambridge? What is there to do on the west side? | turn: I apologize for the trouble earlier. I managed to find you a guesthouse called [[The Hamilton Lodge]] and made a successful reservation. The reference number is EL0WI0ZV.
+- E1#31:s13 [system] previous turn, user: I need a 3 star hotel in Cambridge, that offers a guesthouse, can you book it for me ? | turn: Yes, [[hamilton lodge]] is located on 156 chesterton road.
+- E1#31:s14 [user] previous turn, system: The Hamilton Lodge would be perfect! It is a moderately priced 3 star guesthouse on the north side of town. Does that sound okay to you? | turn: Does the [[The Hamilton Lodge]] have both free wifi and free parking?
+- E1#31:s15 [system] previous turn, user: A three star would be OK as long as it's got free parking. | turn: There are 3 moderately priced guesthouses with a 3 star rating that offers parking. They are the Bridge Guest House, [[Hamilton Lodge]] and Hobsons House.
+
+Return the JSON object now.

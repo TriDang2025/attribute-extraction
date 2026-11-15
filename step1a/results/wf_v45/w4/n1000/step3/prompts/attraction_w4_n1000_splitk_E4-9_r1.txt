@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E4#9:s0": "P1", "E4#9:s1": "P2"}}
+
+Cluster E4#9 of entity E4 (mentions 8, distinct values 6).
+Examples:
+- E4#9:s0 [system] previous turn, user: I'm looking for colleges to visit in the centre of town. | turn: There are 13 colleges in the centre. King's College and [[Saint Catharine's College]] are on the same street and both have free admission.
+- E4#9:s1 [system] previous turn, user: Ok, can you give me the phone number and address please? | turn: [[saint catharine]]'s college address is king's parade. Their phone number is 01223338300. Is there anything else I can do for you today?
+- E4#9:s2 [system] previous turn, user: Can you provide the phone number and post code to the attraction? | turn: King's College is cb21st and their number is 01223331100. [[Saint Catharine's]] is cb21rl and their number is 01223338300.
+- E4#9:s3 [system] previous turn, user: Not really, but what is the fee? | turn: Most are free, but Corpus Christi has a 2 pound fee, [[Saint John]]'s has a 2.50 pound fee, and Trinity has a 1 pound fee.
+- E4#9:s4 [system] previous turn, user: I am looking for college attractions in the centre. | turn: I have about 13 different colleges in that area. Might I suggest [[Saint John's College]]. It does have a small entrance fee of 2.50 pounds but is one of the nicest.
+- E4#9:s5 [user] previous turn, system: Happy to help. What is the name of the attraction you are interested in? | turn: It's called [[St. Catherine's College]]. What's the fee to get in there, and is it a college, architecture, or what?
+- E4#9:s6 [system] previous turn, user: maybe, give me the address of one please | turn: There are several college's in the centre. How about [[Saint Catharine's College]]? It is on King's Parade and has free admission.
+- E4#9:s7 [user] previous turn, system: Your rooms have been booked for Monday. The reference number is JJK77QKA. Is there anything else I can do for you? | turn: Yes, I was looking for a particular attraction, [[Saint Catharine's College]]. What area is it located in?
+
+Return the JSON object now.

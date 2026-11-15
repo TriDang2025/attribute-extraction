@@ -1,0 +1,55 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 15 of 15 (73 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E0#37  (mentions 1, distinct values 1)
+Examples:
+- E0#37:0 [system] previous turn, user: What part of town is that on? I'll also need a train on Friday. | turn: [[Byard art]] is on the south end of town.
+
+### E0#20  (mentions 52, distinct values 1)
+Examples:
+- E0#20:0 [system] previous turn, user: I would like to depart from ely. | turn: There are 10 trains going to Cambridge from [[Ely]] on Monday. Is there a certain time you would like to depart by?
+- E0#20:1 [user] previous turn, system: what about TR5729? it leaves at 13:17 on saturday | turn: Don't you need to know where I am leaving from? Does that train leave from [[Ely]]?
+- E0#20:2 [user] previous turn, system: Okay, where are you departing? | turn: I'm leaving from [[ely]] to cambridge.
+- E0#20:3 [system] previous turn, user: Yes. One ticket. I need the travel time and train ID. | turn: Okay, I have you booked on TR1549 from Cambridge to [[Ely]] leaving Wednesday at 17:50, arriving 17 minutes later at 18:07. The reference number is RHE56NAC. Anything else today?
+- E0#20:4 [user] previous turn, system: Ok, and where are you heading to? | turn: I am heading to [[Ely]].
+- E0#20:5 [user] previous turn, system: The best match for your time is the train TR6517 which leaves at 11:35. Do you want me to book it for you? | turn: Is this train going to [[Ely]] or departing Ely? I believe I made a mistake is saying going to Ely when I should be departing Ely arriving in Cambridge.
+- E0#20:6 [system] previous turn, user: I will be departing from Cambridge to ely. | turn: There are four trains that can get you to [[Ely]] by 13:45, do you have a particular departure time preference?
+- E0#20:7 [system] previous turn, user: Ok I will book that for you and get you a confirmation number | turn: Just to be clear, you want me to book 1 seat on train TR4389, departing [[Ely]] at 15:35. Is that correct?
+
+### E0#64  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E0#64:0 [system] previous turn, user: Yes. Please book for 2 people. | turn: Your passage has been booked. 16.16 [[GPB]] will be payable at the station and your reference number is ZVFTQ0X3. Will that be all?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#37, E0#20, E0#64) and its name as the value, like {"E0#37": "<name>"}.

@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#27/3: name: location full | description: location_full
+Examples:
+- 1 [user] previous turn, system: Where are you traveling to and from? | turn: I am going to cambridge from [[birmingham new street]].
+- 2 [system] previous turn, user: I'm departing from birmingham new street on Saturday and I'd like to leave after 12:45. | turn: How about TR8390 that leaves [[birmingham new street]] at 13:40 on Saturday. It arrives in cambridge at 16:23. The price is 60.08. Shall I book it?
+- 3 [user] previous turn, system: There are 278 entries that match your request. Where will you be departing from and what is your destination? | turn: I will be going to cambridge and should depart from [[birmingham new street]].
+- 4 [user] previous turn, system: There are several trains departing for Cambridge on Tuesday. One train departs every hour starting at 06:08 | turn: I would like to depart from [[birmingham new street]] after 14:45.
+- 5 [user] previous turn, system: You have been booked at the Prezzo for Wednedsday at 15:15 for 4 people. Your reference number is KCV0WNR3. Your table will be reserved for 15 minutes. Anything else? | turn: I also need a train going to cambridge and departing from [[birmingham new street]].
+
+Columns (5):
+- name: location abbrev | examples: london; king lynn cambridge
+- name: location street | examples: liverpool street; liverpool
+- name: location station | examples: birmingham
+- name: location city | examples: london liverpool street; new street; birmingham new street
+- name: location str | examples: peterborough; norwich; leicester
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#27/3", "reason": "str", "same_as": "<column name or none>"}

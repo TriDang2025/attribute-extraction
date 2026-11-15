@@ -1,0 +1,73 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 1 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#78  (mentions 6, distinct values 3)
+Examples:
+- E3#78:0 [system] previous turn, user: Thank you very much. I am also looking for a place to stay in the same price range as the restaurant with free parking. Can you help with this as well? | turn: How about The Copper Kettle. The are located in the Centre at [[4 Kings Parade]] City Centre. May I book a table for you?
+- E3#78:1 [system] previous turn, user: Yes, that would be great! | turn: You should try the the copper kettle at [[4 Kings Parade City Centre]]. Would you like me to make a reservation for you there?
+- E3#78:2 [system] previous turn, user: get me the address please. | turn: It is at cb21rh [[King's Parade]].
+- E3#78:3 [system] previous turn, user: I would like British food. I have no preference of price range. | turn: There are 7 restaurants which meet your needs. The Copper Kettle is located at [[4 Kings Parade]] and serves moderate priced meals. would you like to make reservations?
+- E3#78:4 [system] previous turn, user: Yes, please look in another part of town. | turn: The Copper Kettle is in centre. Phone number is 01223365098 and address is [[4 Kings Parade City Centre]]. Would you like to make a reservation?
+
+### E3#86  (mentions 3, distinct values 3)
+Examples:
+- E3#86:0 [system] previous turn, user: Hi there, I'm looking for information on Darry's Cookhouse and Wine Shop. | turn: That restaurant is locates in centre and is on [[40270 king street]] in city centre. Their phone number is 01223505015.
+- E3#86:1 [system] previous turn, user: No thanks I'm just looking for information for now. | turn: Darrys Cookhouse is a modern European restaurant in the Centre. It is located at [[40270 King Street City]] and is in the expensive price range.
+- E3#86:2 [system] previous turn, user: Yeah, tell me the address for that restaurant and the type of food they serve | turn: They are an Asian/Oriental restaurant, and are located at [[40428 King Street]] City Centre. Is there anything else I can assist you with?
+
+### E3#2  (mentions 7, distinct values 5)
+Examples:
+- E3#2:0 [system] previous turn, user: I do not care about the price range. | turn: anatolia is a turkish restaurant in the moderate price range and in the centre. It is located at [[30 bridge street]] city centre and its phone number is 01223 362372. Is there anything else I can help you with?
+- E3#2:1 [system] previous turn, user: No that doesn't matter | turn: Ask is a cheap restaurant serving Italian food in the centre of town. The address is [[12 Bridge Street]] City Centre, and the phone number is 01223 364917.
+- E3#2:2 [system] previous turn, user: No preference really, you pick. I'll need the address please. | turn: Okay, how about Caffe Uno. It's located at [[32 Bridge Street]] City Centre.
+- E3#2:3 [system] previous turn, user: What is the address and postcode? | turn: The address for Galleria is [[33 Bridge Street]] and the postcode is C.B 2, 1 U.W. Can I help you with anything else?
+- E3#2:4 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is [[43 High Street]] Cherry Hinton Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is 01223 249955.
+
+### E3#133  (mentions 4, distinct values 3)
+Examples:
+- E3#133:0 [system] previous turn, user: Can I have their phone number, postcode and address please? | turn: I'd be happy to provide you with that information. Their phone number is 01223307030 and their address and postcode are Quayside off [[Bridge Street]], cb58aq. Can I help with anything else?
+- E3#133:1 [system] previous turn, user: No, thanks, I just need the address of one of them, please. | turn: darrys cookhouse and wine shop's address is 40270 [[King Street]] City Centre.
+- E3#133:2 [system] previous turn, user: Thanks. I also need information about a specific restaurant called michaelhouse cafe. What can you tell me about it? | turn: It's an expensive european place in the centre at St. Michael's Church [[Trinity Street]] City Centre cb21su with phone 01223309147. Would you like to book a table?
+- E3#133:3 [system] previous turn, user: I don't know. | turn: Cote is located at [[Bridge Street]] City Centre, and Restaurant Two Two is at 22 Chesterton Road Chesterton. How else may I assist you?
+
+### E3#18  (mentions 10, distinct values 5)
+Examples:
+- E3#18:0 [system] previous turn, user: No need to book it. Thanks. But can you help me find a cheap restaurant in the south? | turn: Sure - [[The Lucky Star]] serves Chinese food and Nandos serves Portuguese food. Do either of those sound good?
+- E3#18:1 [user] previous turn, system: There are the Peking Restaurant, which is expensive, the Good Luck Chinese Food Takeaway, which is also expensive, and the Lucky Star, which is cheap. | turn: Can I have the address of [[Lucky Star]]?
+- E3#18:2 [system] previous turn, user: I'd like it to be in the north, and expensive would be best. | turn: I would recommend either Hakka or [[The Hotpot]]. Would you like for me to book a reservation for one of these restaurants?
+- E3#18:3 [system] previous turn, user: Yes, I would prefer an expensive one. | turn: In expensive restaurants, I have two options in the north. There is Hakka and there is [[The Hotspot]]. In my opinion, Hakka is a great chinese restaurant.
+- E3#18:4 [user] previous turn, system: The phone number is 01223354382. Can I help you with anything else today? | turn: Yes, I'm also looking for a place called [[The Man on the Moon]]?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#78, E3#86, E3#2, E3#133, E3#18) and its name as the value, like {"E3#78": "<name>"}.

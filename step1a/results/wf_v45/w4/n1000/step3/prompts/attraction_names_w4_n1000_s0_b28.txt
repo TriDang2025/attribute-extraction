@@ -1,0 +1,65 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 28 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#147  (mentions 1, distinct values 1)
+Examples:
+- E4#147:0 [user] previous turn, system: It is free! Would you like the address or number? | turn: [[Holy Moly]]! No, thanks, that's everything I needed today.
+
+### E4#153  (mentions 2, distinct values 2)
+Examples:
+- E4#153:0 [system] previous turn, user: And that is a 2 star hotel, correct? Are there any attractions I could visit in the centre? | turn: Yes, the [[Lovell]] is indeed a 2 star location. Might I suggest the Cambridge Arts Theatre for your entertainment during your stay? It's a highly recommended experience.
+- E4#153:1 [user] turn: Do you have information about the [[Lovell Lodge]]?
+
+### E4#163  (mentions 1, distinct values 1)
+Examples:
+- E4#163:0 [user] previous turn, system: I've done it. The reference number is LPNKZ7V5. Anything else I can do for you? | turn: I'm also looking for [[Hamilton Lodge]]. Do you have any information on it?
+
+### E4#128  (mentions 5, distinct values 2)
+Examples:
+- E4#128:0 [system] previous turn, user: Where can I find a swimming pool in the north of town? | turn: I have two swimming pools listed north of town. The Jesus Green Outdoor Pool and the [[Kings Hedges Learner Pool]]. Do you have a preference?
+- E4#128:1 [system] previous turn, user: I don't care what part of town it is in. Can you recommend one and give me the phone number for it? | turn: Yes, kings hedges [[learner pool]] is really nice. Their number is 01223353248. Is there anything else I can assist you with?
+- E4#128:2 [system] previous turn, user: I will be visting in North Cambridge and would like to spend sometime at the pool, are there any in the area? | turn: We have two pools located in the north area. Jesus Green Outdoor pool and [[Kings Hedges Learner pool]]. Would you like any additional information on either of these options?
+- E4#128:3 [system] previous turn, user: Yes please. I'll also need the entrance fee, post code and address. | turn: which one would you like jesus green outdoor pool or kings hedges [[learner pool]]?
+- E4#128:4 [user] previous turn, system: I have two swimming pools listed north of town. The Jesus Green Outdoor Pool and the Kings Hedges Learner Pool. Do you have a preference? | turn: I'd like to try the [[Kings Hedges Learner Pool]]. Is there an entrance fee? Can I get their phone number please.
+
+### E4#61  (mentions 13, distinct values 5)
+Examples:
+- E4#61:0 [system] previous turn, user: Okay, what about a college in the same area? | turn: I have 13 to choose from. I suggest corpus christi college located at [[king's parade]].
+- E4#61:1 [system] previous turn, user: I'm looking for a museum. Which one is your favorite? | turn: I would recommend the primavera, located at [[10 king s parade]]. There is no entrance fee. Do you need anything else?
+- E4#61:2 [system] previous turn, user: A museum sounds great. Can you get the phone number for one? | turn: Yes, the byard museum is reachable at 01223464646, they have free admission and are located at [[14 king's parade]], any other questions?
+- E4#61:3 [system] previous turn, user: Do you have any other suggestions? | turn: You should check out Primavera. The phone number is 01223357708. It is at [[10 King's Parade]] and the postcode is cb21sj.
+- E4#61:4 [system] previous turn, user: What is the address? | turn: adress is [[Kings Parade]]
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#147, E4#153, E4#163, E4#128, E4#61) and its name as the value, like {"E4#147": "<name>"}.

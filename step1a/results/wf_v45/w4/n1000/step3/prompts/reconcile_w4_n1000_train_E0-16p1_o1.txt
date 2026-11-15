@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#16/1: name: time value | description: duration
+Examples:
+- 1 [system] previous turn, user: I would like to leave after 13:00. | turn: First train out after 13:00 is TR6193, leaving at 13:40. It's a [[28-minute]] trip, and each ticket is 8.08GBP. Would you like to book passage?
+- 2 [system] previous turn, user: I'm coming from Cambridge and would like to arrive at Kings Lynn by 8 p.m. Monday. | turn: TR7803 will leave at 18:11 and arrive [[47 minutes later]] at 18:58. The trip will cost 9.80 pounds. Would you like to book this train?
+- 3 [system] previous turn, user: I need you to check again. Train from Ely to Cambridge. | turn: OK, the earliest train after 08:15 is the 09:50 to Cambridge. It's a quick, [[17-minute]] trip. Would you like to book seats?
+- 4 [system] previous turn, user: I also need to find a train from stansted airport to cambridge that arrives by 8:00 on tuesday. | turn: Alright, there are three different trains leaving that morning that will get you there on time. Each one has a duration of [[twenty-eight minutes]], should I book one of them?
+- 5 [system] previous turn, user: For the one that departs at 15:48, what time would I arrive? | turn: 16:38, [[fifty minute]] travel time. Shall I book it?
+
+Columns (5):
+- name: time unit | examples: 49 minute
+- name: time interval | examples: anytime; each 1; every 2 hour
+- name: duration unit | examples: 2 hour; 2 day
+- name: duration str | examples: 60 minute; 163 minute; 28 minute
+- name: departure time | examples: 39; 48; departing time
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#16/1", "reason": "str", "same_as": "<column name or none>"}

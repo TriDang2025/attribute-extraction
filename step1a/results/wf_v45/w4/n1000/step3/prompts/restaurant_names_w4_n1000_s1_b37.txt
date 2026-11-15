@@ -1,0 +1,59 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 37 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#169  (mentions 1, distinct values 1)
+Examples:
+- E3#169:0 [user] previous turn, system: The address is 5 mowbray road in the postcode, cb17sr. Do you still need a taxi? | turn: Yes. I'm leaving [[Aylesbray Lodge]] and need to be at Peking Restaurant by 17:00. Please get me the contact number and car type.
+
+### E3#84  (mentions 4, distinct values 1)
+Examples:
+- E3#84:0 [system] previous turn, user: That sounds great. Please book a table for 1 at 19:45 on Monday. | turn: I booked your reservations at [[Loch Fyne]] for Monday at 19:45 the reference number is 4A4FODSE. Is there anything else I can do for you?
+- E3#84:1 [system] previous turn, user: I don't really care about cuisine, but I would like something expensive in the center of town. What's your favorite high-end place? | turn: I would suggest [[Loch Fyne]]. They serve the most amazing selection of seafood in the entire city. It's definitely an experience.
+- E3#84:2 [system] previous turn, user: I am looking for a restaurant serving seafood, in the center of the town. | turn: [[Loch Fyne]] offers seafood in the city centre. Would you like me to book you a table?
+- E3#84:3 [system] previous turn, user: I don't care about the type of food. Do you have a suggestion? | turn: There is a great seafood place in the city centre called [[Loch Fyne]]. They have some of the best reviews overall. Would you like more info about them or a table?
+
+### E3#174  (mentions 1, distinct values 1)
+Examples:
+- E3#174:0 [user] previous turn, system: Sure, the address is on Corn Exchange Street, post code cb23qf. Can I do anything else for you today? | turn: I do need to get from [[Stevenage]] to Cambridge on Saturday. I'd like to leave shortly after 09:45, if possible.
+
+### E3#170  (mentions 1, distinct values 1)
+Examples:
+- E3#170:0 [user] previous turn, system: The Tenpin phone number is 08715501010 and the postcode is cb17dy. Can I help you with anything else today? | turn: Yes please. I'd like to find a good Malaysian restaurant located in the same area as this [[Tenpin place]]. Something on the pricey side. What would you suggest?
+
+### E3#116  (mentions 1, distinct values 1)
+Examples:
+- E3#116:0 [system] previous turn, user: No, where would you suggest? | turn: How about Camboats in the East? Their address is the plough, [[green end]], fen ditton.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#169, E3#84, E3#174, E3#170, E3#116) and its name as the value, like {"E3#169": "<name>"}.

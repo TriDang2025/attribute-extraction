@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#0/2: name: time str | description: time
+Examples:
+- 1 [user] turn: Hey. I'm looking for a train from [[stansted airport]].
+- 2 [system] previous turn, user: Yes please, just one ticket. Could I get the reference number for the train you book please? | turn: OK, I've booked you 1 ticket on TR0514, departing [[stansted airport]] at 7:24 and arriving cambridge at 7:52. The reference number is P1C2KKFQ. Total fee is 10.1 GBP.
+- 3 [user] previous turn, system: Where do you wish to depart from? | turn: I will be departing from [[stansted airport]] and want to leave after 18:15.
+- 4 [user] previous turn, system: There are several trains arriving by 08:15 on Monday? Where would you like to leave from and arrive? | turn: It should leave from [[stansted airport]] and arrive at cambridge.
+- 5 [user] previous turn, system: You're welcome. Is there anything else you need help with today? | turn: Yes, I am looking for a train that departs from cambridge on wednesday. I would like to leave after 17:15 and my destination is [[stansted airport]].
+
+Columns (5):
+- name: destination | examples: departure site; where is your destination; your destination
+- name: location cap | examples: norwhich; stansted
+- name: location str capitalized misspelled | examples: stevenage; steveage
+- name: location abbrev | examples: london; king lynn cambridge
+- name: location str | examples: peterborough; norwich; leicester
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#0/2", "reason": "str", "same_as": "<column name or none>"}

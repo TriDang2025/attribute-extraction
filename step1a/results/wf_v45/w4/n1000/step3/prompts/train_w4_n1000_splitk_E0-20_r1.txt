@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E0#20:s0": "P1", "E0#20:s1": "P2"}}
+
+Cluster E0#20 of entity E0 (mentions 52, distinct values 1).
+Examples:
+- E0#20:s0 [system] previous turn, user: I would like to depart from ely. | turn: There are 10 trains going to Cambridge from [[Ely]] on Monday. Is there a certain time you would like to depart by?
+- E0#20:s1 [user] previous turn, system: what about TR5729? it leaves at 13:17 on saturday | turn: Don't you need to know where I am leaving from? Does that train leave from [[Ely]]?
+- E0#20:s2 [user] previous turn, system: Okay, where are you departing? | turn: I'm leaving from [[ely]] to cambridge.
+- E0#20:s3 [system] previous turn, user: Yes. One ticket. I need the travel time and train ID. | turn: Okay, I have you booked on TR1549 from Cambridge to [[Ely]] leaving Wednesday at 17:50, arriving 17 minutes later at 18:07. The reference number is RHE56NAC. Anything else today?
+- E0#20:s4 [user] previous turn, system: Ok, and where are you heading to? | turn: I am heading to [[Ely]].
+- E0#20:s5 [user] previous turn, system: The best match for your time is the train TR6517 which leaves at 11:35. Do you want me to book it for you? | turn: Is this train going to [[Ely]] or departing Ely? I believe I made a mistake is saying going to Ely when I should be departing Ely arriving in Cambridge.
+- E0#20:s6 [system] previous turn, user: I will be departing from Cambridge to ely. | turn: There are four trains that can get you to [[Ely]] by 13:45, do you have a particular departure time preference?
+- E0#20:s7 [system] previous turn, user: Ok I will book that for you and get you a confirmation number | turn: Just to be clear, you want me to book 1 seat on train TR4389, departing [[Ely]] at 15:35. Is that correct?
+- E0#20:s8 [system] previous turn, user: I would appreciate that. Is there only one option that arrives by the time I need? | turn: There is a train departure on Friday from [[Ely]] to Cambridge that arrives by 11:52. Do you want that instead?
+- E0#20:s9 [user] previous turn, system: Okay, and where will you be travelling to? | turn: I am coming in to Cambridge from [[Ely]] I need it to arrive by 15:15
+- E0#20:s10 [system] previous turn, user: I need to travel on wednesday and get there by 17:15. | turn: TrainID TR6745 leaves Cambridge at 15:50 and arrives at [[Ely]] at 16:07. It's the last Wednesday train.
+- E0#20:s11 [system] previous turn, user: I'm looking to book a train that goes to ely and leaves on sunday please. | turn: There are 10 trains leaving from Cambridge to [[Ely]]. Is there a particular departure or arrival time you would prefer?
+- E0#20:s12 [user] previous turn, system: There are 2058 trains to pick from. I'll need to know your departure and destination locations | turn: I'll be leaving Cambridge going to [[Ely]], I'd like to leave after 10:00.
+- E0#20:s13 [system] previous turn, user: Yes, please for 8 people. | turn: Great! Your train will leave [[Ely]] on Monday at 11:35 and arrive at 11:52. It has been booked for all 8 for a total fee of 35.2GBP, which is payable at the station. Your reference number, if needed, is PD2F8YMF.
+- E0#20:s14 [system] previous turn, user: I need to arrive by 18:45 on Friday. | turn: TR9933 departs Cambridge at 17:50 and arrives in [[Ely]] at 18:07. Do you want me to book this for you?
+- E0#20:s15 [user] previous turn, system: Where are you departing from? | turn: Hello, I am departing from [[Ely]].
+
+Return the JSON object now.

@@ -1,0 +1,27 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E4#73:s0": "P1", "E4#73:s1": "P2"}}
+
+Cluster E4#73 of entity E4 (mentions 12, distinct values 4).
+Examples:
+- E4#73:s0 [system] previous turn, user: Alright, please tell me the phone number and address there, as well as the entrance fee | turn: You can reach them by phone at 01223452587. Entrance is free. The address is [[jesus lane]].
+- E4#73:s1 [system] previous turn, user: great. can i get the address and entry fee? | turn: [[46 Jesus Ln]], Cambridge CB5 8BW. No entrance fee. Anything else I can assist you with?
+- E4#73:s2 [system] previous turn, user: no, please surprise me. | turn: I have the Cambridge Museum of Technology located in the east side of town. It's at the site of the Old Pumping Station on [[Cheddar's lane]]. Would you like more information?
+- E4#73:s3 [system] previous turn, user: Hi, I am looking for a particular attraction. Have you heard of Scudamores Punting Co? | turn: Yes, Scudamores Punting Co is located in Granta Place, [[Mill Lane]] and their phone number is 01223359750. Anything else you want to know?
+- E4#73:s4 [system] previous turn, user: I need their postcode please. | turn: Sure. Postcode is cb58bs and they are located on [[Jesus Lane]].
+- E4#73:s5 [system] previous turn, user: I am coming to Cambridge and would like to see some architecture. Do you have any located in the centre? | turn: Yes, there are 5 places located in the centre. I recommend the All Saints Church on [[Jesus Lane]].
+- E4#73:s6 [system] previous turn, user: A church is great can I have the address of the one you recommend? | turn: May I suggest All Saints Church, it has really great architecture? It's located at [[Jesus Lane]], cb58bs. Is there anything else I can help you with?
+- E4#73:s7 [system] previous turn, user: That would be great. Can I get the postcode, address, and phone number for it? | turn: The postcode of All Saints Church is cb58bs. The phone number is 01223452587. The address is [[Jesus Lane]].
+- E4#73:s8 [system] previous turn, user: Whatever is the most popular attraction | turn: You should check out All Saints Church. It has great architecture and free entrance. It's located on [[Jesus Lane]] cb58bs. The phone is 01223452587. Would that work for you?
+- E4#73:s9 [user] previous turn, system: Your booking was successful with a reference number of VZRQHFHP. Can I help you with anything else? | turn: Thanks great. Also I need to have the phone number for All Saints Church on [[Jesus Lane]].
+- E4#73:s10 [user] previous turn, system: The postcode of All Saints Church is cb58bs. The phone number is 01223452587. The address is Jesus Lane. | turn: [[Jesus Lane]]? Really? Okay. That's about it, but can you confirm the church event is happening on Monday?
+- E4#73:s11 [system] previous turn, user: Old churches would be nice thank you | turn: Okay, there are 5. I recommend All Saint's Church on [[Jesus Lane]].
+
+Return the JSON object now.

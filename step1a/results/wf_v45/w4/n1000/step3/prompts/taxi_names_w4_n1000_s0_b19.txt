@@ -1,0 +1,59 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E2: batch 19 of 24 (117 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E2#74  (mentions 1, distinct values 1)
+Examples:
+- E2#74:0 [user] previous turn, system: Okay, great. And where will you be traveling to and from? | turn: The pick up place will be [[wandlebury country park]] and the drop off at curry prince
+
+### E2#110  (mentions 1, distinct values 1)
+Examples:
+- E2#110:0 [user] previous turn, system: Booking was successful. The reference number is : NYEUMZ53. | turn: Can you book me a taxi from [[Scudamore]]'s punting company to the restaurant?
+
+### E2#83  (mentions 2, distinct values 1)
+Examples:
+- E2#83:0 [user] turn: I need a taxi departing from [[avalon]].
+- E2#83:1 [user] turn: I need a 19:15 taxi to take me to [[Avalon]].
+
+### E2#46  (mentions 2, distinct values 2)
+Examples:
+- E2#46:0 [user] previous turn, system: Ballare is Heidelberg Gardens, Lion Yard, postcode cb23na and the entrance fee is 5 pounds. Is there anything else I can help you with? | turn: I am also going to need a taxi that goes from [[Ballare]] to Meghan and gets me to Meghan by 13:15 for my reservation.
+- E2#46:1 [system] previous turn, user: Could you recommend a nightclub from the previous search? | turn: Yeah, [[the ballare]] is great. It's in the centre of town.
+
+### E2#38  (mentions 2, distinct values 1)
+Examples:
+- E2#38:0 [user] turn: Help me reserve a taxi to take me to [[kambar]]
+- E2#38:1 [user] previous turn, system: Where are you leaving from and going to? When do you want to leave by or arrive by? | turn: I will go from the hotel to the [[Kambar]], leave by 17:30.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E2#74, E2#110, E2#83, E2#46, E2#38) and its name as the value, like {"E2#74": "<name>"}.

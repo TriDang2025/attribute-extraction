@@ -1,0 +1,62 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E2: batch 14 of 24 (117 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E2#76  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E2#76:0 [user] turn: Please book me a taxi to take me from [[Aylesbray Lodge Guest House]] to the London Liverpool Street Train Station.
+
+### E2#79  (mentions 3, distinct values 2)
+Examples:
+- E2#79:0 [system] previous turn, user: Great thanks. I need a taxi from Gonville Hotell to Cherry Hinton Hall and Grounds at 13:15. | turn: Your taxi was booked successfully. You will be picked up in a black Tesla by 13:15 at the [[Gonville Hotel]] and dropped off at Cherry Hinton Hall and Grounds.
+- E2#79:1 [user] previous turn, system: Leverton House is a 4 star guesthouse in the east part of town in the cheap price range with both internet and parking included. Is there anything else today? | turn: Great thanks. I need a taxi from [[Gonville Hotell]] to Cherry Hinton Hall and Grounds at 13:15.
+- E2#79:2 [user] previous turn, system: Where will you depart from? | turn: I'm leaving from [[gonville hotel]].
+
+### E2#8  (mentions 3, distinct values 2)
+Examples:
+- E2#8:0 [user] previous turn, system: Of course! To book a taxi, I'll need to know your destination, departure site, and what time you would like to leave or arrive by. | turn: I want to arrive at [[da vinci pizzeria]] by 15:00.
+- E2#8:1 [user] previous turn, system: Yes, they had a table available and I went ahead and booked it for you. Your reference number is HXSPEY9N. What else can I do for you? | turn: I'll need a taxi to get me from downing college to [[pizza express]] by 17:45. can you set that up for me?
+- E2#8:2 [user] turn: Can you book me a taxi to [[da vinci pizzeria]]?
+
+### E2#102  (mentions 3, distinct values 2)
+Examples:
+- E2#102:0 [user] previous turn, system: You got it. What is your destination? | turn: I am going to the [[fitzwilliam museum]].
+- E2#102:1 [user] previous turn, system: I'd be happy to help! Where are you coming from? | turn: I'll be leaving from [[williams art and antiques]].
+- E2#102:2 [user] turn: I need a taxi. I'll be departing the [[Fitzwilliam museum]] and need to arrive by 20:15
+
+### E2#43  (mentions 1, distinct values 1)
+Examples:
+- E2#43:0 [user] previous turn, system: You did not read the directions of this hit. There is no Tampa bay area. Please read the directions next time. | turn: i'm sorry, dude. i'm from [[florida]] so i'm not very smart. i'm trying to get from cambridge to stevenage.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E2#76, E2#79, E2#8, E2#102, E2#43) and its name as the value, like {"E2#76": "<name>"}.

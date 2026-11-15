@@ -1,0 +1,77 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 4 of 15 (73 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E0#4  (mentions 506, distinct values 8)
+Examples:
+- E0#4:0 [system] previous turn, user: Sunday. Sometime after 21:00, if possible. | turn: There are multiple trains headed to cambridge [[sunday]] after 21:00. Where are you leaving from?
+- E0#4:1 [system] previous turn, user: Only if it leaves on Thursday. | turn: Yes, TR4669 goes from peterborough to cambridge on [[Thursday]]. Would you like to book tickets on this train?
+- E0#4:2 [user] previous turn, system: You're welcome. Is there anything else you need help with today? | turn: Yes, I am looking for a train that departs from cambridge on [[wednesday]]. I would like to leave after 17:15 and my destination is stansted airport.
+- E0#4:3 [user] previous turn, system: There are 42 trains that match your criteria. What day will you be travelling? | turn: I would like to travel on [[Monday]].
+- E0#4:4 [system] previous turn, user: Saturday is nice | turn: what about TR5729? it leaves at 13:17 on [[saturday]]
+- E0#4:5 [system] previous turn, user: I want a train that is leaving from broxbourne. | turn: There is a train leaving from Broxbourne to Cambridge on [[Friday]] at 5:32 and will arrive there at 6:32.
+- E0#4:6 [user] previous turn, system: I will book it for you,is there anything else I can do for you? | turn: Yes! I am leaving from Cambridge on [[Tuesday]]. You need this info.
+- E0#4:7 [user] turn: I am interested in booking a train to cambridge for [[next tuesday]].
+
+### E0#60  (mentions 2, distinct values 2)
+Examples:
+- E0#60:0 [user] previous turn, system: I can certainly look that up for you, what is your destination? | turn: cambridge on [[teusday]]. book for 7 people and please get me reference number.
+- E0#60:1 [user] previous turn, system: There are several trains departing Norwich on Thursday. Is there a specific time you are looking to depart? | turn: leaving on [[thurs]] from norwich going to cambridge and I need to get there by 13:00
+
+### E0#15  (mentions 159, distinct values 18)
+Examples:
+- E0#15:0 [system] previous turn, user: Yes please. I need 5 tickets. | turn: The Booking was successful, the total fee is 82.5 GBP payable at the [[station]]. Reference number is : JU3L0EZL. Is there anything else you need?
+- E0#15:1 [system] previous turn, user: While in Cambridge I want to get a train that leaves on Sunday and goes to stansted airport. | turn: There are 19 trains that day. What time do you need to leave cambridge and/or arrive at the [[airport]]?
+- E0#15:2 [user] turn: I'm looking to book a [[train]], if you could help me.
+- E0#15:3 [user] previous turn, system: There are many trains that meet your criteria. Would you like to narrow it down by departure site or arrival time? | turn: I need to get to [[town]] by 12:30. And I'm coming from bishops stortford
+- E0#15:4 [user] previous turn, system: The first train leaves Stevenage at 05:54 and every two hours thereafter until the last train at 23:54. What time would you like to leave or arrive? | turn: Anytime would be great, I'd like to book it for the same number of people as my [[restaurant]].
+- E0#15:5 [user] previous turn, system: Certainly. When do you want to leave by? Thanks. | turn: I want to leave the [[hotel]] by 23:45, please. I will need the contact number and car type as well.
+- E0#15:6 [user] previous turn, system: I will book that for you and the train leaves at 8:24. | turn: Could you possible email or fax me the reference number, [[train number]], and the time? I appreciate your assistance.
+- E0#15:7 [system] previous turn, user: Sounds great! Thank you very much! What is the price on that train? | turn: [[The train]] is 16.60 pounds. Can I book that for you?
+
+### E0#38  (mentions 2, distinct values 2)
+Examples:
+- E0#38:0 [system] previous turn, user: All I need is the departure time, price, and train ID. Thanks | turn: Sorry, this is the [[manager]], its training day, I have TR1031 for you. It leaves at 15:11, arrives at 15:58, 7.84 pounds per person, does that work?
+- E0#38:1 [user] turn: I need to take a train to Cambridge by 17:45. If its is after that I will be late for dinner, [[mother]] gets angry when that happens.
+
+### E0#32  (mentions 6, distinct values 6)
+Examples:
+- E0#32:0 [system] previous turn, user: No, that's it. Thank you for your help. | turn: Thank you for choosing the [[help desk]]. Have a wonderful day.
+- E0#32:1 [user] previous turn, system: Parkside Pools post code is cb11ly | turn: Can you find me a train I'm leaving cambridge and want to arrive at [[my designation]] by 11:30.
+- E0#32:2 [user] previous turn, system: The TR4203 is leaving from Norwich to Cambridge at 05:16. Would you like to book a ticket? | turn: Sure, can you book that for 2 people and provide [[my reference number]]?
+- E0#32:3 [system] previous turn, user: Yes, I need 4 tickets please. Please send me the reference number. | turn: Your tickets have been reserved, and just to clarify, that train departs at 07:00, and arrives in London, Kings Cross at 07:51. Wouldn't want you to miss the train! [[Ref#]]: AQDCG6N8
+- E0#32:4 [user] previous turn, system: TR5234 will leave at 14:16, would that work for you? | turn: Yes. Give me the [[ref number]] please.
+- E0#32:5 [user] previous turn, system: There are no Italian places to dine, is there another food you would prefer before we book the train? | turn: any expensive restaurant will suffice. Reserve it for 8 people at 18:30 on tuesday and I'll need the [[reservation number]] please.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E0#4, E0#60, E0#15, E0#38, E0#32) and its name as the value, like {"E0#4": "<name>"}.

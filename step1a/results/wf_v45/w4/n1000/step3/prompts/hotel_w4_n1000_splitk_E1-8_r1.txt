@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E1#8:s0": "P1", "E1#8:s1": "P2"}}
+
+Cluster E1#8 of entity E1 (mentions 93, distinct values 5).
+Examples:
+- E1#8:s0 [system] previous turn, user: As long as it is the cheap range, it should be ok | turn: Ok, have 10 locations, 9 of them are guesthouses & 1 hotel. The price of hotel is cheap, but its a [[4 star]]. What type of room do you want?
+- E1#8:s1 [user] previous turn, system: I'm not finding any guesthouses that meet your criteria. Would you like to try a different area, price range, or stars? | turn: So you can't find a moderately priced guesthouse with [[3 stars]] and free parking anywhere in cambridge at all? Area doesn't matter. Please try again?
+- E1#8:s2 [system] previous turn, user: I'm not sure yet. If you have a moderately priced hotel in the north with wifi, I need the name and phone number. | turn: I have found matching two hotels in that area. Ashley Hotel has [[two stars]], and Lovell Lodge also has two stars. Would you like me to book one?
+- E1#8:s3 [user] turn: Hello, I'm looking for a place to stay the night. I'd like a hotel, but nothing fancy, it can have [[zero stars]] and that's fine. Do you have any recommendations?
+- E1#8:s4 [user] previous turn, system: Is there a certain type of place you are looking for? | turn: I would like a cheap place to stay at with [[5 stars]].
+- E1#8:s5 [user] previous turn, system: ashley hotel is a nice 2 star hotel. | turn: How about a hotel with [[4 stars]] instead?
+- E1#8:s6 [system] previous turn, user: This is really frustrating. Can you find me any 3 or 4 star hotels anywhere? | turn: Gonville Hotel is a great hotel located in the centre. It's [[3 stars]] and is in the expensive price range. Would you like me to book you a room?
+- E1#8:s7 [system] previous turn, user: That is all I need. | turn: I am not finding a [[2 star]] in the centre. Are you sure there is not another type of hotel you would like?
+- E1#8:s8 [user] previous turn, system: It has free parking with a 4 star rating | turn: I'm looking for a hotel with [[0 stars]]
+- E1#8:s9 [system] previous turn, user: Yes, please try 5-star hotels with free parking. | turn: Unfortunately, I couldn't find anything with [[5 stars]].
+- E1#8:s10 [user] previous turn, system: Sure how abou the ashley? They have a 2 star rating and are moderately priced. | turn: I would like [[four stars]] and quite expensive.
+- E1#8:s11 [user] previous turn, system: Sure, are you staying in a certain part of town? | turn: In the west. And [[3 stars]], please.
+- E1#8:s12 [system] previous turn, user: How about one that is in the moderate price range? | turn: The moderately priced Ashley Hotel in the north area might suit you. It has [[2 stars]] and provides internet and parking. Would you like to make a reservation?
+- E1#8:s13 [user] previous turn, system: I have 2 guesthouses matching your criteria. The Finches Bed and Breakfast guesthouse is 4 stars and includes free parking and internet. Would you be interested in this? | turn: I am looking for a guesthouse with [[0 stars]].
+- E1#8:s14 [user] previous turn, system: the total fee is 226.8 GBP payable at the station and the reference number is : XYAOCTIY. May i help you with anything else. | turn: I am also looking for a place to stay that has [[4 stars]] and is in the centre.
+- E1#8:s15 [user] turn: I need a hotel to stay at that is [[3 stars]]. I would preferably like one that has free wifi at it, and possibly close to the local restaurants.
+
+Return the JSON object now.

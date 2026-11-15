@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#0/1: name: hotel str | description: hotel
+Examples:
+- 1 [user] turn: I am looking for a [[hotel]] that can offer me both free wifi and free parking.
+- 2 [user] turn: Hi. Please help me find a [[4 star hotel]] to stay at.
+- 3 [user] previous turn, system: The booking went through, your table is reserved for 15 minutes starting at 16:15. Reference number is BT75STQI. | turn: Thanks! I'm also looking for a hotel near that [[restaurant]].
+- 4 [system] previous turn, user: Do you have information about the Lovell Lodge? | turn: I do. It's a moderately priced [[2 star hotel]].
+- 5 [user] turn: I am looking for a place to stay. [[The hotel]] should include free wifi and should be in the cheap price range
+
+Columns (5):
+- name: num days | examples: 3 guesthouse; 2 hotel; 1 hotel
+- name: star str | examples: bridge guest house; place to stay; 2 star guesthouse
+- name: guesthouse str | examples: guesthouse; ashley hotel; the ashley hotel
+- name: single occupancy room | examples: room rate; your room
+- name: hotel name | examples: acorn guest house; gonville hotel; university arm hotel
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#0/1", "reason": "str", "same_as": "<column name or none>"}

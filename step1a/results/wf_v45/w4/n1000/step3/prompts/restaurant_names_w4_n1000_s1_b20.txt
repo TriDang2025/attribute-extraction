@@ -1,0 +1,68 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 20 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#137  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#137:0 [user] turn: Please I want to book an expensive restaurant. First however help me find a place to go in town. Is there a [[nice park]]?
+- E3#137:1 [user] previous turn, system: There are fifteen Italian restaurants in town. Do you want a specific part of town, or maybe a certain price range to narrow down the search? | turn: I'm looking for [[parks]] in Cambridge can you help me?
+
+### E3#41  (mentions 16, distinct values 3)
+Examples:
+- E3#41:0 [user] previous turn, system: There are two british places, graffiti and travellers rest, do you have a preference? | turn: I will take [[Graffiti]]. Can you make a reservation for Tuesday for 8 people at 14:30 please?
+- E3#41:1 [system] previous turn, user: European food that is moderately priced please. | turn: [[galleria]] serves european food and is in the moderate price range. Would you like their location?
+- E3#41:2 [system] previous turn, user: is there something else in the West? | turn: [[Grafitti]] has great British food in the west and fits the expensive pricerange you are looking for. Does this appeal to you?
+- E3#41:3 [system] previous turn, user: yes, I would prefer it to be in the west area. | turn: [[Graffiti]] serves British food in the west area, are you ready to make a reservation?
+- E3#41:4 [system] previous turn, user: Anything in the area would be fine | turn: [[Galleria]] is a nice restaurant serving European food, is in the centre of town and is moderately priced.
+
+### E3#43  (mentions 154, distinct values 4, low confidence)
+Examples:
+- E3#43:0 [user] previous turn, system: I found Prezzo in the west part of town, would that work? | turn: Yes, that works. Please book a [[table]] for 8 people at 19:00 on Wednesday. Can you do that?
+- E3#43:1 [system] previous turn, user: Yes please, can you book a table for 1 on Monday at 13:00? | turn: You are booked! [[Your table]] will be reserved for fifteen minutes and your reference number is RKD8KQPM.
+- E3#43:2 [system] previous turn, user: Yes, please. Can you reserve a table for Saturday for 5 people at 13:45? Thanks. | turn: Booking was successful. [[The table]] will be reserved for 15 minutes.
+- E3#43:3 [system] previous turn, user: Yes, can you book a table for 8 people on Saturday at 15:45? | turn: [[A table]] is booked for Saturday for 15:45 at 8 and for 8 people. Reference number is B00KVHN
+- E3#43:4 [user] previous turn, system: jinling noodle bar is a good fit. Its on 11 Peas Hill City Centre | turn: Great! Can you book me a [[table]] for 5 on Thursday?
+
+### E3#24  (mentions 4, distinct values 2, low confidence)
+Examples:
+- E3#24:0 [user] previous turn, system: Jinling noodle bar, postcode cb23pp. Is there any more info I can give you? | turn: I would like to visit a [[college]] in the same area as the noodle bar, can you find me one?
+- E3#24:1 [user] previous turn, system: There are nine restaurants that fit your requirements. What type of food are you interested in? | turn: Just pick one in the same area as [[Queens' College]], and can you book a table for 1 at 18:30 on Saturday please?
+- E3#24:2 [system] previous turn, user: Actually, I want to visit a college. Somewhere in the centre. | turn: I would suggest downing [[college]], would you like the address?
+- E3#24:3 [user] previous turn, system: What type of food would you be interested in? | turn: Actually, I want to visit a [[college]]. Somewhere in the centre.
+
+### E3#27  (mentions 1, distinct values 1)
+Examples:
+- E3#27:0 [system] previous turn, user: Thank you. Do you have the postcode, please? | turn: The postcode for [[Downing College]] is cb21dq. Anything else I have help you with?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#137, E3#41, E3#43, E3#24, E3#27) and its name as the value, like {"E3#137": "<name>"}.

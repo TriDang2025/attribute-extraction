@@ -1,0 +1,74 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 11 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#126  (mentions 5, distinct values 2)
+Examples:
+- E4#126:0 [user] previous turn, system: Sure, their phone is 01223368786 and their address is Free School Lane City Centre cb23rh. May I help with anything else? | turn: Yes, I'm also looking for an attraction called [[Ruskin Gallery]]. Can you get me some info on that?
+- E4#126:1 [system] previous turn, user: Great I also need some information about the Ruskin Gallery attraction. | turn: Certainly. [[The Ruskin Gallery]] is a museum in the centre of town. It's free to enter. Would you like more information?
+- E4#126:2 [system] previous turn, user: What about a museum in the centre of town? | turn: i have 11 museums in the centre. i would suggest the [[ruskin gallery]]. they have free entrance.
+- E4#126:3 [system] previous turn, user: Yes, I'm also looking for an attraction called Ruskin Gallery. Can you get me some info on that? | turn: [[The Ruskin Gallery]] is in the centre area and the phone number is 01245493131. Would you like the address?
+- E4#126:4 [user] previous turn, system: Booked! You'll play 17.6 GBP at the station. Reference number: OJUFDKX1. | turn: Great I also need some information about the [[Ruskin Gallery]] attraction.
+
+### E4#40  (mentions 7, distinct values 2)
+Examples:
+- E4#40:0 [system] previous turn, user: No, but are there any theatres in the center of town? | turn: Sure, there are 4 theatres in the centre of town. I suggest the Mumford Theatre at [[Anglia Ruskin Enterprise]], East Road. Is there any other information you need?
+- E4#40:1 [system] previous turn, user: phone number, and address please | turn: Their address is [[Anglia Ruskin University]], East Road. And their phone number is 01245493131. Need anything else?
+- E4#40:2 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the Mumford theatre, it is located at [[Anglia Ruskin Enterprise]], East Road in the Centre area.
+- E4#40:3 [system] previous turn, user: Can I have the phone number and address please? | turn: Address is [[anglia ruskin university]], east road, phone number is 01245493131, any other questions today?
+- E4#40:4 [system] previous turn, user: Not particularly. Which do you recommend? If you can provide an address, and info on entrance fees for your favorite, that would be great, thanks. | turn: There is a nice theatre in the centre called Mumford Theatre at [[Anglia Ruskin Enterprise]], East Road. There are no entrance fee's listed. Would you like the phone number?
+
+### E4#18  (mentions 209, distinct values 34)
+Examples:
+- E4#18:0 [system] previous turn, user: What is the address? | turn: Addenbrookes Hospital is located on Hills Rd in [[Cambridge]]. The postal code is CB20QQ.
+- E4#18:1 [system] previous turn, user: I would like Nusha. Can you give me the phone number and address for Nusha? | turn: The address for Nashua is unit g6, [[Cambridge leisure park]], clifton road. Phone number is 01223902158.
+- E4#18:2 [system] previous turn, user: No, that will be all. Thank you! | turn: Thank you for contacting the [[Cambridge TownInfo centre]]. Goodbye
+- E4#18:3 [system] previous turn, user: No I don't need it, thanks for asking. However I also am interested in an attraction known as cambridge artworks. Can you provide their address & contact info? | turn: Sure [[Cambridge Artworks]] is located at 5 greens road phone number is 01223902168. Can I help you with anything else?
+- E4#18:4 [system] previous turn, user: Yes, please provide the address, postcode, and phone number for Cambridge Arts Theatre. I also need to find a hotel to stay in. | turn: [[Cambridge arts theatre]] is located at 6 saint edward's passage, postcode cb23pj, and phone is 0122350333. Did you have any preferences for your place to stay?
+
+### E4#46  (mentions 7, distinct values 4)
+Examples:
+- E4#46:0 [user] turn: Hi! I am looking to find information about the [[Cambridge University Botanic gardens]].
+- E4#46:1 [system] previous turn, user: Okay, what is the address and entrance fee for it? | turn: Ballare is [[Heidelberg Gardens]], Lion Yard, postcode cb23na and the entrance fee is 5 pounds. Is there anything else I can help you with?
+- E4#46:2 [system] previous turn, user: Great, thank you. I am looking for some sort of entertainment in the Centre, maybe a park. Can you help me with that? | turn: I can I've found [[botanic gardens]] in the centre area postcode is cb21jf and has an entrance fee of 4 pounds. will there be anything else?
+- E4#46:3 [user] previous turn, system: I am sorry I need a time to schedule the cab please | turn: I wouold like to leave [[The cambridge university botanic gardens]] by 17:00
+- E4#46:4 [system] previous turn, user: Perhaps. I'm also looking for a place to go.. maybe a park in the centre? | turn: We have [[cambridge university botanic gardens]]. Could you like more information on them?
+
+### E4#47  (mentions 3, distinct values 2)
+Examples:
+- E4#47:0 [system] previous turn, user: I need the address, entrance fee, and phone number. | turn: The address of Ballare is heidelberg gardens, [[lion yard]]. The phone number is 01223364222. The entrance fee is 5 pounds.
+- E4#47:1 [system] previous turn, user: Yes I would like more information on both museums. | turn: saint barnabas press gallery is located in the [[belfast yard]], coldham's road , cb13ew and gallery at twelve a high street is at fulbourn,cb15dh
+- E4#47:2 [system] previous turn, user: Okay, what is the address and entrance fee for it? | turn: Ballare is Heidelberg Gardens, [[Lion Yard]], postcode cb23na and the entrance fee is 5 pounds. Is there anything else I can help you with?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#126, E4#40, E4#18, E4#46, E4#47) and its name as the value, like {"E4#126": "<name>"}.

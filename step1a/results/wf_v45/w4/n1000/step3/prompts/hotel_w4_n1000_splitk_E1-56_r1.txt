@@ -1,0 +1,27 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E1#56:s0": "P1", "E1#56:s1": "P2"}}
+
+Cluster E1#56 of entity E1 (mentions 12, distinct values 3).
+Examples:
+- E1#56:s0 [user] previous turn, system: The restaurant Yu Garden has a postcode of cb58pa. Can I help you with anything else today? | turn: Yes! I'm looking for a particular hotel, the name is home from [[home]].
+- E1#56:s1 [system] previous turn, user: Hi, I'm looking for a place that offers free internet and parking. | turn: We have quite a few like that. I could recommend [[Home From Home]], a moderately priced guesthouse in the north. Or are there other factors that matter?
+- E1#56:s2 [system] previous turn, user: I also need to find a cheap place to stay that has free wifi, is a guesthouse and is located in the north. | turn: i recommend worth [[house]] for you
+- E1#56:s3 [system] previous turn, user: I need to book at a hotel called home from home. | turn: [[home]] from home is in the moderate price range. How many people should I book it for?
+- E1#56:s4 [system] previous turn, user: Oakay great thank you for that info. | turn: Do you want me to book a room for Home from [[Home]]?
+- E1#56:s5 [user] previous turn, system: Reference number is : F756LTGZ.I have you booked then, train leaves at 07:11. Anything else? | turn: I need to book at a hotel called home from [[home]].
+- E1#56:s6 [system] previous turn, user: Just free wifi and free parking. Moderate priced and should be a guesthouse please. | turn: If you tell me when you will be staying, how many people and for how many days, I can book you at he [[home]] from home?
+- E1#56:s7 [system] previous turn, user: I need to book at a hotel called home from home. | turn: home from [[home]] is in the moderate price range. How many people should I book it for?
+- E1#56:s8 [system] previous turn, user: Yes, please get me information about the home from home hotel | turn: [[Home]] from Home is a guesthouse in the North. It is a moderately priced and has a 4 star rating. Is there anything else I can help you with?
+- E1#56:s9 [user] previous turn, system: Reference number is : F756LTGZ.I have you booked then, train leaves at 07:11. Anything else? | turn: I need to book at a hotel called [[home]] from home.
+- E1#56:s10 [user] previous turn, system: The restaurant Yu Garden has a postcode of cb58pa. Can I help you with anything else today? | turn: Yes! I'm looking for a particular hotel, the name is [[home]] from home.
+- E1#56:s11 [system] previous turn, user: Oakay great thank you for that info. | turn: Do you want me to book a room for [[Home]] from Home?
+
+Return the JSON object now.

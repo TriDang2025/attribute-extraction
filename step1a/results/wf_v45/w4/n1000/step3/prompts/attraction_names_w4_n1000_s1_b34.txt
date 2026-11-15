@@ -1,0 +1,62 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 34 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#80  (mentions 9, distinct values 5, low confidence)
+Examples:
+- E4#80:0 [user] previous turn, system: Unfortunately, we do not have information on several of them. But, Byard Art, Wandlebury Country Park, and Sheep's Green and Lammas Land Park are all free admission attractions. | turn: How about the postcode and attraction type for [[Byard Art]]?
+- E4#80:1 [system] previous turn, user: Yes, could you help me find a nice museum to visit. | turn: There's the [[byard art museum]]. It's in the same area and is free.
+- E4#80:2 [system] previous turn, user: A museum sounds great. Can you get the phone number for one? | turn: Yes, the [[byard museum]] is reachable at 01223464646, they have free admission and are located at 14 king's parade, any other questions?
+- E4#80:3 [system] previous turn, user: Can you recommend any good museums there? | turn: [[The byard art]] is the only museum in the south and the entrance fee is free.
+- E4#80:4 [system] previous turn, user: What about the area and phone number? | turn: [[The Byart Museum]] is located in the South area and the phone number is: 01223464646.
+
+### E4#74  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E4#74:0 [system] previous turn, user: Could you recommend a museum in the east? | turn: There are four museums in the East, the Cambridge Artworks, Gallery at twelve a high street and [[Saint Barnabas Press Gallery]] are all Free. Cambridge Museum of Technology charges 5 pounds.
+- E4#74:1 [system] previous turn, user: Yes I would like more information on both museums. | turn: [[saint barnabas press gallery]] is located in the belfast yard, coldham's road , cb13ew and gallery at twelve a high street is at fulbourn,cb15dh
+
+### E4#102  (mentions 1, distinct values 1)
+Examples:
+- E4#102:0 [system] previous turn, user: Yes, I am looking for cinemas and museums. | turn: There are no cinemas on the west side, but I have several museums. The [[Lynne Strover Gallery]] is a great place, and it's free to get in.
+
+### E4#153  (mentions 2, distinct values 2)
+Examples:
+- E4#153:0 [system] previous turn, user: And that is a 2 star hotel, correct? Are there any attractions I could visit in the centre? | turn: Yes, the [[Lovell]] is indeed a 2 star location. Might I suggest the Cambridge Arts Theatre for your entertainment during your stay? It's a highly recommended experience.
+- E4#153:1 [user] turn: Do you have information about the [[Lovell Lodge]]?
+
+### E4#163  (mentions 1, distinct values 1)
+Examples:
+- E4#163:0 [user] previous turn, system: I've done it. The reference number is LPNKZ7V5. Anything else I can do for you? | turn: I'm also looking for [[Hamilton Lodge]]. Do you have any information on it?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#80, E4#74, E4#102, E4#153, E4#163) and its name as the value, like {"E4#80": "<name>"}.

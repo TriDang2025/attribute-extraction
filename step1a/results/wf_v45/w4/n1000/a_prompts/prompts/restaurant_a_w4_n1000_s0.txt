@@ -1,0 +1,1358 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+
+Entity E3: 195 clusters.
+
+Placement options (copy one exactly into "placement"):
+- current entity E3: the attribute belongs to E3
+- sub-entity of E3: a part of E3 that has attributes of its own
+- other entity E0: the attribute belongs to E0
+- other entity E1: the attribute belongs to E1
+- other entity E2: the attribute belongs to E2
+- other entity E4: the attribute belongs to E4
+- relationship(E3, E0): links E3 and E0
+- relationship(E3, E1): links E3 and E1
+- relationship(E3, E2): links E3 and E2
+- relationship(E3, E4): links E3 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#0  (mentions 242, distinct values 44, low confidence)
+Examples:
+- E3#0:0 [system] previous turn, user: It doesn't matter. Just choose one for me. I'll need to know the area that it's located in. | turn: peking restaurant is in the [[south]].
+- E3#0:1 [user] previous turn, system: Thank you and have a great day! | turn: Actually, can you help me find a restaurant? An expensive one in the [[West]].
+- E3#0:2 [system] previous turn, user: I'm looking for a restaurant called nandos. Are you aware of it? | turn: I am. It is a great portuguese place. They have two locations in [[town]]. One in the South and on in the city centre.
+- E3#0:3 [system] previous turn, user: I want a restaurant that is moderately priced. | turn: Golden Wok is located in the [[north part of town]], and is moderately priced.
+- E3#0:4 [user] previous turn, system: We have a few options available to you, is there a particular area you are looking for? | turn: I'm looking for a restaurant that serves italian food in the moderate price range. The restaurant should be in the [[east]].
+
+### E3#1  (mentions 10, distinct values 6, low confidence)
+Examples:
+- E3#1:0 [user] previous turn, system: corpus christi is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is 2 pounds. | turn: Great, thanks! Also, will you please book me a taxi from the attraction to the restaurant, leaving the [[attraction]] at 05:45?
+- E3#1:1 [user] previous turn, system: What is the food type you would prefer? | turn: I don't care. I just need to know the address, phone number, and postcode of the [[venue]] please.
+- E3#1:2 [system] previous turn, user: It's a place called Don Pasquale Pizzeria. | turn: [[A very nice place]] in the centre. Need a reservation?
+- E3#1:3 [system] previous turn, user: I'm looking for a restaurant called little seoul? | turn: yes [[great spot]]. Would you like for me to book?
+- E3#1:4 [system] previous turn, user: Sure, that would work. | turn: Please book another day or time slot. [[the place]] could be full
+
+### E3#2  (mentions 7, distinct values 5)
+Examples:
+- E3#2:0 [system] previous turn, user: I do not care about the price range. | turn: anatolia is a turkish restaurant in the moderate price range and in the centre. It is located at [[30 bridge street]] city centre and its phone number is 01223 362372. Is there anything else I can help you with?
+- E3#2:1 [system] previous turn, user: No that doesn't matter | turn: Ask is a cheap restaurant serving Italian food in the centre of town. The address is [[12 Bridge Street]] City Centre, and the phone number is 01223 364917.
+- E3#2:2 [system] previous turn, user: No preference really, you pick. I'll need the address please. | turn: Okay, how about Caffe Uno. It's located at [[32 Bridge Street]] City Centre.
+- E3#2:3 [system] previous turn, user: What is the address and postcode? | turn: The address for Galleria is [[33 Bridge Street]] and the postcode is C.B 2, 1 U.W. Can I help you with anything else?
+- E3#2:4 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is [[43 High Street]] Cherry Hinton Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is 01223 249955.
+
+### E3#3  (mentions 16, distinct values 4)
+Examples:
+- E3#3:0 [system] previous turn, user: Find me a moderately priced place to eat in the South | turn: I have two options available Pizza Hut [[Cherry Hinton]] serving Italian and Restaurant Alimentum which serves modern european. Which would you prefer?
+- E3#3:1 [system] previous turn, user: I don't need a reservation yet. May I have Taj Tandoori's address, postcode, and phone number, please? | turn: Okay, sure. The address is [[64 Cherry Hinton Road]] Cherry Hinton. The post code is cb17aa, and the phone number is 01223412299. Do you need anything else?
+- E3#3:2 [system] previous turn, user: Yes, I need the reference number. I am also looking for a place to eat in the south area, preferable italian. | turn: There are two restaurants that are Italian, [[Pizza Hut Cherry Hinton]], and Franky and Bennys. The reference number for your train is 0EG8EWWR.
+- E3#3:3 [system] previous turn, user: Hi I am looking for some information on the good luck chinese food takeaway. | turn: Yes, we can help you with that. It is located at [[82 Cherry Hinton Road]] Cherry Hinton. The phone number is 01223244149. Is there anything else you would like to know?
+- E3#3:4 [system] previous turn, user: Yes, may I have the address for restaurants in the south part of town. Preferably something moderately priced. | turn: There are two options. Pizza Hut [[Cherry Hinton]] serves Italian food and is located at G4 Cambridge Leisure Park Clifton Way Cherry Hinton. Restaurant Alimentum serves Modern European food and is located at 152 - 154 Hills Road. Anything else I can help you with today?
+
+### E3#4  (mentions 7, distinct values 3, low confidence)
+Examples:
+- E3#4:0 [system] previous turn, user: What is the address, phone number, and postcode? | turn: The Gourmet Burger Kitchen's phone number is 01223 312598 , they are loated at Regent Street City Centre, and there post code is .[[C.B 2]], 1 A.B
+- E3#4:1 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is [[C.B 1]], 9 H.X, and their phone number is 01223 249955.
+- E3#4:2 [system] previous turn, user: Price doesn't matter, I would like the address, phone number and the postcode please | turn: La mimosa serves Mediterranean food. Their phone number is 01223 362525, their address is Thompsons Lane Fen Ditton and their postcode is [[C.B 5, 8 A.Q.]]
+- E3#4:3 [system] previous turn, user: I need the address, phone number and postcode for a moderately priced restaurant serving international food. | turn: How about the varsity restaurant, they are located at 35 Saint Andrews Street City Centre, postcode [[C.B 2]], 3 A.R, phone number is 01223 356060.
+- E3#4:4 [system] previous turn, user: Can I get the phone number and postcode, please? | turn: bloomsbury restaurant's phone number is 0871 942 9180, their postcode is [[C.B 2]], 3 D.T
+
+### E3#5  (mentions 4, distinct values 4, low confidence)
+Examples:
+- E3#5:0 [system] previous turn, user: That sounds good, can I have the address and postcode please. | turn: the address is 83 Regent Street, postcode is C.B 2, [[1 A.W.]]
+- E3#5:1 [system] previous turn, user: What is the address and postcode? | turn: The address for Galleria is 33 Bridge Street and the postcode is C.B 2, [[1 U.W.]] Can I help you with anything else?
+- E3#5:2 [system] previous turn, user: I need the address, phone number and postcode for a moderately priced restaurant serving international food. | turn: How about the varsity restaurant, they are located at 35 Saint Andrews Street City Centre, postcode C.B 2, [[3 A.R]], phone number is 01223 356060.
+- E3#5:3 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is C.B 1, [[9 H.X]], and their phone number is 01223 249955.
+
+### E3#6  (mentions 48, distinct values 36)
+Examples:
+- E3#6:0 [user] previous turn, system: The cambridge chop house is available, would you like to book there? | turn: What food type does it have? Can you also provide me [[their phone number]]?
+- E3#6:1 [system] previous turn, user: Yes. I would like their address and phone number, please. | turn: Thanh binh's address is 17 Magdalene Street City Centre and their phone number is [[01223 362456]].
+- E3#6:2 [system] previous turn, user: What is the phone number and postcode? | turn: The phone number for La Mimosa is [[01223 362525]], and the postcode is CB58AQ.
+- E3#6:3 [user] previous turn, system: The booking was unsuccessful, would you like to try another time? | turn: Is there an opening available at 15:45? I'll also need the [[reservation number]] if it's available.
+- E3#6:4 [system] previous turn, user: May I have the phone number? | turn: The phone number is [[01223 244955]]. Is there anything else I can help you with?
+
+### E3#7  (mentions 313, distinct values 78, low confidence)
+Examples:
+- E3#7:0 [user] turn: I'm looking for a [[restaurant]], something moderately priced.
+- E3#7:1 [user] previous turn, system: Sorry, there are no available spots for that day and time. Would you like to try another time? | turn: If you can book me a table for 5 at one of the other cheap [[Chinese restaurants]] at 12:30 (or 11:30) on Thursday, that would be fine. Can you try that?
+- E3#7:2 [user] previous turn, system: If you are looking for an inexpensive restaurant in the south there is a Chinese one and a Portuguese as well. Do you have a preference for price or style? | turn: The restaurant should be in the same price range as the [[hotel]] and I would like a restaurant that serves barbeque food
+- E3#7:3 [user] previous turn, system: Yes on both of those. Is there anything else I can do for you? | turn: Yes, I am also looking for an [[Indian restaurant]] to eat at.
+- E3#7:4 [system] previous turn, user: The restaurant should be in the expensive price range and should be in the south, i do not have a particular food preference. | turn: I have five places. Do you prefer, [[Italian]], Chinese, Mexican or Indian?
+
+### E3#8  (mentions 7, distinct values 3)
+Examples:
+- E3#8:0 [system] previous turn, user: Let's try the west part of town. | turn: There are 5 in the West. You might want to try [[Cocum]] on 71 Castle Street City Centre.
+- E3#8:1 [system] previous turn, user: Actually I am specifically looking for the Cocum restaurant, I would like to book for 7 people at 15:00 on monday if possible. | turn: I have a table reserved for you and 6 other guests at the [[Cocum restaurant]] on Monday at 15:00. The reference number is BPE8LVHA.
+- E3#8:2 [user] previous turn, system: no it doesnt but the tandoori palace and the cocum does. would you like me to book a table there. | turn: I think I will try [[The Cocum]]. Can I book a table there for 2 on Sunday at 12:15? And will you please give me the reference #?
+- E3#8:3 [system] previous turn, user: Can you please try Indian food instead. | turn: There are 6 Indian restaurants in the west. They are all expensive. I recommend [[cocum]].
+- E3#8:4 [user] previous turn, system: Would love to! What kind of food do you like? | turn: Actually I am specifically looking for the [[Cocum restaurant]], I would like to book for 7 people at 15:00 on monday if possible.
+
+### E3#9  (mentions 253, distinct values 15)
+Examples:
+- E3#9:0 [system] previous turn, user: Please try Friday at 17:00. It should be less crowded then. | turn: Booking was successful. The table will be reserved for [[15 minutes]]. Reference number is : CQV6JDS3.
+- E3#9:1 [user] previous turn, system: Sure thing! It is located at 30 Bridge Street City Centre and the phone number is 01223362372 | turn: Can you make a reservation for [[6 people]] at 12:15 on wednesday?
+- E3#9:2 [user] previous turn, system: There are 5 expensive Italian restaurants around town is there an area you prefer? | turn: No any area will work. Whatever you recommend. I need a reservation for Friday, [[3 people]] at 13:45. Please include the reference number.
+- E3#9:3 [user] previous turn, system: Bedouin would be the perfect place for you to dine. They're located at 100 Mill Road City Centre. Do you need additional information about them? | turn: No thank you. Let's go ahead and book a table for Tuesday at 16:00. There will be [[5 people]].
+- E3#9:4 [user] previous turn, system: The kymmoy meets your criteria and serves asian oriental food. | turn: I would like to make a reservation for [[7 people]] on Sunday, please.
+
+### E3#10  (mentions 371, distinct values 50, low confidence)
+Examples:
+- E3#10:0 [user] previous turn, system: I'm sorry, neither of them are available. Should I try different time or other restaurants? | turn: Ok, try [[12:30]].
+- E3#10:1 [system] previous turn, user: Can you book a table for 5 at 17:00 on friday. | turn: I booked a table for your party of 5 at Cote for Friday at [[17:00]]. Your reference is B3LAV5Z1 and the table will be reserved for 15 minutes
+- E3#10:2 [system] previous turn, user: Yes please for 7 people at 12:15 on thursday please. I will need the reference number too | turn: I have booked a reservation at [[12:15]] for 7 people on Thursday. The reference number is KLOFPFUM. Is there anything else I can do for you?
+- E3#10:3 [user] previous turn, system: I would be glad to. I need to know the day and time you would like the reservation for, please. | turn: Actually, book the table for 6 people on Tuesday at [[13:30]]. I will need the reference number for this, please.
+- E3#10:4 [user] previous turn, system: Absolutely. Their phone number is 01223351241. Is there anything else I can help you with today? | turn: I am looking for the India House restaurant. I will need to book a table for 1 person at [[16:30]] on Tuesday. Please give me the reference number.
+
+### E3#11  (mentions 325, distinct values 7)
+Examples:
+- E3#11:0 [user] previous turn, system: Sorry, there are no available spots for that day and time. Would you like to try another time? | turn: If you can book me a table for 5 at one of the other cheap Chinese restaurants at 12:30 (or 11:30) on [[Thursday]], that would be fine. Can you try that?
+- E3#11:1 [system] previous turn, user: Please book a table for 4 at the Chinese place at 12:30 on Sunday and give me the reference number. | turn: Okay you're all set for [[Sunday]] at 12:30. Your reference number is F5BTP63A. Can I help you find anything else?
+- E3#11:2 [system] previous turn, user: Can you please check for 13:45? | turn: I have you booked at 13:45 on [[Saturday]]. Your reference number is RERXDPMF. Can I help you with anything else?
+- E3#11:3 [user] previous turn, system: I recommend cotto. It has British cuisine. Would you like reservations? | turn: Yes, there will be 4 of us on [[Wednesday]] at 11:00. Please book.
+- E3#11:4 [user] previous turn, system: There is a great seafood place in the city centre called Loch Fyne. They have some of the best reviews overall. Would you like more info about them or a table? | turn: That sounds great. Please book a table for 1 at 19:45 on [[Monday]].
+
+### E3#12  (mentions 300, distinct values 273)
+Examples:
+- E3#12:0 [system] previous turn, user: Tell me about the Portuguese restaurant | turn: The restaurant is Nandos. I think you'll really like it. It's cheap and in the south area of town at Cambridge Leisure Park Clifton Way, post code [[cb17dy]].
+- E3#12:1 [system] previous turn, user: Great can I just get their address? | turn: Sure, prezzo is located at 21 - 24 Northampton Road postcode [[cb30ad]], would you also like their phone number?
+- E3#12:2 [system] previous turn, user: Any is fine, can I get the phone number and postcode of one you'd recommend? | turn: i'd recommend the oak bistro. their phone number is 01223323361. their postcode is [[cb21eg]].
+- E3#12:3 [system] previous turn, user: Oh what the heck money is no object, an expensive indian restaurant in the west. | turn: Tandoori Palace is the best one. It's at 68 Histon Road Chesterton, [[cb43le]]. Would you like a table booked?
+- E3#12:4 [system] previous turn, user: That sounds good. Can I get the postcode please? | turn: The postcode is [[cb43lf]], anything else?
+
+### E3#13  (mentions 374, distinct values 21)
+Examples:
+- E3#13:0 [system] previous turn, user: I'd like to book one for the same group of people at 11:00 on the same day as before. | turn: Neither of the restaurants in the [[centre]] are available at that time. Would you like to try a different time?
+- E3#13:1 [system] previous turn, user: I would like an expensive price range | turn: There is one, the Kymmoy. It is at 52 Mill Road [[City Centre]], would you like to make a reservation?
+- E3#13:2 [system] previous turn, user: I'm looking for an expensive restaurant in the centre. | turn: I can recommend several restaurants in the [[centre of town]]. Are you looking for any type of food in particular
+- E3#13:3 [system] previous turn, user: Thank you. I am also looking for a place to dine. Im thinking British food and it should be in the centre. | turn: We've got seven different places in the [[center of town]] to eat with moderate to expensive pricing. Do you have a preference?
+- E3#13:4 [system] previous turn, user: How about modern european food? | turn: We have Modern European in the [[centre area]] in several price ranges. Do you have a preference?
+
+### E3#14  (mentions 16, distinct values 2)
+Examples:
+- E3#14:0 [system] previous turn, user: Well, how about African food? | turn: [[Bedouin]] is an expensive serving african food in the centre of town.
+- E3#14:1 [system] previous turn, user: Okay, let's adjust the food type to african please | turn: [[The Bedouin]] serves African food, would you like me to book that for you?
+- E3#14:2 [system] previous turn, user: Are any of those Ethiopian restaurants? | turn: There is an upscale African restaurant called [[Bedouin]]. Would you like me to book it?
+- E3#14:3 [system] previous turn, user: yes, how about another restaurant in the same area and price range? | turn: How about [[Bedouin]], they serve African Cuisine.
+- E3#14:4 [system] previous turn, user: Yes. Can I book for 8 people on Saturday at 16:00? | turn: Your table is reserved at [[Bedouin]], the reference number is 8KD5RUKV. Is there anything else I can help you with today?
+
+### E3#15  (mentions 399, distinct values 54, low confidence)
+Examples:
+- E3#15:0 [system] previous turn, user: No, which one is your favorite? | turn: When it comes to British food, my absolute favorite is Restaurant One Seven. It is [[moderately priced]]. Would you like more info about them?
+- E3#15:1 [system] previous turn, user: I was wondering if you could provide me with its food type, price range as well as the postcode? | turn: They are a chinese restaurant with a [[moderate price range]], their postcode is cb23pp. Is there anything else I can help you with?
+- E3#15:2 [system] previous turn, user: I'm looking for restaurant in the centre area that serves European food please. | turn: I have several listed from moderate to [[expensive]]. Do you have a preference?
+- E3#15:3 [system] previous turn, user: Sorry that last sentence must have been a bad connection, disregard that. Still looking for a restaurant, are there any expensive indian ones in the centre? | turn: There are several. May I suggest Curry Garden is located in the Centre and has an [[expensive price range]]. Would you like a reservation?
+- E3#15:4 [system] previous turn, user: I'm looking for a family friendly restaurant that is reasonably price and located in the center of town near attractions, hotels and easy access to transportation such as buses and taxis. | turn: Ok, to be clear, which price range do you prefer-- [[cheap]], moderate or expensive?
+
+### E3#16  (mentions 78, distinct values 55)
+Examples:
+- E3#16:0 [system] previous turn, user: No, can you just get me the address, post code and phone number. | turn: The address is 106 Regent Street City Centre, the post code is cb21dp and the phone number is [[01223302330]].
+- E3#16:1 [system] previous turn, user: Thanks, what's the price range and phone number? | turn: It's an expensive restaurant and the number is [[01223367660]].
+- E3#16:2 [system] previous turn, user: Could you pick one and give me the postcode and phone number? | turn: Sure thing here you go [[01223259988]] and cb21rt.
+- E3#16:3 [system] previous turn, user: Great Can I have their phone number and postcode please? | turn: [[01223227330]] cb21qa, is there something else i could help you with?
+- E3#16:4 [system] previous turn, user: What is its phone number | turn: Their phone number is [[01223244149]]. Would like to book a table?
+
+### E3#17  (mentions 4, distinct values 2, low confidence)
+Examples:
+- E3#17:0 [system] previous turn, user: How about Chinese food? | turn: There are the Peking Restaurant, which is expensive, the [[Good Luck Chinese Food Takeaway]], which is also expensive, and the Lucky Star, which is cheap.
+- E3#17:1 [system] previous turn, user: I'm looking for a chinese food restaurant. | turn: [[the good luck chinese food takeaway]] is a nice place. Do you want to book?
+- E3#17:2 [user] turn: Hi I am looking for some information on the [[good luck chinese food takeaway]].
+- E3#17:3 [user] previous turn, system: Is there anything else I can help you with? | turn: Yes actually. I'd like the reservation for any other restaurant that is in the same area and price range as [[The Good Luck Chinese Food Takeaway]].
+
+### E3#18  (mentions 10, distinct values 5)
+Examples:
+- E3#18:0 [system] previous turn, user: No need to book it. Thanks. But can you help me find a cheap restaurant in the south? | turn: Sure - [[The Lucky Star]] serves Chinese food and Nandos serves Portuguese food. Do either of those sound good?
+- E3#18:1 [user] previous turn, system: There are the Peking Restaurant, which is expensive, the Good Luck Chinese Food Takeaway, which is also expensive, and the Lucky Star, which is cheap. | turn: Can I have the address of [[Lucky Star]]?
+- E3#18:2 [system] previous turn, user: I'd like it to be in the north, and expensive would be best. | turn: I would recommend either Hakka or [[The Hotpot]]. Would you like for me to book a reservation for one of these restaurants?
+- E3#18:3 [system] previous turn, user: Yes, I would prefer an expensive one. | turn: In expensive restaurants, I have two options in the north. There is Hakka and there is [[The Hotspot]]. In my opinion, Hakka is a great chinese restaurant.
+- E3#18:4 [user] previous turn, system: The phone number is 01223354382. Can I help you with anything else today? | turn: Yes, I'm also looking for a place called [[The Man on the Moon]]?
+
+### E3#19  (mentions 153, distinct values 14, low confidence)
+Examples:
+- E3#19:0 [system] previous turn, user: I'd like to find a place that serves moderately priced chinese food. | turn: I show dour restaurants that serve chinese food. [[Three]] are located in the centre and one is in the North area. They are all moderately priced. May I start by offering you the Jinling Noodle Bar?
+- E3#19:1 [system] previous turn, user: I would like to try an expensive, italian place while visiting cambridge. | turn: I have 5 of them. [[4]] in the centre area and one in the south. Would you like more information?
+- E3#19:2 [user] previous turn, system: There is a great seafood place in the city centre called Loch Fyne. They have some of the best reviews overall. Would you like more info about them or a table? | turn: That sounds great. Please book a table for [[1]] at 19:45 on Monday.
+- E3#19:3 [user] previous turn, system: Cote is a French Restaurant in the centre. Would you like to make a reservation? | turn: Yes! I need at table for [[6]] at 18:30 Wednesday.
+- E3#19:4 [user] previous turn, system: How does the Charlie Chan sound? It is a cheap Chinese restaurant in the centre. | turn: That sounds like they'll have some awesome Chop Suey. Please book me a table for [[2]] on Tuesday at 12:45.
+
+### E3#20  (mentions 11, distinct values 3)
+Examples:
+- E3#20:0 [system] previous turn, user: Italian would be nice thank you | turn: Okay. [[Pizza Express]] would suite your needs, would you like me to make you a reservation?
+- E3#20:1 [system] previous turn, user: The area doesn't matter to me. It just has to be cheap. | turn: Ok I hear good things about [[pizza hut city centre]]. Would you like a table?
+- E3#20:2 [system] previous turn, user: ok, what are they? | turn: curry prince and rajmahal which both serve indian food. And [[pizza hut]] fen ditton serves italian food.
+- E3#20:3 [system] previous turn, user: Not really. Please make a recommendation. | turn: There is a [[Pizza Express]] that is in the Centre area. It is in the moderate category. Would you like me to try to book that?
+- E3#20:4 [system] previous turn, user: Is that Italian? I would like an Italian restaurant, please. | turn: Okay, how about the [[pizza hut city centre]]? I heard it's pretty good.
+
+### E3#21  (mentions 26, distinct values 5)
+Examples:
+- E3#21:0 [system] previous turn, user: Sure, how about one that serves indian food in that area. | turn: There are 5 results for restaurants serving indian food, the first is [[tandoori palace]] located at 68 Histon Road Chesterton. Would you like a reservation and for how many?
+- E3#21:1 [user] previous turn, system: Taj Tandoori is a great place for Indian food. Would you like a reservation? | turn: I don't need a reservation yet. May I have [[Taj Tandoori]]'s address, postcode, and phone number, please?
+- E3#21:2 [system] previous turn, user: The price range doesn't matter. Can you give me a few names to choose from? | turn: The choices are Curry Prince, Pipasha Restaurant, Rajmahal, and [[Sitar Tandoori]]. Would you like to book a table at one of these?
+- E3#21:3 [system] previous turn, user: The restaurant should be in the expensive price range | turn: [[Maharajah tandoori restaurant]] on 41518 Castle Street City Centre is a good fit for you.
+- E3#21:4 [system] previous turn, user: Does it serve Indian food? | turn: no it doesnt but [[the tandoori palace]] and the cocum does. would you like me to book a table there.
+
+### E3#22  (mentions 7, distinct values 2)
+Examples:
+- E3#22:0 [system] previous turn, user: Not really, no. What's the address, postcode, and phone number for your favorite? | turn: Oh well if your letting me decide then [[kymmoy]] serves the best asian oriental food! Phone is 01223311911 postcode is cb12as and they are at 100 Mill Rd City Centre
+- E3#22:1 [system] previous turn, user: I would like it to be in the centre area, please. | turn: [[The kymmoy]] meets your criteria and serves asian oriental food.
+- E3#22:2 [system] previous turn, user: Are there any other restaurants for the same price range in the same area? | turn: [[Kymmoy]] is also in the centre. It is an expensive Asian restaurant. Would you like me to book this one for you?
+- E3#22:3 [system] previous turn, user: I would like an expensive price range | turn: There is one, the [[Kymmoy]]. It is at 52 Mill Road City Centre, would you like to make a reservation?
+- E3#22:4 [system] previous turn, user: An expensive restraunt in town centre that serves asian oriental food | turn: Great, there's a restaurant called [[kymmoy]] that fits your criteria. Would you like their information?
+
+### E3#23  (mentions 12, distinct values 7)
+Examples:
+- E3#23:0 [system] previous turn, user: Could you just give me the postcode and address? | turn: The address is [[100 Mill Road]] City Centre and the postcode is cb12bd. Can I help you with anything else today?
+- E3#23:1 [system] previous turn, user: Lets try rice house. | turn: Sure thing! Their address is [[88 Mill Road]] City Centre, would you like me to book you a table now?
+- E3#23:2 [system] previous turn, user: Not really, no. What's the address, postcode, and phone number for your favorite? | turn: Oh well if your letting me decide then kymmoy serves the best asian oriental food! Phone is 01223311911 postcode is cb12as and they are at [[100 Mill Rd]] City Centre
+- E3#23:3 [system] previous turn, user: What type of restaurants are located in the city centre? | turn: I'm so sorry, I was mistaken, there are several expensive Indian restaurants in the centre of town. May I recommend Curry Queen, at [[106 Mill Road]]?
+- E3#23:4 [system] previous turn, user: Hello, I am looking for a restaurant by the name of Royal Standard. Do you know where it is? | turn: Yes, royal standard is in the city centre at [[290 Mill Road]].
+
+### E3#24  (mentions 4, distinct values 2, low confidence)
+Examples:
+- E3#24:0 [user] previous turn, system: Jinling noodle bar, postcode cb23pp. Is there any more info I can give you? | turn: I would like to visit a [[college]] in the same area as the noodle bar, can you find me one?
+- E3#24:1 [user] previous turn, system: There are nine restaurants that fit your requirements. What type of food are you interested in? | turn: Just pick one in the same area as [[Queens' College]], and can you book a table for 1 at 18:30 on Saturday please?
+- E3#24:2 [system] previous turn, user: Actually, I want to visit a college. Somewhere in the centre. | turn: I would suggest downing [[college]], would you like the address?
+- E3#24:3 [user] previous turn, system: What type of food would you be interested in? | turn: Actually, I want to visit a [[college]]. Somewhere in the centre.
+
+### E3#25  (mentions 25, distinct values 5)
+Examples:
+- E3#25:0 [system] previous turn, user: Yes, that would be great. Can you also give me the entrance fee and postcode for that college? | turn: The address is [[regent street]] and there is no entry fee.
+- E3#25:1 [system] previous turn, user: I'm not sure if I would like to book one yet. Can you please tell me the address, phone number and postcdode? | turn: Address is De Vere University Arms [[Regent Street City Centre]], phone number 01223337766, and postcode cb21ab.
+- E3#25:2 [system] previous turn, user: Yes, that would be great and can you give me the postcode and their address please? | turn: The address is [[83 Regent Street]], postcode cb21aw. What day and time would you like to book?
+- E3#25:3 [system] previous turn, user: No, can you just get me the address, post code and phone number. | turn: The address is [[106 Regent Street]] City Centre, the post code is cb21dp and the phone number is 01223302330.
+- E3#25:4 [system] previous turn, user: Hello I am looking for a restaurant called J restaurant | turn: J restaurant is an asian oriental restaurant in the centre of town. It is cheap and located at [[86 Regent Street]] City Centre.
+
+### E3#26  (mentions 4, distinct values 3, low confidence)
+Examples:
+- E3#26:0 [system] previous turn, user: It doesn't really matter, just whatever you recommend. | turn: Milton County Park in the north is [[free]] and my humble suggestion.
+- E3#26:1 [system] previous turn, user: How about choosing a famous one and give me the address, postcode and entrance fee. | turn: corpus christi is popular this time of year. The address is at king's parade. The post code cb21rh and the [[entree fee]] is 2 pounds.
+- E3#26:2 [system] previous turn, user: Yes, that would be great. Can you also give me the entrance fee and postcode for that college? | turn: The address is regent street and there is no [[entry fee]].
+- E3#26:3 [system] previous turn, user: I was thinking about going to Byard Art, can you tell me the address and what the entrance fee is? | turn: The address is14 king's parade and it is [[free]]
+
+### E3#27  (mentions 1, distinct values 1)
+Examples:
+- E3#27:0 [system] previous turn, user: Thank you. Do you have the postcode, please? | turn: The postcode for [[Downing College]] is cb21dq. Anything else I have help you with?
+
+### E3#28  (mentions 5, distinct values 1)
+Examples:
+- E3#28:0 [system] previous turn, user: I need reservations for 5 people at 15:15 on Sunday. I'll need the reference number as well. | turn: Your table at [[Panahar]] has been reserved for 15 minutes starting at 15:15 on Sunday. Your reference number is TIYE4F1Y. Can I help you with anything else?
+- E3#28:1 [system] previous turn, user: That sounds great. Please book it for 3 people on Thursday at 16:30 | turn: I was able to book a table at [[Panahar]] for 3 people on Thursday at 16:30. The reference number is 5SIQAVA
+- E3#28:2 [system] previous turn, user: Could you please try again? I really need that reservation. I'd prefer it for Sunday but if they can't accommodate that time, Thursday will suffice. | turn: Neither of those days seem to be available. Would you like me to try a different restaurant. [[Panahar]] is expensive and in the same area.
+- E3#28:3 [system] previous turn, user: What about Indian food? | turn: I have 6 restaurants that meet your criteria. Would the [[Panahar]] work for you? It's at 8 Norfolk Street City Centre.
+- E3#28:4 [user] turn: I need information on a restaurant called [[panahar]].
+
+### E3#29  (mentions 6, distinct values 1)
+Examples:
+- E3#29:0 [system] previous turn, user: Any type of food, just cheap in the west part of town. | turn: What about [[La Margherita]]? They serve Italian.
+- E3#29:1 [system] previous turn, user: I would like it to be cheap. Does one of them meet that requirement. | turn: [[la margherita]] is in the cheap range, would you like me to book you?
+- E3#29:2 [user] turn: I'm trying to find information on a particular restaurant, it is called [[la margherita]].
+- E3#29:3 [system] previous turn, user: Does it serve creative food? | turn: Unfortunately, no. [[La Margherita]] is an italian place. And, Thanh Binh serves vietnamese.
+- E3#29:4 [system] previous turn, user: I'm trying to find information on a particular restaurant, it is called la margherita. | turn: [[La Margherita]] is in the west, cheaply priced, located at 15 Magdalene Street City Centre, and can be reached at 01223315232.
+
+### E3#30  (mentions 16, distinct values 2)
+Examples:
+- E3#30:0 [system] previous turn, user: How about vietnamese food? | turn: [[Thanh Binh]] serves Vietnamese food and is located in the west part of town. Would you like more info on it?
+- E3#30:1 [user] turn: I'm trying to get some information on the [[thanh binh restaurant]] please
+- E3#30:2 [system] previous turn, user: I am also looking for a cheap vietnamese restaurant. | turn: There is a vietnamese restaurant called [[Thanh Binh]] on the west side of town. It is located at 17 Magdalene Street City Centre.
+- E3#30:3 [user] previous turn, system: Unfortunately, no. La Margherita is an italian place. And, Thanh Binh serves vietnamese. | turn: [[Thanh Binh]] would be perfect.
+- E3#30:4 [system] previous turn, user: I am also looking for a cheap place to dine in the west part of town please. | turn: Sure! I've heard good things about [[Thanh Binh]], a Vietnamese restaurant. Does that sound good to you?
+
+### E3#31  (mentions 7, distinct values 2)
+Examples:
+- E3#31:0 [system] previous turn, user: First, tell me how far away from the hotel this restaurant is. | turn: It is also in the west side area, located at [[17 Magdalene Street]] City Centre. Would you like to make a reservation?
+- E3#31:1 [system] previous turn, user: I'm trying to find information on a particular restaurant, it is called la margherita. | turn: La Margherita is in the west, cheaply priced, located at [[15 Magdalene Street]] City Centre, and can be reached at 01223315232.
+- E3#31:2 [system] previous turn, user: I am also looking for a cheap vietnamese restaurant. | turn: There is a vietnamese restaurant called Thanh Binh on the west side of town. It is located at [[17 Magdalene Street]] City Centre.
+- E3#31:3 [system] previous turn, user: Yes. I would like their address and phone number, please. | turn: Thanh binh's address is [[17 Magdalene Street]] City Centre and their phone number is 01223 362456.
+- E3#31:4 [system] previous turn, user: Can I have the address please? | turn: The address is [[17 Magdalene Street]] City Centre.
+
+### E3#32  (mentions 89, distinct values 14)
+Examples:
+- E3#32:0 [user] turn: I'm visiting [[Cambridge]] and would like some suggestions for an upscale restaurant which serves modern global cuisine.
+- E3#32:1 [system] previous turn, user: Nope you did everything I needed. I appreciate you more then you think! | turn: Thank you for contacting [[Cambridge TownInfo centre]]. Goodbye!
+- E3#32:2 [system] previous turn, user: No preference, give me an option. | turn: There's The Oak Bistro and The Copper Kettle, which are moderately priced, and Fitzbillies and [[The Cambridge Chop House]] are expensive. Do any of those sound appealing?
+- E3#32:3 [system] previous turn, user: get me its post code | turn: The postcode for the [[Cambridge Lodge Restaurant]] is cb30dq. Can I help with anything else today?
+- E3#32:4 [system] previous turn, user: Yes, please pick one for me. | turn: I have booked you a reservation on saturday at the [[cambridge chop house]]. Your reservation number is 28XENSML. Can I help you with anything else?
+
+### E3#33  (mentions 5, distinct values 5, low confidence)
+Examples:
+- E3#33:0 [system] previous turn, user: Is there an expensive French restaurant in town? | turn: I show two french restaurants. Cote and Restaurant [[two two]].
+- E3#33:1 [user] previous turn, system: I would recommend taj tandoori. Can I book it for you? | turn: Sure. I'll be going there on Thursday 12:30 with [[two other people]].
+- E3#33:2 [system] previous turn, user: Okay, can you book for 7 people on Sunday at 14:00? | turn: I am sorry there is no booking at this time, there are [[2 other places]] would you like me to check booking for any of them?
+- E3#33:3 [system] previous turn, user: I'm hoping to find a french restaurant in Cambridge. | turn: There are two. [[Both]] are expensive. One is in the north and one is in the centre. Do you have a preference?
+- E3#33:4 [user] previous turn, system: There are 9 available. What price range do you prefer? | turn: [[II]]'d like a moderately priced place.
+
+### E3#34  (mentions 11, distinct values 1)
+Examples:
+- E3#34:0 [user] turn: Do you have information on [[La Raza]]?
+- E3#34:1 [system] previous turn, user: Yes can you please? | turn: When would you like to eat at [[La Raza]] and how many people in the party?
+- E3#34:2 [user] previous turn, system: Booked 1 ticket! Reference number: TFI0LLL4. Fee is 75.09 GBP to be paid at the station. | turn: Great! Is there a restaurant called [[la raza]] near by?
+- E3#34:3 [system] previous turn, user: I need help finding a place that serves spanish food and is located in the centre, can you help me? | turn: La Tasca and [[La Raza]] serve Spanish food in the centre of town. What price range would you prefer.
+- E3#34:4 [system] previous turn, user: I don't care. | turn: [[La Raza]] is located int he centre of town and is in the cheap price range.
+
+### E3#35  (mentions 3, distinct values 2)
+Examples:
+- E3#35:0 [system] previous turn, user: Great! Is there a restaurant called la raza near by? | turn: I was able to find it on [[4 - 6 Rose Crescent]] in the centre of town.
+- E3#35:1 [system] previous turn, user: I'm looking for a cheap spanish restaurant. | turn: There is the La Raza located at [[4-6 Rose Crescent]]. The phone number is 0122364550.
+- E3#35:2 [system] previous turn, user: Can I get their address and phone number, please? | turn: Certainly. They're at [[4 - 6 Rose Crescent]]. Their number is 01223464550. I can help you book a table if you'd like. Or is there anything else you need?
+
+### E3#36  (mentions 7, distinct values 2)
+Examples:
+- E3#36:0 [system] previous turn, user: Moderate price range would be fine. Could you pick the shortest name and tell me the address? | turn: [[Anatolia]] is located at 30 Bridge Street City Centre.
+- E3#36:1 [user] previous turn, system: I will get that for you now. | turn: Did you book me at [[Anatolia Turkish]]? I need to book for 6 on Thursday at 17:30.
+- E3#36:2 [system] previous turn, user: I would really like some good Turkish food. | turn: There are two Turkish restaurants listed. [[Anatolia]] and Efes Restaurant. Would you like to make a reservation for either of these?
+- E3#36:3 [system] previous turn, user: Actually I need a moderately priced restaurant. Are there any fitting that description? | turn: I am sorry. I mistook that price range. The [[Anatolia]] is in the moderate range. Would that work for you?
+- E3#36:4 [system] previous turn, user: Can you try booking it for 11:15? | turn: I was able to fulfill your request. You are booked at [[Anatolia]] on Wednesday at 11:15. The reservation is for 6 people. How else may I help you?
+
+### E3#37  (mentions 16, distinct values 6, low confidence)
+Examples:
+- E3#37:0 [user] previous turn, system: I don't have matches. Do you have any other food preferences? | turn: And I would like something Australasian, or if you can't find that, [[Chinese]], at least.
+- E3#37:1 [user] previous turn, system: What kind of cuisine are you interested and do you have a price range in mind? | turn: I would like a cheap [[chinese place]].
+- E3#37:2 [user] turn: I am looking for a place called [[tang chinese]]
+- E3#37:3 [system] previous turn, user: I was also hoping to find a restaurant in the same part of town as the hotel. | turn: If you are looking for an inexpensive restaurant in the south there is a [[Chinese one]] and a Portuguese as well. Do you have a preference for price or style?
+- E3#37:4 [system] previous turn, user: I need the address. | turn: [[Peking]] is at 10 Homerton Street City Centre. Do you need their phone number?
+
+### E3#38  (mentions 12, distinct values 6, low confidence)
+Examples:
+- E3#38:0 [system] previous turn, user: What type of cuisine options do I have? | turn: You can choose between [[Mexican]], Italian, Indian, and Chinese.
+- E3#38:1 [system] previous turn, user: I was also hoping to find a restaurant in the same part of town as the hotel. | turn: If you are looking for an inexpensive restaurant in the south there is a Chinese one and a [[Portuguese]] as well. Do you have a preference for price or style?
+- E3#38:2 [system] previous turn, user: I am looking for a cheap restaurant in the centre part of town. | turn: You have lots of good cheap choices in that part of town! What type of food sounds good to you? There are Italian restaurants, Indian, [[Spanish]], Chinese, and more.
+- E3#38:3 [user] previous turn, system: i have booked you the indian serving restaurant called the golden curry | turn: sorry but i wanted the [[americas]] food.
+- E3#38:4 [system] previous turn, user: What about an expensive restaurant in the centre? | turn: Sure I have many types of cuisine to choose from: African, [[French]], Asian Oriental, British, European..any preference?
+
+### E3#39  (mentions 15, distinct values 3, low confidence)
+Examples:
+- E3#39:0 [user] previous turn, system: There are two great restaurants to choose from. One is a chinese restaurant and on is a indian resaurant. Do you have a preference? | turn: Let's go with [[Indian]]. Can you book me a table for Thursday at 14:00 for 8 people?
+- E3#39:1 [system] previous turn, user: As long as it serves indian we're good. I need the address and phone number | turn: I recommend [[India House]]! It's located at 31 Newnham Road Newnham. Their phone number is 01223461661. Can I do anything else for you?
+- E3#39:2 [user] previous turn, system: Absolutely. Their phone number is 01223351241. Is there anything else I can help you with today? | turn: I am looking for the [[India House restaurant]]. I will need to book a table for 1 person at 16:30 on Tuesday. Please give me the reference number.
+- E3#39:3 [system] previous turn, user: I am looking for a cheap restaurant in the centre part of town. | turn: You have lots of good cheap choices in that part of town! What type of food sounds good to you? There are Italian restaurants, [[Indian]], Spanish, Chinese, and more.
+- E3#39:4 [system] previous turn, user: I am looking for some info on India House | turn: [[India House]] is a restaurant located at 31 Newnham Road Newnham on the west side of town. Is this the place you are referring to?
+
+### E3#40  (mentions 5, distinct values 2)
+Examples:
+- E3#40:0 [system] previous turn, user: I need the address. | turn: Peking is at [[10 Homerton Street]] City Centre. Do you need their phone number?
+- E3#40:1 [system] previous turn, user: Can you help me with finding a restaurant called backstreet bistro? | turn: Certainly. It is a gastropub located in the centre of town, and the address is [[2 Sturton Street]] City Centre.
+- E3#40:2 [system] previous turn, user: I don't need a reservation at the moment but could you send me the postcode and address of the restaurant. Thank you. | turn: The address of the restaurant is [[10 Homerton Street]] City Centre. The postcode is cb28nx. Can I assist with anything else?
+- E3#40:3 [system] previous turn, user: I want a place that serves astropub | turn: Backstreet Bistro is my favorite. They're located at [[2 Sturton Street]] City Centre, cb12qa. Would you like to book a table there?
+- E3#40:4 [system] previous turn, user: i dont mind any | turn: Okay, how about Peking Restaurant located at [[10 Homerton Street]] City Centre? Would you like a reservation?
+
+### E3#41  (mentions 16, distinct values 3)
+Examples:
+- E3#41:0 [user] previous turn, system: There are two british places, graffiti and travellers rest, do you have a preference? | turn: I will take [[Graffiti]]. Can you make a reservation for Tuesday for 8 people at 14:30 please?
+- E3#41:1 [system] previous turn, user: European food that is moderately priced please. | turn: [[galleria]] serves european food and is in the moderate price range. Would you like their location?
+- E3#41:2 [system] previous turn, user: is there something else in the West? | turn: [[Grafitti]] has great British food in the west and fits the expensive pricerange you are looking for. Does this appeal to you?
+- E3#41:3 [system] previous turn, user: yes, I would prefer it to be in the west area. | turn: [[Graffiti]] serves British food in the west area, are you ready to make a reservation?
+- E3#41:4 [system] previous turn, user: Anything in the area would be fine | turn: [[Galleria]] is a nice restaurant serving European food, is in the centre of town and is moderately priced.
+
+### E3#42  (mentions 4, distinct values 2)
+Examples:
+- E3#42:0 [system] previous turn, user: I am craving Turkish food in the centre. Is there a restaurant available? | turn: I have pulled up 3. How about [[anatolia]], they are moderately priced.
+- E3#42:1 [system] previous turn, user: Yes!, Please find a reservation of a restaurant that serves Turkish food. | turn: I have [[anatolia turkish]] located in the centre. It is moderately priced would you like to make reservations?
+- E3#42:2 [system] previous turn, user: I do not care about the price range. | turn: [[anatolia]] is a turkish restaurant in the moderate price range and in the centre. It is located at 30 bridge street city centre and its phone number is 01223 362372. Is there anything else I can help you with?
+- E3#42:3 [system] previous turn, user: If one of them has a moderate price range please give me that address. If not tell me about Turkish restaurants instead. | turn: I have two Turkish restuarants, both in the centre and both expensive. May I recommend [[anatolia]]?
+
+### E3#43  (mentions 154, distinct values 4, low confidence)
+Examples:
+- E3#43:0 [user] previous turn, system: I found Prezzo in the west part of town, would that work? | turn: Yes, that works. Please book a [[table]] for 8 people at 19:00 on Wednesday. Can you do that?
+- E3#43:1 [system] previous turn, user: Yes please, can you book a table for 1 on Monday at 13:00? | turn: You are booked! [[Your table]] will be reserved for fifteen minutes and your reference number is RKD8KQPM.
+- E3#43:2 [system] previous turn, user: Yes, please. Can you reserve a table for Saturday for 5 people at 13:45? Thanks. | turn: Booking was successful. [[The table]] will be reserved for 15 minutes.
+- E3#43:3 [system] previous turn, user: Yes, can you book a table for 8 people on Saturday at 15:45? | turn: [[A table]] is booked for Saturday for 15:45 at 8 and for 8 people. Reference number is B00KVHN
+- E3#43:4 [user] previous turn, system: jinling noodle bar is a good fit. Its on 11 Peas Hill City Centre | turn: Great! Can you book me a [[table]] for 5 on Thursday?
+
+### E3#44  (mentions 4, distinct values 1, low confidence)
+Examples:
+- E3#44:0 [user] previous turn, system: There's actually two expensive places, graffiti and travellers rest. Which would you prefer? | turn: [[Travellers Rest]] sounds good.
+- E3#44:1 [user] previous turn, system: You should try either Graffiti or Travellers Rest then. Would you like more information about these? | turn: I think I'll try [[Travellers Rest]]. Could you book me a table there for Saturday?
+- E3#44:2 [system] previous turn, user: I would love something that has British food. | turn: You should try either Graffiti or [[Travellers Rest]] then. Would you like more information about these?
+- E3#44:3 [system] previous turn, user: Is one of those expensive? If so, book me a table there for Thursday for 8 people at 13:30 please. | turn: There's actually two expensive places, graffiti and [[travellers rest]]. Which would you prefer?
+
+### E3#45  (mentions 5, distinct values 2)
+Examples:
+- E3#45:0 [system] previous turn, user: Travellers Rest sounds good. | turn: ok the address is [[huntingdon road]] in city centre, the phone # is 01223276182, and the postcode is cb30df. will there be anything else ?
+- E3#45:1 [system] previous turn, user: Address and phone number please. | turn: The [[Huntingdon]] Marriott is at Kingfisher Way, Hinchingbrook Business Park, Huntingdon. Their number is 01480446000. Is there anything else I can help you with?
+- E3#45:2 [system] previous turn, user: I'm planning my trip to Cambridge and I need help. Can you find me some expensive dining options on the west side of town? | turn: How about cambridge lodge restaurant located on Cambridge Lodge Hotel 139 [[Huntingdon Road]] City Centre.
+- E3#45:3 [system] previous turn, user: Address and phone number please. | turn: The Huntingdon Marriott is at Kingfisher Way, Hinchingbrook Business Park, [[Huntingdon]]. Their number is 01480446000. Is there anything else I can help you with?
+- E3#45:4 [system] previous turn, user: I want one in the expensive range. | turn: Travellers Rest is located on [[Huntingdon Road]]. Would you like reservations?
+
+### E3#46  (mentions 3, distinct values 2, low confidence)
+Examples:
+- E3#46:0 [user] turn: I have a taste for British food [[tonight]], can you find me a place to eat?
+- E3#46:1 [user] previous turn, system: TR4202 is the one that leaves at 7:16 and it costs 14.08 pounds per ticket. Would you like me to book it for you? | turn: Yes that would be great. I am also looking for a place to dine for the [[night]]. Do you have any suggestions?
+- E3#46:2 [system] previous turn, user: Phone number, please. | turn: Meghna's phone number is 01223 727410. Is there anything else I can do for you [[tonight]]?
+
+### E3#47  (mentions 9, distinct values 2)
+Examples:
+- E3#47:0 [system] previous turn, user: Can I get a reservation for 7 at 14:00 this coming Friday? Please get me a reference number too, I've had trouble in the past with lost reservations. | turn: I have successfully booked your reservation at the [[Ugly Duckling]] for a party of 7 on Friday at 14:00. Your reference number is YNCEB914. Will this be all?
+- E3#47:1 [system] previous turn, user: Is the restaurant moderately priced? If so, please book a table for 5 at 18:00 and send me the reference number. | turn: No, I'm sorry [[the ugly duckling]] is in the expensive price range. The copper kettle serves british food and is moderately priced. Would you like a reservation for it?
+- E3#47:2 [system] previous turn, user: I also would like to find a chinese restaurant in the centre. | turn: What's your price range? I recommend the [[Ugly Duckling]], but it's expensive. Charlie Chan is a good, cheap place, and Lan Hong House is in the middle, price-wise.
+- E3#47:3 [system] previous turn, user: Could I have their phone number and address? | turn: I'm sorry, [[the Ugly Duckling]] does not have any phone number listed but is located at 12 St. Johns Street City Centre.
+- E3#47:4 [system] previous turn, user: I want something expensive. | turn: I think you would enjoy [[ugly duckling]]. Want more information?
+
+### E3#48  (mentions 3, distinct values 2)
+Examples:
+- E3#48:0 [system] previous turn, user: Could I have their phone number and address? | turn: I'm sorry, the Ugly Duckling does not have any phone number listed but is located at [[12 St. Johns Street]] City Centre.
+- E3#48:1 [system] previous turn, user: I love pizza that will work can I get the address? | turn: The address to Don Pasquale Pizzeria is [[12 Market Hill]] at City Centre. Would you like the phone number too?
+- E3#48:2 [system] previous turn, user: Yes that would be great. I am also looking for a place to dine for the night. Do you have any suggestions? | turn: My recommendation would be the Ugly Duckling, a Chinese restaurant in the centre of town. It is located at [[12 St. Johns Street]] City Centre.
+
+### E3#49  (mentions 8, distinct values 2)
+Examples:
+- E3#49:0 [system] previous turn, user: Yes, please look in another part of town. | turn: [[The Copper Kettle]] is in centre. Phone number is 01223365098 and address is 4 Kings Parade City Centre. Would you like to make a reservation?
+- E3#49:1 [user] previous turn, system: There's The Oak Bistro and The Copper Kettle, which are moderately priced, and Fitzbillies and The Cambridge Chop House are expensive. Do any of those sound appealing? | turn: Yes I would like to book the [[Copper Kettle]] for 2 people on Friday for 18:15.
+- E3#49:2 [system] previous turn, user: Is the restaurant moderately priced? If so, please book a table for 5 at 18:00 and send me the reference number. | turn: No, I'm sorry the ugly duckling is in the expensive price range. [[The copper kettle]] serves british food and is moderately priced. Would you like a reservation for it?
+- E3#49:3 [system] previous turn, user: Thank you very much. I am also looking for a place to stay in the same price range as the restaurant with free parking. Can you help with this as well? | turn: How about [[The Copper Kettle]]. The are located in the Centre at 4 Kings Parade City Centre. May I book a table for you?
+- E3#49:4 [system] previous turn, user: I would like British food. I have no preference of price range. | turn: There are 7 restaurants which meet your needs. [[The Copper Kettle]] is located at 4 Kings Parade and serves moderate priced meals. would you like to make reservations?
+
+### E3#50  (mentions 20, distinct values 3, low confidence)
+Examples:
+- E3#50:0 [user] previous turn, system: Do you prefer a particular type of food or are you looking at a specific price range? | turn: I would like [[British food]]. I have no preference of price range.
+- E3#50:1 [system] previous turn, user: I need a restaurant in the west at a moderate price range. | turn: Okay I have an italian, a [[british]] and an indian restaurant. Do you have a preference?
+- E3#50:2 [user] turn: Can you book me a moderately priced [[British restaurant]]?
+- E3#50:3 [user] previous turn, system: There are 21 restaurants that fit that criteria. Is there a specific type of food you want to eat? | turn: Yes please - I'm craving [[British food]].
+- E3#50:4 [system] previous turn, user: I'm looking for an expensive restaurant in the west. | turn: There are 9 expensive restaurants in the west. There are [[British]], European, Indian, and Thai food to choose from. Which would you prefer?
+
+### E3#51  (mentions 46, distinct values 20, low confidence)
+Examples:
+- E3#51:0 [user] previous turn, system: Okay. Pizza Express would suite your needs, would you like me to make you a reservation? | turn: Yes. I need a table for 8 people at 16:15 on the [[same day]].
+- E3#51:1 [system] previous turn, user: Can you book it for me and get a reference number ? | turn: [[What day]] would you like to dine on ?
+- E3#51:2 [system] previous turn, user: It should be in the cheap price range. | turn: The dojo noodle bar is at 40210 Millers Yard City Centre and meets your criteria. [[What time]] would you like to book?
+- E3#51:3 [system] previous turn, user: Yes, I would like to book a table for 6 people at 13:30 on Wednesday. | turn: I'm sorry but I was unable to book you for that time. Would you like to try [[another day]] or another time slot?
+- E3#51:4 [user] previous turn, system: I have made a booking here is your information: Booking was successful. Reference number is : DGGHJ53E. | turn: Thanks. Can you help me find a place to eat also? I'd like some British food, in the [[same price range]] as my hotel.
+
+### E3#52  (mentions 7, distinct values 2)
+Examples:
+- E3#52:0 [system] previous turn, user: Yes. I would like to eat Indian food. | turn: The tandoori palace meets your criteria. It is located at [[68 Histon Road]] Chesterton.
+- E3#52:1 [system] previous turn, user: What is their address and phone number? | turn: The address for Golden Wok is [[191 Histon Road]] Chesterton and the phone number is 01223 350688.
+- E3#52:2 [system] previous turn, user: Thank you! I would like to go to an expensive restaurant, please. | turn: I would recommend Tandoori Palace at [[68 Histon Road]] Chesterton. The food there is great. Would you like for me to book a reservation for you?
+- E3#52:3 [system] previous turn, user: I need to find a restaurant in Cambridge called the Golden Wok please. | turn: I have found a Golden Wok at [[191 Histon Road]] Chesterton.
+- E3#52:4 [system] previous turn, user: Can you tell me where the restaurant Tandoori Palace is located? | turn: Tandoori Palace is in the west, address [[68 Histon Road]] Chesterton, postcode cb43le.
+
+### E3#53  (mentions 20, distinct values 3)
+Examples:
+- E3#53:0 [system] previous turn, user: Can you tell me where the restaurant Tandoori Palace is located? | turn: Tandoori Palace is in the west, address 68 Histon Road [[Chesterton]], postcode cb43le.
+- E3#53:1 [system] previous turn, user: I'm looking for a restaurant called restaurant two two? | turn: Restaurant Two Two is located at [[22 Chesterton Road]] Chesterton. Would you like to book a reservation?
+- E3#53:2 [system] previous turn, user: How about Chinese then? | turn: There are 2 expensive chinese restaurants in the north. The Hakka is located at [[Milton Road Chesterton]]. Would you like me to make a reservation for you?
+- E3#53:3 [system] previous turn, user: I need to find a restaurant in Cambridge called the Golden Wok please. | turn: I have found a Golden Wok at 191 Histon Road [[Chesterton]].
+- E3#53:4 [system] previous turn, user: I don't know. | turn: Cote is located at Bridge Street City Centre, and Restaurant Two Two is at [[22 Chesterton Road]] Chesterton. How else may I assist you?
+
+### E3#54  (mentions 17, distinct values 4)
+Examples:
+- E3#54:0 [system] previous turn, user: Three people please, on Monday at 18:30. | turn: Booked you a table at the [[oak bistro]]. Your reference number is SSUTW528.
+- E3#54:1 [system] previous turn, user: No preference, give me an option. | turn: There's [[The Oak Bistro]] and The Copper Kettle, which are moderately priced, and Fitzbillies and The Cambridge Chop House are expensive. Do any of those sound appealing?
+- E3#54:2 [user] turn: Can you help me with finding a restaurant called [[backstreet bistro]]?
+- E3#54:3 [system] previous turn, user: Thanks! Now can you help me find an expensive gastropub restaurant in the centre please? | turn: There are two that meet your criteria. [[The Backstreet Bistro]], and The Slug and Lettuce. Would you like me to book one of those for you?
+- E3#54:4 [system] previous turn, user: Yes, I would be. Can you list out several of them for me so I can pick? | turn: restaurant one seven is located at De Vere University Arms Regent Street City Centre and is moderately priced, the [[oak bistro]] is at 6 Lensfield Road and is also moderately priced
+
+### E3#55  (mentions 4, distinct values 1)
+Examples:
+- E3#55:0 [system] previous turn, user: No, I don't, actually. Surprise me with the type of food and give me the restaurant's address. | turn: The oak bistro is an excellent choice for british food. The address is [[6 Lensfield Road]].
+- E3#55:1 [system] previous turn, user: What moderately priced restaurants are there? | turn: The Oak Bistro is an excellent moderately priced restaurant located at [[6 Lensfield Road]]. Can I book a table for you?
+- E3#55:2 [system] previous turn, user: Yes, I would be. Can you list out several of them for me so I can pick? | turn: restaurant one seven is located at De Vere University Arms Regent Street City Centre and is moderately priced, the oak bistro is at [[6 Lensfield Road]] and is also moderately priced
+- E3#55:3 [system] previous turn, user: No but could I get the postcode, address, and phone number? | turn: Sure, the address is [[6 Lensfield Road]], cb21eg. You can reach the Oak Bistro at 01223323361. Is there anything else I can assist you with?
+
+### E3#56  (mentions 9, distinct values 2)
+Examples:
+- E3#56:0 [system] previous turn, user: Yes, I'm sure we'll be hungry so could you help me find an appropriate dining establishment in the north? Same price range as our hotel, please. | turn: I have located 2 restaurants in the area the Golden Wok and the [[Nirala]]. Do either of these suit your taste? Would you like me to reserve you a table?
+- E3#56:1 [system] previous turn, user: Yes, I also need to find a place for us to dine, in the same area of town, please. | turn: [[The Nirala]] and the Golden Wok are moderately priced dining options in the north.
+- E3#56:2 [system] previous turn, user: What is the phone number? | turn: The phone number for the [[Nirala]] is 01223 360966. Is there anything else I can help you with?
+- E3#56:3 [system] previous turn, user: Let's go with Indian. Can you book me a table for Thursday at 14:00 for 8 people? | turn: Your table at [[The Nirala]] will be reserved for 15 minutes. The reference number is AM8RPHXF. Can I help you with anything else?
+- E3#56:4 [system] previous turn, user: Oooh. I like both of those. Which would you recommend? | turn: I think you will have a great time picking a dish at the [[nirala]] which serves indian.
+
+### E3#57  (mentions 10, distinct values 7)
+Examples:
+- E3#57:0 [system] previous turn, user: That works, can I get an address? | turn: Yes, it's located at [[20 Milton Road]] Chesterton. Do you need to book a table?
+- E3#57:1 [user] previous turn, system: Milton County Park in the north is free and my humble suggestion. | turn: Could I please have the postcode and area to [[Milton County Park]]?
+- E3#57:2 [system] previous turn, user: Yes please, can I get a phone number, address, and reference number? | turn: Hakka is located at [[Milton Road]] Chesterton, cb41jy. The phone number is 01223568988. Can I help with anything else today?
+- E3#57:3 [system] previous turn, user: I would prefer Italian. | turn: da vinci pizzeria is located at [[20 milton road chesterton]] and they can be reached at 01223 351707
+- E3#57:4 [user] previous turn, system: Do you know the name of this restaurant? | turn: The Hakka restaurant is located at [[24 Milton Road]] Cambridge Cambridgeshire CB4 1JY. The average cost is approximately 30 per person.
+
+### E3#58  (mentions 4, distinct values 4, low confidence)
+Examples:
+- E3#58:0 [system] previous turn, user: I want to find a Chinese restaurant in the centre of Cambridge. | turn: There are [[10 choices]] and we have cheap, moderate and expensive options, any preference?
+- E3#58:1 [system] previous turn, user: I prefer Chinese food | turn: great, i have [[three options]] for you to choose from!
+- E3#58:2 [system] previous turn, user: It should be expensive. | turn: There are [[four choices]] which match your requirements. Would you like to make a reservation at one of them?
+- E3#58:3 [system] previous turn, user: Is it moderately priced? | turn: It's on the expensive side. I do have [[4 options]] in the moderate price range in either the centre of town or the north. Do you have a preference?
+
+### E3#59  (mentions 32, distinct values 6)
+Examples:
+- E3#59:0 [system] previous turn, user: I'd like to find a place that serves moderately priced chinese food. | turn: I show dour restaurants that serve chinese food. Three are located in the centre and one is in the North area. They are all moderately priced. May I start by offering you the [[Jinling Noodle Bar]]?
+- E3#59:1 [system] previous turn, user: I don't have a specific price range. Just something in the centre will be fine. | turn: There are 4 options - [[dojo noodle bar]], yippee noodle bar, j restaurant, and kymmoy. Would you like me to book a table at one of those?
+- E3#59:2 [system] previous turn, user: I don't have a preference. | turn: Out of the 21 restaurant choices, one is the [[Yippee Noodle Bar]] which is moderately priced in the centre of town. Would you like to make a reservation?
+- E3#59:3 [user] previous turn, system: Jinling noodle bar, postcode cb23pp. Is there any more info I can give you? | turn: I would like to visit a college in the same area as the [[noodle bar]], can you find me one?
+- E3#59:4 [system] previous turn, user: Something moderately priced would be great. | turn: [[The yippee noodle bar]] is an asian oriental restraunt in the town centre with a moderate price. Would you like to make a booking?
+
+### E3#60  (mentions 5, distinct values 2)
+Examples:
+- E3#60:0 [system] previous turn, user: No, not right now but can you provide me with an address and postcode for whichever of those restaurants you would recommend? | turn: the restaurant jinling noodle bar the address is [[11 Peas Hill City Centre]] and postal code is cb23pp
+- E3#60:1 [system] previous turn, user: I would like a suggestion of a moderately priced Chinese place. | turn: I recommend Jinling Noodle Bar. It's located at [[11 Peas Hill City Center]]. Would you like me to book a table for you?
+- E3#60:2 [system] previous turn, user: Can you help me find jinling noodle bar please, where is it? | turn: jinling noodle bar is in the centre area and the address is [[11 Peas Hill City Centre]].
+- E3#60:3 [system] previous turn, user: Okay, I don't need a specific area and I will take a recommendation from you on one that is moderately priced please. I will need the address. | turn: OK, I recommend the jinling noodle bar, address is [[11 Peas Hill City Centre]]. Can I get anything else for you?
+- E3#60:4 [system] previous turn, user: Cheap price range, please! | turn: jinling noodle bar is a good fit. Its on [[11 Peas Hill City Centre]]
+
+### E3#61  (mentions 11, distinct values 9, low confidence)
+Examples:
+- E3#61:0 [user] previous turn, system: The phone number is 01223351241 and the postcode is cb21ad. Is there anything else I can help with? | turn: Yes, I am also looking for an [[indian place]] to eat in the centre.
+- E3#61:1 [user] previous turn, system: We have quite a few Italian restaurants. Is there a particular part of the city in which you would like to dine? | turn: I'm looking for a [[italian place]] in the moderate price range. Can you suggest one and make reservations please?
+- E3#61:2 [user] previous turn, system: There isn't, I'm sorry, could there be anything else? | turn: Oh no, my friend told me there was a really great [[British place]] in the centre. Can you double check?
+- E3#61:3 [user] previous turn, system: I'm sorry, there isn't anything available like that. Is there something else you might like? | turn: I'm sorry I meant to say west before. I am looking for a [[European place]] that is expensive in the west.
+- E3#61:4 [system] previous turn, user: If it's moderately priced, yes please. | turn: I do not have a moderate priced [[French place]]. Do you have another kind in mind?
+
+### E3#62  (mentions 5, distinct values 2)
+Examples:
+- E3#62:0 [system] previous turn, user: Do any of them serve Italian cuisine? | turn: Yes, 4. stazione restaurant and coffee bar, clowns cafe, [[don pasquale pizzeria]], and cafe uno.
+- E3#62:1 [system] previous turn, user: Staying in the centre would be more convenient. What are my choices? | turn: How about cafe uno or [[don pasquale]] pizzeria?
+- E3#62:2 [user] previous turn, system: sure thing what's the area and or name? | turn: It's a place called [[Don Pasquale Pizzeria]].
+- E3#62:3 [system] previous turn, user: Please give me the names of the 4 choices and I'll make my selection. Needs to be an expensive Italian restaurant in the Centre. Thanks! | turn: stazione restaurant and coffee bar, [[don pasquale]] pizzeria, clowns cafe, cafe uno
+- E3#62:4 [system] previous turn, user: I love pizza that will work can I get the address? | turn: The address to [[Don Pasquale Pizzeria]] is 12 Market Hill at City Centre. Would you like the phone number too?
+
+### E3#63  (mentions 7, distinct values 5, low confidence)
+Examples:
+- E3#63:0 [user] turn: Get me a list of expensive restaurants that serve [[Danish food]] please
+- E3#63:1 [system] previous turn, user: I would like to find a danish restaurant this is moderately priced. | turn: There are no [[Danish restaurants]] in the moderate price range. Would you like me to check for restaurants serving a different type of food?
+- E3#63:2 [system] previous turn, user: Great! The restaurant should serve scandinavian food and should be in the east. | turn: I'm sorry there are no restaurants serving [[Scandinavian food]]. Is there another type of food you might like to try?
+- E3#63:3 [system] previous turn, user: Yes, I am also looking for a restaurant in the same area. I am looking for an expensive restaurant that serves Scandinavian food. | turn: There are no [[Scandinavian restaurants]] in the centre with an expensive price range. Would you like to try a different type of food or price range?
+- E3#63:4 [user] turn: I'm looking for a [[Swedish restaurant]], preferably in the expensive price range.
+
+### E3#64  (mentions 6, distinct values 2)
+Examples:
+- E3#64:0 [system] previous turn, user: I would like a gastropub then if you have one open. | turn: I would suggest The Cow Pizza Kitchen and Bar. Great food. It is located on [[Corn Exchange Street]].
+- E3#64:1 [system] previous turn, user: No I do not have a price range but it does need to be located in the centre. | turn: I have found seven restaurants available in the moderate to expensive price range. Is there a [[street]] you would like to be near?
+- E3#64:2 [system] previous turn, user: No. How about gastropub type food? May I please have the address, phone number, and area? | turn: The cow pizza kitchen and bar serves gastropub food, is located in the centre part of town and is in the moderate price range. Their phone number is 01223 308871. The address is [[Corn Exchange Street]] and the postcode is C.B 2, 3QF
+- E3#64:3 [system] previous turn, user: Let's go with the moderately priced option. Can I please have the phone number? | turn: In the moderate price range, I have one place. It's called the Cow Pizza Kitchen and Bar. It's located on [[Corn Exchange Street]]. Do you need a reservation?
+- E3#64:4 [system] previous turn, user: I need the address of a restaurant that serves gastropub food. | turn: The cow pizza kitchen and bar serves Gastropub food. Their address is [[Corn Exchange Street]] in the centre area.
+
+### E3#65  (mentions 10, distinct values 3)
+Examples:
+- E3#65:0 [system] previous turn, user: Yes, I also need a Lebanese restaurant in the center of town. | turn: [[Ali Baba]] is a moderately priced labanese restaurant in the centre. Would you like to make a reservation?
+- E3#65:1 [system] previous turn, user: No thanks. But can you find a restaurant that serves lebanese food in the centre? | turn: You're in luck! There is one Lebanese restaurant in all of Cambridge, and it's in the center. [[Ali Bana]], located at 59 Hills Road City Centre.
+- E3#65:2 [user] previous turn, system: I have the Ali Baba restaurant in the centre of town. They are moderately priced. Can I help you in reserving a table? | turn: Really? [[The Ali Baba]] is Lebanese?
+- E3#65:3 [system] previous turn, user: No thank you. I will worry about that later. I also need a lebanese restaurant in the centre. | turn: Okay, [[Ali Baba]] matches your preferences. Would you like a reservation?
+- E3#65:4 [user] turn: Yes, I need information on the restaurant [[Ali Baba]].
+
+### E3#66  (mentions 6, distinct values 4, low confidence)
+Examples:
+- E3#66:0 [system] previous turn, user: I would like to visit a college in the same area as the noodle bar, can you find me one? | turn: There are [[13 colleges]] in the centre of town. Most are free, but some do charge an entrance fee. Any preference?
+- E3#66:1 [system] previous turn, user: I'm looking for an expensive indian restaurant. | turn: I have [[14]] expensive indian restaurants. What area were you looking for?
+- E3#66:2 [system] previous turn, user: I'm looking for colleges in town, are there any in the same area as La Raza? | turn: Yes, there are [[13]]. I'd recommend Corpus Christi. Would you like more information?
+- E3#66:3 [system] previous turn, user: I am looking for a place serving expensive indian food | turn: There are [[14 places]] that serve expensive Indian food. We could narrow it down more if you specified an area. Do you have one in mind?
+- E3#66:4 [system] previous turn, user: Thank you. I am also interested in visiting colleges nearby. | turn: I have [[13 colleges]] available in the centre. Did yo have one particular in mind?
+
+### E3#67  (mentions 5, distinct values 1, low confidence)
+Examples:
+- E3#67:0 [system] previous turn, user: Hi there, can you help me find a good Chinese restaurant? I seriously need some egg rolls. | turn: There are [[17]] Chinese restaurants. Are you looking for any particular area or price range?
+- E3#67:1 [system] previous turn, user: Sure, can you look up chinese food instead? | turn: I have [[17]] chinese restaurants. Is there a certain area or price range you have in mind?
+- E3#67:2 [system] previous turn, user: I would like to book a meal at a chinese restaurant. | turn: I have results for [[17]] chinese restaurants, what area are you looking to dine in?
+- E3#67:3 [user] previous turn, system: I'm sorry, there are no open reservations for that day and time. Would you like to choose a different time or day? | turn: Then how about [[17]]:15?
+- E3#67:4 [system] previous turn, user: I need a place to eat that serves chinese food. | turn: There are [[17]] Chinese restaurants in town. Are you looking for a particular price range?
+
+### E3#68  (mentions 15, distinct values 4)
+Examples:
+- E3#68:0 [system] previous turn, user: Yes, I would prefer an expensive one. | turn: In expensive restaurants, I have two options in the north. There is [[Hakka]] and there is The Hotspot. In my opinion, Hakka is a great chinese restaurant.
+- E3#68:1 [system] previous turn, user: I'm looking for a restaurant named hakka | turn: [[The hakka]] is a chinese restaurant in the north area. Would you like to make a booking today?
+- E3#68:2 [system] previous turn, user: The Hakka restaurant is located at 24 Milton Road Cambridge Cambridgeshire CB4 1JY. The average cost is approximately 30 per person. | turn: Looks like you're doing my job for me! Did you want to know about the [[Hakka Restaurant]] then?
+- E3#68:3 [user] previous turn, system: Do you know the name of this restaurant? | turn: [[The Hakka restaurant]] is located at 24 Milton Road Cambridge Cambridgeshire CB4 1JY. The average cost is approximately 30 per person.
+- E3#68:4 [system] previous turn, user: Yes, I do. I would like it to be in the north. | turn: May I suggest [[Hakka]], a very nice Chinese Restaurant in the north part of town. Shall I provide you with more information?
+
+### E3#69  (mentions 28, distinct values 7)
+Examples:
+- E3#69:0 [system] previous turn, user: ok, what are they? | turn: [[curry prince]] and rajmahal which both serve indian food. And pizza hut fen ditton serves italian food.
+- E3#69:1 [system] previous turn, user: Area doesn't matter. Can you pick one to recommend? | turn: If you'd like to eat in the city center, I recommend the [[curry garden]]. Their phone is 01223302330. Can I book you a table?
+- E3#69:2 [system] previous turn, user: No problem. How about indian food? | turn: There are 5 indian restaurants. [[The curry garden]] is in the expensive price range and is in the centre of town.
+- E3#69:3 [user] previous turn, system: Yes sure. The Curry Prince's telephone number is 01223566388. And their address and postcode are 451 Newmarket Road Fen Ditton cb58jj. | turn: What is the price range for [[The Curry Prince]]?
+- E3#69:4 [system] previous turn, user: Any of the restaurants is fine. But, can I get a postcode and price range for the one you choose please. | turn: [[The Golden Curry]] is expensive and delicious. The postcode is cb12az. Would you like me to make a reservation?
+
+### E3#70  (mentions 4, distinct values 2, low confidence)
+Examples:
+- E3#70:0 [system] previous turn, user: What about an expensive restaurant in the centre? | turn: Sure I have many types of cuisine to choose from: African, French, [[Asian Oriental]], British, European..any preference?
+- E3#70:1 [user] previous turn, system: I don't have matches. Do you have any other food preferences? | turn: And I would like something [[Australasian]], or if you can't find that, Chinese, at least.
+- E3#70:2 [system] previous turn, user: How about something just in the cheap price range? | turn: There are a number of cheap options, though none of them serve Austrian food. There are [[Asian Oriental]], Chinese, Indian, Italian, Mediterranean, Modern European, Portuguese, and Spanish.
+- E3#70:3 [user] turn: I am looking for a restaurant to book a reservation. I want [[asian oriental]] in the expensive price range
+
+### E3#71  (mentions 20, distinct values 10, low confidence)
+Examples:
+- E3#71:0 [system] previous turn, user: It is the Pizza Hut City Centre. I'd like to eat there on Monday if you could reserve a table for me. | turn: sure, [[how many people]] will be in your party?
+- E3#71:1 [system] previous turn, user: This sunday at 15:45. | turn: [[For how many people]] would the reservation need?
+- E3#71:2 [user] previous turn, system: I have the graffiti it serves british food. Would you like to make reservations there? | turn: Yes, please. There are [[5 of us]] coming on sunday. Maybe around 18:00?
+- E3#71:3 [user] previous turn, system: I recommend Cotto, they're found on | turn: You seem to have cut off? Anyway, can you book a table on Wednesday? It'll be [[8 of us]] and we'll be coming in at 18:15.
+- E3#71:4 [user] previous turn, system: Do you know the name of this restaurant? | turn: The Hakka restaurant is located at 24 Milton Road Cambridge Cambridgeshire CB4 1JY. The average cost is [[approximately 30 per person]].
+
+### E3#72  (mentions 16, distinct values 3)
+Examples:
+- E3#72:0 [system] previous turn, user: Can you also help me find a Chinese restaurant on the north side? | turn: [[Golden wok]] is a chinese place in the north part of town, would that work for you?
+- E3#72:1 [system] previous turn, user: Yes, what restaurants are there? | turn: There is the Charlie Chan, Rice House and [[Golden House]]. Would you like to book a table at one of these?
+- E3#72:2 [system] previous turn, user: I want a restaurant in the north part of town. | turn: The City Stop restaurant is in the north part of town. [[The Golden Wok]] is also located in the north part of town.
+- E3#72:3 [user] turn: I need to find a restaurant in Cambridge called the [[Golden Wok]] please.
+- E3#72:4 [system] previous turn, user: Okay I would like to book a table for 5 people at 12:30 on Sunday. | turn: I apologize, there are no reservations at that time. Would you like to try another time at Rice House, or perhaps I can attempt Charlie Chan or [[Golden House]]?
+
+### E3#73  (mentions 5, distinct values 2)
+Examples:
+- E3#73:0 [system] previous turn, user: Yeah, could you recommend a good gastropub? | turn: Backstreet Bistro. It's expensive though. There is a moderately priced one called [[The Cow Pizza Kitchen and Bar]] if preferred.
+- E3#73:1 [system] previous turn, user: Let's go with the moderately priced option. Can I please have the phone number? | turn: In the moderate price range, I have one place. It's called the [[Cow Pizza Kitchen and Bar]]. It's located on Corn Exchange Street. Do you need a reservation?
+- E3#73:2 [system] previous turn, user: I am also looking for a place to eat around the centre area that serves gastropub style food. | turn: I found 3 places, would you like to try [[The Cow Pizza Kitchen and Bar]]?
+- E3#73:3 [system] previous turn, user: I would like a gastropub then if you have one open. | turn: I would suggest [[The Cow Pizza Kitchen and Bar]]. Great food. It is located on Corn Exchange Street.
+- E3#73:4 [system] previous turn, user: Hello, I am looking for a moderately priced restaurant that serves gastropub food. | turn: [[The Cow Pizza Kitchen and Bar]] serves Gastropub food and is in the moderate price range.
+
+### E3#74  (mentions 8, distinct values 5, low confidence)
+Examples:
+- E3#74:0 [system] previous turn, user: I am looking for an expensive restaurant in the centre | turn: There are [[33]] to choose from. Any type of cuisine you'd prefer?
+- E3#74:1 [system] previous turn, user: Yes, i need to find a restaurant to visit in the centre of town. Preferably in the moderate price range. | turn: There are [[21]] that fits your criteria. Which cuisine would you like, to help narrow your choices down?
+- E3#74:2 [system] previous turn, user: Yes, I am also looking for an Indian restaurant to eat at. | turn: We have [[22]] great indian restaurants to choose from. Is there a certain price range you would like to stay in?
+- E3#74:3 [system] previous turn, user: May I please have the phone number? | turn: 01223 [[308871]] Will that be all?
+- E3#74:4 [system] previous turn, user: Can you find me a restaurant with a moderate price range? | turn: That will be no problem. We have [[31]] moderately priced restaurants in the city. Is there a cuisine you'd prefer?
+
+### E3#75  (mentions 14, distinct values 5)
+Examples:
+- E3#75:0 [system] previous turn, user: Please give me the names of the 4 choices and I'll make my selection. Needs to be an expensive Italian restaurant in the Centre. Thanks! | turn: [[stazione restaurant and coffee bar]], don pasquale pizzeria, clowns cafe, cafe uno
+- E3#75:1 [system] previous turn, user: I'll give that a try. Book a table for 6 people for Sunday at 12:30 please. | turn: Thank you. I have booked you a table for six on Sunday at 12:30 at [[City Stop Restaurant]], and your reference number is CAWRD4D1.
+- E3#75:2 [system] previous turn, user: What is the postcode and their phone number? | turn: [[City stop]]'s post code is cb41uy and they can be reached at 01223363270. Would you like a reservation?
+- E3#75:3 [system] previous turn, user: i am looking for a place to dine. The restaurant should be in the expensive price range and should serve european food. | turn: There are 5 that fit your criteria, 3 in the centre of town are eraina, michaelhouse cafe, darrys cookhouse and wine shop and [[city stop restaurant north]] and cambridge lodge restaurant west.
+- E3#75:4 [system] previous turn, user: I want a restaurant in the north part of town. | turn: [[The City Stop]] restaurant is in the north part of town. The Golden Wok is also located in the north part of town.
+
+### E3#76  (mentions 1, distinct values 1)
+Examples:
+- E3#76:0 [system] previous turn, user: No any area will work. Whatever you recommend. I need a reservation for Friday, 3 people at 13:45. Please include the reference number. | turn: I reserved a table for you at stazione restaurant and coffee bar, you ref # is [[SUY8VW]], anything else for you today?
+
+### E3#77  (mentions 2, distinct values 1)
+Examples:
+- E3#77:0 [system] previous turn, user: How about choosing a famous one and give me the address, postcode and entrance fee. | turn: [[corpus christi]] is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is 2 pounds.
+- E3#77:1 [system] previous turn, user: I'm looking for colleges in town, are there any in the same area as La Raza? | turn: Yes, there are 13. I'd recommend [[Corpus Christi]]. Would you like more information?
+
+### E3#78  (mentions 6, distinct values 3)
+Examples:
+- E3#78:0 [system] previous turn, user: Thank you very much. I am also looking for a place to stay in the same price range as the restaurant with free parking. Can you help with this as well? | turn: How about The Copper Kettle. The are located in the Centre at [[4 Kings Parade]] City Centre. May I book a table for you?
+- E3#78:1 [system] previous turn, user: Yes, that would be great! | turn: You should try the the copper kettle at [[4 Kings Parade City Centre]]. Would you like me to make a reservation for you there?
+- E3#78:2 [system] previous turn, user: get me the address please. | turn: It is at cb21rh [[King's Parade]].
+- E3#78:3 [system] previous turn, user: I would like British food. I have no preference of price range. | turn: There are 7 restaurants which meet your needs. The Copper Kettle is located at [[4 Kings Parade]] and serves moderate priced meals. would you like to make reservations?
+- E3#78:4 [system] previous turn, user: Yes, please look in another part of town. | turn: The Copper Kettle is in centre. Phone number is 01223365098 and address is [[4 Kings Parade City Centre]]. Would you like to make a reservation?
+
+### E3#79  (mentions 1, distinct values 1)
+Examples:
+- E3#79:0 [system] previous turn, user: How about choosing a famous one and give me the address, postcode and entrance fee. | turn: corpus christi is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is [[2 pounds]].
+
+### E3#80  (mentions 3, distinct values 2)
+Examples:
+- E3#80:0 [system] previous turn, user: How about Indian food? Can I have the address and phone number? | turn: cocum serves indian food. its address is [[71 castle street]] city centre and the phone number is 01223 366668, is there anything else I can help you with?
+- E3#80:1 [system] previous turn, user: The restaurant should be in the expensive price range | turn: Maharajah tandoori restaurant on 41518 [[Castle Street]] City Centre is a good fit for you.
+- E3#80:2 [system] previous turn, user: Let's try the west part of town. | turn: There are 5 in the West. You might want to try Cocum on [[71 Castle Street]] City Centre.
+
+### E3#81  (mentions 6, distinct values 2, low confidence)
+Examples:
+- E3#81:0 [system] previous turn, user: How about the center? I need a reservation for Wednesday for 1 person at 14:40. | turn: We have 2 in the center, [[De Luca Cucina and Bar]], and Riverside Brasserie, they are great eats.
+- E3#81:1 [system] previous turn, user: Give me the postcode, phone number and address of one of the moderately priced ones | turn: [[De Luca Cuccina and Bar]] is located at 83 Regent Street, cb21aw and the phone number is 01223356666. Is there anything else I can help you with?
+- E3#81:2 [system] previous turn, user: I want to find a moderately priced restaurant serving european food. | turn: [[de luca cucina and bar]] is in the centre part of town and in the moderate price range.
+- E3#81:3 [system] previous turn, user: Yes. How about a restaurant that serves European food? | turn: [[De Luca Cucina and Bar]] is moderately priced and serves modern European food.
+- E3#81:4 [system] previous turn, user: Okay, well how about one that serves modern European food in that area? | turn: I have two modern european restaurants in the centre. Would you like to book at [[de luca cucina and bar]]?
+
+### E3#82  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#82:0 [system] previous turn, user: I would like an indian restaurant in the same price range as the hotel please. | turn: There are [[four cheap Indian places]], three in city centre, and one on the north end.
+
+### E3#83  (mentions 6, distinct values 1)
+Examples:
+- E3#83:0 [system] previous turn, user: Any will do, what ever you recommend. | turn: [[Royal Spice]] is located in the north. It's one of my personal favorites. Would you like me to make reservations for you?
+- E3#83:1 [system] previous turn, user: Whichever one is fine, surprise me! | turn: I would recommend [[Royal Spice]] in the north end. Would you like me to make a reservation there for you?
+- E3#83:2 [system] previous turn, user: Ok, try 12:30. | turn: That worked! You've got a table for 6 reserved at [[Royal Spice]] at 12:30 on Friday. Ref. number is 8NHD0P2I. Need anything else today?
+- E3#83:3 [system] previous turn, user: I need a cheap place, please. | turn: [[Royal spice]] is cheap and looks great.
+- E3#83:4 [system] previous turn, user: Are there any good cheap places to eat in the same area? | turn: Yes we have [[Royal Spice]] which is an Indian Restaurant and Da Vinci Pizzeria which is Italian.
+
+### E3#84  (mentions 4, distinct values 1)
+Examples:
+- E3#84:0 [system] previous turn, user: That sounds great. Please book a table for 1 at 19:45 on Monday. | turn: I booked your reservations at [[Loch Fyne]] for Monday at 19:45 the reference number is 4A4FODSE. Is there anything else I can do for you?
+- E3#84:1 [system] previous turn, user: I don't really care about cuisine, but I would like something expensive in the center of town. What's your favorite high-end place? | turn: I would suggest [[Loch Fyne]]. They serve the most amazing selection of seafood in the entire city. It's definitely an experience.
+- E3#84:2 [system] previous turn, user: I am looking for a restaurant serving seafood, in the center of the town. | turn: [[Loch Fyne]] offers seafood in the city centre. Would you like me to book you a table?
+- E3#84:3 [system] previous turn, user: I don't care about the type of food. Do you have a suggestion? | turn: There is a great seafood place in the city centre called [[Loch Fyne]]. They have some of the best reviews overall. Would you like more info about them or a table?
+
+### E3#85  (mentions 7, distinct values 3, low confidence)
+Examples:
+- E3#85:0 [system] previous turn, user: I am looking for a restaurant called darrys cookhouse and wine shop. | turn: [[Darrys cookhouse and wine shop]] is located in the centre. It is expensive and serves modern european food. Would you like a reservation?
+- E3#85:1 [system] previous turn, user: i am looking for a place to dine. The restaurant should be in the expensive price range and should serve european food. | turn: There are 5 that fit your criteria, 3 in the centre of town are eraina, michaelhouse cafe, [[darrys cookhouse]] and wine shop and city stop restaurant north and cambridge lodge restaurant west.
+- E3#85:2 [user] turn: Hi there, I'm looking for information on [[Darry's Cookhouse and Wine Shop]].
+- E3#85:3 [user] previous turn, system: I don't have any information about admission, but you can call them to get more information. The number is 01223503333. The address is 6 saint edward's passage cb23pj | turn: Ok. I also need info on the restaurant [[Darrys cookhouse and wine shop]].
+- E3#85:4 [system] previous turn, user: No thanks I'm just looking for information for now. | turn: [[Darrys Cookhouse]] is a modern European restaurant in the Centre. It is located at 40270 King Street City and is in the expensive price range.
+
+### E3#86  (mentions 3, distinct values 3)
+Examples:
+- E3#86:0 [system] previous turn, user: Hi there, I'm looking for information on Darry's Cookhouse and Wine Shop. | turn: That restaurant is locates in centre and is on [[40270 king street]] in city centre. Their phone number is 01223505015.
+- E3#86:1 [system] previous turn, user: No thanks I'm just looking for information for now. | turn: Darrys Cookhouse is a modern European restaurant in the Centre. It is located at [[40270 King Street City]] and is in the expensive price range.
+- E3#86:2 [system] previous turn, user: Yeah, tell me the address for that restaurant and the type of food they serve | turn: They are an Asian/Oriental restaurant, and are located at [[40428 King Street]] City Centre. Is there anything else I can assist you with?
+
+### E3#87  (mentions 18, distinct values 6, low confidence)
+Examples:
+- E3#87:0 [system] previous turn, user: How about modern european food? | turn: There are [[3 restaurants]] serving modern European food and in the moderate price range. Would you like the south or centre part of town?
+- E3#87:1 [system] previous turn, user: What about Indian food? | turn: There are [[5 restaurants]] that serve indian food in the centre. Any specific price range?
+- E3#87:2 [system] previous turn, user: Please list all moderately priced restaurants in the centre of Cambridge. | turn: There are [[21 restaurants]] to choose from. Would you like me to narrow this search down by choosing a type of food you would like to eat?
+- E3#87:3 [system] previous turn, user: Are there any British restaurants in the center of town? | turn: There are [[7 restaurants]] in the center of town that serve British cuisine. Would you prefer one with an expensive, moderate, or cheap price range?
+- E3#87:4 [system] previous turn, user: Any restaurants in the centre area with an expensive price range? | turn: There are [[33 restaurants]] with that criteria. Would you like to narrow your search?
+
+### E3#88  (mentions 11, distinct values 3)
+Examples:
+- E3#88:0 [system] previous turn, user: No, any price range is fine. Can you recommend one of the restaurants? | turn: [[bloomsbury restaurant]] is an international restaurant in the centre area.
+- E3#88:1 [user] previous turn, system: There are 2 restaurants serving international food. One is the varsity restaurant, the other is bloomsbury restaurant. Would you like a reservation at one of these? | turn: I would like to book a table for 2 at 11:45 on Thursday at [[Bloomsbury]].
+- E3#88:2 [system] previous turn, user: Okay. Is there one that serves International food? | turn: There are three locations that serve international cuisine. The Missing Sock, The Varsity Restaurant, and [[the Bloomsbury Restaurant]]. Are you interested in any of these?
+- E3#88:3 [system] previous turn, user: Can you find me a restaurant in the centre of town that has availability for Wednesday at 13:30? | turn: Yes, I've got the [[Bloomsbury Restaurant]] at 13:30 for 6 on Wednesday.
+- E3#88:4 [user] previous turn, system: The Varsity restaurant and Bloomsbury restaurant both offer international food. Could you like a recommendation? | turn: Let's go with the [[Bloomsbury]]. I need a reservation for Tuesday for 7 people.
+
+### E3#89  (mentions 13, distinct values 3)
+Examples:
+- E3#89:0 [user] turn: I need a restaurant. I've heard [[Nandos]] recommended, could you give me more information about it?
+- E3#89:1 [system] previous turn, user: Are there no international places to dine in the area? Anything other than British food in the area? | turn: As I mentioned earlier, the only options in the south that are cheap are The Lucky Star (chinese) and [[Nando's]] (portuguese). Do you want me to search another area or price?
+- E3#89:2 [user] turn: I'm looking for a restaurant in Cambridge called [[Nandos City Centre]].
+- E3#89:3 [system] previous turn, user: Is that restaurant in the south? I"d like to book for 4 people at 1330 on saturday please | turn: [[Nandos]] is indeed in the south. The booking is successful with the reference number PCFFZ610. Do you need more help?
+- E3#89:4 [user] previous turn, system: I have 2 choices. The Lucky Star serves chinese. And, Nando's is a portuguese restaurant. Which do you prefer? | turn: I was goona ask to search for international, but it sounds like their isnt an option with a cheap price. Lets go with [[Nando's]]
+
+### E3#90  (mentions 21, distinct values 4)
+Examples:
+- E3#90:0 [system] previous turn, user: Any price range is fine. | turn: How about the [[Charlie Chan]]? They are a budget-friendly Chinese restaurant in the centre of town.
+- E3#90:1 [system] previous turn, user: Is that in the expensive price range? | turn: No, [[Charlin Chan]] is a cheap place. The Ugly Duckling is an expensive Chinese restaurant though, is that what you would like?
+- E3#90:2 [system] previous turn, user: Yes that would be great! Thank you. Can I get some information on it? | turn: [[Sure Charlie Chan]]'s address is Regent Street City Centre and their telephone number is 01223361763.
+- E3#90:3 [system] previous turn, user: No, a moderate restaurant isn't really what I wanted. Can you find a cheap Chinese restaurant for me? | turn: I have 3 cheap chinese restaurants in the centre of town. [[The Charlie Chan]], The Rice House, and the Golden House. Do you have a preference?
+- E3#90:4 [system] previous turn, user: Yes, please. I need it for 8 people at 14:00 Thursday and a reference number. | turn: I have that booked for you at [[Charlie Chan]]'s in the centre of town. Reference number E41S2AFE
+
+### E3#91  (mentions 14, distinct values 5)
+Examples:
+- E3#91:0 [system] previous turn, user: Okay I would like to book a table for 5 people at 12:30 on Sunday. | turn: I apologize, there are no reservations at that time. Would you like to try another time at [[Rice House]], or perhaps I can attempt Charlie Chan or Golden House?
+- E3#91:1 [system] previous turn, user: I'm also looking for information on a restaurant called rice boat. | turn: [[Rice Boat]] is an expensive Indian restaurant on the west side. Their location is 37 Newnham Road, Newnham. Would you like to book a table there?
+- E3#91:2 [user] previous turn, system: Okay, I was able to get you the booking. Your reference number is SQ6GX5Q5. Can I help you with anything else? | turn: Yes, I'm also looking for a restaurant called [[the rice boat]].
+- E3#91:3 [system] previous turn, user: I am traveling to Cambridge and looking for a restaurant in the cheap price range in the cente. | turn: Sure. I have 5. How about [[the rice house]]? They serve chinese. Or dojo noodle bar, the serve asian?
+- E3#91:4 [user] turn: Hi! I'm looking for information on the [[Rice House restaurant]].
+
+### E3#92  (mentions 11, distinct values 4)
+Examples:
+- E3#92:0 [system] previous turn, user: I don't care what part of town it is in, I will need the postcode though. | turn: The restaurant [[Yu Garden]] has a postcode of cb58pa. Can I help you with anything else today?
+- E3#92:1 [user] previous turn, system: Of course. The address listed is bateman street. | turn: Are there any moderately priced restaurants near the [[botanic gardens]]?
+- E3#92:2 [system] previous turn, user: Thank you. What area is that in, and what type of attraction is it? | turn: [[The gardens]] are considered a park and located in the centre.
+- E3#92:3 [system] previous turn, user: I would like a Chinese restaurant the is expensive. | turn: [[The Yu Garden]] is highly recommended, shall I book a table for you?
+- E3#92:4 [system] previous turn, user: I'm interested in restaurants located in the East. | turn: Okay, [[Yu Garden]] matches your specifications. Would you like me to book a reservation?
+
+### E3#93  (mentions 7, distinct values 3)
+Examples:
+- E3#93:0 [system] previous turn, user: Hmmm, okay, I'm craving Thai food so find me a restaurant that serves that | turn: I have one listing for [[bangkok city]] does that sound good to you?
+- E3#93:1 [system] previous turn, user: Is there another restaurant in the same area that is in the same price range? | turn: [[Saigon City]] is also in the expensive price range and on the north side of town. They have asian oriental cuisine. Shall we try there?
+- E3#93:2 [user] previous turn, system: Is there another price range or different cuisine you might like information on? | turn: I have reservations [[Bangkok City restaurant]] but forgot to get the address and postcode.
+- E3#93:3 [system] previous turn, user: How about Thai food instead? | turn: I've got Sala Thong in the west and [[Bangkok City]] in the centre, both expensive. Would you like more information, or for me to make a booking?
+- E3#93:4 [system] previous turn, user: How about something that serves Asian Oriental food? | turn: I do have one expensive asian oriental restaurant in the north. It is called [[Saigon City]]. Can I make you a reservation?
+
+### E3#94  (mentions 3, distinct values 1)
+Examples:
+- E3#94:0 [system] previous turn, user: What is the phone number for The Primavera? | turn: [[The Primavera]] can be reached at 01223357708
+- E3#94:1 [system] previous turn, user: Something near the attraction primavera would be nice. Where is that located? | turn: [[The Primavera]] is located in the centre area. I'll be happy to find a restaurant in that area for you. What type of food would you like?
+- E3#94:2 [user] previous turn, system: The Primavera is located in the centre area. I'll be happy to find a restaurant in that area for you. What type of food would you like? | turn: What is the phone number for [[The Primavera]]?
+
+### E3#95  (mentions 2, distinct values 2)
+Examples:
+- E3#95:0 [user] previous turn, system: A ticket from London Liverpool Street to Cambridge is 13.28GBP. | turn: Ok, I'll have to speak with my friend to see if that price is acceptable. Can I please get the address to the restaurant [[Hotel Du Vin and Bistro]]?
+- E3#95:1 [system] previous turn, user: i am looking for a place to dine. The restaurant should be in the expensive price range and should serve european food. | turn: There are 5 that fit your criteria, 3 in the centre of town are eraina, michaelhouse cafe, darrys cookhouse and [[wine shop]] and city stop restaurant north and cambridge lodge restaurant west.
+
+### E3#96  (mentions 3, distinct values 3)
+Examples:
+- E3#96:0 [system] previous turn, user: Okay, how about some European food? | turn: What about the hotel du vin and bistro at [[15 - 19 Trumpington Street]]?
+- E3#96:1 [system] previous turn, user: Ok, I'll have to speak with my friend to see if that price is acceptable. Can I please get the address to the restaurant Hotel Du Vin and Bistro? | turn: Absolutely, the address is [[15-19 Trumpington Street]]. Is there anything else I can assist you with today?
+- E3#96:2 [system] previous turn, user: I also need the postcode and address please. | turn: The address is [[51 Trumpington Street]] City Centre. The postcode is cb21rg.
+
+### E3#97  (mentions 4, distinct values 4, low confidence)
+Examples:
+- E3#97:0 [system] previous turn, user: Thanks for the help, that's all for now. | turn: I hope you have a good trip. Have a nice day. [[Goedbye]]
+- E3#97:1 [system] previous turn, user: That is everything, thank you. | turn: Have a great day. [[Good day]].
+- E3#97:2 [user] previous turn, system: Thanh binh is a cheap vietnamese restaurant. | turn: May I get the phone number of [[Thank binh]], please?
+- E3#97:3 [system] previous turn, user: Yes, that sounds great, thank you. I want to book a table for 4 people at 15:15 on Wednesday. I'll also need a reference number. | turn: You have been booked at the Prezzo for [[Wednedsday]] at 15:15 for 4 people. Your reference number is KCV0WNR3. Your table will be reserved for 15 minutes. Anything else?
+
+### E3#98  (mentions 3, distinct values 2, low confidence)
+Examples:
+- E3#98:0 [system] previous turn, user: Yes please book a table for 1 on wednesday at 14:00 please. | turn: Sure, I've booked you at [[Ask]] with reference number LK2P76OS. May I help with anything else?
+- E3#98:1 [system] previous turn, user: That is all that I need. | turn: Thank you for using the [[Help Desk]]. Have a great day!
+- E3#98:2 [system] previous turn, user: No that doesn't matter | turn: [[Ask]] is a cheap restaurant serving Italian food in the centre of town. The address is 12 Bridge Street City Centre, and the phone number is 01223 364917.
+
+### E3#99  (mentions 11, distinct values 2)
+Examples:
+- E3#99:0 [system] previous turn, user: I don't have a preference. | turn: Okay, I can book your table at [[Eraina]]. They serve european food. How many in your party, what day and time please?
+- E3#99:1 [user] previous turn, system: There are 2 restaurants that meet your criteria; Eraina and Michaelhouse Cafe. They are both in the centre of town. | turn: Great, can I have the phone number and address for [[Erania]] please?
+- E3#99:2 [system] previous turn, user: Yes I suppose, how about 16:45 instead? | turn: You have a reservation for 2 at [[Eraina]] on Thursday at 16:45. Your reference number is 80V5LKSU.
+- E3#99:3 [system] previous turn, user: What do you recommend? | turn: I personally recommend [[Eraina]]. Would you like a table booked?
+- E3#99:4 [system] previous turn, user: I was thinking maybe trying something european. | turn: [[Eraina]] is an expensive European restaurant in the city centre, would you like me to book that for you?
+
+### E3#100  (mentions 4, distinct values 4, low confidence)
+Examples:
+- E3#100:0 [user] turn: [[AM]] looking for a place to dine. The restaurant should be in the south and should serve gastropod food.
+- E3#100:1 [system] previous turn, user: I'm looking for a restaurant called nandos. Are you aware of it? | turn: [[I am]]. It is a great portuguese place. They have two locations in town. One in the South and on in the city centre.
+- E3#100:2 [user] previous turn, system: There are five restaurants in the moderate price range. They sever british and asian oriental, which are you looking for? | turn: [[iam]] looking for something asian oriental and not so expensive restaurant.
+- E3#100:3 [system] previous turn, user: Can you check for british food instead? | turn: I have 5 would you like [[m]] to recommend one?
+
+### E3#101  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#101:0 [system] previous turn, user: What does Cambridge offer as far as expensive cantonese restaurants? | turn: I'm so sorry but we don't have any expensive [[cantonese]]. Would you like to try another type of food?
+
+### E3#102  (mentions 10, distinct values 2)
+Examples:
+- E3#102:0 [user] previous turn, system: I have 3 places to choose from. All are expensive. I have Fitzbillies, The Cambridge Chop House and Midsummer House Restaurant. Can I reserve a table for you? | turn: [[Fitzbillies]] sounds unique, can you book me for 5 people at 17:00 on tuesday?
+- E3#102:1 [system] previous turn, user: Thanks! Also, could you tell me if there are any places in the center of town that serve british food? Something expensive would be great. | turn: There are 3. How about [[fitzbillies restaurant]]? Should I book you a table?
+- E3#102:2 [system] previous turn, user: No preference, give me an option. | turn: There's The Oak Bistro and The Copper Kettle, which are moderately priced, and [[Fitzbillies]] and The Cambridge Chop House are expensive. Do any of those sound appealing?
+- E3#102:3 [system] previous turn, user: I apologize, disregard what was said before, I will actually just need the expensive british ones, in the centre area | turn: [[fitzbillies restaurant]], the cambridge chop house, and midsummer house restaurant. do any of those interest you?
+- E3#102:4 [system] previous turn, user: British food. And some where in the Centre. | turn: I have 3 places to choose from. All are expensive. I have [[Fitzbillies]], The Cambridge Chop House and Midsummer House Restaurant. Can I reserve a table for you?
+
+### E3#103  (mentions 7, distinct values 1)
+Examples:
+- E3#103:0 [system] previous turn, user: I don't care. | turn: I recommend [[Rajmahal]]. They serve great Indian food. Would you like their contact information?
+- E3#103:1 [system] previous turn, user: Any area is fine. Please just recommend a restaurant, and send me the address and postcode. Thanks in advance! | turn: [[Rajmahal]] is very popular. Their address is 7 Barnwell Road Fen Ditton and their post code is cb58rg. Will that be all today?
+- E3#103:2 [system] previous turn, user: ok, what are they? | turn: curry prince and [[rajmahal]] which both serve indian food. And pizza hut fen ditton serves italian food.
+- E3#103:3 [system] previous turn, user: Indian food | turn: [[Rajmahal]] is an Indian restaurant in the east part of town and in the moderate price range. How does that sound?
+- E3#103:4 [system] previous turn, user: The price range doesn't matter. Can you give me a few names to choose from? | turn: The choices are Curry Prince, Pipasha Restaurant, [[Rajmahal]], and Sitar Tandoori. Would you like to book a table at one of these?
+
+### E3#104  (mentions 14, distinct values 2)
+Examples:
+- E3#104:0 [system] previous turn, user: yes. I would like their address and phone number please. | turn: Rajmahal is located at 7 Barnwell Road [[Fen Ditton]] and the phone number is 01223 244955. Will that be all?
+- E3#104:1 [system] previous turn, user: I'm looking for a restaurant that serves italian food in the moderate price range. The restaurant should be in the east. | turn: I have one place. It is the [[Pizza Hut Fen Ditton]]. They are located on Cambridge Retail Park Newmarket Road Fen Ditton. Can I reserve you a table?
+- E3#104:2 [system] previous turn, user: Yes, please give me their address. | turn: Their address is Grafton Hotel 619 Newmarket Road [[Fen Ditton]]
+- E3#104:3 [system] previous turn, user: Any area is fine. Please just recommend a restaurant, and send me the address and postcode. Thanks in advance! | turn: Rajmahal is very popular. Their address is 7 Barnwell Road [[Fen Ditton]] and their post code is cb58rg. Will that be all today?
+- E3#104:4 [system] previous turn, user: I'm looking for an Italian restaurant in the east. | turn: There is Pizza Hut [[fen ditton]]. It's moderately priced. Would you like a reservation?
+
+### E3#105  (mentions 9, distinct values 5)
+Examples:
+- E3#105:0 [system] previous turn, user: What is the address of one of them? | turn: [[451 Newmarket Road]] Fen Ditton
+- E3#105:1 [system] previous turn, user: Yes, please give me their address. | turn: Their address is Grafton Hotel [[619 Newmarket Road]] Fen Ditton
+- E3#105:2 [system] previous turn, user: Could you tell me what area Pipasha is in along with the post code? | turn: Pipasha is in the east. The full address is [[Newmarket Road]] Fen Ditton postal code cb58pa. Can I help you with anything else?
+- E3#105:3 [system] previous turn, user: I am also looking for the restaurant Yu Garden. | turn: Here is the address [[529 Newmarket Road]] Fen Ditton.
+- E3#105:4 [system] previous turn, user: Can I get the address and phone number, please? | turn: the missing sock is located at [[Finders Corner Newmarket Road]] and their phone number is 01223 812660.
+
+### E3#106  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E3#106:0 [system] previous turn, user: I'm sorry. I'm only looking for a place that is moderately priced and serves Tuscan food. | turn: I apologize, but it appears [[tuscan]] with the moderate price range does not have any result.
+- E3#106:1 [user] turn: I'm interested in finding a restaurant that serves [[Tuscan food]]. Do you know of any in the moderate price range?
+- E3#106:2 [user] previous turn, system: There are several. Is there a certain type of food you would like to have? | turn: I would like to go to a [[Tuscan restaurant]], please.
+
+### E3#107  (mentions 5, distinct values 4)
+Examples:
+- E3#107:0 [system] previous turn, user: Sounds great. Can I get their number? | turn: Certainly, the phone number at [[zizzi cambridge]] is 01223365599. May I help with anything else?
+- E3#107:1 [user] turn: I am looking for a restaurant that serves british food in [[cambridge]] in the moderate price range
+- E3#107:2 [system] previous turn, user: Great. Now I need somewhere to stay. I want an expensive place with 2 stars plus parking and wifi too. | turn: express by [[holiday inn cambridge]] is the only available hotel we have. Would you like me to make the reservation?
+- E3#107:3 [user] turn: I am looking for a mexican restaurant in [[south cambridge]]
+- E3#107:4 [system] previous turn, user: I feel like having Italian for dinner. Are there any cheap restaurants with good Italian in town? | turn: Sure, how about [[zizzi cambridge]], they offer cheap Italian food in the town centre.
+
+### E3#108  (mentions 8, distinct values 2, low confidence)
+Examples:
+- E3#108:0 [system] previous turn, user: I would like Chinese or Mexican restaurants | turn: How about [[chiquito restaurant bar]]? It's an expensive and delicious restaurant in the south.
+- E3#108:1 [system] previous turn, user: i dont care. | turn: [[The chiquito restaurant bar]] is in the south part of town and is in the expensive price range. Would you like their location?
+- E3#108:2 [system] previous turn, user: I'm also looking for a recommendation on Mexican restaurants in the south. | turn: I would recommend the [[Chiquito Restaurant Bar]]. Would you like to make a booking?
+- E3#108:3 [system] previous turn, user: Could I get that reference number? | turn: Yes. The reference number is SEI1ME8K. [[The Chiquito Restaurant Bar]] will reserve your table for 15 mins starting at 15:00. Can I help you with anything else?
+- E3#108:4 [system] previous turn, user: Don't care. | turn: I recommend [[Chiquito Restaurant Bar]]
+
+### E3#109  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#109:0 [system] previous turn, user: Thanks, I'm also looking for a restaurant in the city centre. | turn: There are [[69]] results for restaurants in the city centre area. What type of food are you looking for, and what price range?
+- E3#109:1 [system] previous turn, user: Awesome. Could you also help me find a restaurant in the centre? | turn: There are [[69 choices]] to select from. Can you narrow it down to the type of food and price range? I can then search again for you
+
+### E3#110  (mentions 12, distinct values 1)
+Examples:
+- E3#110:0 [user] previous turn, system: We have two: La Mimosa, and Shiraz Restaurant. | turn: Let's book it for [[La Mimosa]] for 3 people at 17:30 on Thursday.
+- E3#110:1 [user] previous turn, system: There are two expensive mediterranean restaurants in the centre. Would you like to book at la mimosa? | turn: Yes. I'd like to book a table for 7 at 12:15 on Saturday at [[la mimosa]] please.
+- E3#110:2 [system] previous turn, user: expensive mediterranean restaurant please | turn: [[La mimosa]] is an expensive mediterranean restaurant in the centre part of town. Would you like their location?
+- E3#110:3 [system] previous turn, user: Yes whatever one you recommend. I'll need seating for 7 people at 11:00 on Sunday please. | turn: I would highly recommend the [[La Mimosa]], I have you booked for Sunday at 11. The reference number is MZ1VEJL0.
+- E3#110:4 [system] previous turn, user: I prefer the expensive price range. | turn: [[la mimosa]] serves mediterranean food and is in the expensive price range. their phone number is 01223 362525 and they are located at Thompsons Lane Fen Ditton.
+
+### E3#111  (mentions 2, distinct values 2)
+Examples:
+- E3#111:0 [system] previous turn, user: I prefer the expensive price range. | turn: la mimosa serves mediterranean food and is in the expensive price range. their phone number is 01223 362525 and they are located at [[Thompsons Lane]] Fen Ditton.
+- E3#111:1 [system] previous turn, user: Price doesn't matter, I would like the address, phone number and the postcode please | turn: La mimosa serves Mediterranean food. Their phone number is 01223 362525, their address is [[Thompsons Lane Fen Ditton]] and their postcode is C.B 5, 8 A.Q.
+
+### E3#112  (mentions 11, distinct values 2)
+Examples:
+- E3#112:0 [system] previous turn, user: I also need the phone number for the restaurant that you booked for me, the Meghna. | turn: The phone number to [[Meghna]] is 01223727410. Is there anything else I can help you with?
+- E3#112:1 [system] previous turn, user: Let's review. I am looking for an Indian restaurant in the west with a moderate price range. Once chosen, the restaurant booking is for Monday. | turn: Ok great.[[The Meghna]] will fit your needs. How many people and what day?
+- E3#112:2 [system] previous turn, user: I'd like to look at the one in the west, please. | turn: That place goes by the name of [[meghna]], the address is 205 Victoria Road Chesterton, they can be reached at 01223727410, would you like me too book you?
+- E3#112:3 [system] previous turn, user: I am looking for something in the moderate price range, please. | turn: I would recommend the [[Meghna]] for you. Should I make a booking for you?
+- E3#112:4 [system] previous turn, user: Okay, would it help to narrow it down to the west part of town? I am having trouble deciding what I want to eat today. | turn: [[Meghna]] is an Italian restaurant in the west part of town, and is in the moderate price range.
+
+### E3#113  (mentions 2, distinct values 1)
+Examples:
+- E3#113:0 [system] previous turn, user: While in Cambridge I would really like to know where to find a place to eat called meghna. | turn: Meghna is in the west, address [[205 Victoria Road]] Chesterton, postcode cb43lf.
+- E3#113:1 [system] previous turn, user: I'd like to look at the one in the west, please. | turn: That place goes by the name of meghna, the address is [[205 Victoria Road]] Chesterton, they can be reached at 01223727410, would you like me too book you?
+
+### E3#114  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#114:0 [system] previous turn, user: No, where would you suggest? | turn: How about [[Camboats]] in the East? Their address is the plough, green end, fen ditton.
+
+### E3#115  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#115:0 [system] previous turn, user: I would like a recommendation. I will need to book a reservation. | turn: I can book you at [[The Gandhi]] in the centre. How does that sound?
+- E3#115:1 [system] previous turn, user: No, where would you suggest? | turn: How about Camboats in the East? Their address is [[the plough]], green end, fen ditton.
+
+### E3#116  (mentions 1, distinct values 1)
+Examples:
+- E3#116:0 [system] previous turn, user: No, where would you suggest? | turn: How about Camboats in the East? Their address is the plough, [[green end]], fen ditton.
+
+### E3#117  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E3#117:0 [system] previous turn, user: Yes, I would be. Can you list out several of them for me so I can pick? | turn: restaurant one seven is located at [[De Vere University Arms]] Regent Street City Centre and is moderately priced, the oak bistro is at 6 Lensfield Road and is also moderately priced
+- E3#117:1 [system] previous turn, user: I'm not sure if I would like to book one yet. Can you please tell me the address, phone number and postcdode? | turn: Address is [[De Vere University Arms]] Regent Street City Centre, phone number 01223337766, and postcode cb21ab.
+
+### E3#118  (mentions 7, distinct values 3)
+Examples:
+- E3#118:0 [system] previous turn, user: I apologize, disregard what was said before, I will actually just need the expensive british ones, in the centre area | turn: fitzbillies restaurant, the cambridge chop house, and [[midsummer house restaurant]]. do any of those interest you?
+- E3#118:1 [system] previous turn, user: It doesn't matter to me which type of food they serve. What would you recommend for a person eating alone? | turn: How about Midsummer House Restaurant, serving British food? It's at [[Midsummer Common]]. Would you like to book a table?
+- E3#118:2 [system] previous turn, user: I'd be interested in any serving British food. | turn: Okay, how about [[midsummer house]] restaurant located at midsummer common?
+- E3#118:3 [system] previous turn, user: British food. And some where in the Centre. | turn: I have 3 places to choose from. All are expensive. I have Fitzbillies, The Cambridge Chop House and [[Midsummer House Restaurant]]. Can I reserve a table for you?
+- E3#118:4 [system] previous turn, user: I'd be interested in any serving British food. | turn: Okay, how about midsummer house restaurant located at [[midsummer common]]?
+
+### E3#119  (mentions 7, distinct values 1)
+Examples:
+- E3#119:0 [system] previous turn, user: Yes please. Is there another restaurant in the area in that price range that is available at that time? | turn: I have booked a reservation for you at the [[Lan Hong House]]. Your reference number is BMU049L6. DO you need anything else?
+- E3#119:1 [system] previous turn, user: What are they? | turn: I have the [[Lan Hong House]], Jinling Noodle Bar and the Shanghi Family Restaurant that are all moderately priced and serving Chinese food.
+- E3#119:2 [system] previous turn, user: Yes, what are my three choices before we make a reservation? | turn: The restaurants are: jinling noodle bar, [[lan hong house]] and shanghai family restaurant.
+- E3#119:3 [system] previous turn, user: I also would like to find a chinese restaurant in the centre. | turn: What's your price range? I recommend the Ugly Duckling, but it's expensive. Charlie Chan is a good, cheap place, and [[Lan Hong House]] is in the middle, price-wise.
+- E3#119:4 [user] turn: Hello, is [[lan hong house]] still in operation?
+
+### E3#120  (mentions 2, distinct values 1)
+Examples:
+- E3#120:0 [user] previous turn, system: Great choice! I have 10 Chinese restaurants. What is your price range and we can narrow them down. | turn: I need some cheap [[Chop Suey]], please.
+- E3#120:1 [user] previous turn, system: How does the Charlie Chan sound? It is a cheap Chinese restaurant in the centre. | turn: That sounds like they'll have some awesome [[Chop Suey]]. Please book me a table for 2 on Tuesday at 12:45.
+
+### E3#121  (mentions 8, distinct values 2)
+Examples:
+- E3#121:0 [system] previous turn, user: American food and I need a booking for same group | turn: The only one I find with American food is in the expensive range, it's the [[gourmet burger kitchen]]. Is this something you would be interested or would you prefer something else?
+- E3#121:1 [system] previous turn, user: Can I have the address for the restaurant. | turn: Absolutely! [[The Gourmet Burger Kitchen]] is located on Regent Street. Would you like the phone number? Or anything else?
+- E3#121:2 [system] previous turn, user: how about 16:30 then? | turn: Perfect. Your table has been booked at 16:30 for 2 at the [[Gourmet Burger Kitchen]]. The reference number is 3377L9IJ.
+- E3#121:3 [system] previous turn, user: North American, I would would like to eat in the centre area? | turn: [[The Gourmet Burger Kitchen]] would be perfect for you! It's at Regent Street City Centre. Would you like more information?
+- E3#121:4 [user] turn: Can you tell me more about [[gourmet burger kitchen]]? Where is it?
+
+### E3#122  (mentions 4, distinct values 1)
+Examples:
+- E3#122:0 [system] previous turn, user: How about 10:15? | turn: I have you booked for 7 at [[little seoul]] on tuesday at 10:15. Here is the reference number for your booking: KAHFBHYI.
+- E3#122:1 [user] turn: I'm looking for a restaurant called [[little seoul]]?
+- E3#122:2 [system] previous turn, user: I'd like to find a korean restaurant in the same area as that hotel. | turn: There's a restaurant called [[Little Seoul]]. It's expensive, but also on Regent Street. Would that work?
+- E3#122:3 [system] previous turn, user: How about a restaurant in the centre that serves Korean food? | turn: [[Little Seoul]] is a great place that fits your description. Would you like me to book you a table?
+
+### E3#123  (mentions 7, distinct values 2)
+Examples:
+- E3#123:0 [system] previous turn, user: I would prefer Italian. | turn: [[da vinci pizzeria]] is located at 20 milton road chesterton and they can be reached at 01223 351707
+- E3#123:1 [system] previous turn, user: That's okay. How about Italian food? | turn: There are a few. [[The Da Vinci Pizzeria]] is cheap. It's in the north part of town so it shouldn't be too far from Worth House. Would you like a reservation?
+- E3#123:2 [system] previous turn, user: I want to find a cheap restaurant in the north part of town. What is the phone number? | turn: [[da vinci pizzeria]] is in the north part of town and in the cheap price range. Their phone number is 01223 351707
+- E3#123:3 [system] previous turn, user: Are there any good cheap places to eat in the same area? | turn: Yes we have Royal Spice which is an Indian Restaurant and [[Da Vinci Pizzeria]] which is Italian.
+- E3#123:4 [system] previous turn, user: Please recommend me a cheap restaurant in the north . | turn: [[Da Vinci pizzeria]] is in the north part of town and in the cheap price range. Would you like their location?
+
+### E3#124  (mentions 14, distinct values 1)
+Examples:
+- E3#124:0 [system] previous turn, user: I am looking for a restaurant that serves british food in cambridge in the moderate price range | turn: We have several options, and most are in the center of town. I recommend [[Cotto]]!
+- E3#124:1 [system] previous turn, user: Type of food doesn't matter, what would you prefer? | turn: I recommend [[cotto]]. It has British cuisine. Would you like reservations?
+- E3#124:2 [user] previous turn, system: Yes, I have 5 places. What about cotto? | turn: [[Cotto]] is fine. I want to book a table for 1 person at 12:00 on Sunday.
+- E3#124:3 [system] previous turn, user: Not yet.. just needed the ID. Also, looking for a place to dine in the center of town at a moderate price range. | turn: I have many delicious options. How does [[Cotto]] sound? It's British food.
+- E3#124:4 [user] previous turn, system: Booking was successful, the total fee is 21.12 GBP payable at the station. Reference number is : J6SICRD5. Is there anything else I can help with? | turn: Thank you! Can you please tell me about a restaurant called [[Cotto]]?
+
+### E3#125  (mentions 1, distinct values 1)
+Examples:
+- E3#125:0 [system] previous turn, user: I would like the one in the west. | turn: [[Meghan]] is in that area and serves Indian food would you like to make a reservation
+
+### E3#126  (mentions 3, distinct values 1)
+Examples:
+- E3#126:0 [system] previous turn, user: Great. Could you please book a table for 1 at 16:30 on Saturday? | turn: I was able to make a reservation for 1 at the [[royal standard]]. Your reference number is: FZP2XK9Q. Do you need anything else today?
+- E3#126:1 [system] previous turn, user: No particular price range. Which one do you recommend? | turn: [[Royal Standard]] is a great gastropub located on the east side. Would you like me to reserve you a table?
+- E3#126:2 [user] turn: Hello, I am looking for a restaurant by the name of [[Royal Standard]]. Do you know where it is?
+
+### E3#127  (mentions 5, distinct values 3)
+Examples:
+- E3#127:0 [system] previous turn, user: I would like a nice place to dine in the south area. | turn: [[Frankie and Bennys]] is a wonderful Italian restaurant in the south. It's expensive, but worth it. Homemade pasta and everything!
+- E3#127:1 [system] previous turn, user: Can I please have their postcode and phone number? | turn: [[Frankie]] and bennys is in postcode cb17dy and their phone number is 01223412430. Can I help you with anything else today?
+- E3#127:2 [system] previous turn, user: Yes, I need the reference number. I am also looking for a place to eat in the south area, preferable italian. | turn: There are two restaurants that are Italian, Pizza Hut Cherry Hinton, and [[Franky and Bennys]]. The reference number for your train is 0EG8EWWR.
+- E3#127:3 [system] previous turn, user: I would like the phone number and postcode, please. | turn: The phone number for [[frankie and bennys]] is 01223 412430 and postcode is C.B 1, 7 D.Y
+- E3#127:4 [system] previous turn, user: Are there any others? | turn: Yes, there is [[frankie and bennys]], italian restaurant in the expensive price range and in south. Do you want the address?
+
+### E3#128  (mentions 7, distinct values 3)
+Examples:
+- E3#128:0 [user] turn: I'm looking for a place called [[riverside brasserie]]
+- E3#128:1 [user] previous turn, system: What day and time should I book the reservation for? | turn: On second thought, can I just get the phone number, address and postcode for [[Riverside]]?
+- E3#128:2 [system] previous turn, user: What is the address? | turn: [[Riverside Brasseri]], located at Doubletree by Hilton Cambridge Granta Place Mill Lane. Will there be anything else?
+- E3#128:3 [system] previous turn, user: How about the center? I need a reservation for Wednesday for 1 person at 14:40. | turn: We have 2 in the center, De Luca Cucina and Bar, and [[Riverside Brasserie]], they are great eats.
+- E3#128:4 [system] previous turn, user: Is there one that serves modern European food? | turn: [[Riverside]] is modern european. I also have de luca.
+
+### E3#129  (mentions 5, distinct values 2)
+Examples:
+- E3#129:0 [system] previous turn, user: Great, can I have the phone number and address for Erania please? | turn: Sure, their phone is 01223368786 and their address is [[Free School Lane]] City Centre cb23rh. May I help with anything else?
+- E3#129:1 [system] previous turn, user: On second thought, can I just get the phone number, address and postcode for Riverside? | turn: Sure! The phone number is 01223259988. The address is Doubletree by Hilton Cambridge Granta Place [[Mill Lane]] postcode cb21rt. Is there anything else I can help you with?
+- E3#129:2 [system] previous turn, user: The area doesn't matter. Can you make a recommendation, please? | turn: I would recommend Eraina, it is at [[Free School Lane]] City Centre.
+- E3#129:3 [system] previous turn, user: What is the address? | turn: Riverside Brasseri, located at Doubletree by Hilton Cambridge Granta Place [[Mill Lane]]. Will there be anything else?
+- E3#129:4 [system] previous turn, user: Oh darn it. How about one that offers european food? | turn: There are 3 options in the centre area with european food. Eraina is located at [[Free School Lane]] City Centre, postcode cb23rh. Would you like info on the others also?
+
+### E3#130  (mentions 13, distinct values 5)
+Examples:
+- E3#130:0 [system] previous turn, user: How about a French restaurant in any price range? | turn: [[Cote]] is a French restaurant in the city centre in the expensive price range.
+- E3#130:1 [user] turn: I am traveling to Cambridge and looking for a restaurant in the cheap price range in the [[cente]].
+- E3#130:2 [system] previous turn, user: Is there an expensive French restaurant in town? | turn: I show two french restaurants. [[Cote and Restaurant]] two two.
+- E3#130:3 [system] previous turn, user: I am looking for an expensive French restaurant. | turn: There are two restaurants that fulfill your inquiry, [[Cote in the Center]] and Restaurant Two Two in the north. Would you like more information on either?
+- E3#130:4 [system] previous turn, user: Are there any expensive french restaurants in the centre? | turn: Yes, one of my favorites. [[Cote on Bridge Street]] City Centre.
+
+### E3#131  (mentions 6, distinct values 4)
+Examples:
+- E3#131:0 [system] previous turn, user: I also need a restaurant that serves turkish food please. | turn: There are three Turkish restaurants, all in the center of town. [[The Meze Bar]] is expensive, but the other two are more moderate. Would you like to book a table?
+- E3#131:1 [system] previous turn, user: Would you have something modern european? | turn: [[The River Bar Steakhouse and Grill]] offers Modern European cuisine. Would you like me to book you a reservation?
+- E3#131:2 [system] previous turn, user: No, no thank you. I just needed some info for a later date. I am also wanting to see if you can tell me about the River Bar Steakhouse and Grill. | turn: Yes, the [[River Bar Steakhouse and Grill]] has modern European food and is inexpensive. It is in the Centre.
+- E3#131:3 [system] previous turn, user: The price range doesn't matter. Please suggest one to me. | turn: [[The river bar]] steakhouse and grill is good but cheap. Would you like their address or phone number?
+- E3#131:4 [user] previous turn, system: There are three Turkish restaurants, all in the center of town. The Meze Bar is expensive, but the other two are more moderate. Would you like to book a table? | turn: [[the meze bar]] is fine. book it for 6 at 14:15 on tuesday
+
+### E3#132  (mentions 3, distinct values 2)
+Examples:
+- E3#132:0 [system] previous turn, user: Sounds good. Could you give me the number? Also, the address and postcode. | turn: The phone number is 01223307030. The address is [[Quayside Off Bridge STreet]] and the postcode is cb58aq. Can I book a reservation?
+- E3#132:1 [system] previous turn, user: Can I have their phone number, postcode and address please? | turn: I'd be happy to provide you with that information. Their phone number is 01223307030 and their address and postcode are [[Quayside]] off Bridge Street, cb58aq. Can I help with anything else?
+- E3#132:2 [system] previous turn, user: Of course | turn: their address is [[Quayside Off Bridge Street]] and their phone number is 01223 307030
+
+### E3#133  (mentions 4, distinct values 3)
+Examples:
+- E3#133:0 [system] previous turn, user: Can I have their phone number, postcode and address please? | turn: I'd be happy to provide you with that information. Their phone number is 01223307030 and their address and postcode are Quayside off [[Bridge Street]], cb58aq. Can I help with anything else?
+- E3#133:1 [system] previous turn, user: No, thanks, I just need the address of one of them, please. | turn: darrys cookhouse and wine shop's address is 40270 [[King Street]] City Centre.
+- E3#133:2 [system] previous turn, user: Thanks. I also need information about a specific restaurant called michaelhouse cafe. What can you tell me about it? | turn: It's an expensive european place in the centre at St. Michael's Church [[Trinity Street]] City Centre cb21su with phone 01223309147. Would you like to book a table?
+- E3#133:3 [system] previous turn, user: I don't know. | turn: Cote is located at [[Bridge Street]] City Centre, and Restaurant Two Two is at 22 Chesterton Road Chesterton. How else may I assist you?
+
+### E3#134  (mentions 6, distinct values 3)
+Examples:
+- E3#134:0 [system] previous turn, user: Yes, I'd like to find a Japanese place in the centre. | turn: There is wagamama in [[36 Saint Andrews Street]], would you like me to book for you?
+- E3#134:1 [system] previous turn, user: I would prefer portuguese food please. | turn: Nandos City Centre is located at [[33-34 Saint Andrews Street]]. Would you like me to make reservations for you?
+- E3#134:2 [system] previous turn, user: I need the address, phone number and postcode for a moderately priced restaurant serving international food. | turn: How about the varsity restaurant, they are located at [[35 Saint Andrews Street]] City Centre, postcode C.B 2, 3 A.R, phone number is 01223 356060.
+- E3#134:3 [system] previous turn, user: Can i please have the phone number and address? | turn: Their phone number is 01223 462354 and their address is [[36 Saint Andrews Street]].
+- E3#134:4 [system] previous turn, user: I'm looking for a restaurant in Cambridge called Nandos City Centre. | turn: Nandos city centre is located at [[33-34 Saint Andrews Street]].
+
+### E3#135  (mentions 4, distinct values 3, low confidence)
+Examples:
+- E3#135:0 [user] previous turn, system: How about nandos, I've heard great things! | turn: Is that restaurant in the south? I"d like to book for 4 people at [[1330]] on saturday please
+- E3#135:1 [system] previous turn, user: If neither restaurant is available for 13:30, can you try 14:30? It's later than I wished, but I guess that can't be helped. | turn: I'm sorry booking for both restaurants at [[1430]] were unsuccessful would you like to try another time?
+- E3#135:2 [system] previous turn, user: 16:30 please. | turn: Okay, I successfully booked that table for you at [[1630]] for your party. Please arrive on time, as the table is only reserved for 15 minutes.Your reference number is LSAY2YOX.
+- E3#135:3 [system] previous turn, user: Could you try it for Tuesday? | turn: I'm sorry, but I was unable to book either restaurant for [[1330]] on Tuesday either. Would you consider dining a little earlier or later?
+
+### E3#136  (mentions 13, distinct values 4)
+Examples:
+- E3#136:0 [system] previous turn, user: I am looking for some info on India House | turn: India House is a restaurant located at 31 Newnham Road [[Newnham]] on the west side of town. Is this the place you are referring to?
+- E3#136:1 [system] previous turn, user: Yes, I'm also looking for a restaurant called the rice boat. | turn: Rice boat is an expensive Indian food restaurant in the west, located at [[37 Newnham Road]] Newnham.
+- E3#136:2 [system] previous turn, user: As long as it serves indian we're good. I need the address and phone number | turn: I recommend India House! It's located at [[31 Newnham Road]] Newnham. Their phone number is 01223461661. Can I do anything else for you?
+- E3#136:3 [system] previous turn, user: What is the address, phone number, and price range? | turn: Sala Thong is an expensive restaurant located at [[35 Newnham Road]] Newnham. Their number is 01223 323178. Is there anything else I can help you with?
+- E3#136:4 [system] previous turn, user: Could you give me the address, phone number, and postcode? | turn: The address is 35 Newnham Road [[Newnham]], phone number is 01223323178, and finally their postcode is cb39ey. Is there anything else I can help with?
+
+### E3#137  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#137:0 [user] turn: Please I want to book an expensive restaurant. First however help me find a place to go in town. Is there a [[nice park]]?
+- E3#137:1 [user] previous turn, system: There are fifteen Italian restaurants in town. Do you want a specific part of town, or maybe a certain price range to narrow down the search? | turn: I'm looking for [[parks]] in Cambridge can you help me?
+
+### E3#138  (mentions 3, distinct values 2)
+Examples:
+- E3#138:0 [system] previous turn, user: I need a restaurant that serves Thai food, that is expensive and is in Cambridge please | turn: Bangkok City is located at [[24 Green Street]] City Centre. Their number is 01223354382
+- E3#138:1 [system] previous turn, user: I'm not ready to reserve a table just yet, but could you give me the address, phone, and postcode for The Slug and Lettuce, just because its name is so awesome? | turn: Their address is [[34 - 35 Green Street]], cb23ju. There is no phone number listed. I can reserve a table for you if you'd like.
+- E3#138:2 [system] previous turn, user: I have reservations Bangkok City restaurant but forgot to get the address and postcode. | turn: The address and postcode are [[24 Green Street]] City Centre, CB23JX. Can I assist you any further today?
+
+### E3#139  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#139:0 [user] previous turn, system: Eraina is an expensive European restaurant in the city centre, would you like me to book that for you? | turn: That sounds great! Can I book a [[talbe]] for 7 people at 17:30 on Wednesday?
+
+### E3#140  (mentions 5, distinct values 2)
+Examples:
+- E3#140:0 [system] previous turn, user: It does not matter, I just need one available for 7 people at 18:15 on thursday | turn: I have made a reservation at restaurant alimentum for you. Your table will be reserved for 15 minutes. The address is [[152 - 154 Hills Road]].
+- E3#140:1 [system] previous turn, user: No, just the address and postcode please. | turn: the address is [[59 hills road]] city centre. the postcode is cb21nt.
+- E3#140:2 [system] previous turn, user: Yes, may I have the address for restaurants in the south part of town. Preferably something moderately priced. | turn: There are two options. Pizza Hut Cherry Hinton serves Italian food and is located at G4 Cambridge Leisure Park Clifton Way Cherry Hinton. Restaurant Alimentum serves Modern European food and is located at [[152 - 154 Hills Road]]. Anything else I can help you with today?
+- E3#140:3 [system] previous turn, user: No thanks. But can you find a restaurant that serves lebanese food in the centre? | turn: You're in luck! There is one Lebanese restaurant in all of Cambridge, and it's in the center. Ali Bana, located at [[59 Hills Road]] City Centre.
+- E3#140:4 [system] previous turn, user: I want to find a moderately priced restaurant in the south part of town. What is the phone number and address? | turn: restaurant alimentum is a moderately price restaurant in the south area of town. their phone number is 01223 413000 and their address is [[152 - 154 Hills Road]].
+
+### E3#141  (mentions 5, distinct values 1)
+Examples:
+- E3#141:0 [system] previous turn, user: Hi, I am looking for information on a restaurant it's called saffron brasserie. | turn: [[Saffron Brasserie]] is an expensive Indian restaurant in the centre. Would you like me to make reservations?
+- E3#141:1 [system] previous turn, user: I'm looking for a restaurant called saffron brasserie. | turn: There is a [[Saffron Brasserie]] in the centre. It is an expensive Indian place. Would you like the phone number?
+- E3#141:2 [user] previous turn, system: Booking was successful. Your reference number is : 5Z9LQBDL. Did you need anything else today? | turn: I'm looking for a restaurant called [[saffron brasserie]].
+- E3#141:3 [user] turn: Hi, I am looking for information on a restaurant it's called [[saffron brasserie]].
+- E3#141:4 [system] previous turn, user: Yes, please. I'd also like to know what area of town it's in and what type of food it serves. | turn: [[Saffron Brasserie]] is in the center of town, and it's an expensive Indian restaurant. Their phone number is 01223354679. Would you like to make a reservation?
+
+### E3#142  (mentions 5, distinct values 2)
+Examples:
+- E3#142:0 [user] previous turn, system: Pipasha is an expensive restaurant serving Indian food in the east part of town. Do you need more information? | turn: Could you tell me what area [[Pipasha]] is in along with the post code?
+- E3#142:1 [system] previous turn, user: The price range doesn't matter. Can you give me a few names to choose from? | turn: The choices are Curry Prince, [[Pipasha Restaurant]], Rajmahal, and Sitar Tandoori. Would you like to book a table at one of these?
+- E3#142:2 [system] previous turn, user: I'm also looking for info on a restaurant called pipasha. | turn: [[Pipasha]] is an expensive restaurant serving Indian food in the east part of town. Do you need more information?
+- E3#142:3 [system] previous turn, user: Could you tell me what area Pipasha is in along with the post code? | turn: [[Pipasha]] is in the east. The full address is Newmarket Road Fen Ditton postal code cb58pa. Can I help you with anything else?
+- E3#142:4 [user] previous turn, system: You're welcome. Is there anything else I can help with today? | turn: I'm also looking for info on a restaurant called [[pipasha]].
+
+### E3#143  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E3#143:0 [system] previous turn, user: How about something just in the cheap price range? | turn: There are a number of cheap options, though none of them serve Austrian food. There are Asian Oriental, Chinese, Indian, Italian, [[Mediterranean]], Modern European, Portuguese, and Spanish.
+- E3#143:1 [system] previous turn, user: I do not care about the price range. | turn: There are no [[Mediterranean location]] in the north part of town. However there is an International place call the Bloomsbury restaurant.
+- E3#143:2 [user] turn: Im up north, whats the address for a [[mediterranean place]] around here?
+
+### E3#144  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#144:0 [system] previous turn, user: Sorry. I'm looking for a hotel, not a restaurant. It should be in the centre and moderately-priced. It doesn't need to have free parking. | turn: [[Cityroomz]] meets your criteria. Would you like to book a room there?
+- E3#144:1 [user] previous turn, system: Let's get the hotel book and then we'll find a place to eat. What nights would you like to stay? | turn: I would like to stay 3 nights starting Thursday. I need the [[room]] for two people.
+
+### E3#145  (mentions 7, distinct values 7, low confidence)
+Examples:
+- E3#145:0 [system] previous turn, user: What about an expensive restaurant in the centre? | turn: Sure I have many types of cuisine to choose from: [[African]], French, Asian Oriental, British, European..any preference?
+- E3#145:1 [user] previous turn, system: What type of food would you like to eat? | turn: I would love to try some [[African food]].
+- E3#145:2 [user] turn: Hello. I'm trying to find an inexpensive restaurant that serves [[Moroccan food]]. Can you help me?
+- E3#145:3 [user] previous turn, system: Certainly. I recommend Tandoori Palace. They serve expensive Indian food in the west. Were you looking for reservations? | turn: No that doesn't sound good, I need one that serves [[north african food]].
+- E3#145:4 [user] previous turn, system: I have two restaurants in the south. They serve italian or modern european. Would you like information on either of those? | turn: No, I was hoping to eat some [[South African food]].
+
+### E3#146  (mentions 6, distinct values 3)
+Examples:
+- E3#146:0 [system] previous turn, user: The cuisine doesn't really matter, but I guess I should try some British food while I'm there? | turn: I found the [[saint johns chop house]]. Would you like more information?
+- E3#146:1 [system] previous turn, user: Yes, I would like the address and phone number. | turn: [[saint johns]] chop house phone number is 01223 353110 and is located at 21 - 24 Northampton Street
+- E3#146:2 [system] previous turn, user: I would like to get information about moderately priced. | turn: I have [[st johns chop house]] within the moderate price range. Can I book it for you?
+- E3#146:3 [system] previous turn, user: Let's try the west. | turn: I have one in the west called [[Saint Johns Chop House]]. Would you like a reservation here?
+- E3#146:4 [system] previous turn, user: British sounds good. What's it called? | turn: [[Saint johns chop house]] serves british food in the west part of town and is in the moderate price range. Would you like their location?
+
+### E3#147  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#147:0 [user] previous turn, system: There are none available, do you have another type of food. | turn: I sort of really had my heart set on [[Singaporean food]].
+- E3#147:1 [system] previous turn, user: I'm looking for an expensive restaurant in the west. | turn: There are 9 expensive restaurants in the west. There are British, European, Indian, and [[Thai food]] to choose from. Which would you prefer?
+
+### E3#148  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#148:0 [system] previous turn, user: Yes, can you book a table for 8 people on Saturday at 15:45? | turn: A table is booked for Saturday for 15:45 at 8 and for 8 people. Reference number is [[B00KVHN]]
+
+### E3#149  (mentions 1, distinct values 1)
+Examples:
+- E3#149:0 [system] previous turn, user: I am looking for the east area. | turn: [[The allenbell]] would suite your needs.Would you like me to make you a reservation?
+
+### E3#150  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#150:0 [system] previous turn, user: Can I please have their postcode and phone number? | turn: Frankie and [[bennys]] is in postcode cb17dy and their phone number is 01223412430. Can I help you with anything else today?
+
+### E3#151  (mentions 2, distinct values 2)
+Examples:
+- E3#151:0 [system] previous turn, user: I'd like to find a restaurant called Cotto, please. | turn: Cotto is located on [[183 East Road]] City Centre and has the postcode cb11bg. Is there anything else I could help you with today?
+- E3#151:1 [system] previous turn, user: Actually, I would just like the address, postcode and phone number instead at this time. | turn: Here is that information,phone-01223302010 post code-cb11bg Address-183 [[East Road]] City Centre
+
+### E3#152  (mentions 1, distinct values 1)
+Examples:
+- E3#152:0 [user] previous turn, system: I'm sorry, can you tell me what type of business that is? | turn: Oops, sorry. [[Ian Hong]] is a restaurant.
+
+### E3#153  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#153:0 [user] previous turn, system: Unfortunately, my system is not able to pull up that information. I do have information available on restaurants or attractions. Can I help you with any of those? | turn: I was thinking about going to [[Byard Art]], can you tell me the address and what the entrance fee is?
+
+### E3#154  (mentions 2, distinct values 1)
+Examples:
+- E3#154:0 [user] previous turn, system: There are two that meet your criteria. The Backstreet Bistro, and The Slug and Lettuce. Would you like me to book one of those for you? | turn: I'm not ready to reserve a table just yet, but could you give me the address, phone, and postcode for [[The Slug and Lettuce]], just because its name is so awesome?
+- E3#154:1 [system] previous turn, user: Thanks! Now can you help me find an expensive gastropub restaurant in the centre please? | turn: There are two that meet your criteria. The Backstreet Bistro, and [[The Slug and Lettuce]]. Would you like me to book one of those for you?
+
+### E3#155  (mentions 4, distinct values 2, low confidence)
+Examples:
+- E3#155:0 [user] previous turn, system: Your booking for 1 at the arbury lodge guesthouse this sunday for 5 days 4 nights was successful. Your Reference number is : X1GCL10K. Anything else for today? | turn: Yes, Can you please book a table at the [[grafton hotel restaurant]] for the same amount of people at 11:15 on the same day?
+- E3#155:1 [system] previous turn, user: Yes, please give me their address. | turn: Their address is [[Grafton Hotel]] 619 Newmarket Road Fen Ditton
+- E3#155:2 [system] previous turn, user: Hello, I'm looking for a place to eat on the East. I prefer a restaurant that serves British food | turn: I see one option - [[Grafton Hotel Restaurant]], an expensive restaurant. Would you like the address or to make a reservation?
+- E3#155:3 [system] previous turn, user: I'm looking to eat at a place that serves british food in the east part of town. | turn: I have found the [[Grafton Hotel Restaurant]] at 619 Newmarket Road. Would like a reservation?
+
+### E3#156  (mentions 1, distinct values 1)
+Examples:
+- E3#156:0 [user] previous turn, system: Whale of a Time is a great place! It is in the West and the post code is cb238el. Do you need more information? | turn: Yes, I also need a restaurant ina [[mdoerate range]] that serve modern european food.
+
+### E3#157  (mentions 7, distinct values 2)
+Examples:
+- E3#157:0 [user] previous turn, system: Sure, it is a Thai restaurant in the west part of the city. It is expensive but very good. What would you like to know? | turn: Can you give me the phone number for [[Sala Thong]]?
+- E3#157:1 [system] previous turn, user: I am looking for a place to eat in the West, Thai food please. | turn: [[The Sala Thong]] serves Thai food. It is expensive but good. Can I reserve a table for you?
+- E3#157:2 [system] previous turn, user: What is the address, phone number, and price range? | turn: [[Sala Thong]] is an expensive restaurant located at 35 Newnham Road Newnham. Their number is 01223 323178. Is there anything else I can help you with?
+- E3#157:3 [system] previous turn, user: How about Thai food instead? | turn: I've got [[Sala Thong]] in the west and Bangkok City in the centre, both expensive. Would you like more information, or for me to make a booking?
+- E3#157:4 [system] previous turn, user: How about Thai food in the west part of town? | turn: [[Sala Thong]] is a restaurant that serves Thai food
+
+### E3#158  (mentions 4, distinct values 4, low confidence)
+Examples:
+- E3#158:0 [user] previous turn, system: As I mentioned earlier, the only options in the south that are cheap are The Lucky Star (chinese) and Nando's (portuguese). Do you want me to search another area or price? | turn: Sorry, this is the [[husband]], Im taking over the call, my wife is too indecisive. Please book us for Nandos at 13:45 on tuesday for 5 people, thank you.
+- E3#158:1 [system] previous turn, user: Yes, can you please book a table for 1 for 17:15 on Thursday. Could I have the reference number please? | turn: Booking was successful, your table will be reserved for [[minutes]], and your reference number is J37KC1PB. Anything else I can help you with?
+- E3#158:2 [user] previous turn, system: It's address is at sidgwick avenue and it is free to enter. Would you like their phone number as well? | turn: No, but I need a cheap chinese restaurant [[nearby]] as well.
+- E3#158:3 [user] turn: Hi, I am looking forward to trying some local restaurants when I visit Cambridge [[next month]]. Are there any good ones?
+
+### E3#159  (mentions 4, distinct values 2)
+Examples:
+- E3#159:0 [system] previous turn, user: I want a restaurant in the centre and serves japanese food. What is the address? | turn: [[Wagamama]] serves Japanese food and is in the center area of town. The address is 36 Saint Andrews Street.
+- E3#159:1 [system] previous turn, user: Great, can you also find me a Japanese food restaurant in the expensive price range? | turn: [[Wagamana]] is good fit. Would you like me to make a reservation for you?
+- E3#159:2 [system] previous turn, user: Hello, I am looking for a restaurant that serves Japanese food. | turn: [[Wagamama]] is a Japanese restaurant that's in the centre part of town.
+- E3#159:3 [system] previous turn, user: Yes, I'd like to find a Japanese place in the centre. | turn: There is [[wagamama]] in 36 Saint Andrews Street, would you like me to book for you?
+
+### E3#160  (mentions 2, distinct values 1)
+Examples:
+- E3#160:0 [system] previous turn, user: Great, thanks for that. I'm also looking for information about a restaurant called mahal of cambridge. | turn: Okay, the [[Mahal of Cambridge]] serves indian food and is located in the centre. Would you like me to make a reservation for you?
+- E3#160:1 [user] previous turn, system: Your booking was successful reference number is 1QVLVD25 | turn: Great, thanks for that. I'm also looking for information about a restaurant called [[mahal of cambridge]].
+
+### E3#161  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#161:0 [user] previous turn, system: Good news, the booking system finally worked and I made the reservation! Your reference number is I3VJP80T | turn: Great. Now I need somewhere to stay. I want an expensive place with [[2 stars]] plus parking and wifi too.
+
+### E3#162  (mentions 2, distinct values 2)
+Examples:
+- E3#162:0 [system] previous turn, user: Tell me about the Portuguese restaurant | turn: The restaurant is Nandos. I think you'll really like it. It's cheap and in the south area of town at [[Cambridge Leisure Park Clifton Way]], post code cb17dy.
+- E3#162:1 [system] previous turn, user: Yes, may I have the address for restaurants in the south part of town. Preferably something moderately priced. | turn: There are two options. Pizza Hut Cherry Hinton serves Italian food and is located at G4 Cambridge Leisure Park [[Clifton Way]] Cherry Hinton. Restaurant Alimentum serves Modern European food and is located at 152 - 154 Hills Road. Anything else I can help you with today?
+
+### E3#163  (mentions 2, distinct values 1)
+Examples:
+- E3#163:0 [user] previous turn, system: You're more than welcome. May I do anything else for you today? | turn: Wait, I might want to change my mind about that restaurant. Are there any that serve food from [[Corsica]]?
+- E3#163:1 [user] previous turn, system: They do and the Booking was successful. Reference number is : ZN1NTVHW. | turn: I would also appreciate it if you could help me find a cheap restaurant serving food from [[Corsica]]
+
+### E3#164  (mentions 2, distinct values 1)
+Examples:
+- E3#164:0 [user] previous turn, system: Just to confirm. You need a cab to take you to the Worth House? Where will you be departing from? | turn: No, from [[worth house]] to the restaurant, please.
+- E3#164:1 [system] previous turn, user: That's okay. How about Italian food? | turn: There are a few. The Da Vinci Pizzeria is cheap. It's in the north part of town so it shouldn't be too far from [[Worth House]]. Would you like a reservation?
+
+### E3#165  (mentions 7, distinct values 3)
+Examples:
+- E3#165:0 [user] previous turn, system: Their number is 08451962320 | turn: Thanks. I also need information about a specific restaurant called [[michaelhouse cafe]]. What can you tell me about it?
+- E3#165:1 [system] previous turn, user: Do any of them serve Italian cuisine? | turn: Yes, 4. stazione restaurant and coffee bar, [[clowns cafe]], don pasquale pizzeria, and cafe uno.
+- E3#165:2 [system] previous turn, user: How about another restaurant in the same area and price range? | turn: I was able to book you at another Italian place by the name of [[Clowns Caafe]], your reference number is BAOHHC1Z, is there anything else that i can assist with?
+- E3#165:3 [system] previous turn, user: i am looking for a place to dine. The restaurant should be in the expensive price range and should serve european food. | turn: There are 5 that fit your criteria, 3 in the centre of town are eraina, [[michaelhouse cafe]], darrys cookhouse and wine shop and city stop restaurant north and cambridge lodge restaurant west.
+- E3#165:4 [system] previous turn, user: Please give me the names of the 4 choices and I'll make my selection. Needs to be an expensive Italian restaurant in the Centre. Thanks! | turn: stazione restaurant and coffee bar, don pasquale pizzeria, [[clowns cafe]], cafe uno
+
+### E3#166  (mentions 7, distinct values 2, low confidence)
+Examples:
+- E3#166:0 [system] previous turn, user: What about an expensive restaurant in the centre? | turn: Sure I have many types of cuisine to choose from: African, French, Asian Oriental, British, [[European]]..any preference?
+- E3#166:1 [system] previous turn, user: How about something just in the cheap price range? | turn: There are a number of cheap options, though none of them serve Austrian food. There are Asian Oriental, Chinese, Indian, Italian, Mediterranean, [[Modern European]], Portuguese, and Spanish.
+- E3#166:2 [system] previous turn, user: How about european food? | turn: Would you prefer European or modern [[European]] food?
+- E3#166:3 [system] previous turn, user: I am looking for a moderately priced restaurant in the south part of town. | turn: There are two moderately priced restaurants in the south. Would you prefer Italian or [[Modern European]]?
+- E3#166:4 [system] previous turn, user: I'm looking for an expensive restaurant in the west. | turn: There are 9 expensive restaurants in the west. There are British, [[European]], Indian, and Thai food to choose from. Which would you prefer?
+
+### E3#167  (mentions 3, distinct values 2)
+Examples:
+- E3#167:0 [system] previous turn, user: Could you check fr mediterranean please? | turn: [[The Gardenia]] is a Mediterranean restaurant in the centre of town, would you like to make a reservation?
+- E3#167:1 [system] previous turn, user: I will need it for three, at noon, on Thursday. | turn: I am sorry, but the [[Gardenia]] does not have any openings for noon on Thursday for 3 people. Would you like for me check a different time for you?
+- E3#167:2 [system] previous turn, user: I don't have a particular price range in mind but would prefer something in the mid to low range | turn: [[The gardenia]] is cheap, can I book you or provide some info?
+
+### E3#168  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#168:0 [system] previous turn, user: Thanks. I also need information about a specific restaurant called michaelhouse cafe. What can you tell me about it? | turn: It's an expensive european place in the centre at [[St. Michael's Church]] Trinity Street City Centre cb21su with phone 01223309147. Would you like to book a table?
+
+### E3#169  (mentions 1, distinct values 1)
+Examples:
+- E3#169:0 [user] previous turn, system: The address is 5 mowbray road in the postcode, cb17sr. Do you still need a taxi? | turn: Yes. I'm leaving [[Aylesbray Lodge]] and need to be at Peking Restaurant by 17:00. Please get me the contact number and car type.
+
+### E3#170  (mentions 1, distinct values 1)
+Examples:
+- E3#170:0 [user] previous turn, system: The Tenpin phone number is 08715501010 and the postcode is cb17dy. Can I help you with anything else today? | turn: Yes please. I'd like to find a good Malaysian restaurant located in the same area as this [[Tenpin place]]. Something on the pricey side. What would you suggest?
+
+### E3#171  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#171:0 [system] previous turn, user: Thank you for the reference number. Are there any cheap places to dine in the North area? | turn: Do you have a preference for type of food? I have an [[Indian option]] and an Italian option.
+- E3#171:1 [system] previous turn, user: Thank you for the reference number. Are there any cheap places to dine in the North area? | turn: Do you have a preference for type of food? I have an Indian option and an [[Italian option]].
+
+### E3#172  (mentions 3, distinct values 1)
+Examples:
+- E3#172:0 [system] previous turn, user: Okay. Is there one that serves International food? | turn: There are three locations that serve international cuisine. [[The Missing Sock]], The Varsity Restaurant, and the Bloomsbury Restaurant. Are you interested in any of these?
+- E3#172:1 [system] previous turn, user: Hmm, I don't really like the food there. Is there anything else? | turn: [[the missing sock]] is another restaurant there.
+- E3#172:2 [user] previous turn, system: There are three locations that serve international cuisine. The Missing Sock, The Varsity Restaurant, and the Bloomsbury Restaurant. Are you interested in any of these? | turn: Sure, can I please get a table on Sunday at 13:00 for 6 people at [[The Missing Sock]]?
+
+### E3#173  (mentions 3, distinct values 2)
+Examples:
+- E3#173:0 [system] previous turn, user: What are they? | turn: I have the Lan Hong House, Jinling Noodle Bar and the [[Shanghi Family Restaurant]] that are all moderately priced and serving Chinese food.
+- E3#173:1 [system] previous turn, user: Yes, what are my three choices before we make a reservation? | turn: The restaurants are: jinling noodle bar, lan hong house and [[shanghai family restaurant]].
+- E3#173:2 [user] previous turn, system: I have the Lan Hong House, Jinling Noodle Bar and the Shanghi Family Restaurant that are all moderately priced and serving Chinese food. | turn: I would like a table for 8 at 16:30 wednesday at [[Shanghi Family Restaurant]] please.
+
+### E3#174  (mentions 1, distinct values 1)
+Examples:
+- E3#174:0 [user] previous turn, system: Sure, the address is on Corn Exchange Street, post code cb23qf. Can I do anything else for you today? | turn: I do need to get from [[Stevenage]] to Cambridge on Saturday. I'd like to leave shortly after 09:45, if possible.
+
+### E3#175  (mentions 6, distinct values 4)
+Examples:
+- E3#175:0 [system] previous turn, user: Hi, can you help me find a Caribbean restaurant to eat at on my upcoming visit? | turn: Oh no! We don't have any [[Caribbean restaurants]] at the moment. Is there another type you'd like?
+- E3#175:1 [system] previous turn, user: I want to eat. I am looking for a Jamaican restaurant with a moderate price range please. | turn: I'm sorry, there are no moderately priced [[Jamaican restaurants]]. What about a different food type?
+- E3#175:2 [system] previous turn, user: I am looking for a cheap caribbean restaurant to eat at. | turn: I'm sorry, I am unable to find any restaurants that serve [[Caribbean cuisine]].
+- E3#175:3 [user] previous turn, system: I'm sorry, there are no moderately priced Jamaican restaurants. What about a different food type? | turn: I would really prefer [[Jamaican]]. Are there any in the centre part of town?
+- E3#175:4 [user] turn: Hi, can you help me find a [[Caribbean restaurant]] to eat at on my upcoming visit?
+
+### E3#176  (mentions 3, distinct values 3)
+Examples:
+- E3#176:0 [system] previous turn, user: Great can I just get their address? | turn: Sure, prezzo is located at [[21 - 24 Northampton Road]] postcode cb30ad, would you also like their phone number?
+- E3#176:1 [system] previous turn, user: Yes, I would like the address and phone number. | turn: saint johns chop house phone number is 01223 353110 and is located at [[21 - 24 Northampton Street]]
+- E3#176:2 [system] previous turn, user: Can I have the address and phone number of the Italian location? | turn: Prezzo is at [[21-24 Northampton Road]], and can be reached at 01799 521260. Can I be of further assistance?
+
+### E3#177  (mentions 2, distinct values 2)
+Examples:
+- E3#177:0 [system] previous turn, user: I'd like their address please. | turn: They are located at [[Napier Street]] City Centre
+- E3#177:1 [system] previous turn, user: I would like to know if you have any information on a place called Tang Chinese? | turn: Of course! It's an expensive chinese restaurant in the centre, at [[Napier Street City Centre]] cb11hr. May I help with anything else?
+
+### E3#178  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#178:0 [user] previous turn, system: Absolutely. What sort of cuisine would you like? | turn: I'd like [[modern American]] in the moderate price range, if possible?
+- E3#178:1 [user] previous turn, system: I have none that match your criteria. May I suggest a different area or food type? | turn: If you don't have any [[Modern American places]], maybe Modern European?
+
+### E3#179  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#179:0 [system] previous turn, user: What adult attraction are within 5 miles of the restaurant? | turn: I have [[ballare nightclub]] very close in the same area.
+
+### E3#180  (mentions 4, distinct values 2)
+Examples:
+- E3#180:0 [system] previous turn, user: I would like Indian food. | turn: There are three cheap Indian restaurants in the centre of town. I have heard great things about the chef at [[Kohinoor]]. Would you like me to make a reservation?
+- E3#180:1 [system] previous turn, user: I'm not concerned with price. I do need a reservation for 7 at 15:30 on Wednesday. | turn: I will book you at the best--[[The Kohinoor]]. Your booking was successful. The table will be reserved for 15 minutes. Reference number is : MRRV4AHE. Anything else I can do for you?
+- E3#180:2 [system] previous turn, user: Yes, I am looking for a cheap restaurant. | turn: [[kohinoor]] is a cheap indian restaurant in centre. Would you like me to book a table?
+- E3#180:3 [system] previous turn, user: Yes. Book that one for 3 people on Friday at 18:45. | turn: Done. You have a reservation for 3 at [[kohinoor]] on Friday at 18:45. Your reference is 37R6X4JS and the table will be held for 15 minutes. Will that be all today?
+
+### E3#181  (mentions 3, distinct values 2, low confidence)
+Examples:
+- E3#181:0 [system] previous turn, user: Could you tell me if there are any corsica restaurants in the south side? | turn: There aren't any [[corsica]] restaurants located in the south side.
+- E3#181:1 [user] previous turn, system: I have your booking for the Hobsons House. Your reference number is A4UULB11. What else can I do for you today? | turn: I'm looking for a restaurant in the same price range as the guesthouse, one that serves [[corsica food]].
+- E3#181:2 [user] turn: Could you tell me if there are any [[corsica]] restaurants in the south side?
+
+### E3#182  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#182:0 [system] previous turn, user: That sounds fine! Can I get their phone number, address, and postcode? | turn: You can reach Clare Hall at 01223 332 360, and their address is Herschel Road, [[CB3 9AL]]. Can I help you with anything else today?
+- E3#182:1 [user] previous turn, system: Do you know the name of this restaurant? | turn: The Hakka restaurant is located at 24 Milton Road Cambridge Cambridgeshire [[CB4 1JY]]. The average cost is approximately 30 per person.
+
+### E3#183  (mentions 2, distinct values 1)
+Examples:
+- E3#183:0 [system] previous turn, user: yes. I would like their address and phone number please. | turn: Rajmahal is located at [[7 Barnwell Road]] Fen Ditton and the phone number is 01223 244955. Will that be all?
+- E3#183:1 [system] previous turn, user: Any area is fine. Please just recommend a restaurant, and send me the address and postcode. Thanks in advance! | turn: Rajmahal is very popular. Their address is [[7 Barnwell Road]] Fen Ditton and their post code is cb58rg. Will that be all today?
+
+### E3#184  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#184:0 [system] previous turn, user: Thanks. I'm also wondering what kind of information you have on Pizza Express. | turn: Pizza express serves italian food, is located in the centre of town, in the moderate price range, their phone number is 01223324033, postcode is [[cb213b]], and at Regent Street City Centre
+
+### E3#185  (mentions 1, distinct values 1)
+Examples:
+- E3#185:0 [system] previous turn, user: Address and phone number please. | turn: The Huntingdon Marriott is at [[Kingfisher Way]], Hinchingbrook Business Park, Huntingdon. Their number is 01480446000. Is there anything else I can help you with?
+
+### E3#186  (mentions 1, distinct values 1)
+Examples:
+- E3#186:0 [system] previous turn, user: Address and phone number please. | turn: The Huntingdon Marriott is at Kingfisher Way, [[Hinchingbrook Business Park]], Huntingdon. Their number is 01480446000. Is there anything else I can help you with?
+
+### E3#187  (mentions 3, distinct values 3)
+Examples:
+- E3#187:0 [system] previous turn, user: I'll just take the first one on the list. Can you make a reservation for 6 at 15:30 on Saturday? | turn: I've book you at lan hong house, located at [[12 Norfolk Street]] City Centre. Your reference number is XPQ6J119.
+- E3#187:1 [system] previous turn, user: I don't care about the price range. Can you just pick a good one for me? | turn: If money is no concern, I would definitely recommend HK Fusion. It's in the centre of town and expensive. It's located at [[21 Burleigh Street]], City Centre. How does that sound?
+- E3#187:2 [system] previous turn, user: What about Indian food? | turn: I have 6 restaurants that meet your criteria. Would the Panahar work for you? It's at [[8 Norfolk Street]] City Centre.
+
+### E3#188  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#188:0 [system] previous turn, user: That sounds great. Please book it for 3 people on Thursday at 16:30 | turn: I was able to book a table at Panahar for 3 people on Thursday at 16:30. The reference number is [[5SIQAVA]]
+
+### E3#189  (mentions 1, distinct values 1)
+Examples:
+- E3#189:0 [user] previous turn, system: I'm sorry there are no moroccan restaurants in the centre of town. | turn: [[Boo]]. I guess I would be able to try a modern european food restaurant?
+
+### E3#190  (mentions 1, distinct values 1)
+Examples:
+- E3#190:0 [user] previous turn, system: Yes, I can help you. What type of food are you interested in? | turn: I don't care, just something good in the same area as [[Broughton House]] is. Try and stay in the moderate price range though.
+
+### E3#191  (mentions 2, distinct values 1)
+Examples:
+- E3#191:0 [system] previous turn, user: I don't care about the price range. Can you just pick a good one for me? | turn: If money is no concern, I would definitely recommend [[HK Fusion]]. It's in the centre of town and expensive. It's located at 21 Burleigh Street, City Centre. How does that sound?
+- E3#191:1 [system] previous turn, user: Is 11:15 on Saturday available? | turn: That booking was successful. A reservation was made for 6 people at [[HK Fusion]] on Saturday at 11:15. Reference is ARWFXLDL. Can I help with anything else?
+
+### E3#192  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E3#192:0 [system] previous turn, user: That sounds fine! Can I get their phone number, address, and postcode? | turn: You can reach [[Clare Hall]] at 01223 332 360, and their address is Herschel Road, CB3 9AL. Can I help you with anything else today?
+- E3#192:1 [system] previous turn, user: Can you tell me about some colleges to go to? | turn: I like [[Clare Hall]] in the west part of town. Do you have any preference to area?
+
+### E3#193  (mentions 1, distinct values 1)
+Examples:
+- E3#193:0 [system] previous turn, user: That sounds fine! Can I get their phone number, address, and postcode? | turn: You can reach Clare Hall at 01223 332 360, and their address is [[Herschel Road]], CB3 9AL. Can I help you with anything else today?
+
+### E3#194  (mentions 3, distinct values 2)
+Examples:
+- E3#194:0 [system] previous turn, user: I need help finding a place that serves spanish food and is located in the centre, can you help me? | turn: [[La Tasca]] and La Raza serve Spanish food in the centre of town. What price range would you prefer.
+- E3#194:1 [user] previous turn, system: 8 mercers row, mercers row industrial estate is their address, and their postcode is cb58hy. I don't have their entrance fee, unfortunately. | turn: Ok thank you. I am also looking for information on [[La Tasca restaurant]]. Could you help me with that?
+- E3#194:2 [system] previous turn, user: Ok thank you. I am also looking for information on La Tasca restaurant. Could you help me with that? | turn: Definitely! [[La tasca]] is a spanish restaurant in the centre of town in the moderate price range.
+
+Return the JSON object now.

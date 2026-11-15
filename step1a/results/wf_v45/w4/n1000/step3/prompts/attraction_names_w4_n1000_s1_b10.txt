@@ -1,0 +1,72 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 10 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#64  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E4#64:0 [system] previous turn, user: Can you tell me what theatres are in cambridge please? | turn: We have four theatre's in the centre of town and [[one theatre]] on the south side. Do you have a preference on location?
+- E4#64:1 [system] previous turn, user: Can you help me with places to go? I like architecture. | turn: There are [[four churches]] and a place called old schools for architecture. They are all conveniently located in the center of town.
+- E4#64:2 [system] previous turn, user: Can you tell me what theatres are in cambridge please? | turn: We have [[four theatre]]'s in the centre of town and one theatre on the south side. Do you have a preference on location?
+
+### E4#123  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E4#123:0 [user] turn: I'm looking for [[cafe uno]], can you help me find where it is?
+- E4#123:1 [system] previous turn, user: I'm looking for cafe uno, can you help me find where it is? | turn: Absolutely! [[Caffe uno]] is located at 32 Bridge Street City Centre.
+- E4#123:2 [system] previous turn, user: That sound good. Could I have their postcode and address please? | turn: The postcode for [[Restaurant One Seven]] is cb21ab, and the address is De Vere University Arms Regent Street City Centre. Do you require further assistance?
+
+### E4#55  (mentions 16, distinct values 4)
+Examples:
+- E4#55:0 [system] previous turn, user: I want to find a museum located in the west. | turn: how about [[cafe jello gallery]]? it's gotten great reviews.
+- E4#55:1 [system] previous turn, user: Excellent. What is the postcode for both museums? | turn: [[Cafe Jello]] postcode is cb30af. Kettle's yard is cb30aq.
+- E4#55:2 [system] previous turn, user: Yes please. | turn: [[The cafe jello gallery]] has free admission and is located at 13 magdalene street, postcode cb30af. Would you like information on any others?
+- E4#55:3 [user] previous turn, system: It is free, and located at cafe jello gallery, 13 magdalene street | turn: Okay. That was in the [[West Cafe Jello Gallery]] at 13 magdalene street and it's free. Thank you. Goodbye.
+- E4#55:4 [system] previous turn, user: Yes could I have their postcode and entrance fee? | turn: [[Cafe jello gallery]] postcode is cb30af and the entrance is free, is there anything else I can do for you?
+
+### E4#58  (mentions 10, distinct values 4)
+Examples:
+- E4#58:0 [system] previous turn, user: You can choose for me but I would like to know the postcode of the museum. | turn: [[Castle Galleries]] is my choice. The postcode is cb23bj. I never made that hotel reservation. Would you like me to do that now?
+- E4#58:1 [system] previous turn, user: Yes I would like all the contact info please. | turn: Their number is 01223748100.They are located on [[Castle Street]] and their postcode is cb30aq
+- E4#58:2 [system] previous turn, user: No, it does not matter. You can make a suggestion and provide the address and postcode. | turn: cambridge and county folk museum located at [[2-3 Castle street]]. 3.50 pounds to get in, but well worth it.Check out the gift shop too.
+- E4#58:3 [system] previous turn, user: Can I please have the phone number and address for that place? | turn: Certainly! The address for [[gallery]] at twelve a high street is fulbourn and the phone number is 01223295264. Can I help you with anything else?
+- E4#58:4 [user] previous turn, system: There are 11 museums, I would recommend castle galleries because it's free. | turn: Fantastic. Can you provide me with the address and phone number for the [[Castle Galleries]], please?
+
+### E4#11  (mentions 21, distinct values 3)
+Examples:
+- E4#11:0 [system] previous turn, user: Great, I would like to get some phone numbers for those places in the centre. | turn: I have Hughes Hall, 01223334898, with free entrance. The [[broughton house gallery]] at 01223314960, also free. I don't seem to have any churches. Can I help you further?
+- E4#11:1 [system] previous turn, user: Can I get a postcode, entrance fee, and address of one of them? | turn: [[The Broughton House Gallery]] is located at 98 King Street, cb11ln. Their phone number is 01223314960, and it's free to get in.
+- E4#11:2 [system] previous turn, user: Nothing specific.Recommend one and send me their phone number. | turn: I would recommend [[Broughton House Galley]]. Here is their phone number: 01223314960
+- E4#11:3 [system] previous turn, user: OK, now can you tell me about some of the attractions in the center of town? | turn: We have 44 attractions in the centre of town [[Broughton House Gallery]] is a museum we have available.
+- E4#11:4 [system] previous turn, user: Can you suggestion one? | turn: [[The broughton house gallery]] is very nice
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#64, E4#123, E4#55, E4#58, E4#11) and its name as the value, like {"E4#64": "<name>"}.

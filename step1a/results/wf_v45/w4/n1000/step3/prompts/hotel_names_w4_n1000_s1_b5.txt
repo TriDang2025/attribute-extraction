@@ -1,0 +1,77 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 5 of 20 (100 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E1#20  (mentions 11, distinct values 6, low confidence)
+Examples:
+- E1#20:0 [user] previous turn, system: You can reach Christ's College at 01223334900. As far as guesthouses, I have 2 that meet your criteria. Both offer free wifi and parking. Hobson's House is moderately priced. | turn: Hobson's House sounds interesting. What is [[their phone number]]?
+- E1#20:1 [user] previous turn, system: Sorry, it looks like they're all booked up. Would you like to try a different day or just one night? | turn: One night would work. Be sure to include [[my reference number]].
+- E1#20:2 [system] previous turn, user: Is it possible to book this reservation for 2 nights? | turn: Indeed it is! I just booked you for two nights, [[ref num]]: IC0RATQI. Do you need anything else today?
+- E1#20:3 [user] previous turn, system: How about the Charlie Chan? They are a budget-friendly Chinese restaurant in the centre of town. | turn: That sounds good. May I have [[their telephone number]]? Also could you help me finding a 4 star hotel in the same area?
+- E1#20:4 [system] previous turn, user: Yes please, for 4 people. How about the TR8167 please. | turn: Oh! It looks like we've already booked [[Train TR8167]] for your group of 4. Your reference number is H4BIFD0U. Is there anything else I can help you with today?
+- E1#20:5 [system] previous turn, user: I need it for 5 nights for 7 people starting friday. | turn: Your room has been booked. [[Your reference number]] is EZRMPRMW.
+
+### E1#27  (mentions 63, distinct values 32)
+Examples:
+- E1#27:0 [system] previous turn, user: I don't need to book a hotel just need the address and price range. | turn: It is a moderate priced guesthouse. They can be contacted at [[01223353888]]. Is there anything else I can help you with?
+- E1#27:1 [system] previous turn, user: Sure, could I get the phone number and postcode? | turn: The postcode for the Hamilton Lodge is cb41da and the phone number is [[01223365664]].
+- E1#27:2 [system] previous turn, user: Yes, The Lovell Lodge sounds nice. Can you give me the phone number and postcode please? | turn: Of course. The phone number of Lovell Lodge is [[01223425478]] and their postcode is cb41sr.
+- E1#27:3 [system] previous turn, user: No, but could I get the address and phone number, please? | turn: [[01223210353]] is the phone number. The address is 517a coldham lane. Is there anything else I could help you with?
+- E1#27:4 [system] previous turn, user: Yes I would like the phone number and postcode | turn: The phone number is [[01223351241]] and the postcode is cb21ad. Is there anything else I can help with?
+- E1#27:5 [system] previous turn, user: Can you tell me about a hotel called city centre north b and b? | turn: It is located at 328a histon road cb43ht. Their phone number is [[01223312843]].
+
+### E1#6  (mentions 284, distinct values 261)
+Examples:
+- E1#6:0 [system] previous turn, user: What's the postcode? | turn: The postcode is [[cb41da]]
+- E1#6:1 [system] previous turn, user: Yes, The Lovell Lodge sounds nice. Can you give me the phone number and postcode please? | turn: Of course. The phone number of Lovell Lodge is 01223425478 and their postcode is [[cb41sr]].
+- E1#6:2 [system] previous turn, user: Um, ok. Are you read to give me that information now? | turn: 01223210353 is the phone number. The postcode is [[cb13js]]. Can I help with anything else?
+- E1#6:3 [system] previous turn, user: No, but can you give me the post code, please? | turn: Yes, their postcode is [[cb21ad]]. Is there anything else you would like to know?
+- E1#6:4 [system] previous turn, user: Let's try the cheap one. Could you give me the address and postcode? | turn: Yes the postcode is [[cb22ha]] and the address is 53 roseford road. Would you like me to book it for you?
+- E1#6:5 [system] previous turn, user: Yes please tell me their postcode and star rating. | turn: The ashley hotel has 2 stars. They're in the postcode [[cb41er]].
+
+### E1#19  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E1#19:0 [system] previous turn, user: Just please get me the train ID and total travel time. | turn: the id is [[TR1892]] and the duration is 79 minutes. anything else today?
+- E1#19:1 [user] previous turn, system: There are 2 trains that meet your criteria. The TR8167 and the TR9693. Would you like me to book one of them for you? | turn: Yes please, for 4 people. How about the [[TR8167]] please.
+
+### E1#37  (mentions 11, distinct values 10, low confidence)
+Examples:
+- E1#37:0 [user] previous turn, system: I need to know for what day and time and for how many people please | turn: Make the reservation for 3 people on Friday at [[20:00]]. Thank you!
+- E1#37:1 [user] previous turn, system: Sure can! What day are you checking in? | turn: i would like to check in on monday at [[5:30]]
+- E1#37:2 [user] previous turn, system: Booking was successful. Reference number is : FBDR5BNR. | turn: So you need to arrive on Thursday after [[11:00 am]] to check-in.
+- E1#37:3 [system] previous turn, user: No, can you give me the travel time, departure time, and train ID for the train you mentioned? | turn: TR1590 leaves at [[11:32]] and the duration is 60 minutes.
+- E1#37:4 [user] previous turn, system: How many people will be staying? Also, when would you like to check in? | turn: Sure, just me. Monday at [[12:00]] is fine.
+- E1#37:5 [system] previous turn, user: No. I'm all set. Thanks again. | turn: I remind you that you can check-in in this guesthouse after [[3:00 pm]]. You can leave your suitcases anytime.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#20, E1#27, E1#6, E1#19, E1#37) and its name as the value, like {"E1#20": "<name>"}.

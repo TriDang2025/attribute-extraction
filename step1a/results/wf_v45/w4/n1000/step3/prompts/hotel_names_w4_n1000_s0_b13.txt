@@ -1,0 +1,73 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 13 of 20 (100 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E1#57  (mentions 3, distinct values 2)
+Examples:
+- E1#57:0 [user] previous turn, system: It was successful. The booking number is WCRBSYUL. Is there anything else? | turn: Yes. What can you tell me about [[cherry hinton hall and grounds]]? I am interested in visiting it. Do I need to book a tour?
+- E1#57:1 [system] previous turn, user: I am looking for some places to go in the east of multiple sports. Can you help? | turn: [[The Cherry Hinton Village Centre]] sounds like exactly what you're looking for. Their phone number is 01223576412.
+- E1#57:2 [user] previous turn, system: Your booking has been made and your reference number is O0FG9YKT. Acorn Guest House is located at 154 Chesterton Road. Is there anything else I can do for you? | turn: Yes, I am looking to visit the [[cherry hinton hall and grounds]]. Can I please have more information on that?
+
+### E1#74  (mentions 8, distinct values 1)
+Examples:
+- E1#74:0 [user] turn: I am looking for information on the [[leverton house]] hotel
+- E1#74:1 [system] previous turn, user: 4 nights starting from wednesday please | turn: The three guesthouses in the area are Allenbell, Autumn House, and [[Leverton House]]. Would you like to reserve at any of these?
+- E1#74:2 [user] previous turn, system: The travel time on that route is 28 minutes. Is there anything else I can help you with? | turn: I'm also looking for a particular hotel. The name is [[Leverton house]].
+- E1#74:3 [system] previous turn, user: Could you double check for a 3 or 4 star hotel on the east side with free parking? | turn: [[Leverton House]] is a 4 star guesthouse in the east part of town in the cheap price range with both internet and parking included. Is there anything else today?
+- E1#74:4 [system] previous turn, user: Is the fee not listed? I also will need to find a hotel, and I will need free parking please. | turn: The entrance fee is not listed I am afraid for the pool. For hotels, I have Autumn House and [[Leverton House]] for hotels, 4 stars and free parking.
+- E1#74:5 [system] previous turn, user: The hotel should be in the east and should have a star of 4 in the cheap price range and should include free wifi | turn: There are 3 gueshouse that fit that match. allenbell, autumn house, and [[leverton house]]. Would you like to book one of those?
+
+### E1#59  (mentions 9, distinct values 2)
+Examples:
+- E1#59:0 [system] previous turn, user: Yes, I'm looking for the hotel Limehouse. | turn: [[limehouse]] is a moderate priced guesthouse in the north at 78-80 milton road. Would you like to make a reservation?
+- E1#59:1 [system] previous turn, user: i am also looking for a hotel called limehouse | turn: [[The Limehouse]] is a moderately priced 4 star guesthouse located in the North, would you like their contact information and address, or would you like to book a room?
+- E1#59:2 [system] previous turn, user: As long as there is available parking I'd like to book my reservation there please. | turn: I can book you at the [[Limehouse]]. when would you like the reservation?
+- E1#59:3 [user] turn: Can you help me find a hotel called [[Limehouse]]? Thanks.
+- E1#59:4 [user] previous turn, system: Certainly, the phone number is 01223248882. Is there anything else I can do? Reserve a table for you, perhaps? | turn: i am also looking for a hotel called [[limehouse]]
+- E1#59:5 [user] previous turn, system: The Limehouse is a moderately priced 4 star guesthouse located in the North, would you like their contact information and address, or would you like to book a room? | turn: Can you tell me if [[Limehouse]] has internet access?
+
+### E1#15  (mentions 113, distinct values 14)
+Examples:
+- E1#15:0 [system] previous turn, user: Sure. Check only for hotels which include free parking also. | turn: There are no 4-star lodgings available in [[Cambridge]] that meet your criteria. Shall we check 5-star locations instead?
+- E1#15:1 [system] previous turn, user: Are there any cheap hotels (not guesthouses) in town? | turn: [[the cambridge belfry]] is a hotel located in the west and is cheap. Has 4 stars and free internet and parking.
+- E1#15:2 [system] previous turn, user: Yes. For the same group of people for 3 nights starting on the same day | turn: I have successfully booked a room for you at the [[Cambridge Belfry]] for 3 nights starting from Thursday for 3 people. Your reference number is MGOPZNPJ..Would that be all for you?
+- E1#15:3 [system] previous turn, user: No that is perfect. Thank you very much. | turn: You are welcome. Thank you for calling the [[Cambridge TownInfo Centre]]. Good bye.
+- E1#15:4 [user] previous turn, system: Yes, the 9:39 arrives by 11:07. Can I book this train for you today? | turn: That's okay. Can you tell me about a hotel though? It's the Express by [[Holiday Inn Cambridge]].
+- E1#15:5 [system] previous turn, user: I need to find a place to stay while in Cambridge, I do not need it to have internet but I do need it to have free parking. | turn: There are currently no hotels in the [[Cambridge area]] that have parking, is there another area close by that would work for you?
+
+### E1#36  (mentions 1, distinct values 1)
+Examples:
+- E1#36:0 [system] previous turn, user: Just the phone number please? | turn: The phone of [[Downing College]] is 01223334860. Do you need a place to stay?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E1#57, E1#74, E1#59, E1#15, E1#36) and its name as the value, like {"E1#57": "<name>"}.

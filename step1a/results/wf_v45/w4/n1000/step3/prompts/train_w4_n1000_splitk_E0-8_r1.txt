@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E0#8:s0": "P1", "E0#8:s1": "P2"}}
+
+Cluster E0#8 of entity E0 (mentions 85, distinct values 16).
+Examples:
+- E0#8:s0 [system] previous turn, user: I need to leave after 21:00. | turn: The TR7610 leaves at 21:21 and is a [[105 minute]] ride to Leicester. Would you like me to book you seats?
+- E0#8:s1 [system] previous turn, user: No, I just need the train ID, travel time, and price, please. | turn: The train ID is TR5979. Travel time is [[60 minutes]] and price is 17.90 pounds per ticket. Anything else?
+- E0#8:s2 [system] previous turn, user: can i also get the travel time please? | turn: The train will take [[163 minutes]] to arrive at the station.
+- E0#8:s3 [system] previous turn, user: Can you tell me how long a ride that is? I always mess up the math when it crosses the hour. | turn: The duration of that ride would be [[49 minutes]]
+- E0#8:s4 [system] previous turn, user: Possibly, I'll have to confirm with my husband later. Can you tell me what the travel time is for that train? And the price as well? | turn: The price is 10.10 and it takes [[28 minutes]].
+- E0#8:s5 [system] previous turn, user: Alright, all I need the travel time and that should be all, thanks! | turn: The travel time is [[17 minutes]]. Thank you for allowing me to assist you!
+- E0#8:s6 [system] previous turn, user: I don't need to book. I just need the train ID, travel time and arrival time for the 13:17 train. | turn: Those would be TR0922, [[51 minutes]], and 14:08. How else may I help you?
+- E0#8:s7 [system] previous turn, user: I would like to go to Norwich on Monday. | turn: Trains leave hourly to Norwich. The closest time available is TR8495, departing 09:36 and arriving 10:55, with duration [[79 minutes]] and price 17.60 pounds. Would you like to book this one?
+- E0#8:s8 [system] previous turn, user: I think so. How much is that train? And can you tell me the travel time? | turn: The cost is 8.08 GBP per ticket, and the travel time is [[38 minutes]].
+- E0#8:s9 [system] previous turn, user: What is the travel time? | turn: The travel time is [[50 minutes]].
+- E0#8:s10 [system] previous turn, user: Please pick a train that leaves after 8:15 and going to cambridge. I need the travel time and price. | turn: TR3447 leaves Kings Lynn at 09:11 and arrives at 09:58 with a travel time of [[47 minutes]]. The price is 9.80 pounds.
+- E0#8:s11 [system] previous turn, user: Thanks, I also need a train from cambridge to peterborough afterwards | turn: There are 16 trains leaving on Thursday after your dinner. I would think [[2 hours]] should be long enough? So there is one at 18:06 I can recommend.
+- E0#8:s12 [system] previous turn, user: No thank you, may I please get the travel time of TR5015? | turn: The travel time is [[88 minutes]]. Can I help you with anything else?
+- E0#8:s13 [system] previous turn, user: any expensive restaurant will suffice. Reserve it for 8 people at 18:30 on tuesday and I'll need the reservation number please. | turn: Booking was successful. The table will be reserved for [[15 minutes]]. Reference number is : 51VEERAC.
+- E0#8:s14 [user] previous turn, system: Sure, the phone number is 01223355017. How many days will you be staying, what day do you need to arrive, and how many people will be staying? | turn: I'm staying for [[2 days]] and it's just myself. What train can I take to depart from the stansted airport that leaves at 19:30?
+- E0#8:s15 [user] previous turn, system: I recommend the Acorn Guest House. Would you like me to book a room for you? | turn: Okay book it for 2 people for [[3 nights]] and let me have the reference number. Also find me a Train departing from London liverpool street to arrive Cambridge by 08:15.
+
+Return the JSON object now.

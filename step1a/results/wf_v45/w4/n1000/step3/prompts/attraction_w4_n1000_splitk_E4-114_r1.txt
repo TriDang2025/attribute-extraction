@@ -1,0 +1,23 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E4#114:s0": "P1", "E4#114:s1": "P2"}}
+
+Cluster E4#114 of entity E4 (mentions 8, distinct values 2).
+Examples:
+- E4#114:s0 [user] turn: Hello, I am looking for information on [[kambar]]. What do you know about that attraction?
+- E4#114:s1 [system] previous turn, user: get phone number, area, and postcode of Kambar. | turn: [[Kambar nightclub]] is in the centre area. The phone# is 01223842725 and the postcode is cb23qb.
+- E4#114:s2 [user] turn: Hi! I'm looking for an attraction named [[Kambar]].
+- E4#114:s3 [system] previous turn, user: Please give me their postcode | turn: The postcode for [[Kambar]] is CB23QB.
+- E4#114:s4 [user] previous turn, system: We have 6 nightclubs in town. Most of them are in the center, and Kambar, at 1 Wheeler St., is my favorite. | turn: get phone number, area, and postcode of [[Kambar]].
+- E4#114:s5 [system] previous turn, user: I'm also looking for places to go. Maybe a nightclub? | turn: We have 6 nightclubs in town. Most of them are in the center, and [[Kambar]], at 1 Wheeler St., is my favorite.
+- E4#114:s6 [user] turn: i'm looking for a place called [[kambar]]
+- E4#114:s7 [system] previous turn, user: Hello, I am looking for information on kambar. What do you know about that attraction? | turn: [[Kambar]] is a nightclub located in the centre of town. Its address is 1 wheeler street and postcode is cb23qb with an entrance fee of 5 pounds.
+
+Return the JSON object now.

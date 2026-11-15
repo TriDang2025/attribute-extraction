@@ -1,0 +1,31 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E1#51:s0": "P1", "E1#51:s1": "P2"}}
+
+Cluster E1#51 of entity E1 (mentions 24, distinct values 4).
+Examples:
+- E1#51:s0 [system] previous turn, user: No, could you make a recommendation based on that criteria and send me the postcode, address, and hotel type, please? | turn: I recommend the [[Kirkwood House]]. It is a guesthouse with 4 star ratings. The postcode is cb41da, and the address is 172 Chesterton Road.
+- E1#51:s1 [system] previous turn, user: The area doesn't matter I prefer a guesthouse. Any one you recommend will be fine. | turn: There are still quite a few guesthouses to consider. I suggest the [[archway house]] which is 4 stars. It's in the north of the city.
+- E1#51:s2 [system] previous turn, user: No thanks. Could you just tell me their phone umber and price range? | turn: [[The archway house]]'s phone number is 01223575314, it's a moderately priced guesthouse. Can I get you any more information?
+- E1#51:s3 [user] turn: I am looking for information about the [[kirkwood hotel]].
+- E1#51:s4 [system] previous turn, user: That would be fine with me | turn: Lovell lodge does not have availability on Friday either. Would you like to try another guesthouse? Does the area matter? We could try [[kirkwood house]], it is in the north.
+- E1#51:s5 [system] previous turn, user: Yes. A different hotel in the same price range would be fine. | turn: I would also recommend [[archway house]] would you like me to check booking there?
+- E1#51:s6 [system] previous turn, user: It doesn't matter to me as long as it also is within a moderate price range. | turn: [[The Archway House]] is a guesthouse in the north that is moderately pried and includes free internet and parking. Would that work for you?
+- E1#51:s7 [system] previous turn, user: Hi, can you find the hotel Kirkwood House? | turn: Yes. [[Kirkwood House]] is a 4-star, moderately-priced, guesthouse in the north. It includes free parking and internet. Would you like me to book this for you?
+- E1#51:s8 [system] previous turn, user: I would like to stay in the moderate price range and I will need free parking. | turn: We have several places that meet your needs. If you don't care about the area, I recommend the [[Archway House]] in the north.
+- E1#51:s9 [system] previous turn, user: Hi I am in the north looking for a place to stay. I'd prefer a hotel with 4 stars. Any suggestions? | turn: [[The Archway House]] is a guesthouse in the north with four stars. It's moderately priced and includes wifi and parking. Should I book?
+- E1#51:s10 [system] previous turn, user: No preference really. Could you pick one and get me the postcode and price range please? | turn: I have selected the [[kirkwood house]], it is moderately priced and the postal code is cb41da, can I help with anything else?
+- E1#51:s11 [system] previous turn, user: I also need a place to stay, it should be 4 stars, in the north and include free wifi. | turn: We have six 4-star guesthouses in the north that might suit you. I can recommend [[Archway House]]. Would you like to book a room?
+- E1#51:s12 [system] previous turn, user: No, can you recommend me a good one? | turn: [[The archway house]] would be a great choice. It's located at 52 gilbert road, cb43pe. Would you like me to try and book a stay for you?
+- E1#51:s13 [system] previous turn, user: I don't care about price. It needs to be in the north, however. | turn: We have many guesthouses located in the north, many of which are 4 stars. May I recommend the [[Kirkwood House]] located in the north for a moderate price with 4 stars?
+- E1#51:s14 [user] turn: Yeah, what can you tell me about [[Archway House]]?
+- E1#51:s15 [system] previous turn, user: How about a different hotel in the same price range? | turn: I was able to book you into [[Kirkwood house]]. Your reference number is ANO69RVP. Is there anything else I can help you with?
+
+Return the JSON object now.

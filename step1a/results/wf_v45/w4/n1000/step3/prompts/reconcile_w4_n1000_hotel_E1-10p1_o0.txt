@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#10/1: name: location noun | description: location_noun
+Examples:
+- 1 [system] previous turn, user: Does this place include free parking? | turn: The alexander bed and breakfast is a cheap, 4 star guesthouse in the [[centre area]], It has wifi and parking. Does this fit your needs?
+- 2 [system] previous turn, user: I'm looking for a hotel with 0 stars | turn: There are 2 guesthouses meeting your needs. One in the north and one in the [[centre of town]]. Which would you prefer?
+- 3 [system] previous turn, user: Between $100-$300 per night. | turn: How about the Gonville Hotel located in the [[centre area of town]]?
+- 4 [system] previous turn, user: I'm looking for a place to stay in the centre. I also need free wifi there. | turn: We have two guesthouses and three hotels in [[town centre]]. Do you have a pricerange in mind?
+- 5 [user] previous turn, system: I was able to reserve that for you. Your reference number is 3CZFPQPV. Is there anything else I can help you with? | turn: Yes, I also need a place to stay. Same price range as the restaurant and in the [[centre of town]], please.
+
+Columns (5):
+- name: amenity | examples: alexander bed and breakfast; east side of town; north area
+- name: area | examples: town; north part of town; what part of town
+- name: location str | examples: centre; cambridge; cambridge towninfo centre
+- name: location prepositional | examples: center of town; town center; center part of town
+- name: location adjective | examples: city centre; centre part of town; the city centre
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#10/1", "reason": "str", "same_as": "<column name or none>"}

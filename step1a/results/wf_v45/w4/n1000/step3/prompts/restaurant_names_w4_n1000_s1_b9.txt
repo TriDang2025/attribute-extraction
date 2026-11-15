@@ -1,0 +1,74 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 9 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#40  (mentions 5, distinct values 2)
+Examples:
+- E3#40:0 [system] previous turn, user: I need the address. | turn: Peking is at [[10 Homerton Street]] City Centre. Do you need their phone number?
+- E3#40:1 [system] previous turn, user: Can you help me with finding a restaurant called backstreet bistro? | turn: Certainly. It is a gastropub located in the centre of town, and the address is [[2 Sturton Street]] City Centre.
+- E3#40:2 [system] previous turn, user: I don't need a reservation at the moment but could you send me the postcode and address of the restaurant. Thank you. | turn: The address of the restaurant is [[10 Homerton Street]] City Centre. The postcode is cb28nx. Can I assist with anything else?
+- E3#40:3 [system] previous turn, user: I want a place that serves astropub | turn: Backstreet Bistro is my favorite. They're located at [[2 Sturton Street]] City Centre, cb12qa. Would you like to book a table there?
+- E3#40:4 [system] previous turn, user: i dont mind any | turn: Okay, how about Peking Restaurant located at [[10 Homerton Street]] City Centre? Would you like a reservation?
+
+### E3#57  (mentions 10, distinct values 7)
+Examples:
+- E3#57:0 [system] previous turn, user: That works, can I get an address? | turn: Yes, it's located at [[20 Milton Road]] Chesterton. Do you need to book a table?
+- E3#57:1 [user] previous turn, system: Milton County Park in the north is free and my humble suggestion. | turn: Could I please have the postcode and area to [[Milton County Park]]?
+- E3#57:2 [system] previous turn, user: Yes please, can I get a phone number, address, and reference number? | turn: Hakka is located at [[Milton Road]] Chesterton, cb41jy. The phone number is 01223568988. Can I help with anything else today?
+- E3#57:3 [system] previous turn, user: I would prefer Italian. | turn: da vinci pizzeria is located at [[20 milton road chesterton]] and they can be reached at 01223 351707
+- E3#57:4 [user] previous turn, system: Do you know the name of this restaurant? | turn: The Hakka restaurant is located at [[24 Milton Road]] Cambridge Cambridgeshire CB4 1JY. The average cost is approximately 30 per person.
+
+### E3#23  (mentions 12, distinct values 7)
+Examples:
+- E3#23:0 [system] previous turn, user: Could you just give me the postcode and address? | turn: The address is [[100 Mill Road]] City Centre and the postcode is cb12bd. Can I help you with anything else today?
+- E3#23:1 [system] previous turn, user: Lets try rice house. | turn: Sure thing! Their address is [[88 Mill Road]] City Centre, would you like me to book you a table now?
+- E3#23:2 [system] previous turn, user: Not really, no. What's the address, postcode, and phone number for your favorite? | turn: Oh well if your letting me decide then kymmoy serves the best asian oriental food! Phone is 01223311911 postcode is cb12as and they are at [[100 Mill Rd]] City Centre
+- E3#23:3 [system] previous turn, user: What type of restaurants are located in the city centre? | turn: I'm so sorry, I was mistaken, there are several expensive Indian restaurants in the centre of town. May I recommend Curry Queen, at [[106 Mill Road]]?
+- E3#23:4 [system] previous turn, user: Hello, I am looking for a restaurant by the name of Royal Standard. Do you know where it is? | turn: Yes, royal standard is in the city centre at [[290 Mill Road]].
+
+### E3#140  (mentions 5, distinct values 2)
+Examples:
+- E3#140:0 [system] previous turn, user: It does not matter, I just need one available for 7 people at 18:15 on thursday | turn: I have made a reservation at restaurant alimentum for you. Your table will be reserved for 15 minutes. The address is [[152 - 154 Hills Road]].
+- E3#140:1 [system] previous turn, user: No, just the address and postcode please. | turn: the address is [[59 hills road]] city centre. the postcode is cb21nt.
+- E3#140:2 [system] previous turn, user: Yes, may I have the address for restaurants in the south part of town. Preferably something moderately priced. | turn: There are two options. Pizza Hut Cherry Hinton serves Italian food and is located at G4 Cambridge Leisure Park Clifton Way Cherry Hinton. Restaurant Alimentum serves Modern European food and is located at [[152 - 154 Hills Road]]. Anything else I can help you with today?
+- E3#140:3 [system] previous turn, user: No thanks. But can you find a restaurant that serves lebanese food in the centre? | turn: You're in luck! There is one Lebanese restaurant in all of Cambridge, and it's in the center. Ali Bana, located at [[59 Hills Road]] City Centre.
+- E3#140:4 [system] previous turn, user: I want to find a moderately priced restaurant in the south part of town. What is the phone number and address? | turn: restaurant alimentum is a moderately price restaurant in the south area of town. their phone number is 01223 413000 and their address is [[152 - 154 Hills Road]].
+
+### E3#96  (mentions 3, distinct values 3)
+Examples:
+- E3#96:0 [system] previous turn, user: Okay, how about some European food? | turn: What about the hotel du vin and bistro at [[15 - 19 Trumpington Street]]?
+- E3#96:1 [system] previous turn, user: Ok, I'll have to speak with my friend to see if that price is acceptable. Can I please get the address to the restaurant Hotel Du Vin and Bistro? | turn: Absolutely, the address is [[15-19 Trumpington Street]]. Is there anything else I can assist you with today?
+- E3#96:2 [system] previous turn, user: I also need the postcode and address please. | turn: The address is [[51 Trumpington Street]] City Centre. The postcode is cb21rg.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#40, E3#57, E3#23, E3#140, E3#96) and its name as the value, like {"E3#40": "<name>"}.

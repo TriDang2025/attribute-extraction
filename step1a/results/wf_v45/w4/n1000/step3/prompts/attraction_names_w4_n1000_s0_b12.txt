@@ -1,0 +1,76 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 12 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#44  (mentions 84, distinct values 24, low confidence)
+Examples:
+- E4#44:0 [system] previous turn, user: And the travel time? I also need a museum to go to in the east. | turn: The travel time for that would be 50 minutes. Cambridge Artworks would be a great museum to visit and it's [[free]]. Does that interest you?
+- E4#44:1 [user] previous turn, system: There is Christ's College, Churchill College, Clare College, Clare Hall, Corpus Christi, Downing College, Emmanuel College, and Huges Hall. Would you like me to list more? | turn: May I please have [[entrance fees]], phone numbers, and post codes?
+- E4#44:2 [system] previous turn, user: I need information about Pembroke College. | turn: Pembroke is located the in centre area, they have [[free admission]], anything else that I can help with?
+- E4#44:3 [user] previous turn, system: there is only one, it's called cineworld cinema | turn: How much is that cinema's [[entry fee]]?
+- E4#44:4 [system] previous turn, user: An architecture attraction would be good. | turn: old schools is in trinity lane and [[entrance]] is free. can i give you their phone number?
+
+### E4#31  (mentions 14, distinct values 8)
+Examples:
+- E4#31:0 [user] previous turn, system: Cherry Hinton hall and grounds is on the east part of town. | turn: Okay [[how much does it cost]]? And where the postal code?
+- E4#31:1 [system] previous turn, user: yeah, can i get the price range and the postcode | turn: For a price range I have '[[cheap]]'!
+- E4#31:2 [user] previous turn, system: Their postal code is cb23bu. Can I assist you with anything else today? | turn: I'm looking for a place to stay in the centre. Free wifi, please. [[Expensive price range]]. Don't need free parking.
+- E4#31:3 [system] previous turn, user: I would like to find a cheap restaurant in the east part of town. | turn: The Missing Sock serves International cuisine at a [[cheap price]]. They are in the east part of town at Finders Corner Newmarket Road.
+- E4#31:4 [user] previous turn, system: There are seven different places to stay in the east. Could you narrow down what you're looking for a bit? What price range are you looking for? | turn: Yes, it should be in the [[cheap price range]] and I don't require internet.
+
+### E4#5  (mentions 20, distinct values 12, low confidence)
+Examples:
+- E4#5:0 [user] previous turn, system: Your table for 6 is reserved for Monday at 18:15 and they'll hold your table for 15 minutes. Your reference number is T67ZV5US. Can I help you with anything else today? | turn: I am also looking for an [[attraction]], some type of boat.
+- E4#5:1 [user] turn: I am looking for [[college attractions]] to go to in town.
+- E4#5:2 [user] previous turn, system: Certainly, did you have a particular place in mind? | turn: [[An architecture attraction]] would be good.
+- E4#5:3 [user] previous turn, system: Booking was successful, the total fee is 39.2 GBP payable at the station. Reference number is : 20RFDCGC. | turn: Can you help me find an [[architecture attraction]] to visit?
+- E4#5:4 [user] previous turn, system: Is there anything in particular you're interested in doing/seeing? | turn: Anything you recommend. I just need the entrance fee, [[attraction type]] and phone number.
+
+### E4#54  (mentions 10, distinct values 7, low confidence)
+Examples:
+- E4#54:0 [system] previous turn, user: Wait, I need to find a museum in the centre first, then i can get a taxi. I'm very sorry, I got a little ahead of myself. | turn: There are [[11 museums]] in the center. I recommend the whipple museum of the history of science for hours of fun. Do you need more information?
+- E4#54:1 [system] previous turn, user: I'd love to visit a museum - can you help me find one, please? | turn: Sure. There are [[23 museums]] in Cambridge. Is there a particular area or type of museum you are interested in?
+- E4#54:2 [system] previous turn, user: Do you have any places to go in the east area? | turn: There are [[10 attractions]] in the east. Do you have a preference for type? If not, I recommend cambridge artworks
+- E4#54:3 [system] previous turn, user: Any interesting attractions in that part of town? | turn: There are [[13 attractions]], ranging from colleges, to entertainment, to museums. Do you have a type preference?
+- E4#54:4 [system] previous turn, user: I'm also looking for attractions in center and free entrance. | turn: We have [[25 attractions]] in the centre with free entry. Do you have a preference for what type of attraction you'd like to visit?
+
+### E4#94  (mentions 5, distinct values 1, low confidence)
+Examples:
+- E4#94:0 [system] previous turn, user: Find me places to go in town. I want to go to museum type attractions. | turn: I have [[11]] museum type locations in the city centre, would you care to see a listing?
+- E4#94:1 [system] previous turn, user: I'd like to find a museum in the centre of town, please. | turn: I've found [[eleven]] different museums in the centre of the city. Would you like to hear about any in particular?
+- E4#94:2 [system] previous turn, user: How about one that is in the type of museum? | turn: Sure, we have [[11]] museums in the centre area, a few are broughton house gallery, cambridge contemporary art, castle galleries and primavera. Any sound good?
+- E4#94:3 [system] previous turn, user: I am looking for museum type attractions in the centre of town | turn: I have found [[11]] museum attractions. Do you have a preference or would you like me to suggest one?
+- E4#94:4 [system] previous turn, user: Are there any in the centre you can tell me about as well? | turn: Yes. There are [[11]] in the centre. Would you like to know more about one?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#44, E4#31, E4#5, E4#54, E4#94) and its name as the value, like {"E4#44": "<name>"}.

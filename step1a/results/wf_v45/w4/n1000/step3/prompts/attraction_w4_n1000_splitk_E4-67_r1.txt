@@ -1,0 +1,24 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E4#67:s0": "P1", "E4#67:s1": "P2"}}
+
+Cluster E4#67 of entity E4 (mentions 9, distinct values 5).
+Examples:
+- E4#67:s0 [user] turn: I want to go to a particular attraction called [[great saint mary]]'s church. Where is it?
+- E4#67:s1 [system] previous turn, user: It does not really matter can you suggest one? | turn: how about [[little saint mary]]'s church?
+- E4#67:s2 [system] previous turn, user: Anything you recommend. I just need the entrance fee, attraction type and phone number. | turn: [[Little Saint Mary's Church]] is an architecture attraction with no entrance fee. Their phone number is 01223366202.
+- E4#67:s3 [system] previous turn, user: Sounds perfect. Is it architectural? Also, can I have the address with postcode? | turn: It is an architecture attraction it's located on [[little saint mary's lane]] postcode cb21qy. Is there anything else I can help you with?
+- E4#67:s4 [system] previous turn, user: I want to go to a particular attraction called great saint mary's church. Where is it? | turn: [[The great saint mary]]'s church is in city centre, the entrance fee is 2 pounds. Would you like more information?
+- E4#67:s5 [system] previous turn, user: As long as it is in the same area it doesn't matter, please recommend one. I want its postcode and entrance fee as well | turn: I recommend [[great saint mary]]'s church. Its postcode is cb23pq and the entrance fee is 2 pounds.
+- E4#67:s6 [system] previous turn, user: I am looking for an attraction called great saint mary's church. | turn: [[great saint mary]]'s church is at Market Square, their phone number is 01223350914, and their postcode is cb23pq. Do you need any more information?
+- E4#67:s7 [user] turn: I'm planning a trip to Cambridge and I would like some information on [[great saint mary]]'s church. Where exactly is it located?
+- E4#67:s8 [user] turn: I am looking for an attraction called [[great saint mary]]'s church.
+
+Return the JSON object now.

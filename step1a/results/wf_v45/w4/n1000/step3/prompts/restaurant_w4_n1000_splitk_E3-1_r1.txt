@@ -1,0 +1,25 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#1:s0": "P1", "E3#1:s1": "P2"}}
+
+Cluster E3#1 of entity E3 (mentions 10, distinct values 6).
+Examples:
+- E3#1:s0 [user] previous turn, system: corpus christi is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is 2 pounds. | turn: Great, thanks! Also, will you please book me a taxi from the attraction to the restaurant, leaving the [[attraction]] at 05:45?
+- E3#1:s1 [user] previous turn, system: What is the food type you would prefer? | turn: I don't care. I just need to know the address, phone number, and postcode of the [[venue]] please.
+- E3#1:s2 [system] previous turn, user: It's a place called Don Pasquale Pizzeria. | turn: [[A very nice place]] in the centre. Need a reservation?
+- E3#1:s3 [system] previous turn, user: I'm looking for a restaurant called little seoul? | turn: yes [[great spot]]. Would you like for me to book?
+- E3#1:s4 [system] previous turn, user: Sure, that would work. | turn: Please book another day or time slot. [[the place]] could be full
+- E3#1:s5 [user] previous turn, system: I have several options to choose from. Is there a particular area you want to go boating? | turn: No, [[where]] would you suggest?
+- E3#1:s6 [user] previous turn, system: Sure, I can help you with that. Do you want to get picked up at Bangkok City or from The Man on the Moon? | turn: I want to get picked up from the [[attraction]] by 23:45 and taken to the restaurant. Please make the taxi booking and give me the relevant info
+- E3#1:s7 [user] turn: Hello. I would like to know if you serve African food. If you do, can I please get the address, phone number and postcode of the [[venue]]?
+- E3#1:s8 [user] previous turn, system: corpus christi is popular this time of year. The address is at king's parade. The post code cb21rh and the entree fee is 2 pounds. | turn: Great, thanks! Also, will you please book me a taxi from the [[attraction]] to the restaurant, leaving the attraction at 05:45?
+- E3#1:s9 [user] turn: I'm looking for a family friendly restaurant that is reasonably price and located in the center of town near [[attractions]], hotels and easy access to transportation such as buses and taxis.
+
+Return the JSON object now.

@@ -1,0 +1,70 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 13 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#59  (mentions 3, distinct values 2)
+Examples:
+- E4#59:0 [system] previous turn, user: Fantastic. Can you provide me with the address and phone number for the Castle Galleries, please? | turn: They are located at [[unit su43]], grande arcade, saint andrews street and their phone number is 01223307402
+- E4#59:1 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend Castle Galleries, phone number 01223307402, postal code cb23bj, [[address unit su43]], grande arcade, saint andrews street. It is free.
+- E4#59:2 [system] previous turn, user: I would like to visit a nice museum. Please give me the address, entrance fee and phone number. | turn: How about the castle galleries? They are located at [[unit su43]], grande arcade, saint andrews street. Phone number is 01223307402. Admission is free.
+
+### E4#139  (mentions 6, distinct values 3, low confidence)
+Examples:
+- E4#139:0 [user] turn: Can you point me to the [[nearest police station]]?
+- E4#139:1 [user] previous turn, system: The nearest police station is located at Parkside, Cambridge. | turn: Could you please give me the postcode to the [[police station]]?
+- E4#139:2 [user] turn: Can you direct me to the [[closest police station]]?
+- E4#139:3 [user] turn: I need to find the [[nearest police station]].
+- E4#139:4 [user] turn: Hi, I want to find the [[police station]] that's nearest to me.
+
+### E4#107  (mentions 3, distinct values 2)
+Examples:
+- E4#107:0 [system] previous turn, user: Club Salsa sounds good. Can I get their phone number, address and postcode please? | turn: You sure may. The address is [[1 Station Road]], CB12JB. The phone number is 07782218745. Is there anything else I may help you with?
+- E4#107:1 [system] previous turn, user: No, I don't need to book a room, but can I get their contact info and location please. Thanks. | turn: Certainly. Cityroomz is in the centre of town, and their address is Sleeperz Hotel, [[Station Road]], postcode cb12tz. Their phone number is 01223304050. Can I help with anything else?
+- E4#107:2 [system] previous turn, user: I'm looking for place called club salsa. | turn: That is a nightclub at [[1 Station Road]] in the town centre. What would you like to know?
+
+### E4#115  (mentions 5, distinct values 3)
+Examples:
+- E4#115:0 [system] previous turn, user: Hi! I'm looking for an attraction named Kambar. | turn: It is a nightclub in centre at [[1 wheeler street]]. Phone is 01223842725. Do you need any more information?
+- E4#115:1 [system] previous turn, user: I'm also looking for places to go. Maybe a nightclub? | turn: We have 6 nightclubs in town. Most of them are in the center, and Kambar, at [[1 Wheeler St.]], is my favorite.
+- E4#115:2 [system] previous turn, user: Yes more info and adress and is there any fee's? | turn: Ok, their address is [[Wheeler Street]].
+- E4#115:3 [system] previous turn, user: Hello, I am looking for information on kambar. What do you know about that attraction? | turn: Kambar is a nightclub located in the centre of town. Its address is [[1 wheeler street]] and postcode is cb23qb with an entrance fee of 5 pounds.
+- E4#115:4 [system] previous turn, user: i'm looking for a place called kambar | turn: Sure, I found it! It's located at [[1 Wheeler Street]]. It's a nightclub in the city's centre and it has a 5 pounds entrance fee.
+
+### E4#127  (mentions 3, distinct values 3)
+Examples:
+- E4#127:0 [user] turn: Yes, can you provide me with information on the attraction Gallery at [[Twelve and High Street]]?
+- E4#127:1 [system] previous turn, user: Actually, I'm also looking for a museum in the west. Which one is your favorite? | turn: My favorite is Lynne Strover Gallery at [[23 High Street]], Fen Ditton. Best of all, there's no entrance fee! Would you like any additional information?
+- E4#127:2 [system] previous turn, user: Yes, any suggestions of museums found in the east area of town? | turn: Yes, [[Gallery at Twelve a High Street]] is excellent, and has free admission. Would you like more information?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#59, E4#139, E4#107, E4#115, E4#127) and its name as the value, like {"E4#59": "<name>"}.

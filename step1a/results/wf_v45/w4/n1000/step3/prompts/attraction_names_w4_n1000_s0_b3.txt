@@ -1,0 +1,74 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 3 of 36 (177 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E3: moderately priced, moderate price range, expensive; centre, city centre, centre of town; 12:30, 17:00, 12:15
+
+### E4#106  (mentions 3, distinct values 3, low confidence)
+Examples:
+- E4#106:0 [system] previous turn, user: I'm leaving from the Marriott Hotel in downtown Cambridge next to the theatre. | turn: Is that the [[huntingdon marriott hotel]]?
+- E4#106:1 [user] previous turn, system: Where will you leave from? | turn: I'm leaving from the [[Marriott Hotel]] in downtown Cambridge next to the theatre.
+- E4#106:2 [system] previous turn, user: No, I don't need to book a room, but can I get their contact info and location please. Thanks. | turn: Certainly. Cityroomz is in the centre of town, and their address is [[Sleeperz Hotel]], Station Road, postcode cb12tz. Their phone number is 01223304050. Can I help with anything else?
+
+### E4#34  (mentions 27, distinct values 7)
+Examples:
+- E4#34:0 [user] previous turn, system: Booking was successful, the total fee is 47.2 GBP payable at the station. Your reference number is 9BB5OGBN. Do you need help with anything else? | turn: I'm also looking for places to go. Maybe a [[nightclub]]?
+- E4#34:1 [system] previous turn, user: Yes. Can you give me the postcode for Club Salsa? | turn: The post code for [[Club Salsa]] is cb12jb. Is there anything else I can help you with?
+- E4#34:2 [system] previous turn, user: Is there a entrance fee? | turn: Yes, there is a 5 pound entrance fee for the [[club]].
+- E4#34:3 [system] previous turn, user: A nightclub sounds fun. Is there one in the centre of town? | turn: I have five. Would you like to try club salsa or the [[fez club]]?
+- E4#34:4 [user] previous turn, system: I've successfully booked your table. The reference number is GK41EYSD. | turn: I would like to go to a [[nice nightclub]]
+
+### E4#150  (mentions 10, distinct values 2)
+Examples:
+- E4#150:0 [user] previous turn, system: soul tree nightclub is a good one in city centre. | turn: How much does it cost to get in to [[Soul Tree Nightclub]]?
+- E4#150:1 [system] previous turn, user: Are there any that are free entry? | turn: No, our nightclubs are top notch and that takes a bit of punch, so they all have an entrance fee. [[The Soul Tree]] is the most budget sensitive.
+- E4#150:2 [system] previous turn, user: Are there any nightclubs in the centre of town? | turn: Yes, there are 5 results for nightclubs in the centre area. The cheapest entrance fee is 4 pounds and that's at [[soul tree nightclub]]. Do you need more information?
+- E4#150:3 [system] previous turn, user: Yes could I have their address please? | turn: [[The Soul Tree]] is located at 1-6 corn exchange street.
+- E4#150:4 [system] previous turn, user: No, but I am looking for a nightclub to go to. What ones are there? | turn: There are quite a few in the Centre. I suggest either Club Salsa or [[Soul Tree Nightclub]].
+
+### E4#29  (mentions 19, distinct values 8)
+Examples:
+- E4#29:0 [system] previous turn, user: Awesome, can I have the postcode and address please? | turn: The postcode is cb21dq, and the address is [[regent street]].
+- E4#29:1 [system] previous turn, user: That sounds great. Could I have the address please? | turn: The address is university of cambridge [[downing street]].
+- E4#29:2 [system] previous turn, user: Where can I find the Queen's College? | turn: Queen's College is on the west side of town, on [[Silver Street]]. Their postcode is cb39et.
+- E4#29:3 [system] previous turn, user: Yes I would like more information on both museums. | turn: saint barnabas press gallery is located in the belfast yard, coldham's road , cb13ew and gallery at twelve a [[high street]] is at fulbourn,cb15dh
+- E4#29:4 [system] previous turn, user: I am looking for the Fitzwilliam Museum. | turn: I'd be happy to give you more information on the Fitzwilliam Museum. The address is [[trumpington street]]. Do you need any additional information for this attraction?
+
+### E4#68  (mentions 7, distinct values 2)
+Examples:
+- E4#68:0 [system] previous turn, user: What kind of attractions are available in the centre? | turn: There is the Holy Trinity Church on [[Market Street]]. It is free to get in.
+- E4#68:1 [system] previous turn, user: I am looking for an attraction called great saint mary's church. | turn: great saint mary's church is at [[Market Square]], their phone number is 01223350914, and their postcode is cb23pq. Do you need any more information?
+- E4#68:2 [system] previous turn, user: No, not really. What's your favorite thing to do in the centre of town? | turn: My favorite thing to do is look at the architecture at Holy Trinity Church. It's located on [[Market Street]] and it's free to get in. Does this work?
+- E4#68:3 [system] previous turn, user: I'm planning a trip to Cambridge and I would like some information on great saint mary's church. Where exactly is it located? | turn: It is located in the centre. The address is [[market square]]. Postcode is cb23pq. The entrance fee is 2 pounds.
+- E4#68:4 [system] previous turn, user: Can I get the address of that? | turn: Sure. Their address is [[market street]] with postcode cb23nz.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E4#106, E4#34, E4#150, E4#29, E4#68) and its name as the value, like {"E4#106": "<name>"}.

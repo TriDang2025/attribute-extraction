@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E1#12/1: name: day | description: length_of_stay
+Examples:
+- 1 [system] previous turn, user: 3 people. Can I get the reference number please? | turn: I'm sorry, but there is nothing available at that time at either hotel. Would you like to try fewer nights or perhaps a different [[arrival day]]?
+- 2 [system] previous turn, user: Starting saturday, either place is fine if available. | turn: The booking did not go through, can you book [[another day]] or a shorter stay?
+- 3 [system] previous turn, user: I would like to book a room for 2 nights for 2 people starting on Friday please. | turn: Sorry, it looks like they're all booked up. Would you like to try a [[different day]] or just one night?
+- 4 [user] previous turn, system: Fortunately for you, they both offer free parking. The Ashley hotel and the Lovell lodge are both available for you. Would you like to make reservations at one? | turn: No, no thank you. I just needed some info for a [[later date]]. I am also wanting to see if you can tell me about the River Bar Steakhouse and Grill.
+- 5 [user] previous turn, system: The Worth house is a cheap hotel in the north. Its on 152 Chesterton Road. Would you like to book? Also would you like me to book train? | turn: No, can you give me the [[travel time]], departure time, and train ID for the train you mentioned?
+
+Columns (5):
+- name: num people | examples: 3 night; 6 people; 3 people
+- name: any area | examples: another area; another area of town; another location
+- name: duration | examples: duration; short period; staying for 2 night
+- name: date | examples: sunday; friday; thursday
+- name: day of week | examples: thursday; tuesday
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E1#12/1", "reason": "str", "same_as": "<column name or none>"}

@@ -1,0 +1,26 @@
+Below are examples of ONE cluster of values taken from a dialogue corpus. Decide whether the cluster mixes
+two or more attributes (roles): values that look alike but play different roles in the dialogue.
+Examples are marked with [[...]] inside the turn they come from.
+If it does mix, list the parts (at most 4): for each part a snake_case name and a short role. Then give every
+example the number of the part it belongs to (P1 for the first part, P2 for the second, and so on). Every example gets
+exactly one part. If it does not mix, give is_mixed false, no parts, and P1 for every example.
+Return ONLY one JSON object, nothing before or after it:
+{"is_mixed": true,
+ "parts": [{"name": "str", "role": "str"}],
+ "examples": {"E3#112:s0": "P1", "E3#112:s1": "P2"}}
+
+Cluster E3#112 of entity E3 (mentions 11, distinct values 2).
+Examples:
+- E3#112:s0 [system] previous turn, user: I also need the phone number for the restaurant that you booked for me, the Meghna. | turn: The phone number to [[Meghna]] is 01223727410. Is there anything else I can help you with?
+- E3#112:s1 [system] previous turn, user: Let's review. I am looking for an Indian restaurant in the west with a moderate price range. Once chosen, the restaurant booking is for Monday. | turn: Ok great.[[The Meghna]] will fit your needs. How many people and what day?
+- E3#112:s2 [system] previous turn, user: I'd like to look at the one in the west, please. | turn: That place goes by the name of [[meghna]], the address is 205 Victoria Road Chesterton, they can be reached at 01223727410, would you like me too book you?
+- E3#112:s3 [system] previous turn, user: I am looking for something in the moderate price range, please. | turn: I would recommend the [[Meghna]] for you. Should I make a booking for you?
+- E3#112:s4 [system] previous turn, user: Okay, would it help to narrow it down to the west part of town? I am having trouble deciding what I want to eat today. | turn: [[Meghna]] is an Italian restaurant in the west part of town, and is in the moderate price range.
+- E3#112:s5 [system] previous turn, user: Is it located in the west? | turn: Curry Prince is in the east. If you need someplace in the west, I recommend [[Meghna]].
+- E3#112:s6 [user] previous turn, system: I have booked you a red toyota taxi. The contact number is 07193902205 | turn: I also need the phone number for the restaurant that you booked for me, the [[Meghna]].
+- E3#112:s7 [user] turn: While in Cambridge I would really like to know where to find a place to eat called [[meghna]].
+- E3#112:s8 [system] previous turn, user: Phone number, please. | turn: [[Meghna]]'s phone number is 01223 727410. Is there anything else I can do for you tonight?
+- E3#112:s9 [system] previous turn, user: While in Cambridge I would really like to know where to find a place to eat called meghna. | turn: [[Meghna]] is in the west, address 205 Victoria Road Chesterton, postcode cb43lf.
+- E3#112:s10 [system] previous turn, user: Either is fine. I need a table for 2 the same day at 17:00. | turn: I would go with [[Meghna]] in the west. But they are fully booked at that time. Would you like me to try another time?
+
+Return the JSON object now.

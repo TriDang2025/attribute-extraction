@@ -1,0 +1,72 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E3: batch 26 of 39 (195 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 08:15, 16:45, 08:45; cambridge, cambridge towninfo centre, cambrige; sunday, thursday, wednesday
+- E1: guesthouse, hotel, ashley hotel; 2 night, 3 night, 4 night; moderately priced, moderate price range, cheap
+- E2: restaurant, hotel, museum; 13:00, 13:15, 17:00; 07389012325, 07648586609, 07998934356
+- E4: centre, centre of town, town; 01223358966, 01223245151, 01223314960; cambridge, cambridge leisure park, cambridge towninfo centre
+
+### E3#89  (mentions 13, distinct values 3)
+Examples:
+- E3#89:0 [user] turn: I need a restaurant. I've heard [[Nandos]] recommended, could you give me more information about it?
+- E3#89:1 [system] previous turn, user: Are there no international places to dine in the area? Anything other than British food in the area? | turn: As I mentioned earlier, the only options in the south that are cheap are The Lucky Star (chinese) and [[Nando's]] (portuguese). Do you want me to search another area or price?
+- E3#89:2 [user] turn: I'm looking for a restaurant in Cambridge called [[Nandos City Centre]].
+- E3#89:3 [system] previous turn, user: Is that restaurant in the south? I"d like to book for 4 people at 1330 on saturday please | turn: [[Nandos]] is indeed in the south. The booking is successful with the reference number PCFFZ610. Do you need more help?
+- E3#89:4 [user] previous turn, system: I have 2 choices. The Lucky Star serves chinese. And, Nando's is a portuguese restaurant. Which do you prefer? | turn: I was goona ask to search for international, but it sounds like their isnt an option with a cheap price. Lets go with [[Nando's]]
+
+### E3#56  (mentions 9, distinct values 2)
+Examples:
+- E3#56:0 [system] previous turn, user: Yes, I'm sure we'll be hungry so could you help me find an appropriate dining establishment in the north? Same price range as our hotel, please. | turn: I have located 2 restaurants in the area the Golden Wok and the [[Nirala]]. Do either of these suit your taste? Would you like me to reserve you a table?
+- E3#56:1 [system] previous turn, user: Yes, I also need to find a place for us to dine, in the same area of town, please. | turn: [[The Nirala]] and the Golden Wok are moderately priced dining options in the north.
+- E3#56:2 [system] previous turn, user: What is the phone number? | turn: The phone number for the [[Nirala]] is 01223 360966. Is there anything else I can help you with?
+- E3#56:3 [system] previous turn, user: Let's go with Indian. Can you book me a table for Thursday at 14:00 for 8 people? | turn: Your table at [[The Nirala]] will be reserved for 15 minutes. The reference number is AM8RPHXF. Can I help you with anything else?
+- E3#56:4 [system] previous turn, user: Oooh. I like both of those. Which would you recommend? | turn: I think you will have a great time picking a dish at the [[nirala]] which serves indian.
+
+### E3#157  (mentions 7, distinct values 2)
+Examples:
+- E3#157:0 [user] previous turn, system: Sure, it is a Thai restaurant in the west part of the city. It is expensive but very good. What would you like to know? | turn: Can you give me the phone number for [[Sala Thong]]?
+- E3#157:1 [system] previous turn, user: I am looking for a place to eat in the West, Thai food please. | turn: [[The Sala Thong]] serves Thai food. It is expensive but good. Can I reserve a table for you?
+- E3#157:2 [system] previous turn, user: What is the address, phone number, and price range? | turn: [[Sala Thong]] is an expensive restaurant located at 35 Newnham Road Newnham. Their number is 01223 323178. Is there anything else I can help you with?
+- E3#157:3 [system] previous turn, user: How about Thai food instead? | turn: I've got [[Sala Thong]] in the west and Bangkok City in the centre, both expensive. Would you like more information, or for me to make a booking?
+- E3#157:4 [system] previous turn, user: How about Thai food in the west part of town? | turn: [[Sala Thong]] is a restaurant that serves Thai food
+
+### E3#119  (mentions 7, distinct values 1)
+Examples:
+- E3#119:0 [system] previous turn, user: Yes please. Is there another restaurant in the area in that price range that is available at that time? | turn: I have booked a reservation for you at the [[Lan Hong House]]. Your reference number is BMU049L6. DO you need anything else?
+- E3#119:1 [system] previous turn, user: What are they? | turn: I have the [[Lan Hong House]], Jinling Noodle Bar and the Shanghi Family Restaurant that are all moderately priced and serving Chinese food.
+- E3#119:2 [system] previous turn, user: Yes, what are my three choices before we make a reservation? | turn: The restaurants are: jinling noodle bar, [[lan hong house]] and shanghai family restaurant.
+- E3#119:3 [system] previous turn, user: I also would like to find a chinese restaurant in the centre. | turn: What's your price range? I recommend the Ugly Duckling, but it's expensive. Charlie Chan is a good, cheap place, and [[Lan Hong House]] is in the middle, price-wise.
+- E3#119:4 [user] turn: Hello, is [[lan hong house]] still in operation?
+
+### E3#152  (mentions 1, distinct values 1)
+Examples:
+- E3#152:0 [user] previous turn, system: I'm sorry, can you tell me what type of business that is? | turn: Oops, sorry. [[Ian Hong]] is a restaurant.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E3#89, E3#56, E3#157, E3#119, E3#152) and its name as the value, like {"E3#89": "<name>"}.
