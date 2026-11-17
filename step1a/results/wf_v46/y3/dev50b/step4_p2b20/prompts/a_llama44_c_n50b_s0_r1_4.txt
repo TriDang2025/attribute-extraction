@@ -1,0 +1,56 @@
+Below are two tables of a relational database design, each with its columns. Decide whether accommodation_option and phone_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "accommodation_option -> phone_number": one accommodation_option row has many phone_number rows (each phone_number row refers to one accommodation_option row)
+- "phone_number -> accommodation_option": one phone_number row has many accommodation_option rows (each accommodation_option row refers to one phone_number row)
+- "many_to_many": a accommodation_option row can go with many phone_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table accommodation_option (one row = one accommodation_option), 4 columns:
+[accommodation_option:1] address
+  values: text (share 1.00); 5 mentions in 3 dialogues
+  examples:
+    "138 perne road" (in: "...tely priced. Their address is 138 Perne Road and their phone number is 012...")
+    "365 milton road" (in: "located at 74 Chesterton road and Lovell Lodge located at 365 Milton road.")
+[accommodation_option:2] amenity
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "expensive" (in: "Yes, please try expensive.")
+[accommodation_option:3] amenity str
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "north side of town" (in: "I'd like to be in the north side of town.")
+    "south part of town" (in: "...e Lensfield Hotel is in the south part of town. Do either of those sound g...")
+[accommodation_option:4] area
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "north" (in: "There are no 3 star hotels in the North. You sure a guesthouse won't work?")
+    "north center" (in: "I just need a 3 star hotel in the north center.")
+
+Table phone_number (one row = one phone_number), 3 columns:
+[location:7] phone number
+  values: number (share 0.70); 10 mentions in 6 dialogues
+  examples:
+    "their phone number" (in: "Something located in the city centre. Also may I have their phone number?")
+    "01223307402" (in: "... Castle Galleries, phone number 01223307402, postal code cb23bj, address u...")
+[location:9] theatre
+  values: number (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "1 theatre" (in: "...tre's in the centre of town and one theatre on the south side. Do you have...")
+    "4 theatre" (in: "We have four theatre's in the centre of town and one theatre on")
+[establishment:12] phone number
+  values: number (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "01223" (in: "01223 308871 Will that be all?")
+    "07754509492" (in: "...volvo and the contact number is 07754509492. Is there anything else I can ...")
+
+Return the JSON object now.

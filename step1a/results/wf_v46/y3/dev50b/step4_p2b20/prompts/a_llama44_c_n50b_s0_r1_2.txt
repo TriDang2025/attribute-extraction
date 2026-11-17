@@ -1,0 +1,95 @@
+Below are two tables of a relational database design, each with its columns. Decide whether accommodation_option and location are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "accommodation_option -> location": one accommodation_option row has many location rows (each location row refers to one accommodation_option row)
+- "location -> accommodation_option": one location row has many accommodation_option rows (each accommodation_option row refers to one location row)
+- "many_to_many": a accommodation_option row can go with many location rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table accommodation_option (one row = one accommodation_option), 4 columns:
+[accommodation_option:1] address
+  values: text (share 1.00); 5 mentions in 3 dialogues
+  examples:
+    "138 perne road" (in: "...tely priced. Their address is 138 Perne Road and their phone number is 012...")
+    "365 milton road" (in: "located at 74 Chesterton road and Lovell Lodge located at 365 Milton road.")
+[accommodation_option:2] amenity
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "expensive" (in: "Yes, please try expensive.")
+[accommodation_option:3] amenity str
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "north side of town" (in: "I'd like to be in the north side of town.")
+    "south part of town" (in: "...e Lensfield Hotel is in the south part of town. Do either of those sound g...")
+[accommodation_option:4] area
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "north" (in: "There are no 3 star hotels in the North. You sure a guesthouse won't work?")
+    "north center" (in: "I just need a 3 star hotel in the north center.")
+
+Table location (one row = one location), 11 columns:
+[accommodation_option:10] location
+  values: text (share 1.00); 35 mentions in 18 dialogues
+  examples:
+    "cambridge" (in: "I am going to cambridge and need a hotel")
+    "alexander bed and breakfast" (in: "Alexander bed and breakfast can acommodate your request.")
+[accommodation_option:11] location name
+  values: text (share 1.00); 4 mentions in 2 dialogues
+  examples:
+    "allenbell" (in: "mentioned all have free wifi and parking. I recommend the Allenbell.")
+[accommodation_option:12] location part
+  values: text (share 1.00); 19 mentions in 9 dialogues
+  examples:
+    "north" (in: "I would like a hotel in the north, please.")
+    "east" (in: "I am looking for a cheap hotel on the east.")
+[accommodation_option:13] location str
+  values: text (share 0.75); 8 mentions in 6 dialogues
+  examples:
+    "centre of town" (in: "actually like a hotel instead of guesthouse and in the centre of town.")
+    "centre" (in: "...you. The Gonville Hotel is in the centre and The Lensfield Hotel is in the...")
+[location:1] address
+  values: id (share 0.53); 15 mentions in 9 dialogues
+  examples:
+    "cb23bu" (in: "is on Saint Andrew's Street and the post code is cb23bu. It's free admission.")
+    "10 king's parade" (in: "... number is 01223357708. It is at 10 King's Parade and the postcode is cb21sj.")
+[location:4] location
+  values: text (share 1.00); 48 mentions in 13 dialogues
+  examples:
+    "centre" (in: "I am looking for a multiple sports attraction in the centre.")
+    "centre of town" (in: "what attractions do you have in the centre of town?")
+[location:5] museum
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "castle gallery" (in: "...he Centre. I would recommend Castle Galleries, phone number 01223307402, p...")
+    "the broughton house gallery" (in: "the broughton house gallery is a museum located in the centre.")
+[location:6] park
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "wandlebury country park" (in: "...are free. May I recommend Wandlebury country park located wandlebury ring,...")
+    "wandlebury ring" (in: "...ndlebury country park located wandlebury ring, gog magog hills, babraham? ...")
+[establishment:7] location
+  values: text (share 1.00); 17 mentions in 11 dialogues
+  examples:
+    "attraction" (in: "...ated in the center of town near attractions, hotels and easy access to tra...")
+    "cambridge" (in: "Is there any good Jamaican food in Cambridge?")
+[establishment:8] location str
+  values: text (share 1.00); 21 mentions in 14 dialogues
+  examples:
+    "centre" (in: "I have 13 colleges available in the centre. Did yo have one particular in mind?")
+    "city centre" (in: "... J restaurant, 86 Regent Street City Centre. I currently do not have revie...")
+[establishment:13] postcode
+  values: id (share 0.50); 4 mentions in 4 dialogues
+  examples:
+    "c.b 2" (in: "The address is Corn Exchange Street and the postcode is C.B 2, 3QF")
+    "cb21rh" (in: "...ess is at king's parade. The post code cb21rh and the entree fee is 2 pounds.")
+
+Return the JSON object now.

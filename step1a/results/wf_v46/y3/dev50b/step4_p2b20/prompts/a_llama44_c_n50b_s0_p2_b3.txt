@@ -1,0 +1,135 @@
+Below are columns found by analysing a corpus of dialogues (a kind of information, with a description, the type of its values, example values and
+counts) and the list of tables of a database design. Put every column into exactly one of the listed tables, or into "unused" when a database
+would not store it. Use only the listed names; do not add tables. Use "unused" only when the column clearly holds nothing a database would
+store.
+Return ONLY one JSON object, nothing before or after it. Shape (the ids and names here are made up): {"x:1": "table_a", "x:2": "table_b", "x:3": "unused"}
+Every column id must appear once.
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Pass 1, the main things (tables): ["customer", "car", "rental"]
+Pass 2, each column to one table:
+{"customer_name": "customer", "customer_phone": "customer", "licence_number": "customer", "car_model": "car", "car_class": "car",
+ "plate_number": "car", "pickup_date": "rental", "return_date": "rental", "daily_rate": "rental"}
+
+Tables: train_schedule, accommodation_option, location, establishment, phone_number
+
+Columns (18):
+== establishment ==
+[establishment:15] price range
+  values: text (share 1.00); 28 mentions in 17 dialogues
+  examples:
+    "moderately priced" (in: "I would like to find a danish restaurant this is moderately priced.")
+    "moderate price range" (in: "... Danish restaurants in the moderate price range. Would you like me to chec...")
+    "expensive" (in: "I'd like it to be in the north, and expensive would be best.")
+    "expensive price range" (in: "to book a reservation. I want asian oriental in the expensive price range")
+    "expensive restaurant" (in: "Thank you! I would like to go to an expensive restaurant, please.")
+[establishment:16] reference number
+  values: id (share 1.00); 13 mentions in 13 dialogues
+  examples:
+    "4h1drif8" (in: "... 10:30. Your reference number is 4H1DRIF8. Is there anything else I can as...")
+    "56ahcple" (in: "table will be reserved for 15 minutes. Reference number is 56AHCPLE.")
+    "97aaf776" (in: "will be reserved for 15 minutes. The reference number is 97AAF776.")
+    "k4pzhb51" (in: "8 people at 16:15 on Monday. Your reference number is K4PZHB51.")
+    "kay2s45o" (in: "...cessful. The reference number is KAY2S45O. Is there anything else I can do...")
+[establishment:17] restaurant info
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "01223 308871" (in: "...e range. Their phone number is 01223 308871. The address is Corn Exchange ...")
+    "40270 king street city" (in: "... Centre. It is located at 40270 King Street City and is in the expensive p...")
+[establishment:18] restaurant name
+  values: text (share 1.00); 29 mentions in 16 dialogues
+  examples:
+    "j restaurant" (in: "you! Do you have the reviews and address for the J Restaurant near there?")
+    "86 regent street" (in: "...ddress for the J restaurant, 86 Regent Street City Centre. I currently do ...")
+    "darry cookhouse and wine shop" (in: "I am looking for a restaurant called darrys cookhouse and wine shop.")
+    "jinling noodle bar" (in: "Jinling noodle bar, postcode cb23pp. Is there any more info I can")
+    "1 a.w" (in: "the address is 83 Regent Street, postcode is C.B 2, 1 A.W.")
+[establishment:19] something
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "cheap" (in: "...a total of 15 restaurants that are cheap in the centre. Is there another t...")
+    "cheap range" (in: "looking for a restaurant that serves asian oriental food in cheap range.")
+[establishment:20] str
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "hotel" (in: "... center of town near attractions, hotels and easy access to transportation...")
+    "indian restaurant" (in: "I would like an indian restaurant in the same price range as the hotel please.")
+[establishment:21] table booking
+  values: text (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "table" (in: "Lets try Hakka,can you book a table for 8 people at 16:30 on tuesday?")
+[establishment:22] table reservation time
+  values: duration (share 0.44); 9 mentions in 5 dialogues
+  examples:
+    "15 minute" (in: "...Your table will be reserved for 15 minutes and your reference number is VW...")
+    "16:15" (in: "Yes. I need a table for 8 people at 16:15 on the same day.")
+    "15" (in: "There are a total of 15 restaurants that are cheap in the centre. Is there an...")
+    "16:30" (in: "try Hakka,can you book a table for 8 people at 16:30 on tuesday?")
+    "19:30" (in: "perfect. Could you book a table for 8 people at 19:30 on Friday?")
+[establishment:23] time
+  values: time (share 0.58); 19 mentions in 12 dialogues
+  examples:
+    "12:45" (in: "I would like a reservation for 2 at 12:45 please.")
+    "13:15" (in: "suggest. I need to book a table for 1 at 13:15 on Tuesday.")
+    "2" (in: "...e 4 different indian places to eat. Two are moderately priced and two are ...")
+    "same day" (in: "need a table for 8 people at 16:15 on the same day.")
+    "05:45" (in: "from the attraction to the restaurant, leaving the attraction at 05:45?")
+== phone_number ==
+[phone_number:1] arrival time
+  values: time (share 0.67); 12 mentions in 9 dialogues
+  examples:
+    "14:45" (in: "from college to the restaurant. I need to arrive by 14:45.")
+    "11:45" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+    "12:45" (in: "I'd like the arrival time to be 12:45, please.")
+    "14:15" (in: "have the car pick me up at the college at 2:15 p.m. instead.")
+    "14:30" (in: "I would like to leave and 2:30 p.m and arrive at 3:23 p.m.")
+[phone_number:2] car type
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[phone_number:3] day of week
+  values: day (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "saturday" (in: "sounds good. Please book for 2 people at 11:45 on Saturday.")
+[phone_number:4] departure location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "leverton house" (in: "I will be leaving from leverton house arriving by 06:45.")
+[phone_number:5] departure time
+  values: time (share 0.88); 8 mentions in 6 dialogues
+  examples:
+    "19:15" (in: "I'd like to book a taxi from Ask, departing after 19:15.")
+    "06:45" (in: "I will be leaving from leverton house arriving by 06:45.")
+    "10:45" (in: "i want to leave by 10:45")
+    "13:15" (in: "Allenbell to J Restaurant. I need to be there by 13:15.")
+    "15:23" (in: "would like to leave and 2:30 p.m and arrive at 3:23 p.m.")
+[phone_number:6] destination
+  values: text (share 1.00); 9 mentions in 5 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "cambridge" (in: "Your welcome, enjoy your time in Cambridge.")
+    "attraction" (in: "I need to leave the attraction by 21:00 please.")
+    "cambridge county fair" (in: "I am going to the Cambridge county fair next to the city tourist museum.")
+    "city tourist museum" (in: "am going to the Cambridge county fair next to the city tourist museum.")
+[phone_number:7] party size
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 people" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+[phone_number:8] pickup location
+  values: text (share 1.00); 12 mentions in 6 dialogues
+  examples:
+    "restaurant" (in: "...need a taxi to get from college to the restaurant. I need to arrive by 14:45.")
+    "college" (in: "I also need a taxi to get from college to the restaurant. I need to arrive by...")
+    "allenbell" (in: "...But, can you book me a taxi from Allenbell to J Restaurant. I need to be t...")
+    "finch bed and breakfast" (in: "to pick me up Travellers Rest to take me to Finches Bed and Breakfast.")
+    "hotel" (in: "... a taxi from the restaurant to the hotel, please. I need to leave the rest...")
+[phone_number:9] time str
+  values: number (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "07048450899" (in: "you need to contact the taxi company, you can call 07048450899.")
+    "07128258422" (in: "up at hughes hall at 14:45. The contact number is 07128258422.")
+    "07267142867" (in: "completed! Booked car type : white ford Contact number : 07267142867")
+    "07340953955" (in: "...e that booked for you, contact number 07340953955. Do you need anyhting else?")
+    "07481840729" (in: "...for you. Your contact number is 07481840729. Can I help you with anything ...")
+
+Return the JSON object now.
