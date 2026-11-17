@@ -35,6 +35,7 @@ from . import batch_v4 as B
 from . import nov16_v41 as NV
 from . import step4_gt as G
 from . import step4_inputs as I
+from . import step4_p2batch_v46 as P2B
 from . import step4_prompts as SP
 from . import step4_score as S
 from . import step4_score_v43 as SC43
@@ -69,13 +70,19 @@ def load_config(path=CONFIG):
     return {"switches": dict(cfg["switches"]), "thresholds": dict(cfg["thresholds"])}
 
 
-def with_switches(cfg, off=(), **kw):
-    """Copy of cfg with the switches in `off` set to False and the keyword switches set (e.g. all_off = with_switches(cfg, off=SWITCHES))."""
+def with_switches(cfg, off=(), p2_batch=None, **kw):
+    """Copy of cfg with the switches in `off` set to False and the keyword switches set (e.g. all_off = with_switches(cfg, off=SWITCHES)).
+    p2_batch (wf_v4.6, not one of SWITCHES): pass 2 in batches of that many columns (step4_p2batch_v46); None keeps the value of cfg, 0 or none = off.
+    The key "p2_batch" is in the result only when it is on."""
     sw = {**cfg["switches"], **kw, **{k: False for k in off}}
     unknown = set(sw) - set(SWITCHES)
     if unknown:
         raise ValueError(f"unknown switches {sorted(unknown)}")
-    return {"switches": sw, "thresholds": dict(cfg["thresholds"])}
+    out = {"switches": sw, "thresholds": dict(cfg["thresholds"])}
+    n = P2B.check(cfg.get("p2_batch") if p2_batch is None else p2_batch)
+    if n:
+        out["p2_batch"] = n
+    return out
 
 
 # ---------------------------------------------------------------- values per column (mention ids of the input)
@@ -493,7 +500,7 @@ def replay(out, chain, upto, root=ROOT):
                 return st, "p1: no table name", log
         if upto < 2:
             return st, None, log
-        parsed, why = V._answer(out, f"{cid}_p2")
+        parsed, why = P2B.answer(out, chain, cols)
         if why:
             return st, f"p2: {why}", log
         st["assign"], st["rest_host"], st["names"] = p2_assign(parsed, cols, st["p1_names"], sw, log, cid)
@@ -563,6 +570,11 @@ def build_stage(out, k, chains, root=ROOT):
             text, schema, fmt = build_p1(st["cols"], sw)
             _emit(jobs, f"{cid}_p1", fmt, text, schema, ch, k, n_columns=len(st["cols"]))
         elif k == 2:
+            if ch.get("p2_batch"):
+                for name, text, schema, fmt, bc in P2B.prompts(lambda c: build_p2(c, st["p1_names"], sw), st["cols"], cid, ch["p2_batch"]):
+                    _emit(jobs, name, fmt, text, schema, ch, k, n_columns=len(bc))
+                    jobs.jobs[-1]["max_tokens"] = P2B.max_tokens(len(bc), MAX_TOKENS[fmt])
+                continue
             text, schema, fmt = build_p2(st["cols"], st["p1_names"], sw)
             _emit(jobs, f"{cid}_p2", fmt, text, schema, ch, k, n_columns=len(st["cols"]))
         elif k == 3:
@@ -641,6 +653,9 @@ def make_chains(out, inputs=INPUTS, sets=SETS, seeds=SEEDS, cfg=None, step3_dirs
                     write_score_map(out, inp, s, ids)
             seed_chains = [{"id": B.chain_id(inp, s, d), "kind": "main", "input": inp, "set": s, "seed": d, "exclude": [], "prompt_version": "v44",
                             "columns_file": _rel(p, root), "switches": dict(sw), "thresholds": dict(th), "values_file": vf} for d in seeds]
+            if cfg.get("p2_batch"):
+                for c in seed_chains:
+                    c["p2_batch"] = cfg["p2_batch"]
             chains += seed_chains
             if sw["vote"] and len(seeds) >= 2:
                 chains.append({**seed_chains[0], "id": f"{inp}_{s}_vote", "kind": "vote", "seed": 0, "members": seed_chains})
@@ -685,6 +700,8 @@ def run(out, backend, inputs=INPUTS, sets=SETS, seeds=SEEDS, cfg=None, step3_dir
         chains = [c for c in B.read_json(out / "chains.json") if c["input"] not in inputs] + chains
     B.write_json(out / "chains.json", chains)
     info = {"chains": len(chains), "switches": cfg["switches"], "thresholds": cfg["thresholds"], "inputs": {}}
+    if cfg.get("p2_batch"):
+        info["p2_batch"] = cfg["p2_batch"]
     for inp in inputs:
         cs = [c for c in chains if c["input"] == inp]
         if not cs:

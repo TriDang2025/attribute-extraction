@@ -93,3 +93,21 @@ def test_map_handover_and_reachable(gt, tmp_path):
     status = G.reachable_status(list(rows.values()))
     assert status["Train booking id"] == "no"  # train_booking has no reachable column here
     assert status["Train leave at"] == "yes"
+
+
+def test_map_handover_reads_every_entity_file(gt, tmp_path):
+    lev = pd.Series({0: "Attraction name", 1: "Attraction name", 2: "Train day"})
+    d = tmp_path / "dev50"
+    d.mkdir()
+    for ent, ids in {"train": [2], "attraction": [0, 1]}.items():
+        (d / f"{ent}.json").write_text(json.dumps({"columns": [{"id": "1", "mention_ids": ids}]}), encoding="utf-8")
+    m = G.map_handover(tmp_path, "dev50", lev, G.gt_names(gt))
+    assert m["attraction:1"]["gt"] == "Attraction name" and m["train:1"]["gt"] == "Train day"
+    assert "attraction:1" not in G.map_handover(tmp_path, "dev50", lev, G.gt_names(gt), entities=G.ENTITIES)
+
+
+def test_reachable_by_annotations(gt):
+    r = G.reachable_by_annotations(gt, "dev50")
+    assert r["Attraction name"] == "yes" and r["Attraction openhours"] == "no"  # 21 vs 0 dev50 mentions
+    assert r["Train booking id"] == "yes"  # added column, train_booking has annotated columns
+    assert set(r) == {c["name"] for t in gt["tables"].values() for c in t["columns"]}

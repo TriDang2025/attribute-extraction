@@ -231,13 +231,16 @@ def split_labels(v):
     return [x.strip() for x in str(v).split(";") if x.strip()] or [""]
 
 
-def map_handover(handover_dir, set_name, gt_levels, names=None, entities=ENTITIES):
+def map_handover(handover_dir, set_name, gt_levels, names=None, entities=None):
     """{"<entity>:<id>": {"gt", "purity", "n", "entity"}} for every handover column: gt = the most common gt_L2 label of its mention_ids
     (gt_L2 is multi-label, "A;B": every label counts once for the mention; an empty gt_L2 counts as a label and the denominator is all mentions; ties by name; None when the top label is empty), purity =
     its share, n = number of mentions; also labels {label: mentions} (non-empty labels) and n_labelled (mentions with a gt_L2). gt_levels: path to gt_levels.csv or a Series mention_id -> gt_L2. names: {norm: GT name} to
-    normalise case and spaces."""
+    normalise case and spaces. entities None = every <entity>.json in the set folder (wf_v4.6 Y1: a run with predicted entities, e.g.
+    attraction, has more than the 3 handover files; the old fixed list left those columns unmapped)."""
     lev = read_gt_levels(gt_levels) if isinstance(gt_levels, (str, Path)) else gt_levels
     out = {}
+    if entities is None:
+        entities = sorted(f.stem for f in (Path(handover_dir) / set_name).glob("*.json"))
     for ent in entities:
         p = Path(handover_dir) / set_name / f"{ent}.json"
         if not p.exists():
@@ -284,6 +287,20 @@ def reachable_status(rows):
     has = {r["gt_table"] for r in rows if r["reachable"] == "yes"}
     return {r["gt_column"]: ("yes" if r["reachable"] == "yes" or (r["reachable"] == "added" and r["gt_table"] in has) else "no")
             for r in rows}
+
+
+def reachable_by_annotations(gt, set_name):
+    """wf_v4.6 Y1 rule (not adopted): {gt column: yes|no} from the GT annotations of the set only, never from a run's output or the old gold
+    entity choice. A tear / schema_slot column is reachable if the set has >= 1 annotated value for it (mentions_<set> > 0); an added (key or
+    link) column is reachable if its table has a reachable column. Uses the main design (the other designs only drop columns)."""
+    out = {}
+    for t in gt["tables"].values():
+        cols = {c["name"]: (c["mentions"].get(set_name) or 0) > 0 for c in t["columns"] if c["source"] != "added"}
+        any_yes = any(cols.values())
+        for c in t["columns"]:
+            ok = any_yes if c["source"] == "added" else cols[c["name"]]
+            out[c["name"]] = "yes" if ok else "no"
+    return out
 
 
 def load_reachable(path):

@@ -213,8 +213,9 @@ def score_step4_as(out, set_name, as_set="dev50"):
 STEP4 = {"v44_other_off": dict(off=("other_choice",)), "v43": dict(off=S4.SWITCHES)}   # W1 decides; all switches off = the v4.3 chain
 
 
-def step4_config(choice):
-    return S4.with_switches(S4.load_config(), **STEP4[choice])
+def step4_config(choice, p2_batch=None):
+    """p2_batch (wf_v4.6): pass 2 in batches of that many columns; None or 0 = the single pass-2 prompt (frozen v4.3)."""
+    return S4.with_switches(S4.load_config(), p2_batch=p2_batch, **STEP4[choice])
 
 
 def run_pipeline(corpus, out, set_name, backend, encoder, enc_1a, step4_cfg, load_seconds=None, log=print, skip_1a=False, backend4=None):
