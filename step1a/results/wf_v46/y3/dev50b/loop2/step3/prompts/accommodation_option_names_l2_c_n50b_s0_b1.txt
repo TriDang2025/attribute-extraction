@@ -1,0 +1,58 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 1 of 1 (2 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 11:30, 13:06, 16:15; sunday, friday, monday; cambridge, cambridge towninfo centre
+- E2: centre, centre of town, centre area; cb23bu, cb17gx, cb18dw; 01223307402, 01223314960, 01223333516
+- E3: moderately priced, moderate price range, expensive; restaurant, j restaurant, danish restaurant; centre, city centre, center of town
+- E4: 14:45, 19:15, 06:45; 07048450899, 07128258422, 07267142867; restaurant, hotel, j restaurant
+
+### L2_accommodation_option#0  (mentions 15, distinct values 8)
+Examples:
+- L2_accommodation_option#0:0 [user] previous turn, system: i cant find it anywhere. can we change the price range? | turn: I know I have found places with those requirements before. I just don't remember the name. I really want to stay moderately priced with the 3 stars and [[parking]].
+- L2_accommodation_option#0:1 [user] previous turn, system: Sorry, parking isn't something that is mentioned for attractions. | turn: Okay. I'd like a hotel that includes [[free parking]] then.
+- L2_accommodation_option#0:2 [system] previous turn, user: Hello. I really need to find a cheap place to stay in the east. Is there anything like that? | turn: I've found three, all of them are guesthouses and all of them have [[free internet]] and parking. Would you like me to give your their information?
+- L2_accommodation_option#0:3 [system] previous turn, user: Can you give me one that has free wifi and free parking? | turn: The 3 guesthouses mentioned all have [[free wifi]] and parking. I recommend the Allenbell.
+- L2_accommodation_option#0:4 [user] previous turn, system: i cant find it anywhere. can we change the price range? | turn: I know I have found places with those requirements before. I just don't remember the name. I really want to stay moderately priced with the [[3 stars]] and parking.
+- L2_accommodation_option#0:5 [system] previous turn, user: Hello. I really need to find a cheap place to stay in the east. Is there anything like that? | turn: I've found three, all of them are [[guesthouses]] and all of them have free internet and parking. Would you like me to give your their information?
+- L2_accommodation_option#0:6 [user] previous turn, system: Sure, we have many. Are you looking for anything else specifically? | turn: Yes, I need [[internet]] and free parking.
+- L2_accommodation_option#0:7 [system] previous turn, user: I live in the centre of town and want to see if I can find a reasonable room for my parents to stay while they are visiting. | turn: How about the Alexander bed and breakfast in the centre? It is a cheap 4 star guesthouse with free internet and [[wifi]].
+
+### L2_accommodation_option#1  (mentions 20, distinct values 2)
+Examples:
+- L2_accommodation_option#1:0 [user] previous turn, system: Are you looking to stay in the east? There are three moderately priced, 4 star guesthouses there. | turn: What about 3 star places? And i need [[free parking]].
+- L2_accommodation_option#1:1 [user] previous turn, system: Booking was successful, the total fee is 31.36 GBP payable at the station . Reference number is : 8K88DU7K. | turn: Awesome! I also need help finding a place to stay in the South. Not driving so don't need [[parking]].
+- L2_accommodation_option#1:2 [user] previous turn, system: Certainly. I have now reserved two tickets for you, which you can pay for at the station. Your reference number is 13GQ9S3A. | turn: I'm also looking for a place to stay in the centre of town that includes [[free parking]].
+- L2_accommodation_option#1:3 [system] previous turn, user: Can you give me one that has free wifi and free parking? | turn: The 3 guesthouses mentioned all have free wifi and [[parking]]. I recommend the Allenbell.
+- L2_accommodation_option#1:4 [user] turn: I am looking for a hotel that can offer me both free wifi and [[free parking]].
+- L2_accommodation_option#1:5 [system] previous turn, user: Hello. I really need to find a cheap place to stay in the east. Is there anything like that? | turn: I've found three, all of them are guesthouses and all of them have free internet and [[parking]]. Would you like me to give your their information?
+- L2_accommodation_option#1:6 [user] previous turn, system: Sure, we have many. Are you looking for anything else specifically? | turn: Yes, I need internet and [[free parking]].
+- L2_accommodation_option#1:7 [system] previous turn, user: I'm looking for something cheap with free parking. | turn: Hotel allenbell is what I found that is cheap and has [[parking]].
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (L2_accommodation_option#0, L2_accommodation_option#1) and its name as the value, like {"L2_accommodation_option#0": "<name>"}.
