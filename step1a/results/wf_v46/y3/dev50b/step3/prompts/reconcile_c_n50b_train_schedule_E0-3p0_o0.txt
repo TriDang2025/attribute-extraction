@@ -1,0 +1,23 @@
+Below is one part of a cluster of values taken from dialogue turns, and a list of other columns of the same table. Each
+column has a name, a description (when there is one) and example values. The examples of the part are marked with [[ ]]
+inside the turn they come from. Values that play different roles (where something starts and where it ends, the
+earliest and the latest time) are different attributes. If unsure, answer none.
+
+Part E0#3/0: name: time str | description: time
+Examples:
+- 1 [system] previous turn, user: I'm departing from birmingham new street on Saturday and I'd like to leave after 12:45. | turn: How about TR8390 that leaves birmingham new street at [[13:40]] on Saturday. It arrives in cambridge at 16:23. The price is 60.08. Shall I book it?
+- 2 [system] previous turn, user: I need to go to Birmingham new street on Monday. | turn: I would recommend train ID TR5435 which leaves Cambridge at 15:02 and arrives at Birmingham New Street at [[17:44]].
+- 3 [user] previous turn, system: Your booking was successful! Your reference number is EV4ADBI9. | turn: I want a train that goes to peterborough and leaves after [[13:00]]
+- 4 [user] previous turn, system: Where will you be headed? | turn: I need arrive in stevenage by [[15:00]].
+- 5 [user] previous turn, system: There are many train departure options on Thursday. When do you want to leave and arrive by? | turn: I would like to arrive in cambridge by [[11:30]].
+
+Columns (5):
+- name: time int | examples: 05:01; 05:11; 05:21
+- name: number of people | examples: 2 people; 3 seat; 4 ticket
+- name: departure day | examples: what day; what time; what time of day
+- name: day of week | examples: sunday; monday; tuesday
+- name: price | examples: 12.80 pound; 17.90; 17.90 pound
+
+Question: Is this part the same attribute, with the same role, as one of these columns? Answer that column's name, or none.
+
+Return ONLY one JSON object, nothing before or after it, with a reason of at most 25 words written before the answer: {"unit_id": "E0#3/0", "reason": "str", "same_as": "<column name or none>"}

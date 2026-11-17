@@ -1,0 +1,177 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table location (one row = one location), 33 columns:
+[train_schedule:3] date
+  values: day (share 1.00); 17 mentions in 11 dialogues
+  examples:
+    "sunday" (in: "Cambridge, and it will be on sunday.")
+    "monday" (in: "I'm going to London's Kings Cross on Monday.")
+[train_schedule:6] destination
+  values: text (share 1.00); 32 mentions in 17 dialogues
+  examples:
+    "broxbourne" (in: "I am also look for a train on saturday to broxbourne.")
+    "stevenage" (in: "am also looking for a train for Thursday departing from Stevenage.")
+[train_schedule:7] location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "Thank you for contacting the Cambridge TownInfo centre. Goodbye")
+[accommodation_option:1] address
+  values: text (share 1.00); 5 mentions in 3 dialogues
+  examples:
+    "138 perne road" (in: "...tely priced. Their address is 138 Perne Road and their phone number is 012...")
+    "365 milton road" (in: "located at 74 Chesterton road and Lovell Lodge located at 365 Milton road.")
+[accommodation_option:3] amenity str
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "north side of town" (in: "I'd like to be in the north side of town.")
+    "south part of town" (in: "...e Lensfield Hotel is in the south part of town. Do either of those sound g...")
+[accommodation_option:4] area
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "north" (in: "There are no 3 star hotels in the North. You sure a guesthouse won't work?")
+    "north center" (in: "I just need a 3 star hotel in the north center.")
+[accommodation_option:7] hotel name
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "the lensfield hotel" (in: "The Lensfield Hotel meets your criteria. Would you like me to book it?")
+    "ashely hotel" (in: "... hotels meeting your criteria. Ashely Hotel located at 74 Chesterton road ...")
+[accommodation_option:10] location
+  values: text (share 1.00); 35 mentions in 18 dialogues
+  examples:
+    "cambridge" (in: "I am going to cambridge and need a hotel")
+    "alexander bed and breakfast" (in: "Alexander bed and breakfast can acommodate your request.")
+[accommodation_option:11] location name
+  values: text (share 1.00); 4 mentions in 2 dialogues
+  examples:
+    "allenbell" (in: "mentioned all have free wifi and parking. I recommend the Allenbell.")
+[accommodation_option:12] location part
+  values: text (share 1.00); 19 mentions in 9 dialogues
+  examples:
+    "north" (in: "I would like a hotel in the north, please.")
+    "east" (in: "I am looking for a cheap hotel on the east.")
+[accommodation_option:13] location str
+  values: text (share 0.75); 8 mentions in 6 dialogues
+  examples:
+    "centre of town" (in: "actually like a hotel instead of guesthouse and in the centre of town.")
+    "centre" (in: "...you. The Gonville Hotel is in the centre and The Lensfield Hotel is in the...")
+[accommodation_option:14] lodging type
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "finch bed and breakfast" (in: "Finches Bed and Breakfast is a cheap 4-star guesthouse on the west side. Its")
+    "carolina bed and breakfast" (in: "I recommend Carolina Bed and Breakfast. It's located close to where you'll be...")
+[accommodation_option:19] str
+  values: text (share 1.00); 17 mentions in 12 dialogues
+  examples:
+    "hotel" (in: "...s available. Do you have a preference of guesthouse or hotel and price range?")
+    "4 3 star guest house" (in: "There are four three star guest houses. Is there an area of town that interes...")
+[accommodation_option:21] type
+  values: text (share 1.00); 25 mentions in 16 dialogues
+  examples:
+    "guesthouse" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "acorn guest house" (in: "Yes the phone number to the acorn guest house 01223353888 with a price range ...")
+[location:1] address
+  values: id (share 0.53); 15 mentions in 9 dialogues
+  examples:
+    "cb23bu" (in: "is on Saint Andrew's Street and the post code is cb23bu. It's free admission.")
+    "10 king's parade" (in: "... number is 01223357708. It is at 10 King's Parade and the postcode is cb21sj.")
+[location:2] college
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "magdalene" (in: "honestly recommend visiting a famous college such as Christs or Magdalene.")
+[location:3] entrance fee
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "entrance fee" (in: "Do you have any information on their entrance fees?")
+    "free" (in: "street , post code cb21dq. You can visit them for free! Anything else you need?")
+[location:4] location
+  values: text (share 1.00); 48 mentions in 13 dialogues
+  examples:
+    "centre" (in: "I am looking for a multiple sports attraction in the centre.")
+    "centre of town" (in: "what attractions do you have in the centre of town?")
+[location:5] museum
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "castle gallery" (in: "...he Centre. I would recommend Castle Galleries, phone number 01223307402, p...")
+    "the broughton house gallery" (in: "the broughton house gallery is a museum located in the centre.")
+[location:6] park
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "wandlebury country park" (in: "...are free. May I recommend Wandlebury country park located wandlebury ring,...")
+    "wandlebury ring" (in: "...ndlebury country park located wandlebury ring, gog magog hills, babraham? ...")
+[establishment:1] college name
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "king's parade" (in: "...ime of year. The address is at king's parade. The post code cb21rh and the...")
+[establishment:2] cuisine
+  values: text (share 1.00); 7 mentions in 2 dialogues
+  examples:
+    "lebanese" (in: "Some options are Lebanese, Turkish, international, British, European, and Chi...")
+    "british" (in: "...Lebanese, Turkish, international, British, European, and Chinese. Do any o...")
+[establishment:5] entity
+  values: text (share 1.00); 26 mentions in 17 dialogues
+  examples:
+    "restaurant" (in: "...to dine in the centre. I would like a restaurant in the moderate price range.")
+    "danish restaurant" (in: "I would like to find a danish restaurant this is moderately priced.")
+[establishment:6] entrance fee
+  values: price (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 pound" (in: "parade. The post code cb21rh and the entree fee is 2 pounds.")
+[establishment:7] location
+  values: text (share 1.00); 17 mentions in 11 dialogues
+  examples:
+    "attraction" (in: "...ated in the center of town near attractions, hotels and easy access to tra...")
+    "cambridge" (in: "Is there any good Jamaican food in Cambridge?")
+[establishment:8] location str
+  values: text (share 1.00); 21 mentions in 14 dialogues
+  examples:
+    "centre" (in: "I have 13 colleges available in the centre. Did yo have one particular in mind?")
+    "city centre" (in: "... J restaurant, 86 Regent Street City Centre. I currently do not have revie...")
+[establishment:14] price
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "prezzo" (in: "prezzo's postcode is cb30ad.")
+    "what price range" (in: "What price range are you interested in?")
+[establishment:15] price range
+  values: text (share 1.00); 28 mentions in 17 dialogues
+  examples:
+    "moderately priced" (in: "I would like to find a danish restaurant this is moderately priced.")
+    "moderate price range" (in: "... Danish restaurants in the moderate price range. Would you like me to chec...")
+[establishment:17] restaurant info
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "01223 308871" (in: "...e range. Their phone number is 01223 308871. The address is Corn Exchange ...")
+    "40270 king street city" (in: "... Centre. It is located at 40270 King Street City and is in the expensive p...")
+[establishment:18] restaurant name
+  values: text (share 1.00); 29 mentions in 16 dialogues
+  examples:
+    "j restaurant" (in: "you! Do you have the reviews and address for the J Restaurant near there?")
+    "86 regent street" (in: "...ddress for the J restaurant, 86 Regent Street City Centre. I currently do ...")
+[establishment:19] something
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "cheap" (in: "...a total of 15 restaurants that are cheap in the centre. Is there another t...")
+    "cheap range" (in: "looking for a restaurant that serves asian oriental food in cheap range.")
+[establishment:20] str
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "hotel" (in: "... center of town near attractions, hotels and easy access to transportation...")
+    "indian restaurant" (in: "I would like an indian restaurant in the same price range as the hotel please.")
+[phone_number:6] destination
+  values: text (share 1.00); 9 mentions in 5 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "cambridge" (in: "Your welcome, enjoy your time in Cambridge.")
+
+Return the JSON object now.

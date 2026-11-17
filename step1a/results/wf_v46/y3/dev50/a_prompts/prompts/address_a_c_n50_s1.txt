@@ -1,0 +1,262 @@
+You help design a database schema from a dialogue corpus. Below is ONE entity (a candidate table) found
+by clustering text spans. Each cluster of the entity is a candidate attribute (column). Work in two steps.
+1. Write the list of the entity's distinct attributes, each once: a snake_case name, a one-sentence
+   description and a short role. Use role-specific names: when values play different roles (where
+   something starts vs where it ends, the earliest vs the latest time allowed), give each role its own
+   attribute and put the role in the name; do not use one general name for both.
+2. Assign EVERY cluster to one listed attribute by name. Several clusters may share one attribute (then they
+   are the same attribute). Use "not_attribute" for noise. Noise is common: yes, ok, thanks, booking words,
+   and values that a database would not store. If a cluster holds two attributes (two roles), assign its
+   most frequent attribute and set "mixed" to true.
+Also choose where each cluster belongs: pick ONE placement from the listed options and copy its text
+exactly. Quote one example span as evidence. Examples are marked with [[...]] inside the turn they come from.
+Lines labelled "automatic suggestion" are weak hints and can be wrong; decide from the examples.
+Return ONLY one JSON object, nothing before or after it. Example of the shape (other names and values):
+{"attributes": [{"name": "graduation_year", "description": "year the degree was finished", "role": "end of the studies"}],
+ "clusters": [{"cluster_id": "E9#0", "attribute": "graduation_year", "evidence": "I finished in [[2019]]",
+               "mixed": false, "placement": "current entity E9"},
+              {"cluster_id": "E9#1", "attribute": "not_attribute", "evidence": "[[ok]] thanks",
+               "mixed": false, "placement": "current entity E9"}]}
+
+Entity E3: 42 clusters.
+
+Placement options (copy one exactly into "placement"):
+- current entity E3: the attribute belongs to E3
+- sub-entity of E3: a part of E3 that has attributes of its own
+- other entity E0: the attribute belongs to E0
+- other entity E1: the attribute belongs to E1
+- other entity E2: the attribute belongs to E2
+- other entity E4: the attribute belongs to E4
+- relationship(E3, E0): links E3 and E0
+- relationship(E3, E1): links E3 and E1
+- relationship(E3, E2): links E3 and E2
+- relationship(E3, E4): links E3 and E4
+- separate table: a table of its own (several values per entity instance)
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E3#19  (mentions 5, distinct values 4)
+Examples:
+- E3#19:0 [user] previous turn, system: You're welcome! Is there anything else I can help you with? | turn: Yes, what type of attraction is [[Cherry Hinton Water Play]]?
+- E3#19:1 [system] previous turn, user: Can I have the address of Lucky Star? | turn: Cambridge Leisure Park Clifton Way [[Cherry Hinton]] 01223 244277
+- E3#19:2 [system] previous turn, user: I am looking for information about the the Cherry Hinton Water Play | turn: That is a free park on the east side of town. They are located at [[Cherry Hinton Hall]] on Cherry Hinton Road. Their phone number is 01223446100.
+- E3#19:3 [system] previous turn, user: I am looking for information about the the Cherry Hinton Water Play | turn: That is a free park on the east side of town. They are located at Cherry Hinton Hall on [[Cherry Hinton Road]]. Their phone number is 01223446100.
+- E3#19:4 [user] turn: I am looking for information about the the [[Cherry Hinton Water Play]]
+
+### E3#16  (mentions 1, distinct values 1)
+Examples:
+- E3#16:0 [system] previous turn, user: Can you please give me the exact address. | turn: The address for emmanuel college is [[saint andrew]]'s street. Is there any other information I can provide?
+
+### E3#28  (mentions 1, distinct values 1)
+Examples:
+- E3#28:0 [system] previous turn, user: It'll be very good if you can include alexander bed and breakfast but need to be in a reasonable price. | turn: [[alexander bed and breakfast]] is ideal for you.
+
+### E3#9  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#9:0 [system] previous turn, user: Not really, but what is the fee? | turn: Most are free, but Corpus Christi has a 2 pound fee, [[Saint John]]'s has a 2.50 pound fee, and Trinity has a 1 pound fee.
+
+### E3#23  (mentions 1, distinct values 1)
+Examples:
+- E3#23:0 [system] previous turn, user: Can you tell me the address for The Whale of a Time entertainment venue? And is there an entrance fee to get in there? | turn: I do not have any information on an entrance fee but I can give you the address which is [[unit 8]], viking way, bar hill.
+
+### E3#25  (mentions 1, distinct values 1)
+Examples:
+- E3#25:0 [system] previous turn, user: Can you tell me the address for The Whale of a Time entertainment venue? And is there an entrance fee to get in there? | turn: I do not have any information on an entrance fee but I can give you the address which is unit 8, viking way, [[bar hill]].
+
+### E3#22  (mentions 2, distinct values 1)
+Examples:
+- E3#22:0 [user] previous turn, system: The Whale of a Time entertainment venue is a fun choice. We also have museums and colleges to visit, if you'd like something quieter. | turn: Can you tell me the address for [[The Whale of a Time]] entertainment venue? And is there an entrance fee to get in there?
+- E3#22:1 [system] previous turn, user: I'm looking for things to do in the west. Can you recommend anything? | turn: [[The Whale of a Time]] entertainment venue is a fun choice. We also have museums and colleges to visit, if you'd like something quieter.
+
+### E3#33  (mentions 2, distinct values 1)
+Examples:
+- E3#33:0 [system] previous turn, user: No thanks, I just need the address please. | turn: There address is Hotel Felix Whitehouse Lane [[Huntingdon Road]] postcode cb30lx. Is there anything else I can assist you with today?
+- E3#33:1 [system] previous turn, user: I am looking for the address for graffiti | turn: Their address is Hotel Felix Whitehouse Lane [[Huntingdon Road]]. Anything more I can help with?
+
+### E3#3  (mentions 1, distinct values 1)
+Examples:
+- E3#3:0 [system] previous turn, user: Yes. May I have the address and postcode for the Abbey Pool please? | turn: Yes, of course. They are located at Pool Way, [[Whitehill Road]], off NewMarket Road. Their postcode is cb58nt. Is there anything else I can do for today?
+
+### E3#29  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#29:0 [system] previous turn, user: Can you help me to locate a free attraction near the hotel? | turn: There are many in the centre of town,what type are you looking for a church,or [[swimming]] or a park ?
+
+### E3#20  (mentions 9, distinct values 6, low confidence)
+Examples:
+- E3#20:0 [system] previous turn, user: I am looking for places in the centre to go to. | turn: There are 44 great attractions to visit! Is there a certain type you were looking for? Perhaps a [[museum]] or theatre?
+- E3#20:1 [user] previous turn, system: I can definitely help you with that. Is there a specific type of attraction you are interested in or section of the city you were looking at? | turn: I'm looking for a [[theatre]] in any part of the city. Can you recommend one?
+- E3#20:2 [system] previous turn, user: Can you help me to locate a free attraction near the hotel? | turn: There are many in the centre of town,what type are you looking for a [[church]],or swimming or a park ?
+- E3#20:3 [user] turn: I need a [[cinema]] to go to in the south.
+- E3#20:4 [system] previous turn, user: I am looking for places to on the south side of town. | turn: Alright. What type of places? Cambridge has a wide array of things to do and places to go such as, museum's, [[nightclubs]], parks and restaurants.
+- E3#20:5 [system] previous turn, user: I am looking for places to on the south side of town. | turn: Alright. What type of places? Cambridge has a wide array of things to do and places to go such as, museum's, nightclubs, parks and [[restaurants]].
+- E3#20:6 [user] previous turn, system: There are 44 great attractions to visit! Is there a certain type you were looking for? Perhaps a museum or theatre? | turn: A [[museum]] sounds nice. Do you have a favorite? I need an address and entrance fee.
+- E3#20:7 [system] previous turn, user: I am looking for places in the centre to go to. | turn: There are 44 great attractions to visit! Is there a certain type you were looking for? Perhaps a museum or [[theatre]]?
+
+### E3#0  (mentions 16, distinct values 11, low confidence)
+Examples:
+- E3#0:0 [system] previous turn, user: Can you help me to locate a free attraction near the hotel? | turn: There are many in the [[centre of town]],what type are you looking for a church,or swimming or a park ?
+- E3#0:1 [system] previous turn, user: I am also looking for an attraction to go to. Is there any in town? | turn: We have nearly 80 different attractions in town. First off, is there a type of attraction you would prefer? Or an area of [[town]] to search in?
+- E3#0:2 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the Mumford theatre, it is located at Anglia Ruskin Enterprise, East Road in the [[Centre area]].
+- E3#0:3 [system] previous turn, user: The centre please. | turn: There are 13 colleges in the [[center of town]]. Does entrance fee matter to you?
+- E3#0:4 [system] previous turn, user: I am looking for a college attraction to go to in town. | turn: There are several colleges in either the [[centre]] or west part of town. Which area do you prefer?
+- E3#0:5 [user] previous turn, system: I can definitely help you with that. Is there a specific type of attraction you are interested in or section of the city you were looking at? | turn: I'm looking for a theatre in any part of the [[city]]. Can you recommend one?
+- E3#0:6 [system] previous turn, user: It doesn't matter, anywhere will do. And can you get me the address? | turn: The Cambridge Arts Theatre is a popular attraction in the [[city centre]]. Does that sound good to you?
+- E3#0:7 [user] previous turn, system: The price for that ticket is 10.10 pounds. Would you like me to book it for you? | turn: No. Are there any swimming pools on the [[east side of town]]?
+
+### E3#15  (mentions 4, distinct values 1)
+Examples:
+- E3#15:0 [system] previous turn, user: Yes. I am looking for places to go in the centre area. I am looking for college. | turn: There are 13 choices, how do you feel about [[Emmanuel College]]?
+- E3#15:1 [user] previous turn, system: There are 13 choices, how do you feel about Emmanuel College? | turn: I wouldn't mind seeing [[Emmanuel College]]. Can you give me the postcode?
+- E3#15:2 [system] previous turn, user: I wouldn't mind seeing Emmanuel College. Can you give me the postcode? | turn: Sure, [[Emmanuel College]] has a postcode of cb23ap.
+- E3#15:3 [system] previous turn, user: Can you please give me the exact address. | turn: The address for [[emmanuel college]] is saint andrew's street. Is there any other information I can provide?
+
+### E3#7  (mentions 1, distinct values 1)
+Examples:
+- E3#7:0 [system] previous turn, user: Not really, but what is the fee? | turn: Most are free, but [[Corpus Christi]] has a 2 pound fee, Saint John's has a 2.50 pound fee, and Trinity has a 1 pound fee.
+
+### E3#6  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#6:0 [system] previous turn, user: The centre please. | turn: There are [[13 colleges]] in the center of town. Does entrance fee matter to you?
+
+### E3#40  (mentions 1, distinct values 1)
+Examples:
+- E3#40:0 [system] previous turn, user: I need the address, entrance fee, and phone number. | turn: The address of Ballare is [[heidelberg gardens]], lion yard. The phone number is 01223364222. The entrance fee is 5 pounds.
+
+### E3#21  (mentions 1, distinct values 1)
+Examples:
+- E3#21:0 [system] previous turn, user: I need a cinema to go to in the south. | turn: [[The cineworld cinema]] is the place!
+
+### E3#17  (mentions 9, distinct values 6)
+Examples:
+- E3#17:0 [system] previous turn, user: I am also looking for places to go in town. | turn: [[Cambridge]] has over 70 delightful attractions, what type appeals to you most?
+- E3#17:1 [system] previous turn, user: Can I have the address of Lucky Star? | turn: [[Cambridge Leisure Park]] Clifton Way Cherry Hinton 01223 244277
+- E3#17:2 [system] previous turn, user: Yes can I get their address please? | turn: The address of the [[Cambridge Arts Theatre]] is 6 Saint Edward's Passage, postcode cb23pj.
+- E3#17:3 [system] previous turn, user: No, that's all I need. Thank you for your help! | turn: Thank you for contacting [[Cambridge TownInfo centre]]. Goodbye!
+- E3#17:4 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the [[Mumford theatre]], it is located at Anglia Ruskin Enterprise, East Road in the Centre area.
+- E3#17:5 [system] previous turn, user: It doesn't matter, anywhere will do. And can you get me the address? | turn: [[The Cambridge Arts Theatre]] is a popular attraction in the city centre. Does that sound good to you?
+- E3#17:6 [user] turn: I am looking for information in [[Cambridge]]
+- E3#17:7 [system] previous turn, user: Can you tell me the address? | turn: The address is [[cambridge leisure park]], clifton way. Can I help with anything else?
+
+### E3#39  (mentions 2, distinct values 1, low confidence)
+Examples:
+- E3#39:0 [system] previous turn, user: I think I would like a nightclub in the centre of town please. | turn: There are 5 different nightclubs in that area. Might I suggest [[Ballare]]. Would you like more info?
+- E3#39:1 [system] previous turn, user: I need the address, entrance fee, and phone number. | turn: The address of [[Ballare]] is heidelberg gardens, lion yard. The phone number is 01223364222. The entrance fee is 5 pounds.
+
+### E3#24  (mentions 1, distinct values 1)
+Examples:
+- E3#24:0 [system] previous turn, user: Can you tell me the address for The Whale of a Time entertainment venue? And is there an entrance fee to get in there? | turn: I do not have any information on an entrance fee but I can give you the address which is unit 8, [[viking way]], bar hill.
+
+### E3#30  (mentions 3, distinct values 1, low confidence)
+Examples:
+- E3#30:0 [system] previous turn, user: Can you help me to locate a free attraction near the hotel? | turn: There are many in the centre of town,what type are you looking for a church,or swimming or a [[park]] ?
+- E3#30:1 [system] previous turn, user: I am looking for places to on the south side of town. | turn: Alright. What type of places? Cambridge has a wide array of things to do and places to go such as, museum's, nightclubs, [[parks]] and restaurants.
+- E3#30:2 [user] previous turn, system: Alright. What type of places? Cambridge has a wide array of things to do and places to go such as, museum's, nightclubs, parks and restaurants. | turn: I would like to visit a [[park]]. Could you find one and give me the address and postcode?
+
+### E3#27  (mentions 2, distinct values 2)
+Examples:
+- E3#27:0 [system] previous turn, user: A museum sounds nice. Do you have a favorite? I need an address and entrance fee. | turn: My personal favorite is the Museum of Archaeology and Anthropology at University of Cambridge, [[Downing Street]]. It even has free admission!
+- E3#27:1 [system] previous turn, user: Surprise me and pick one for me! Just make sure to let me know what kind of attraction it is. | turn: How about a theater? Cineworld Cinema is showing all our the newest [[London]] films!
+
+### E3#1  (mentions 3, distinct values 2)
+Examples:
+- E3#1:0 [user] previous turn, system: Yes there is the abbey pool and astroturf pitch would you like their address? | turn: Yes. May I have the address and postcode for the [[Abbey Pool]] please?
+- E3#1:1 [system] previous turn, user: Yes. May I have the address and postcode for the Abbey Pool please? | turn: Yes, of course. They are located at [[Pool Way]], Whitehill Road, off NewMarket Road. Their postcode is cb58nt. Is there anything else I can do for today?
+- E3#1:2 [system] previous turn, user: No. Are there any swimming pools on the east side of town? | turn: Yes there is the [[abbey pool]] and astroturf pitch would you like their address?
+
+### E3#11  (mentions 1, distinct values 1)
+Examples:
+- E3#11:0 [user] turn: I'm looking for information on [[Broughton house gallery]].
+
+### E3#34  (mentions 1, distinct values 1)
+Examples:
+- E3#34:0 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the Mumford theatre, it is located at [[Anglia Ruskin Enterprise]], East Road in the Centre area.
+
+### E3#14  (mentions 5, distinct values 5, low confidence)
+Examples:
+- E3#14:0 [user] previous turn, system: Certainly! It's a museum in the centre at 98 king street cb11ln with free entrance. Their phone number is 01223314960. May I help find anything else? | turn: Is the [[cb11ln]] the postcode?
+- E3#14:1 [system] previous turn, user: That sounds good, I like that. Could you tell me what the postcode is please? | turn: the postcode is [[cb11pt]]
+- E3#14:2 [system] previous turn, user: I wouldn't mind seeing Emmanuel College. Can you give me the postcode? | turn: Sure, Emmanuel College has a postcode of [[cb23ap]].
+- E3#14:3 [system] previous turn, user: Yes can I get their address please? | turn: The address of the Cambridge Arts Theatre is 6 Saint Edward's Passage, postcode [[cb23pj]].
+- E3#14:4 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park Fen Causeway is located at Fen Causeway, Newnham road, postal code [[cb322ad]].
+
+### E3#4  (mentions 3, distinct values 3)
+Examples:
+- E3#4:0 [system] previous turn, user: I'm looking for a theatre in any part of the city. Can you recommend one? | turn: There is the Mumford theatre, it is located at Anglia Ruskin Enterprise, [[East Road]] in the Centre area.
+- E3#4:1 [system] previous turn, user: Yes. May I have the address and postcode for the Abbey Pool please? | turn: Yes, of course. They are located at Pool Way, Whitehill Road, off [[NewMarket Road]]. Their postcode is cb58nt. Is there anything else I can do for today?
+- E3#4:2 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park Fen Causeway is located at Fen Causeway, [[Newnham road]], postal code cb322ad.
+
+### E3#36  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#36:0 [system] previous turn, user: A museum sounds nice. Do you have a favorite? I need an address and entrance fee. | turn: My personal favorite is the [[Museum of Archaeology and Anthropology]] at University of Cambridge, Downing Street. It even has free admission!
+
+### E3#31  (mentions 2, distinct values 1)
+Examples:
+- E3#31:0 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park [[Fen Causeway]] is located at Fen Causeway, Newnham road, postal code cb322ad.
+- E3#31:1 [system] previous turn, user: I would like to visit a park. Could you find one and give me the address and postcode? | turn: Sheep's Green and Lammas Land Park Fen Causeway is located at [[Fen Causeway]], Newnham road, postal code cb322ad.
+
+### E3#35  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#35:0 [system] previous turn, user: I am looking for places in the centre to go to. | turn: There are [[44]] great attractions to visit! Is there a certain type you were looking for? Perhaps a museum or theatre?
+
+### E3#41  (mentions 1, distinct values 1)
+Examples:
+- E3#41:0 [system] previous turn, user: I need the address, entrance fee, and phone number. | turn: The address of Ballare is heidelberg gardens, [[lion yard]]. The phone number is 01223364222. The entrance fee is 5 pounds.
+
+### E3#37  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#37:0 [system] previous turn, user: A museum sounds nice. Do you have a favorite? I need an address and entrance fee. | turn: My personal favorite is the Museum of Archaeology and Anthropology at University of Cambridge, Downing Street. It even has [[free admission]]!
+
+### E3#26  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#26:0 [user] previous turn, system: We have nearly 80 different attractions in town. First off, is there a type of attraction you would prefer? Or an area of town to search in? | turn: Please recommend something in the [[South]].
+
+### E3#2  (mentions 1, distinct values 1, low confidence)
+Examples:
+- E3#2:0 [system] previous turn, user: No. Are there any swimming pools on the east side of town? | turn: Yes there is the abbey pool and [[astroturf pitch]] would you like their address?
+
+### E3#12  (mentions 1, distinct values 1)
+Examples:
+- E3#12:0 [system] previous turn, user: I'm looking for information on Broughton house gallery. | turn: Certainly! It's a museum in the centre at [[98 king street]] cb11ln with free entrance. Their phone number is 01223314960. May I help find anything else?
+
+### E3#10  (mentions 3, distinct values 3)
+Examples:
+- E3#10:0 [system] previous turn, user: Please recommend something in the South. | turn: How about a cinema or museum? There's also The Place, which is a nightclub. Or, [[The Junction]], which is a theatre. How about one of those?
+- E3#10:1 [system] previous turn, user: Please recommend something in the South. | turn: How about a cinema or museum? There's also [[The Place]], which is a nightclub. Or, The Junction, which is a theatre. How about one of those?
+- E3#10:2 [system] previous turn, user: Not really, but what is the fee? | turn: Most are free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50 pound fee, and [[Trinity]] has a 1 pound fee.
+
+### E3#5  (mentions 2, distinct values 2, low confidence)
+Examples:
+- E3#5:0 [user] previous turn, system: It will cost 8.08 pounds. Would you like me to book a train for you? | turn: Yes. I am looking for places to go in the centre area. I am looking for [[college]].
+- E3#5:1 [user] turn: I am looking for a [[college attraction]] to go to in town.
+
+### E3#8  (mentions 4, distinct values 4)
+Examples:
+- E3#8:0 [system] previous turn, user: Not really, but what is the fee? | turn: Most are free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50 pound fee, and Trinity has a [[1 pound fee]].
+- E3#8:1 [system] previous turn, user: Not really, but what is the fee? | turn: Most are free, but Corpus Christi has a [[2 pound fee]], Saint John's has a 2.50 pound fee, and Trinity has a 1 pound fee.
+- E3#8:2 [system] previous turn, user: Not really, but what is the fee? | turn: Most are free, but Corpus Christi has a 2 pound fee, Saint John's has a [[2.50 pound fee]], and Trinity has a 1 pound fee.
+- E3#8:3 [system] previous turn, user: I need the address, entrance fee, and phone number. | turn: The address of Ballare is heidelberg gardens, lion yard. The phone number is 01223364222. The entrance fee is [[5 pounds]].
+
+### E3#32  (mentions 2, distinct values 1)
+Examples:
+- E3#32:0 [system] previous turn, user: No thanks, I just need the address please. | turn: There address is [[Hotel Felix Whitehouse Lane]] Huntingdon Road postcode cb30lx. Is there anything else I can assist you with today?
+- E3#32:1 [system] previous turn, user: I am looking for the address for graffiti | turn: Their address is [[Hotel Felix Whitehouse Lane]] Huntingdon Road. Anything more I can help with?
+
+### E3#18  (mentions 2, distinct values 1)
+Examples:
+- E3#18:0 [system] previous turn, user: Can I have the address of Lucky Star? | turn: Cambridge Leisure Park [[Clifton Way]] Cherry Hinton 01223 244277
+- E3#18:1 [system] previous turn, user: Can you tell me the address? | turn: The address is cambridge leisure park, [[clifton way]]. Can I help with anything else?
+
+### E3#13  (mentions 3, distinct values 3)
+Examples:
+- E3#13:0 [system] previous turn, user: I'm looking for information on Broughton house gallery. | turn: Certainly! It's a museum in the centre at 98 king street cb11ln with free entrance. Their phone number is [[01223314960]]. May I help find anything else?
+- E3#13:1 [system] previous turn, user: I need the address, entrance fee, and phone number. | turn: The address of Ballare is heidelberg gardens, lion yard. The phone number is [[01223364222]]. The entrance fee is 5 pounds.
+- E3#13:2 [system] previous turn, user: I am looking for information about the the Cherry Hinton Water Play | turn: That is a free park on the east side of town. They are located at Cherry Hinton Hall on Cherry Hinton Road. Their phone number is [[01223446100]].
+
+### E3#38  (mentions 1, distinct values 1)
+Examples:
+- E3#38:0 [system] previous turn, user: Yes can I get their address please? | turn: The address of the Cambridge Arts Theatre is [[6 Saint Edward's Passage]], postcode cb23pj.
+
+Return the JSON object now.

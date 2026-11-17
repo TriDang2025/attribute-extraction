@@ -1,0 +1,38 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+This table refers to the other tables listed below. For each of them, choose the id of the column of this table that holds the reference (its value points to a row of that table), or "new" when no column does; a new reference column is then added. Tables referred to: location (one location row has many rows of establishment).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "x:3", "new_id_name": "", "foreign_keys": {"table_b": "new"}}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table establishment (one row = one establishment), 4 columns:
+[accommodation_option:5] checkin date
+  values: day (share 0.80); 10 mentions in 10 dialogues
+  examples:
+    "wednesday" (in: "like it for 6 people for 2 nights starting on Wednesday.")
+    "thursday" (in: "book it for 8 people for 4 nights starting on thursday?")
+[accommodation_option:6] day
+  values: day (share 1.00); 11 mentions in 8 dialogues
+  examples:
+    "friday" (in: "...ok reservation for 2 people at 16:00 on Friday. Send me the reference number.")
+    "sunday" (in: "Yes I'll need it for Sunday for 2 nights and 4 people.")
+[accommodation_option:8] hotel rating
+  values: number (share 0.50); 8 mentions in 4 dialogues
+  examples:
+    "2 star" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "3 star" (in: "Yes, how about a guesthouse with 3 stars and free wifi instead?")
+[establishment:3] date
+  values: day (share 1.00); 15 mentions in 12 dialogues
+  examples:
+    "friday" (in: "would like the reservation for 5 people at 18:45 on Friday.")
+    "tuesday" (in: "you book a table for 8 people at 16:30 on tuesday?")
+
+Return the JSON object now.
