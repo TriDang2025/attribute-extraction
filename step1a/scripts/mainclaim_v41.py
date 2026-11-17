@@ -39,8 +39,10 @@ def load_spans(paths):
     return pd.concat([pd.read_csv(p, encoding="utf-8") for p in have], ignore_index=True).drop_duplicates(), have
 
 
-def run(set_name, loop2, tear, spans_paths, out):
-    handover, mt, labels, gold = M.load_set(set_name)
+def run(set_name, loop2, tear, spans_paths, out, handover=None):
+    """handover: {entity: handover-format doc} to score instead of handover/<set>/ (wf_v4.6: a pipeline run's columns)."""
+    frozen, mt, labels, gold = M.load_set(set_name)
+    handover = handover or frozen
     gold_all = {a for g in gold.values() for a in g}
     tear_map = json.loads(TEAR_MAP.read_text(encoding="utf-8"))
     spans, read = load_spans(spans_paths)
