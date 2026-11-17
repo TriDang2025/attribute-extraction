@@ -36,7 +36,7 @@ Model: Llama-3.1-8B-Instruct, bf16, vLLM, temperature 0, guided JSON (setting `l
 **One GPU session only**: the model loads once (about 4 min), then every job runs back to back. Expected model time under 10 min.
 
 - Cells 1-8: setup. Cell 2 installs, then restart the session, rerun cell 1 and skip cell 2.
-- Cell 4: GLiNER, deberta-v3-base and bge-m3 (loop-2 evidence check), downloaded before vLLM starts.
+- Cell 3: GLiNER, deberta-v3-base and bge-m3 (loop-2 evidence check). It must run before any other cell imports `s1a`: the model paths are read at import.
 - Cell 5: loads Llama with `gpu_memory_utilization=0.6`, so bge-m3 and GLiNER fit next to it.
 - Cell 9: **Y3** loop 1 with LLM entity names on raw dev50 and dev50b (Step 1a-2 from git; Step 3 v4.4, 3 orders; Step 4 v4.3 seed 0). About 450-600 calls per set.
 - Cell 10: **Y5 + Y6** loop 2 on the Y3 output (Step 1b 3 orders + vote, evidence check, Step 3 naming). About 30-60 calls per set.
@@ -47,8 +47,8 @@ Model: Llama-3.1-8B-Instruct, bf16, vLLM, temperature 0, guided JSON (setting `l
 - Colab Secrets `HF_TOKEN` and `GH_TOKEN`, notebook access on. Never put a token in a cell.
 """
 c1 = swap(text(v45[1]), [("wf-v4.5", "wf-v4.6")], "clone cell")
-setting = text(v45[4])
-models = text(v41[5])
+setting = swap(text(v45[4]), [("#@title 3. Model setting", "#@title 4. Model setting")], "setting cell")
+models = swap(text(v41[5]), [("#@title 4. Data and", "#@title 3. Data and")], "models cell")   # before any s1a import: spans / chk.config read CHK_MODELS at import
 load = swap(text(v45[5]), [("GPU_UTIL = 0.80", "GPU_UTIL = 0.6"), ("results/wf_v45/model_load.json", "results/wf_v46/model_load.json"), ("#@title 4. Load", "#@title 5. Load"),
                            ("import time\n_t0 = time.time()", "import time\n_t0 = _T_SESSION = time.time()   # the GPU session clock starts with the model load")],
             "model load cell")
@@ -103,7 +103,7 @@ print(p.stdout.strip() or p.stderr[-500:])
 print("Done: Runtime > Disconnect and delete runtime, then tell Claude 'GPU done'")
 """
 nb = json.loads((step1a / "colab" / "S1A_wf45_colab.ipynb").read_text(encoding="utf-8"))
-nb["cells"] = [cell("markdown", intro), cell("code", c1), v45[2], v45[3], cell("code", setting), cell("code", models), cell("code", load),
+nb["cells"] = [cell("markdown", intro), cell("code", c1), v45[2], v45[3], cell("code", models), cell("code", setting), cell("code", load),
                cell("code", backend), cell("code", data), cell("code", enc), cell("code", y3), cell("code", y56), cell("code", y8), cell("code", end)]
 out = step1a / "colab" / "S1A_wf46_colab.ipynb"
 out.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
