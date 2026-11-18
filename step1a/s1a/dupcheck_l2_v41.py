@@ -23,14 +23,20 @@ ORDERS = (0, 1)
 N_TOP = 5
 
 
-def new_columns(dec, clusters, first_cid):
+def new_columns(dec, clusters, first_cid, separate=False):
     """New column dicts (cid, name, description, top_values, clusters, n_mentions) from the voted decision table `dec`
-    (pilot_verify.DEC_COLS) of one entity; clusters = {L2 id: cluster record}. cids from `first_cid` on, in table order."""
-    groups = {}
+    (pilot_verify.DEC_COLS) of one entity; clusters = {L2 id: cluster record}. cids from `first_cid` on, in table order.
+    separate (wf_v4.7 r2): one column per cluster; a cluster whose Step 3 name is already taken is named after its own label."""
+    groups, used = {}, set()
     for r in dec.to_dict("records"):
         if r["action"] in ("not_attribute", "", None) or not r["name"]:
             continue
-        g = groups.setdefault(PV.norm_name(r["name"]), {"name": r["name"], "description": r["description"] or "", "clusters": []})
+        name = r["name"]
+        if separate and PV.norm_name(name) in used:
+            name = clusters[r["cluster_id"]]["label"].replace(" ", "_")
+        used.add(PV.norm_name(name))
+        key = r["cluster_id"] if separate else PV.norm_name(name)
+        g = groups.setdefault(key, {"name": name, "description": r["description"] or "", "clusters": []})
         g["clusters"].append(r["cluster_id"])
     out = []
     for i, g in enumerate(groups.values()):
@@ -66,10 +72,10 @@ def agreed_pairs(parsed_by_order, cols_by_id):
     return set.intersection(*sets) if sets else set()
 
 
-def resolve(old, new, parsed_by_order):
+def resolve(old, new, parsed_by_order, join_new=True):
     """Final new columns: [{name, description, clusters, top_values, n_mentions, status, duplicate_of, reason, joined}]. status "new" or
     "duplicate" (duplicate_of = old column names; reason "same name" or "dupcheck, both orders"); joined = names of the new columns
-    merged into this one."""
+    merged into this one. join_new False (wf_v4.7 r2): new-new joins are ignored, every new column stays its own."""
     by_id = {c["cid"]: c for c in old + new}
     old_ids, new_ids = {c["cid"] for c in old}, [c["cid"] for c in new]
     pairs = agreed_pairs(parsed_by_order, by_id)
@@ -88,7 +94,7 @@ def resolve(old, new, parsed_by_order):
         while parent[x] != x:
             x = parent[x]
         return x
-    for p in pairs:
+    for p in pairs if join_new else ():
         a, b = sorted(p)
         if a in parent and b in parent:
             parent[root(b)] = root(a)

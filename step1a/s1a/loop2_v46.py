@@ -26,6 +26,9 @@ Writes <out>/loop2/:
   columns_l2.json {entity: new columns, status new | duplicate}, merged_columns.json {entity: loop-1 + new columns, source, flag},
   attributes.json {entity: [names]} (pipeline_v45 format), a2.columns.json (Step 4 input: a + new columns),
   suggestions.csv + report.md (every suggested name: pass / fail, stage, reason), calls.csv + cost.json (every LLM call).
+
+wf_v4.7 switches (default off = v4.6; on in config/wf_v47_loop2.json, CONFIG_V47): step1b.prompt_examples (PROMPT_EXAMPLES),
+step3.separate_names (dupcheck_l2_v41 new_columns separate / resolve join_new), step3.name_hint (add_hints); min_votes 1 is a config value.
 """
 import contextlib
 import json
@@ -52,6 +55,7 @@ from . import step3_v43 as S3
 from . import step3_v44 as S3_44
 
 CONFIG = paths.ROOT / "config" / "wf_v46_loop2.json"
+CONFIG_V47 = paths.ROOT / "config" / "wf_v47_loop2.json"
 DUP_MAX_TOKENS = 1024          # STEP3.md, duplicate check
 VERDICTS = ["keep", "flag"]
 FAMILIES = {"verdicts": "loop2_verdicts", "missing": "loop2_missing"}
@@ -67,7 +71,7 @@ with one verdict and one short reason:
 - flag: doubtful (noise, too general, two meanings mixed, or not about a {entity}).
 You can only keep or flag an attribute; nothing is removed or renamed.
 {json_only} Shape (the ids here are made up):
-{{"x:1": {{"verdict": "keep", "reason": "..."}}, "x:2": {{"verdict": "flag", "reason": "..."}}}}
+{verdict_shape}
 
 Attributes ({n}):
 """
@@ -80,13 +84,26 @@ few example values (each with a short piece of text around it) and counts. Lines
 Question: which information is still missing for this {entity}? List attributes that a {entity} normally has and that people would
 plausibly mention in such dialogues, but that are missing from the list. At most {max_new}; fewer, or an empty list, is fine. Do not list
 an attribute that is already in the list under another name. For each give a name ({max_words} plain words or fewer that a text tagger
-can search for, such as "loan period") and a one-line description. Names must be general words that fit any collection of texts about
+can search for, such as "{name_example}") and a one-line description. Names must be general words that fit any collection of texts about
 such things: no example values, no names of places, people or brands, and no names of datasets.
-{json_only} Shape (the name here is made up):
-{{"missing": [{{"name": "due date", "description": "..."}}]}}
+{json_only} Shape ({shape_note}):
+{missing_shape}
 
 Attributes ({n}):
 """
+
+# Examples inside the Step 1b instructions (config step1b.prompt_examples). v46: "..." placeholders, which Llama copied into every
+# description; v47 (wf_v4.7 Z3 format fix): real-looking text from a made-up domain (car rental).
+PROMPT_EXAMPLES = {
+    "v46": {"verdict_shape": '{"x:1": {"verdict": "keep", "reason": "..."}, "x:2": {"verdict": "flag", "reason": "..."}}',
+            "name_example": "loan period", "shape_note": "the name here is made up",
+            "missing_shape": '{"missing": [{"name": "due date", "description": "..."}]}'},
+    "v47": {"verdict_shape": '{"x:1": {"verdict": "keep", "reason": "the pickup branch of a car rental"}, '
+                             '"x:2": {"verdict": "flag", "reason": "mixes daily rate and deposit"}}',
+            "name_example": "mileage limit", "shape_note": "an example from a car rental, not from your data",
+            "missing_shape": '{"missing": [{"name": "fuel policy", "description": "whether the car must be returned with a full tank"}]}'},
+}
+NAME_HINT = 'Hint: this cluster was searched for as "{label}" (a suggested name; use it only if it fits the values).'
 
 
 # ------------------------------------------------------------------ config
@@ -132,7 +149,7 @@ def question_prompts(entity, cols, cfg):
     """{"verdicts": (prompt, schema), "missing": (prompt, schema)} of one entity's columns (S1B.render: capped examples per attribute)."""
     c = cfg["step1b"]
     block = S1B.render(cols) + "\nReturn the JSON object now.\n"
-    head = dict(entity=entity, n=len(cols), json_only=S1B._JSON_ONLY)
+    head = dict(entity=entity, n=len(cols), json_only=S1B._JSON_ONLY, **PROMPT_EXAMPLES[c.get("prompt_examples", "v46")])
     v = VERDICTS_INSTRUCTION.format(**head)
     m = MISSING_INSTRUCTION.format(**head, max_new=c["max_new"], max_words=c["max_name_words"])
     for text in (v, m):
@@ -317,8 +334,9 @@ def _entities_and_run_key(stage1_of, set_name):
         PIN.find_pilot_entity, PP.RUN_KEY = find, rk
 
 
-def naming_prompts(ri, kept, stage1_of, set_name):
-    """{entity: {order: frozen A prompt text}} over the kept clusters (step3_loop2_v41.Loop2Run + pilot_build_v37.a_prompts)."""
+def naming_prompts(ri, kept, stage1_of, set_name, hint=False):
+    """{entity: {order: frozen A prompt text}} over the kept clusters (step3_loop2_v41.Loop2Run + pilot_build_v37.a_prompts).
+    hint (wf_v4.7 Z3): a NAME_HINT line with the cluster's label under each cluster header; the frozen prompt is otherwise unchanged."""
     pbv = PP.script("pilot_build_v37")
     merged = S3L.merge_mentions(ri.export.mentions, kept)
     run = S3L.Loop2Run(ri, merged, kept)
@@ -326,7 +344,22 @@ def naming_prompts(ri, kept, stage1_of, set_name):
     with _entities_and_run_key(stage1_of, set_name):
         for ent in dict.fromkeys(c["entity"] for c in kept):
             out[ent] = pbv.a_prompts(run, ent)[3]
+    if hint:
+        out = {ent: {o: add_hints(t, kept) for o, t in texts.items()} for ent, texts in out.items()}
     return out
+
+
+def add_hints(text, clusters):
+    """`text` with a NAME_HINT line after the "### <cluster id>" header of every cluster it shows (ValueError if a header is not found
+    exactly once: the frozen prompt layout changed)."""
+    for c in clusters:
+        pat = re.compile(rf"^### {re.escape(c['id'])} .*$", re.M)
+        if c["id"] not in text:
+            continue
+        text, n = pat.subn(lambda m: m.group(0) + "\n" + NAME_HINT.format(label=c["label"]), text)
+        if n != 1:
+            raise ValueError(f"cluster header {c['id']} found {n} times")
+    return text
 
 
 def names_jobs(out, set_name, prompts, stage1_of, cfg):
@@ -365,10 +398,11 @@ def voted_names(out, jobs):
     return res
 
 
-def dupcheck_jobs(out, set_name, ent, finals, dec, clusters, stage1):
-    """(jobs, old, new) of the v3.8 duplicate check of one entity: loop-1 columns + the new columns named by `dec`. No new column: no job."""
+def dupcheck_jobs(out, set_name, ent, finals, dec, clusters, stage1, separate=False):
+    """(jobs, old, new) of the v3.8 duplicate check of one entity: loop-1 columns + the new columns named by `dec`. No new column: no job.
+    separate: one new column per cluster (DL.new_columns, wf_v4.7 r2)."""
     old = DL.old_columns({"columns": [{**c, "id": c["cid"]} for c in finals]})
-    new = DL.new_columns(dec, clusters, max((c["cid"] for c in old), default=0) + 1)
+    new = DL.new_columns(dec, clusters, max((c["cid"] for c in old), default=0) + 1, separate)
     jobs = []
     for o, (text, schema) in (DL.prompts(old, new, f"{set_name}/{ent}") if new else {}).items():
         name = f"dupcheck_l2_{set_name}_{re.sub(r'[^A-Za-z0-9]+', '_', ent).strip('_')}_o{o}"
@@ -380,7 +414,7 @@ def dupcheck_jobs(out, set_name, ent, finals, dec, clusters, stage1):
     return jobs, old, new
 
 
-def resolve_entity(out, jobs, old, new):
+def resolve_entity(out, jobs, old, new, join_new=True):
     """(final new columns of DL.resolve, errors): an order without a valid answer joins nothing (the columns stay new)."""
     parsed, errs = [], []
     for j in jobs:
@@ -388,7 +422,7 @@ def resolve_entity(out, jobs, old, new):
         ok = row is not None and isinstance(row["parsed"], dict) and not row["errors"]
         errs += [] if ok else [f"{j['job']}: no valid answer, no joins"]
         parsed.append(row["parsed"] if ok else {"joins": []})
-    return DL.resolve(old, new, parsed), errs
+    return DL.resolve(old, new, parsed, join_new), errs
 
 
 # ------------------------------------------------------------------ outputs
@@ -504,13 +538,15 @@ def run_loop2(out, set_name, backend, encoder, gliner_loader, cfg=None, log=prin
     log(f"loop 2 step 3: {len(kept)} clusters pass the evidence check")
     s3, final, dec_by_ent, naming = l2 / "step3", {}, {}, {}
     if kept:
-        s3_jobs = names_jobs(s3, set_name, naming_prompts(ri, kept, stage1_of, set_name), stage1_of, cfg)
+        sep = cfg["step3"].get("separate_names", False)
+        s3_jobs = names_jobs(s3, set_name, naming_prompts(ri, kept, stage1_of, set_name, cfg["step3"].get("name_hint", False)),
+                             stage1_of, cfg)
         backend.run(s3, s3_jobs)
         by_id = {c["id"]: c for c in clusters}
         dup_jobs = []
         for ent, (dec, stats, cids, errs) in voted_names(s3, s3_jobs).items():
             dec_by_ent[ent] = dict(zip(dec["cluster_id"], dec["action"]))
-            jobs_e, old, new = dupcheck_jobs(s3, set_name, ent, finals[ent], dec, by_id, stage1_of[ent])
+            jobs_e, old, new = dupcheck_jobs(s3, set_name, ent, finals[ent], dec, by_id, stage1_of[ent], sep)
             dup_jobs += jobs_e
             naming[ent] = {"vote": stats, "errors": errs, "old": old, "new": new, "dup_jobs": jobs_e}
         B.write_json(s3 / "manifest_dupcheck.json", {"stage": 2, "jobs": dup_jobs})
@@ -518,9 +554,9 @@ def run_loop2(out, set_name, backend, encoder, gliner_loader, cfg=None, log=prin
             backend.run(s3, dup_jobs)
         for ent, n in naming.items():
             if cfg["step3"]["dupcheck"]:
-                final[ent], errs = resolve_entity(s3, n["dup_jobs"], n["old"], n["new"])
+                final[ent], errs = resolve_entity(s3, n["dup_jobs"], n["old"], n["new"], not sep)
             else:     # no check: every new column stays new
-                final[ent], errs = DL.resolve(n["old"], n["new"], []), []
+                final[ent], errs = DL.resolve(n["old"], n["new"], [], not sep), []
             n["errors"] += errs
         B.write_json(s3 / "naming.json", {e: {k: v for k, v in n.items() if k in ("vote", "errors")} for e, n in naming.items()})
     outcomes(rows, final, dec_by_ent, clusters)
