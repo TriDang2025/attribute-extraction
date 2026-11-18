@@ -71,43 +71,51 @@ def y8(backend, sets=SETS, root=OUT, log=print):
     return res
 
 
+class Fakes:
+    """One fake backend for every job family, like the real VllmBackend44 (laptop checks; also used by gpu_v47)."""
+
+    def __init__(self):
+        from s1a import entity_names_v46 as EN
+        from s1a import step3_v44 as S3
+        from s1a import step4_fake_v44 as F4
+        self.s3, self.s4, self.names, self.l2 = S3.FakeStep44(), F4.FakeV44(), EN.FakeNames(), L2.FakeLoop2LLM()
+
+    def run(self, folder, jobs):               # by folder: loop2/..., names/, step4*/, else Step 3
+        parts = Path(folder).parts
+        if "loop2" in parts:
+            return self.l2.run(folder, jobs)
+        if parts[-1] == "names":
+            return self.names.run(folder, jobs)
+        if any(p.startswith("step4") for p in parts):
+            return self.s4.run(folder, jobs)
+        return self.s3.run(folder, jobs)
+
+
+class FakeEnc:
+    """.encode(list[str]) -> unit vectors (loop-2 evidence check)."""
+
+    def encode(self, texts):
+        import numpy as np
+        v = np.array([[hash((t, i)) % 997 + 1.0 for i in range(8)] for t in texts], dtype="float32")
+        return v / np.linalg.norm(v, axis=1, keepdims=True)
+
+
+class NoGliner:
+    def predict_entities(self, text, labels, threshold=0.5):
+        return []
+
+    def inference(self, texts, labels, threshold=0.5, **kw):
+        return [[] for _ in texts]
+
+
 def fake_check(root):
     """The whole driver with the laptop fakes (fake LLMs, fake encoders, fake GLiNER) into `root`; raises on any failure."""
-    import numpy as np
-    from s1a import entity_names_v46 as EN
     from s1a import step3_v44 as S3
-    from s1a import step4_fake_v44 as F4
-
-    class Fakes:                                   # one backend for every job family, like the real VllmBackend44
-        def __init__(self):
-            self.s3, self.s4, self.names, self.l2 = S3.FakeStep44(), F4.FakeV44(), EN.FakeNames(), L2.FakeLoop2LLM()
-
-        def run(self, folder, jobs):           # by folder: loop2/..., names/, step4*/, else Step 3
-            parts = Path(folder).parts
-            if "loop2" in parts:
-                return self.l2.run(folder, jobs)
-            if parts[-1] == "names":
-                return self.names.run(folder, jobs)
-            if any(p.startswith("step4") for p in parts):
-                return self.s4.run(folder, jobs)
-            return self.s3.run(folder, jobs)
-
-    class Enc:                                     # .encode(list[str]) -> unit vectors (loop-2 evidence check)
-        def encode(self, texts):
-            v = np.array([[hash((t, i)) % 997 + 1.0 for i in range(8)] for t in texts], dtype="float32")
-            return v / np.linalg.norm(v, axis=1, keepdims=True)
-
-    class NoGliner:
-        def predict_entities(self, text, labels, threshold=0.5):
-            return []
-
-        def inference(self, texts, labels, threshold=0.5, **kw):
-            return [[] for _ in texts]
 
     fb = Fakes()
     sets = {k: v for k, v in SETS.items() if PL.CO.run_dir(v).exists()}
-    y3(fb, S3.FakeEncoder(), Enc(), sets, root=root)
-    y56(fb, Enc(), NoGliner, sets, root=root)
+    y3(fb, S3.FakeEncoder(), FakeEnc(), sets, root=root)
+    y56(fb, FakeEnc(), NoGliner, sets, root=root)
     y8(fb, sets, root=root)
     return sets
 
