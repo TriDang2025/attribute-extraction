@@ -11,6 +11,7 @@ A filled sheet is kept on a rerun (mainclaim_v41.merge_answers).
 """
 import argparse
 import json
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -70,6 +71,32 @@ def loop2_file(run_dir, emap, out):
     return p
 
 
+def split_values(step3_dir, run_key, run, group):
+    """Values of the examples the split answer gave to part `group` ("E0#6/3"), read from the [[...]] marks of the split prompt."""
+    cl, part = group.split("/")
+    job = f"{run_key}_{run}_split_{cl.replace('#', '-')}_r1"
+    parsed = json.loads((step3_dir / "responses" / f"{job}.jsonl").read_text(encoding="utf-8").splitlines()[0])["parsed"]
+    marks = dict(re.findall(r"^- (\S+) .*?\[\[(.+?)\]\]", (step3_dir / "prompts" / f"{job}.txt").read_text(encoding="utf-8"), re.M))
+    return [marks[s].lower() for s in parsed["parts"][int(part)]["examples"] if s in marks]
+
+
+def fill_empty_examples(set_name, run_dir, ho, out):
+    """Sheet rows with no example values (split parts whose values all sit in another part, so 0 mentions): show the values of the part's
+    split examples, marked "(no mentions)". Display only; the scoring is unchanged."""
+    d = Path(out) / set_name
+    sheet = pd.read_csv(d / "human_check_sheet.csv", dtype=str, keep_default_na=False)
+    key = pd.read_csv(d / "human_check_key.csv", dtype=str, keep_default_na=False).set_index("id")
+    final = json.loads((run_dir / "step3" / "scores" / "final_columns.json").read_text(encoding="utf-8"))[RUN_OF[set_name]]
+    for i in sheet.index[sheet["example_values"] == ""]:
+        ent, cid = key.loc[sheet.at[i, "id"], "item_id"].split(":")
+        run_key = ho[ent]["run_key"]
+        col = next(c for c in final[run_key] if str(c["cid"]) == cid)
+        vals = [v for g in col["groups"] for v in split_values(run_dir / "step3", run_key, RUN_OF[set_name], g)]
+        top = [v for v, _ in Counter(vals).most_common(MC.M.N_EXAMPLES)]
+        sheet.at[i, "example_values"] = " | ".join(top) + " (no mentions)" if top else "(no mentions)"
+    sheet.to_csv(d / "human_check_sheet.csv", index=False, encoding="utf-8", lineterminator="\n")
+
+
 def run(set_name, runs=RUNS, out=OUT):
     run_dir = Path(runs) / set_name
     keys = json.loads((run_dir / "entities.json").read_text(encoding="utf-8"))        # {key: stage-1 id}
@@ -81,6 +108,7 @@ def run(set_name, runs=RUNS, out=OUT):
                                        encoding="utf-8", newline="\n")
     ho = handover(final, emap)
     md, _ = MC.run(set_name, loop2_file(run_dir, emap, d), None, MC.SPANS, out, handover=ho)
+    fill_empty_examples(set_name, run_dir, ho, out)
     return md
 
 
