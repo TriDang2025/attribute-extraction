@@ -18,7 +18,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 RUN_OF = {"dev50": "c_n50", "dev50b": "c_n50b"}
-STOPS = ["vote", "overlap", "no spans", "too few dialogues", "duplicate", "merged", "added"]
+STOPS = ["vote", "name check", "overlap", "no spans", "too few dialogues", "duplicate", "merged", "added"]
 N_SHOW = 3
 
 
@@ -33,6 +33,8 @@ def stop_point(row, seen_cols):
         hit = key in seen_cols
         seen_cols.add(key)
         return "merged" if hit else "added"
+    if row["stage"] == "check":                     # loop2_v46.screen: repeats an existing name, too long, not generic
+        return "name check"
     first = row["reason"].split(";")[0]
     if first.startswith("no spans"):
         return "no spans"
@@ -95,7 +97,7 @@ def main():
     ap.add_argument("--out", default=str(ROOT / "results" / "wf_v47" / "z1"))
     a = ap.parse_args()
     counts = {s: run_set(s, a.runs, a.out)["stop"].value_counts() for s in RUN_OF}
-    lines = ["# Z1 stop points of the v4.6 loop-2 suggestions", "", "| stop point | " + " | ".join(RUN_OF) + " |", "|---|---|---|"]
+    lines = [f"# Stop points of the loop-2 suggestions ({Path(a.runs).relative_to(ROOT).as_posix() if Path(a.runs).is_relative_to(ROOT) else a.runs})", "", "| stop point | " + " | ".join(RUN_OF) + " |", "|---|---|---|"]
     lines += [f"| {s} | " + " | ".join(str(counts[k].get(s, 0)) for k in RUN_OF) + " |" for s in STOPS]
     lines += ["| total | " + " | ".join(str(counts[k].sum()) for k in RUN_OF) + " |"]
     p = Path(a.out) / "z1.md"
