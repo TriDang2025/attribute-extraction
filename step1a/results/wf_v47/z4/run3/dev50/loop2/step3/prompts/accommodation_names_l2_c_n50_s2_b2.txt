@@ -1,0 +1,48 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 2 of 2 (6 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### L2_accommodation#5  (mentions 13, distinct values 8)
+Hint: this cluster was searched for as "rating" (a suggested name; use it only if it fits the values).
+Examples:
+- L2_accommodation#5:0 [user] previous turn, system: I have several different hotels. Are you wanting a certain area of town or any special accommodations? | turn: I would prefer it to be a [[4 star]] hotel, with free parking.
+- L2_accommodation#5:1 [user] previous turn, system: What other star option would you like ? | turn: How about a [[4 star rating]]?
+- L2_accommodation#5:2 [system] previous turn, user: Not, at the moment. However, I would also like to find a hotel to stay with free wifi and a moderate price range. | turn: There are 17 options. Do you care about area, type or [[star rating]]?
+- L2_accommodation#5:3 [user] previous turn, system: There are 17 options. Do you care about area, type or star rating? | turn: I would like a [[0 star]] hotel.
+- L2_accommodation#5:4 [user] turn: I'm curious about the [[3-star]] lodging options available in Cambridge.
+- L2_accommodation#5:5 [user] previous turn, system: Anatolia is located at 30 Bridge Street City Centre. | turn: Thank you! I am also looking for a [[5 star]] hotel.
+- L2_accommodation#5:6 [user] previous turn, system: There are no 4-star lodgings available in Cambridge that meet your criteria. Shall we check 5-star locations instead? | turn: Yes, please try [[5-star]] hotels with free parking.
+- L2_accommodation#5:7 [system] previous turn, user: Before I book, is the guesthouse located in the south part of town and at what price range? | turn: The hotel is found in the Northern part of town and it is in the [[moderate price range]]
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (L2_accommodation#5) and its name as the value, like {"L2_accommodation#5": "<name>"}.

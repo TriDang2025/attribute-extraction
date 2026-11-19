@@ -1,0 +1,57 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E1: batch 1 of 1 (2 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### L2_train_info#1  (mentions 13, distinct values 6)
+Hint: this cluster was searched for as "route" (a suggested name; use it only if it fits the values).
+Examples:
+- L2_train_info#1:0 [user] turn: I want to depart from Cambridge by [[train]].
+- L2_train_info#1:1 [user] previous turn, system: Yes, that's the postcode. Is there anything else I can assist you with? | turn: Yes, I need a train going to [[cambridge]].
+- L2_train_info#1:2 [user] turn: I'm looking to book a train that goes to [[ely]] and leaves on sunday please.
+- L2_train_info#1:3 [user] previous turn, system: I have found several trains that you can use. What is your destination? | turn: [[The train]] should go to Cambridge on Tuesday
+- L2_train_info#1:4 [system] previous turn, user: I need to book seats for 4 people please, and can I get the reference number for that? | turn: First let's verify which train you want. The [[TR1719]] will have you at your destination around 10:09.
+- L2_train_info#1:5 [system] previous turn, user: No just to leave after 13:15. | turn: then train ID [[TR4679]] suits you. it leaves at 13:19
+- L2_train_info#1:6 [system] previous turn, user: I need a train that leaves at 20:45 from stevenage to cambridge | turn: What day would you like to travel by [[train]]?
+- L2_train_info#1:7 [user] previous turn, system: ok the address is huntingdon road in city centre, the phone # is 01223276182, and the postcode is cb30df. will there be anything else ? | turn: I am also looking for a train from [[Cambridge]] on Wednesday.
+
+### L2_train_info#9  (mentions 5, distinct values 5)
+Hint: this cluster was searched for as "seating capacity" (a suggested name; use it only if it fits the values).
+Examples:
+- L2_train_info#9:0 [user] previous turn, system: Great! I found 9 trains that match your requests. I'll be happy to book one if you'll let me know how many tickets you need. | turn: I need to book seats for [[4 people]] please, and can I get the reference number for that?
+- L2_train_info#9:1 [user] previous turn, system: First let's verify which train you want. The TR1719 will have you at your destination around 10:09. | turn: Yes, that sounds perfect. I'll need [[4 seats]].
+- L2_train_info#9:2 [user] previous turn, system: There are only 4 trains that leave on Saturday | turn: I just need to find a train that leaves at 19:30 for [[5 people]]
+- L2_train_info#9:3 [system] previous turn, user: Sunday,can you book it for me and I need a reference number,please | turn: Sure. Just to confirm, [[how many seats]] will you need?
+- L2_train_info#9:4 [system] previous turn, user: Please book it and send me the confirmation code. | turn: Before i book it, could you confirm the [[number of seats]] you need?
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (L2_train_info#1, L2_train_info#9) and its name as the value, like {"L2_train_info#1": "<name>"}.
