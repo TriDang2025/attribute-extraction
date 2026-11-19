@@ -1,0 +1,48 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E0: batch 2 of 2 (6 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E2: 15:15, 18:00, 10:00; city centre, centre, centre area; expensive, moderately priced, expensive price range
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### L2_accommodation#12  (mentions 12, distinct values 2)
+Hint: this cluster was searched for as "parking" (a suggested name; use it only if it fits the values).
+Examples:
+- L2_accommodation#12:0 [user] turn: Find a budget hotel with [[free parking]] in Cambridge.
+- L2_accommodation#12:1 [system] previous turn, user: I am also looking for a hotel in the north please. | turn: The acorn guest house is available in your selected region. It's moderately priced and includes free internet and [[parking]].
+- L2_accommodation#12:2 [user] previous turn, system: There are no 3-star lodgings available in Cambridge. Shall we check 4-star locations instead? | turn: Sure. Check only for hotels which include [[free parking]] also.
+- L2_accommodation#12:3 [system] previous turn, user: how about the north? | turn: How about the Ashley Hotel? They have free internet and [[parking]], though.
+- L2_accommodation#12:4 [system] previous turn, user: Hello. I'm hoping to find a guesthouse in the north part of Cambridge. Are there any? | turn: Indeed there are. In fact, there are 11. If you'd like an inexpensive, 4 star guesthouse with free internet and [[free parking]], Worth House is a good choice.
+- L2_accommodation#12:5 [system] previous turn, user: I want to stay at a 3 star hotel with free parking. | turn: I'm sorry for the confusion. There are two expensive hotels with 3 stars and [[parking]]. Do you prefer the centre or the south?
+- L2_accommodation#12:6 [user] previous turn, system: We have several hotels that meet your requirements. Would you prefer a hotel that is cheap or moderate in price? | turn: Oh, I really don't worry about the price, so long as it has four stars and [[free parking]].
+- L2_accommodation#12:7 [user] previous turn, system: Your booking was successful, the total fee is 66 GBP payable at the station . Your reference number is : P6G0S9IT. Is there anything else I can help you with? | turn: I need a hotel in the west with [[free parking]] please.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (L2_accommodation#12) and its name as the value, like {"L2_accommodation#12": "<name>"}.
