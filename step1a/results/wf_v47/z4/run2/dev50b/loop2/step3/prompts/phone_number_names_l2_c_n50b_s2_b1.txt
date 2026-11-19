@@ -1,0 +1,48 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E4: batch 1 of 1 (1 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 11:30, 13:06, 16:15; sunday, friday, monday; cambridge, cambridge towninfo centre
+- E1: guesthouse, hotel, acorn guest house; 2 night, 4 night, 5 night; wednesday, friday, sunday
+- E2: centre, centre of town, centre area; cb23bu, cb17gx, cb18dw; 01223307402, 01223314960, 01223333516
+- E3: moderately priced, moderate price range, expensive; restaurant, j restaurant, danish restaurant; centre, city centre, center of town
+
+### L2_phone_number#22  (mentions 8, distinct values 7)
+Hint: this cluster was searched for as "type" (a suggested name; use it only if it fits the values).
+Examples:
+- L2_phone_number#22:0 [system] previous turn, user: I would like to leave and 2:30 p.m and arrive at 3:23 p.m. | turn: I have a [[taxi]], a red skoda, booked for you. Your contact number is 07481840729. Can I help you with anything else?
+- L2_phone_number#22:1 [system] previous turn, user: It doesn't matter when I arrive at Rice House as long as the taxi leaves after 19:15. | turn: You will be picked up by a [[black ford]] and the contact number is 07635928440. Anything else?
+- L2_phone_number#22:2 [system] previous turn, user: Actually, on second thought. I should book it later. But, can you book me a taxi from Allenbell to J Restaurant. I need to be there by 13:15. | turn: Your taxi was booked! The car type will be [[blue ford]] and the contact number is 07646890093.
+- L2_phone_number#22:3 [user] previous turn, system: I have that booked for you, contact number 07340953955. Do you need anyhting else? | turn: I need the [[car type]] please.
+- L2_phone_number#22:4 [system] previous turn, user: I would like to arrive at the restaurant no later than ten o'clock a.m. | turn: I have confirmed a taxi booking for you, a [[red tesla]] will be picking you up.
+- L2_phone_number#22:5 [system] previous turn, user: Leaving from travelers rest | turn: Booking completed! Booked car type : [[white ford]] Contact number : 07267142867
+- L2_phone_number#22:6 [system] previous turn, user: I will be leaving from leverton house arriving by 06:45. | turn: Booking is complete. Your car is a [[white tesla]] and contact number is 07609996919.
+- L2_phone_number#22:7 [user] turn: I want help booking a [[taxi]]
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (L2_phone_number#22) and its name as the value, like {"L2_phone_number#22": "<name>"}.

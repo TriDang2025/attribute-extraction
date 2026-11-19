@@ -1,0 +1,57 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E2: batch 1 of 1 (2 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: 11:30, 13:06, 16:15; sunday, friday, monday; cambridge, cambridge towninfo centre
+- E1: guesthouse, hotel, acorn guest house; 2 night, 4 night, 5 night; wednesday, friday, sunday
+- E3: moderately priced, moderate price range, expensive; restaurant, j restaurant, danish restaurant; centre, city centre, center of town
+- E4: 14:45, 19:15, 06:45; 07048450899, 07128258422, 07267142867; restaurant, hotel, j restaurant
+
+### L2_location#1  (mentions 15, distinct values 8)
+Hint: this cluster was searched for as "directions" (a suggested name; use it only if it fits the values).
+Examples:
+- L2_location#1:0 [user] previous turn, system: Okay, that sounds fun! What area are you going to be in? | turn: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and [[address]].
+- L2_location#1:1 [user] previous turn, system: There are many to choose from! Almost 80. Can you tell me if you have a certain type of place you want to visit? | turn: What do you recommend? I will be need the address, entrance fee, and [[postcode]] for what you recommend please.
+- L2_location#1:2 [user] previous turn, system: We have four theatre's in the centre of town and one theatre on the south side. Do you have a preference on location? | turn: I'm interested in the one on the south side of town. Please provide me their postcode and [[phone number]].
+- L2_location#1:3 [system] previous turn, user: Can I have their phone number and address? Also, are there any trains that go from Peterborough to Cambridge? | turn: sure no problem. Address is [[11 Peas Hill City Centre]] and phone number is 01223566188. Would you like to book a reservation?
+- L2_location#1:4 [system] previous turn, user: No specific area. Just the first thing that pops up. | turn: Cherry Hinton hall and grounds is on the [[east part of town]].
+- L2_location#1:5 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend Castle Galleries, phone number 01223307402, postal code cb23bj, address unit su43, [[grande arcade]], saint andrews street. It is free.
+- L2_location#1:6 [system] previous turn, user: We will be in the centre area. What do you suggest? Please provide phone number, postcode, and address. | turn: I have 11 museums in the Centre. I would recommend Castle Galleries, phone number 01223307402, postal code cb23bj, address unit su43, grande arcade, [[saint andrews street]]. It is free.
+- L2_location#1:7 [system] previous turn, user: Do you have there address? | turn: The address of hughes hall is [[wollaston road]].
+
+### L2_location#5  (mentions 5, distinct values 5)
+Hint: this cluster was searched for as "amenities" (a suggested name; use it only if it fits the values).
+Examples:
+- L2_location#5:0 [user] turn: I am looking for some places to go in town. I'm so excited about seeing some of the [[local attractions]].
+- L2_location#5:1 [system] previous turn, user: Yes, I am looking for a multiple sports attraction in the centre. | turn: I'm sorry, but there are no [[multiple sports type attractions]] in the centre. Would you like to try a different area?
+- L2_location#5:2 [system] previous turn, user: what attractions do you have in the centre of town? | turn: There are [[multiple types of attractions]] in the centre of town. What are you interested in so I can better help you?
+- L2_location#5:3 [system] previous turn, user: Is there one in the centre with free parking | turn: Sorry, [[parking]] isn't something that is mentioned for attractions.
+- L2_location#5:4 [system] previous turn, user: I am not entirely sure. What would you recommend? | turn: Are you interested in archaeology? Our Museum of Archaelogy and Anthropology might interest you. Or if you want to exercise, [[Parkside Pools]] would be a fun venue.
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (L2_location#1, L2_location#5) and its name as the value, like {"L2_location#1": "<name>"}.
