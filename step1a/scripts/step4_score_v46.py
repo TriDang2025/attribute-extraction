@@ -31,8 +31,8 @@ CHAINS = [  # (label, dev set, run name, step 4 folder)
 METRICS = ("table_f1", "grouping_f1", "gt_columns_placed", "pk_right", "pk_right_b")
 
 
-def score_chain(gt, label, dev, run, folder):
-    chain = f"a_llama44_{run}_s0"
+def score_chain(gt, label, dev, run, folder, seed=0):
+    chain = f"a_llama44_{run}_s{seed}"
     c = json.loads((folder / "final" / chain / "canonical.json").read_text(encoding="utf-8"))
     full = G.map_handover(folder / "score_map" / "a_llama44", run, ROOT / SCR.GT_LEVELS[dev], G.gt_names(gt))
     srcs = {x["source"] for t in c["tables"] for x in t["columns"] if x.get("source")} | {u["source"] for u in c.get("unused", [])}

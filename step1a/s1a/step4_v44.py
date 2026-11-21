@@ -35,6 +35,7 @@ from . import batch_v4 as B
 from . import nov16_v41 as NV
 from . import step4_gt as G
 from . import step4_inputs as I
+from . import step4_neutral_v48 as NT
 from . import step4_p2batch_v46 as P2B
 from . import step4_prompts as SP
 from . import step4_score as S
@@ -70,10 +71,11 @@ def load_config(path=CONFIG):
     return {"switches": dict(cfg["switches"]), "thresholds": dict(cfg["thresholds"])}
 
 
-def with_switches(cfg, off=(), p2_batch=None, **kw):
+def with_switches(cfg, off=(), p2_batch=None, neutral_ids=None, **kw):
     """Copy of cfg with the switches in `off` set to False and the keyword switches set (e.g. all_off = with_switches(cfg, off=SWITCHES)).
     p2_batch (wf_v4.6, not one of SWITCHES): pass 2 in batches of that many columns (step4_p2batch_v46); None keeps the value of cfg, 0 or none = off.
-    The key "p2_batch" is in the result only when it is on."""
+    neutral_ids (wf_v4.8, not one of SWITCHES): pass 2 with neutral table ids (step4_neutral_v48); None keeps the value of cfg.
+    The keys "p2_batch" / "neutral_ids" are in the result only when on."""
     sw = {**cfg["switches"], **kw, **{k: False for k in off}}
     unknown = set(sw) - set(SWITCHES)
     if unknown:
@@ -82,6 +84,8 @@ def with_switches(cfg, off=(), p2_batch=None, **kw):
     n = P2B.check(cfg.get("p2_batch") if p2_batch is None else p2_batch)
     if n:
         out["p2_batch"] = n
+    if cfg.get("neutral_ids") if neutral_ids is None else neutral_ids:
+        out["neutral_ids"] = True
     return out
 
 
@@ -503,7 +507,11 @@ def replay(out, chain, upto, root=ROOT):
         parsed, why = P2B.answer(out, chain, cols)
         if why:
             return st, f"p2: {why}", log
-        st["assign"], st["rest_host"], st["names"] = p2_assign(parsed, cols, st["p1_names"], sw, log, cid)
+        p2_names = NT.neutral(st["p1_names"]) if chain.get("neutral_ids") else st["p1_names"]
+        st["assign"], st["rest_host"], st["names"] = p2_assign(parsed, cols, p2_names, sw, log, cid)
+        if chain.get("neutral_ids"):
+            st["assign"], st["names"], ren = NT.name_tables(st["assign"], st["names"], cols, log, cid)
+            st["rest_host"] = {i: ren.get(t, t) for i, t in st["rest_host"].items()}
     if not st["names"]:
         return st, "p2: no column assigned to a table", log
     st["links"] = []
@@ -570,12 +578,16 @@ def build_stage(out, k, chains, root=ROOT):
             text, schema, fmt = build_p1(st["cols"], sw)
             _emit(jobs, f"{cid}_p1", fmt, text, schema, ch, k, n_columns=len(st["cols"]))
         elif k == 2:
+            def p2(c, st=st, sw=sw, neutral=ch.get("neutral_ids")):
+                if neutral:
+                    return NT.build_p2(lambda cc, ids: build_p2(cc, ids, sw), c, st["p1_names"])
+                return build_p2(c, st["p1_names"], sw)
             if ch.get("p2_batch"):
-                for name, text, schema, fmt, bc in P2B.prompts(lambda c: build_p2(c, st["p1_names"], sw), st["cols"], cid, ch["p2_batch"]):
+                for name, text, schema, fmt, bc in P2B.prompts(p2, st["cols"], cid, ch["p2_batch"]):
                     _emit(jobs, name, fmt, text, schema, ch, k, n_columns=len(bc))
                     jobs.jobs[-1]["max_tokens"] = P2B.max_tokens(len(bc), MAX_TOKENS[fmt])
                 continue
-            text, schema, fmt = build_p2(st["cols"], st["p1_names"], sw)
+            text, schema, fmt = p2(st["cols"])
             _emit(jobs, f"{cid}_p2", fmt, text, schema, ch, k, n_columns=len(st["cols"]))
         elif k == 3:
             for i, j, ev in link_pairs(st, sw, th):
@@ -653,9 +665,10 @@ def make_chains(out, inputs=INPUTS, sets=SETS, seeds=SEEDS, cfg=None, step3_dirs
                     write_score_map(out, inp, s, ids)
             seed_chains = [{"id": B.chain_id(inp, s, d), "kind": "main", "input": inp, "set": s, "seed": d, "exclude": [], "prompt_version": "v44",
                             "columns_file": _rel(p, root), "switches": dict(sw), "thresholds": dict(th), "values_file": vf} for d in seeds]
-            if cfg.get("p2_batch"):
-                for c in seed_chains:
-                    c["p2_batch"] = cfg["p2_batch"]
+            for key in ("p2_batch", "neutral_ids"):
+                if cfg.get(key):
+                    for c in seed_chains:
+                        c[key] = cfg[key]
             chains += seed_chains
             if sw["vote"] and len(seeds) >= 2:
                 chains.append({**seed_chains[0], "id": f"{inp}_{s}_vote", "kind": "vote", "seed": 0, "members": seed_chains})
@@ -700,8 +713,9 @@ def run(out, backend, inputs=INPUTS, sets=SETS, seeds=SEEDS, cfg=None, step3_dir
         chains = [c for c in B.read_json(out / "chains.json") if c["input"] not in inputs] + chains
     B.write_json(out / "chains.json", chains)
     info = {"chains": len(chains), "switches": cfg["switches"], "thresholds": cfg["thresholds"], "inputs": {}}
-    if cfg.get("p2_batch"):
-        info["p2_batch"] = cfg["p2_batch"]
+    for key in ("p2_batch", "neutral_ids"):
+        if cfg.get(key):
+            info[key] = cfg[key]
     for inp in inputs:
         cs = [c for c in chains if c["input"] == inp]
         if not cs:
