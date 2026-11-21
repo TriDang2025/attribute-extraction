@@ -88,8 +88,27 @@ def table_md(df):
     return "\n".join(lines)
 
 
+def figure(gt, dev="dev50", seed=0, root=OUT):
+    """<root>/fig_schema_<dev>_s<seed>.png: variant A, variant B and the GT main design, side by side (fig_schema_v43.draw)."""
+    import matplotlib.pyplot as plt
+    import fig_schema_v43 as FIG
+    from s1a import step4_gt as SG
+    run = G.SETS[dev]
+    fig, axes = plt.subplots(1, 3, figsize=(24, 10))
+    for ax, v in zip(axes, G.VARIANTS):
+        c = json.loads((Path(root) / dev / f"step4_{v}" / "final" / f"a_llama44_{run}_s{seed}" / "canonical.json").read_text(encoding="utf-8"))
+        FIG.draw(ax, SC43._schema_view(c), f"Variant {v} ({'batched' if v == 'A' else 'batched + neutral ids'}), {dev}, seed {seed}")
+    FIG.draw(axes[2], SC43._schema_view(SG.to_canonical(gt)), "Ground truth (schema GT v1)")
+    fig.tight_layout()
+    p = Path(root) / f"fig_schema_{dev}_s{seed}.png"
+    fig.savefig(p, dpi=110)
+    return p
+
+
 def main():
-    df = rows(SC43.load_gt(ROOT))
+    gt = SC43.load_gt(ROOT)
+    print("wrote", figure(gt))
+    df = rows(gt)
     OUT.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT / "scores.csv", index=False, encoding="utf-8", lineterminator="\n")
     full = df[df.get("gt_view", pd.Series(dtype=str)) == "full"] if "gt_view" in df else df
