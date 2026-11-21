@@ -1,0 +1,42 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table accommodation (one row = one accommodation), 5 columns:
+[accommodation:10] num days
+  values: number (share 0.91); 22 mentions in 15 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+[accommodation:6] entity
+  values: text (share 1.00); 16 mentions in 9 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "3 star hotel" (in: "I want to stay at a 3 star hotel with free parking.")
+[accommodation:12] num people
+  values: number (share 0.88); 16 mentions in 11 dialogues
+  examples:
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+[accommodation:25] internet
+  values: text (share 1.00); 29 mentions in 10 dialogues
+  examples:
+    "free wifi" (in: "Yes, can you find a place for me with free wifi in the moderate price range?")
+    "free internet" (in: "...lected region. It's moderately priced and includes free internet and parking.")
+[accommodation:2] attribute
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "hotel" (in: "Can you please confirm that the hotel you've booked for us offers free wi-fi?...")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+
+Return the JSON object now.

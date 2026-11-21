@@ -1,0 +1,45 @@
+Below are two tables of a relational database design, each with its columns. Decide whether accommodation and train_info_2 are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "accommodation -> train_info_2": one accommodation row has many train_info_2 rows (each train_info_2 row refers to one accommodation row)
+- "train_info_2 -> accommodation": one train_info_2 row has many accommodation rows (each accommodation row refers to one train_info_2 row)
+- "many_to_many": a accommodation row can go with many train_info_2 rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table accommodation (one row = one accommodation), 4 columns:
+[accommodation:21] str
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+[accommodation:24] amenities
+  values: text (share 1.00); 11 mentions in 7 dialogues
+  examples:
+    "free parking" (in: "the north part of town. It offers free wifi and free parking.")
+    "free internet" (in: "...lected region. It's moderately priced and includes free internet and parking.")
+[accommodation:25] internet
+  values: text (share 1.00); 29 mentions in 10 dialogues
+  examples:
+    "free wifi" (in: "Yes, can you find a place for me with free wifi in the moderate price range?")
+    "free internet" (in: "...lected region. It's moderately priced and includes free internet and parking.")
+[accommodation:26] parking
+  values: text (share 1.00); 14 mentions in 6 dialogues
+  examples:
+    "free parking" (in: "Yes, please try 5-star hotels with free parking.")
+
+Table train_info_2 (one row = one train_info_2), 1 columns:
+[train_info:19] total fee
+  values: text (share 0.67); 6 mentions in 5 dialogues
+  examples:
+    "17.89" (in: "...ference number is 698RE4W1. The total fee of 17.89 is payable at the station.")
+    "37.79 gpb" (in: "...ber is GJ3062PE. The total fee is 37.79 GPB which you can pay at the station.")
+
+Return the JSON object now.

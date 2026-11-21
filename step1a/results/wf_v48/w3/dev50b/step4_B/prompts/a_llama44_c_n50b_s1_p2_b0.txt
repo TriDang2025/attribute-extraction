@@ -1,0 +1,132 @@
+Below are columns found by analysing a corpus of dialogues (a kind of information, with a description, the type of its values, example values and
+counts) and the list of tables of a database design. Put every column into exactly one of the listed tables, or into "unused" when a database
+would not store it. Use only the listed names; do not add tables. Use "unused" only when the column clearly holds nothing a database would
+store.
+Return ONLY one JSON object, nothing before or after it. Shape (the ids and names here are made up): {"x:1": "table_a", "x:2": "table_b", "x:3": "unused"}
+Every column id must appear once.
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Pass 1, the main things (tables): ["customer", "car", "rental"]
+Pass 2, each column to one table:
+{"customer_name": "customer", "customer_phone": "customer", "licence_number": "customer", "car_model": "car", "car_class": "car",
+ "plate_number": "car", "pickup_date": "rental", "return_date": "rental", "daily_rate": "rental"}
+
+Tables: table_1, table_2, table_3, table_4, table_5
+Table hints (the names given to these tables before; use them only as a hint, the columns decide): table_1 = train, table_2 = accommodation, table_3 = location, table_4 = establishment, table_5 = phone_number.
+
+Columns (20):
+== train_schedule ==
+[train_schedule:3] date
+  values: day (share 1.00); 17 mentions in 11 dialogues
+  examples:
+    "sunday" (in: "Cambridge, and it will be on sunday.")
+    "monday" (in: "I'm going to London's Kings Cross on Monday.")
+    "tuesday" (in: "Tuesday, I want to arrive at 20:15.")
+    "saturday" (in: "I am also look for a train on saturday to broxbourne.")
+[train_schedule:11] time
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[train_schedule:1] arrival time
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[train_schedule:15] train number
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[train_schedule:7] location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "Thank you for contacting the Cambridge TownInfo centre. Goodbye")
+[train_schedule:6] destination
+  values: text (share 1.00); 32 mentions in 17 dialogues
+  examples:
+    "broxbourne" (in: "I am also look for a train on saturday to broxbourne.")
+    "stevenage" (in: "am also looking for a train for Thursday departing from Stevenage.")
+    "peterborough" (in: "I need to get to Cambridge from Peterborough by 13:15 on the the same day as ...")
+    "birmingham new street" (in: "I'm departing from birmingham new street on Saturday and I'd like to leave af...")
+    "king lynn" (in: "hello. I'm trying to get to kings lynn on sunday. can you help?")
+[train_schedule:4] departure day
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "what day" (in: "Okay what day will you be travelling and what time would you like")
+    "what time" (in: "It might, what time does the train depart?")
+    "what time of day" (in: "...everal trains headed to broxbourne. What time of day would you like to leave?")
+    "which day" (in: "I need to know where you are departing from and which day.")
+[train_schedule:9] price
+  values: price (share 0.80); 10 mentions in 10 dialogues
+  examples:
+    "12.80 pound" (in: "Sure! The fare is 12.80 pounds and the travel time is 49 minutes. Is there an...")
+    "17.90" (in: "want info or to book the train? The cost is 17.90 per ticket.")
+    "17.90 pound" (in: "Alright. The price for TR 6357 is 17.90 pounds. Anything else?")
+    "23.60 pound" (in: "...o London Kings Cross will cost 23.60 pounds. Would you like me to book the...")
+    "31.36 gbp" (in: "...was successful, the total fee is 31.36 GBP payable at the station . Refere...")
+[train_schedule:8] number of people
+  values: number (share 1.00); 6 mentions in 6 dialogues
+  examples:
+    "2 people" (in: "Could you book that for me for 2 people?")
+    "3 seat" (in: "Yes, can you please book for 3 seats?")
+    "4 ticket" (in: "That sounds great. Can you book me 4 tickets on that train please?")
+    "5" (in: "Yes please. I need 5 tickets.")
+    "5 people" (in: "Yes, can I book that for 5 people?")
+[train_schedule:12] time int
+  values: time (share 1.00); 24 mentions in 13 dialogues
+  examples:
+    "11:30" (in: "I would like to arrive in cambridge by 11:30.")
+    "13:06" (in: "...is the TR0545 leaving cambridge at 13:06. Would you like me to book it or ...")
+    "16:15" (in: "I would like to leave after 16:15.")
+    "10:43" (in: "TR3330 will arrive at 10:43, would that work for you?")
+    "12:45" (in: "new street on Saturday and I'd like to leave after 12:45.")
+[train_schedule:16] travel time
+  values: duration (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "49 minute" (in: "...0 pounds and the travel time is 49 minutes. Is there anything else I can h...")
+    "163 minute" (in: "The total travel time will be 163 minutes. Is there anything else I can help ...")
+[train_schedule:2] booking reference
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[train_schedule:13] time str
+  values: time (share 0.50); 42 mentions in 17 dialogues
+  examples:
+    "friday" (in: "Yes, TR2515 departs on friday at 05:21 to stevenage, would you like me to book")
+    "thursday" (in: "I am also looking for a train for Thursday departing from Stevenage.")
+    "tr2515" (in: "Yes, TR2515 departs on friday at 05:21 to stevenage, would you like")
+    "05:01" (in: "TR6357 leaves at 05:01 and arrives at 06:01. Would you like me to book")
+    "05:11" (in: "I have train TR6003 leaving cambridge at 5:11 and arriving at 5:58 on sunday.")
+[train_schedule:14] total fee
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[train_schedule:10] reference number
+  values: text (share 0.71); 31 mentions in 16 dialogues
+  examples:
+    "cambridge" (in: "Cambridge, and it will be on sunday.")
+    "0w0bqb8w" (in: "I was able to book it, reference is 0W0BQB8W.")
+    "13gq9s3a" (in: "can pay for at the station. Your reference number is 13GQ9S3A.")
+    "1l0fbgwg" (in: "the total fee is 42.96 GBP and your reference #1l0FBGWG")
+    "6upai5j3" (in: "...oked it. Your reference number is 6UPAI5J3. What else can I do for you today?")
+[train_schedule:5] departure time
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+== accommodation_option ==
+[accommodation_option:24] parking
+  values: text (share 1.00); 16 mentions in 13 dialogues
+  examples:
+    "free parking" (in: "Does this place include free parking?")
+[accommodation_option:3] amenity str
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "north side of town" (in: "I'd like to be in the north side of town.")
+    "south part of town" (in: "...e Lensfield Hotel is in the south part of town. Do either of those sound g...")
+[accommodation_option:12] location part
+  values: text (share 1.00); 19 mentions in 9 dialogues
+  examples:
+    "north" (in: "I would like a hotel in the north, please.")
+    "east" (in: "I am looking for a cheap hotel on the east.")
+    "expensive price range" (in: "I found 3 for you all in the expensive price range. Can you please give me th...")
+    "south" (in: "moderately priced. Do you want to be in the north, south, or west side of town?")
+    "west side of town" (in: "Do you want to be in the north, south, or west side of town?")
+[accommodation_option:2] amenity
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "expensive" (in: "Yes, please try expensive.")
+
+Return the JSON object now.
