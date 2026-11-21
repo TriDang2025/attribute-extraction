@@ -1,0 +1,23 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+This table refers to the other tables listed below. For each of them, choose the id of the column of this table that holds the reference (its value points to a row of that table), or "new" when no column does; a new reference column is then added. Tables referred to: accommodation (one accommodation row has many rows of address).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "x:3", "new_id_name": "", "foreign_keys": {"table_b": "new"}}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table address (one row = one address), 1 columns:
+[location:2] reference number
+  values: id (share 0.50); 2 mentions in 2 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "It's my pleasure. Thank you for using Cambridge TownInfo centre. Goodbye.")
+    "pu74excq" (in: "That worked and I have a reference number for you: PU74EXCQ.")
+
+Return the JSON object now.

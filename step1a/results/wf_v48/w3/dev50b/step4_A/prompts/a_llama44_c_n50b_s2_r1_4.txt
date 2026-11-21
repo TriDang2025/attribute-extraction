@@ -1,0 +1,47 @@
+Below are two tables of a relational database design, each with its columns. Decide whether accommodation_option and phone_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "accommodation_option -> phone_number": one accommodation_option row has many phone_number rows (each phone_number row refers to one accommodation_option row)
+- "phone_number -> accommodation_option": one phone_number row has many accommodation_option rows (each accommodation_option row refers to one phone_number row)
+- "many_to_many": a accommodation_option row can go with many phone_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table accommodation_option (one row = one accommodation_option), 4 columns:
+[accommodation_option:8] hotel rating
+  values: number (share 0.50); 8 mentions in 4 dialogues
+  examples:
+    "2 star" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "3 star" (in: "Yes, how about a guesthouse with 3 stars and free wifi instead?")
+[accommodation_option:5] checkin date
+  values: day (share 0.80); 10 mentions in 10 dialogues
+  examples:
+    "wednesday" (in: "like it for 6 people for 2 nights starting on Wednesday.")
+    "thursday" (in: "book it for 8 people for 4 nights starting on thursday?")
+[accommodation_option:4] area
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "north" (in: "There are no 3 star hotels in the North. You sure a guesthouse won't work?")
+    "north center" (in: "I just need a 3 star hotel in the north center.")
+[accommodation_option:14] lodging type
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "finch bed and breakfast" (in: "Finches Bed and Breakfast is a cheap 4-star guesthouse on the west side. Its")
+    "carolina bed and breakfast" (in: "I recommend Carolina Bed and Breakfast. It's located close to where you'll be...")
+
+Table phone_number (one row = one phone_number), 1 columns:
+[phone_number:10] contact_number
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "taxi" (in: "I want help booking a taxi")
+    "black ford" (in: "You will be picked up by a black ford and the contact number is 07635928440. ...")
+
+Return the JSON object now.

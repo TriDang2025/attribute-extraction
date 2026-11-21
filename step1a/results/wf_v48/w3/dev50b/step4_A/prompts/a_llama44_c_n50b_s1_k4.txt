@@ -1,0 +1,37 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+This table refers to the other tables listed below. For each of them, choose the id of the column of this table that holds the reference (its value points to a row of that table), or "new" when no column does; a new reference column is then added. Tables referred to: establishment (one establishment row has many rows of phone_number).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "x:3", "new_id_name": "", "foreign_keys": {"table_b": "new"}}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table phone_number (one row = one phone_number), 4 columns:
+[accommodation_option:16] phone number
+  values: number (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "01223247015" (in: "address is 138 Perne Road and their phone number is 01223247015.")
+    "01223334860" (in: "The phone of Downing College is 01223334860. Do you need a place to stay?")
+[phone_number:10] contact_number
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "taxi" (in: "I want help booking a taxi")
+    "black ford" (in: "You will be picked up by a black ford and the contact number is 07635928440. ...")
+[phone_number:4] departure location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "leverton house" (in: "I will be leaving from leverton house arriving by 06:45.")
+[phone_number:9] time str
+  values: number (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "07048450899" (in: "you need to contact the taxi company, you can call 07048450899.")
+    "07128258422" (in: "up at hughes hall at 14:45. The contact number is 07128258422.")
+
+Return the JSON object now.

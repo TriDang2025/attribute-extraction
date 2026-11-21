@@ -1,0 +1,140 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train and location are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train -> location": one train row has many location rows (each location row refers to one train row)
+- "location -> train": one location row has many train rows (each train row refers to one location row)
+- "many_to_many": a train row can go with many location rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train (one row = one train), 10 columns:
+[train_schedule:3] date
+  values: day (share 1.00); 17 mentions in 11 dialogues
+  examples:
+    "sunday" (in: "Cambridge, and it will be on sunday.")
+    "monday" (in: "I'm going to London's Kings Cross on Monday.")
+[train_schedule:7] location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "Thank you for contacting the Cambridge TownInfo centre. Goodbye")
+[train_schedule:6] destination
+  values: text (share 1.00); 32 mentions in 17 dialogues
+  examples:
+    "broxbourne" (in: "I am also look for a train on saturday to broxbourne.")
+    "stevenage" (in: "am also looking for a train for Thursday departing from Stevenage.")
+[train_schedule:4] departure day
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "what day" (in: "Okay what day will you be travelling and what time would you like")
+    "what time" (in: "It might, what time does the train depart?")
+[train_schedule:9] price
+  values: price (share 0.80); 10 mentions in 10 dialogues
+  examples:
+    "12.80 pound" (in: "Sure! The fare is 12.80 pounds and the travel time is 49 minutes. Is there an...")
+    "17.90" (in: "want info or to book the train? The cost is 17.90 per ticket.")
+[train_schedule:8] number of people
+  values: number (share 1.00); 6 mentions in 6 dialogues
+  examples:
+    "2 people" (in: "Could you book that for me for 2 people?")
+    "3 seat" (in: "Yes, can you please book for 3 seats?")
+[train_schedule:12] time int
+  values: time (share 1.00); 24 mentions in 13 dialogues
+  examples:
+    "11:30" (in: "I would like to arrive in cambridge by 11:30.")
+    "13:06" (in: "...is the TR0545 leaving cambridge at 13:06. Would you like me to book it or ...")
+[train_schedule:16] travel time
+  values: duration (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "49 minute" (in: "...0 pounds and the travel time is 49 minutes. Is there anything else I can h...")
+    "163 minute" (in: "The total travel time will be 163 minutes. Is there anything else I can help ...")
+[train_schedule:13] time str
+  values: time (share 0.50); 42 mentions in 17 dialogues
+  examples:
+    "friday" (in: "Yes, TR2515 departs on friday at 05:21 to stevenage, would you like me to book")
+    "thursday" (in: "I am also looking for a train for Thursday departing from Stevenage.")
+[train_schedule:10] reference number
+  values: text (share 0.71); 31 mentions in 16 dialogues
+  examples:
+    "cambridge" (in: "Cambridge, and it will be on sunday.")
+    "0w0bqb8w" (in: "I was able to book it, reference is 0W0BQB8W.")
+
+Table location (one row = one location), 14 columns:
+[accommodation_option:10] location
+  values: text (share 1.00); 35 mentions in 18 dialogues
+  examples:
+    "cambridge" (in: "I am going to cambridge and need a hotel")
+    "alexander bed and breakfast" (in: "Alexander bed and breakfast can acommodate your request.")
+[accommodation_option:13] location str
+  values: text (share 0.75); 8 mentions in 6 dialogues
+  examples:
+    "centre of town" (in: "actually like a hotel instead of guesthouse and in the centre of town.")
+    "centre" (in: "...you. The Gonville Hotel is in the centre and The Lensfield Hotel is in the...")
+[accommodation_option:1] address
+  values: text (share 1.00); 5 mentions in 3 dialogues
+  examples:
+    "138 perne road" (in: "...tely priced. Their address is 138 Perne Road and their phone number is 012...")
+    "365 milton road" (in: "located at 74 Chesterton road and Lovell Lodge located at 365 Milton road.")
+[location:5] museum
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "castle gallery" (in: "...he Centre. I would recommend Castle Galleries, phone number 01223307402, p...")
+    "the broughton house gallery" (in: "the broughton house gallery is a museum located in the centre.")
+[location:6] park
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "wandlebury country park" (in: "...are free. May I recommend Wandlebury country park located wandlebury ring,...")
+    "wandlebury ring" (in: "...ndlebury country park located wandlebury ring, gog magog hills, babraham? ...")
+[location:2] college
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "magdalene" (in: "honestly recommend visiting a famous college such as Christs or Magdalene.")
+[location:3] entrance fee
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "entrance fee" (in: "Do you have any information on their entrance fees?")
+    "free" (in: "street , post code cb21dq. You can visit them for free! Anything else you need?")
+[location:4] location
+  values: text (share 1.00); 48 mentions in 13 dialogues
+  examples:
+    "centre" (in: "I am looking for a multiple sports attraction in the centre.")
+    "centre of town" (in: "what attractions do you have in the centre of town?")
+[location:9] theatre
+  values: number (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "1 theatre" (in: "...tre's in the centre of town and one theatre on the south side. Do you have...")
+    "4 theatre" (in: "We have four theatre's in the centre of town and one theatre on")
+[establishment:7] location
+  values: text (share 1.00); 17 mentions in 11 dialogues
+  examples:
+    "attraction" (in: "...ated in the center of town near attractions, hotels and easy access to tra...")
+    "cambridge" (in: "Is there any good Jamaican food in Cambridge?")
+[establishment:8] location str
+  values: text (share 1.00); 21 mentions in 14 dialogues
+  examples:
+    "centre" (in: "I have 13 colleges available in the centre. Did yo have one particular in mind?")
+    "city centre" (in: "... J restaurant, 86 Regent Street City Centre. I currently do not have revie...")
+[establishment:13] postcode
+  values: id (share 0.50); 4 mentions in 4 dialogues
+  examples:
+    "c.b 2" (in: "The address is Corn Exchange Street and the postcode is C.B 2, 3QF")
+    "cb21rh" (in: "...ess is at king's parade. The post code cb21rh and the entree fee is 2 pounds.")
+[phone_number:8] pickup location
+  values: text (share 1.00); 12 mentions in 6 dialogues
+  examples:
+    "restaurant" (in: "...need a taxi to get from college to the restaurant. I need to arrive by 14:45.")
+    "college" (in: "I also need a taxi to get from college to the restaurant. I need to arrive by...")
+[phone_number:6] destination
+  values: text (share 1.00); 9 mentions in 5 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "cambridge" (in: "Your welcome, enjoy your time in Cambridge.")
+
+Return the JSON object now.

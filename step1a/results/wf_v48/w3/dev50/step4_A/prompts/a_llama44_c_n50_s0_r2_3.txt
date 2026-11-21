@@ -1,0 +1,194 @@
+Below are two tables of a relational database design, each with its columns. Decide whether address and location are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "address -> location": one address row has many location rows (each location row refers to one address row)
+- "location -> address": one location row has many address rows (each address row refers to one location row)
+- "many_to_many": a address row can go with many location rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table address (one row = one address), 13 columns:
+[address:1] address
+  values: text (share 0.73); 11 mentions in 7 dialogues
+  examples:
+    "clifton way" (in: "Cambridge Leisure Park Clifton Way Cherry Hinton 01223 244277")
+    "01223314960" (in: "...e entrance. Their phone number is 01223314960. May I help find anything else?")
+[address:2] attraction name
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "ballare" (in: "...t nightclubs in that area. Might I suggest Ballare. Would you like more info?")
+    "broughton house gallery" (in: "I'm looking for information on Broughton house gallery.")
+[address:3] attraction type
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "church" (in: "...centre of town,what type are you looking for a church,or swimming or a park ?")
+    "restaurant" (in: "and places to go such as, museum's, nightclubs, parks and restaurants.")
+[address:4] bed and breakfast
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast is ideal for you.")
+[address:5] cinema name
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "the whale of a time" (in: "The Whale of a Time entertainment venue is a fun choice. We also have museums")
+    "the cineworld cinema" (in: "The cineworld cinema is the place!")
+[address:6] entrance fee
+  values: price (share 0.57); 7 mentions in 3 dialogues
+  examples:
+    "1 pound fee" (in: "John's has a 2.50 pound fee, and Trinity has a 1 pound fee.")
+    "2 pound fee" (in: "... free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50 pound...")
+[address:7] favorite museum
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "museum of archaeology and anthropology" (in: "...l favorite is the Museum of Archaeology and Anthropology at University of ...")
+[address:8] location
+  values: text (share 1.00); 46 mentions in 14 dialogues
+  examples:
+    "emmanuel college" (in: "There are 13 choices, how do you feel about Emmanuel College?")
+    "cambridge" (in: "I am looking for information in Cambridge")
+[address:9] location abbrev
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "town" (in: "am looking for a college attraction to go to in town.")
+    "city" (in: "I'm looking for a theatre in any part of the city. Can you recommend one?")
+[address:10] location str
+  values: text (share 1.00); 9 mentions in 4 dialogues
+  examples:
+    "centre area" (in: "Yes. I am looking for places to go in the centre area. I am looking for college.")
+    "cambridge art theatre" (in: "The address of the Cambridge Arts Theatre is 6 Saint Edward's Passage, postco...")
+[address:11] noun
+  values: text (share 1.00); 5 mentions in 3 dialogues
+  examples:
+    "museum" (in: "...s to do and places to go such as, museum's, nightclubs, parks and restaura...")
+    "cinema" (in: "I need a cinema to go to in the south.")
+[address:12] postcode
+  values: id (share 1.00); 5 mentions in 5 dialogues
+  examples:
+    "cb11ln" (in: "Is the cb11ln the postcode?")
+    "cb11pt" (in: "the postcode is cb11pt")
+[address:13] street name
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "saint andrew" (in: "...ddress for emmanuel college is saint andrew's street. Is there any other i...")
+
+Table location (one row = one location), 23 columns:
+[accommodation:1] area
+  values: text (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+    "north part of cambridge" (in: "...'m hoping to find a guesthouse in the north part of Cambridge. Are there any?")
+[accommodation:2] attribute
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "hotel" (in: "Can you please confirm that the hotel you've booked for us offers free wi-fi?...")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+[accommodation:4] date
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "what day" (in: "That shouldn't be a problem. What day would you like to begin your stay?")
+[accommodation:5] day of week
+  values: day (share 0.84); 25 mentions in 15 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+[accommodation:6] entity
+  values: text (share 1.00); 16 mentions in 9 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "3 star hotel" (in: "I want to stay at a 3 star hotel with free parking.")
+[accommodation:7] guest house name
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "aylesbray lodge" (in: "would also like to book at a guest house named Aylesbray Lodge, starting Monday.")
+[accommodation:8] hotel name
+  values: text (share 1.00); 13 mentions in 8 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+    "the acorn guest house" (in: "The Acorn Guest House is moderately-priced, in the north. They offer free wif...")
+[accommodation:9] location
+  values: text (share 0.96); 27 mentions in 13 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+[accommodation:10] num days
+  values: number (share 0.91); 22 mentions in 15 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+[accommodation:11] num nights
+  values: number (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "1 person" (in: "Great can you book that for 1 person for 3 nights starting friday?")
+    "3 people" (in: "...ailable starting on Sunday for three people, can I look something else up ...")
+[accommodation:12] num people
+  values: number (share 0.88); 16 mentions in 11 dialogues
+  examples:
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+[accommodation:13] party size
+  values: text (share 0.56); 9 mentions in 8 dialogues
+  examples:
+    "how many people" (in: "OK, and how many people will be staying in the room?")
+    "11" (in: "Sorry, you are right. We actually have 11 to choose from.")
+[accommodation:15] price
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+    "expensive hotel" (in: "...ld you try and book a 4 star, expensive hotel for 3 nights, starting on Sa...")
+[accommodation:16] price range
+  values: text (share 1.00); 10 mentions in 7 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "city centre north b and b" (in: "Okay! Would you like to stay at City Centre North B and B, or at Worth House?")
+[accommodation:17] price range noun
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "cheap price range" (in: "...ooking to book a guesthouse in the cheap price range that includes free wifi.")
+    "cheaper price range" (in: "...also like a guesthouse in the cheaper price range. Can you help me with that?")
+[accommodation:19] reservation number
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples:
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+    "72ycmlxx" (in: "...fectly. Your reference number is 72YCMLXX. Is there anything else I can he...")
+[accommodation:20] start date
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "avalon" (in: "I have begun a booking for you at Avalon. How many days will you be staying?")
+[accommodation:21] str
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+[accommodation:24] amenities
+  values: text (share 1.00); 11 mentions in 7 dialogues
+  examples:
+    "free parking" (in: "the north part of town. It offers free wifi and free parking.")
+    "free internet" (in: "...lected region. It's moderately priced and includes free internet and parking.")
+[accommodation:25] internet
+  values: text (share 1.00); 29 mentions in 10 dialogues
+  examples:
+    "free wifi" (in: "Yes, can you find a place for me with free wifi in the moderate price range?")
+    "free internet" (in: "...lected region. It's moderately priced and includes free internet and parking.")
+[accommodation:26] parking
+  values: text (share 1.00); 14 mentions in 6 dialogues
+  examples:
+    "free parking" (in: "Yes, please try 5-star hotels with free parking.")
+[location:1] attraction name
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "all saint church" (in: "we have a lovely architecture called all saints church it is free admission")
+    "free admission" (in: "have a lovely architecture called all saints church it is free admission")
+[location:2] reference number
+  values: id (share 0.50); 2 mentions in 2 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "It's my pleasure. Thank you for using Cambridge TownInfo centre. Goodbye.")
+    "pu74excq" (in: "That worked and I have a reference number for you: PU74EXCQ.")
+
+Return the JSON object now.

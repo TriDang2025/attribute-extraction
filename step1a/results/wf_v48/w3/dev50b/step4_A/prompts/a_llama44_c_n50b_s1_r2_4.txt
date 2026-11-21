@@ -1,0 +1,110 @@
+Below are two tables of a relational database design, each with its columns. Decide whether location and phone_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "location -> phone_number": one location row has many phone_number rows (each phone_number row refers to one location row)
+- "phone_number -> location": one phone_number row has many location rows (each location row refers to one phone_number row)
+- "many_to_many": a location row can go with many phone_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table location (one row = one location), 14 columns:
+[accommodation_option:10] location
+  values: text (share 1.00); 35 mentions in 18 dialogues
+  examples:
+    "cambridge" (in: "I am going to cambridge and need a hotel")
+    "alexander bed and breakfast" (in: "Alexander bed and breakfast can acommodate your request.")
+[accommodation_option:13] location str
+  values: text (share 0.75); 8 mentions in 6 dialogues
+  examples:
+    "centre of town" (in: "actually like a hotel instead of guesthouse and in the centre of town.")
+    "centre" (in: "...you. The Gonville Hotel is in the centre and The Lensfield Hotel is in the...")
+[accommodation_option:1] address
+  values: text (share 1.00); 5 mentions in 3 dialogues
+  examples:
+    "138 perne road" (in: "...tely priced. Their address is 138 Perne Road and their phone number is 012...")
+    "365 milton road" (in: "located at 74 Chesterton road and Lovell Lodge located at 365 Milton road.")
+[location:5] museum
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "castle gallery" (in: "...he Centre. I would recommend Castle Galleries, phone number 01223307402, p...")
+    "the broughton house gallery" (in: "the broughton house gallery is a museum located in the centre.")
+[location:6] park
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "wandlebury country park" (in: "...are free. May I recommend Wandlebury country park located wandlebury ring,...")
+    "wandlebury ring" (in: "...ndlebury country park located wandlebury ring, gog magog hills, babraham? ...")
+[location:2] college
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "magdalene" (in: "honestly recommend visiting a famous college such as Christs or Magdalene.")
+[location:3] entrance fee
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "entrance fee" (in: "Do you have any information on their entrance fees?")
+    "free" (in: "street , post code cb21dq. You can visit them for free! Anything else you need?")
+[location:4] location
+  values: text (share 1.00); 48 mentions in 13 dialogues
+  examples:
+    "centre" (in: "I am looking for a multiple sports attraction in the centre.")
+    "centre of town" (in: "what attractions do you have in the centre of town?")
+[location:9] theatre
+  values: number (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "1 theatre" (in: "...tre's in the centre of town and one theatre on the south side. Do you have...")
+    "4 theatre" (in: "We have four theatre's in the centre of town and one theatre on")
+[establishment:7] location
+  values: text (share 1.00); 17 mentions in 11 dialogues
+  examples:
+    "attraction" (in: "...ated in the center of town near attractions, hotels and easy access to tra...")
+    "cambridge" (in: "Is there any good Jamaican food in Cambridge?")
+[establishment:8] location str
+  values: text (share 1.00); 21 mentions in 14 dialogues
+  examples:
+    "centre" (in: "I have 13 colleges available in the centre. Did yo have one particular in mind?")
+    "city centre" (in: "... J restaurant, 86 Regent Street City Centre. I currently do not have revie...")
+[establishment:13] postcode
+  values: id (share 0.50); 4 mentions in 4 dialogues
+  examples:
+    "c.b 2" (in: "The address is Corn Exchange Street and the postcode is C.B 2, 3QF")
+    "cb21rh" (in: "...ess is at king's parade. The post code cb21rh and the entree fee is 2 pounds.")
+[phone_number:8] pickup location
+  values: text (share 1.00); 12 mentions in 6 dialogues
+  examples:
+    "restaurant" (in: "...need a taxi to get from college to the restaurant. I need to arrive by 14:45.")
+    "college" (in: "I also need a taxi to get from college to the restaurant. I need to arrive by...")
+[phone_number:6] destination
+  values: text (share 1.00); 9 mentions in 5 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "cambridge" (in: "Your welcome, enjoy your time in Cambridge.")
+
+Table phone_number (one row = one phone_number), 4 columns:
+[accommodation_option:16] phone number
+  values: number (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "01223247015" (in: "address is 138 Perne Road and their phone number is 01223247015.")
+    "01223334860" (in: "The phone of Downing College is 01223334860. Do you need a place to stay?")
+[phone_number:10] contact_number
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "taxi" (in: "I want help booking a taxi")
+    "black ford" (in: "You will be picked up by a black ford and the contact number is 07635928440. ...")
+[phone_number:4] departure location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "leverton house" (in: "I will be leaving from leverton house arriving by 06:45.")
+[phone_number:9] time str
+  values: number (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "07048450899" (in: "you need to contact the taxi company, you can call 07048450899.")
+    "07128258422" (in: "up at hughes hall at 14:45. The contact number is 07128258422.")
+
+Return the JSON object now.

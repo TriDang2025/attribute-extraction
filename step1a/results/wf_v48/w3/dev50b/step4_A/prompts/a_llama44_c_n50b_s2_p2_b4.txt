@@ -1,0 +1,59 @@
+Below are columns found by analysing a corpus of dialogues (a kind of information, with a description, the type of its values, example values and
+counts) and the list of tables of a database design. Put every column into exactly one of the listed tables, or into "unused" when a database
+would not store it. Use only the listed names; do not add tables. Use "unused" only when the column clearly holds nothing a database would
+store.
+Return ONLY one JSON object, nothing before or after it. Shape (the ids and names here are made up): {"x:1": "table_a", "x:2": "table_b", "x:3": "unused"}
+Every column id must appear once.
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Pass 1, the main things (tables): ["customer", "car", "rental"]
+Pass 2, each column to one table:
+{"customer_name": "customer", "customer_phone": "customer", "licence_number": "customer", "car_model": "car", "car_class": "car",
+ "plate_number": "car", "pickup_date": "rental", "return_date": "rental", "daily_rate": "rental"}
+
+Tables: train_schedule, accommodation_option, location, establishment, phone_number
+
+Columns (7):
+== phone_number ==
+[phone_number:3] day of week
+  values: day (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "saturday" (in: "sounds good. Please book for 2 people at 11:45 on Saturday.")
+[phone_number:2] car type
+  values:  (share 0.00); 0 mentions in 0 dialogues
+  no examples
+[phone_number:10] contact_number
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "taxi" (in: "I want help booking a taxi")
+    "black ford" (in: "You will be picked up by a black ford and the contact number is 07635928440. ...")
+    "blue ford" (in: "...was booked! The car type will be blue ford and the contact number is 07646...")
+    "car type" (in: "I need the car type please.")
+    "red tesla" (in: "I have confirmed a taxi booking for you, a red tesla will be picking you up.")
+[phone_number:7] party size
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 people" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+[phone_number:6] destination
+  values: text (share 1.00); 9 mentions in 5 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "cambridge" (in: "Your welcome, enjoy your time in Cambridge.")
+    "attraction" (in: "I need to leave the attraction by 21:00 please.")
+    "cambridge county fair" (in: "I am going to the Cambridge county fair next to the city tourist museum.")
+    "city tourist museum" (in: "am going to the Cambridge county fair next to the city tourist museum.")
+[phone_number:4] departure location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "leverton house" (in: "I will be leaving from leverton house arriving by 06:45.")
+[phone_number:8] pickup location
+  values: text (share 1.00); 12 mentions in 6 dialogues
+  examples:
+    "restaurant" (in: "...need a taxi to get from college to the restaurant. I need to arrive by 14:45.")
+    "college" (in: "I also need a taxi to get from college to the restaurant. I need to arrive by...")
+    "allenbell" (in: "...But, can you book me a taxi from Allenbell to J Restaurant. I need to be t...")
+    "finch bed and breakfast" (in: "to pick me up Travellers Rest to take me to Finches Bed and Breakfast.")
+    "hotel" (in: "... a taxi from the restaurant to the hotel, please. I need to leave the rest...")
+
+Return the JSON object now.
