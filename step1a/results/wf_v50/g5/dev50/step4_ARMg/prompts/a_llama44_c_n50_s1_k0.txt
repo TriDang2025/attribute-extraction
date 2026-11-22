@@ -1,0 +1,120 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table accommodation (one row = one accommodation), 22 columns:
+[accommodation:24] amenities
+  values: text (share 1.00); 11 mentions in 7 dialogues
+  examples:
+    "free parking" (in: "the north part of town. It offers free wifi and free parking.")
+    "free internet" (in: "...lected region. It's moderately priced and includes free internet and parking.")
+[accommodation:25] internet
+  values: text (share 1.00); 29 mentions in 10 dialogues
+  examples:
+    "free wifi" (in: "Yes, can you find a place for me with free wifi in the moderate price range?")
+    "free internet" (in: "...lected region. It's moderately priced and includes free internet and parking.")
+[accommodation:12] num people
+  values: number (share 0.88); 16 mentions in 11 dialogues
+  examples:
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+[accommodation:11] num nights
+  values: number (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "1 person" (in: "Great can you book that for 1 person for 3 nights starting friday?")
+    "3 people" (in: "...ailable starting on Sunday for three people, can I look something else up ...")
+[accommodation:23] train id
+  values: id (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "tr8167" (in: "Yes please, for 4 people. How about the TR8167 please.")
+[accommodation:2] attribute
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "hotel" (in: "Can you please confirm that the hotel you've booked for us offers free wi-fi?...")
+    "ashley hotel" (in: "How about the Ashley Hotel? They have free internet and parking, though.")
+[accommodation:6] entity
+  values: text (share 1.00); 16 mentions in 9 dialogues
+  examples:
+    "guesthouse" (in: "Thank you. I'd also like a guesthouse in the cheaper price range. Can you hel...")
+    "3 star hotel" (in: "I want to stay at a 3 star hotel with free parking.")
+[accommodation:26] parking
+  values: text (share 1.00); 14 mentions in 6 dialogues
+  examples:
+    "free parking" (in: "Yes, please try 5-star hotels with free parking.")
+[accommodation:20] start date
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "avalon" (in: "I have begun a booking for you at Avalon. How many days will you be staying?")
+[accommodation:14] phone number
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "01223355017" (in: "Sure, the phone number is 01223355017. How many days will you be staying, wha...")
+[accommodation:10] num days
+  values: number (share 0.91); 22 mentions in 15 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+[accommodation:17] price range noun
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "cheap price range" (in: "...ooking to book a guesthouse in the cheap price range that includes free wifi.")
+    "cheaper price range" (in: "...also like a guesthouse in the cheaper price range. Can you help me with that?")
+[accommodation:1] area
+  values: text (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+    "north part of cambridge" (in: "...'m hoping to find a guesthouse in the north part of Cambridge. Are there any?")
+[accommodation:8] hotel name
+  values: text (share 1.00); 13 mentions in 8 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast would be perfect for you. Shall i book it ?")
+    "the acorn guest house" (in: "The Acorn Guest House is moderately-priced, in the north. They offer free wif...")
+[accommodation:7] guest house name
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "aylesbray lodge" (in: "would also like to book at a guest house named Aylesbray Lodge, starting Monday.")
+[accommodation:13] party size
+  values: text (share 0.56); 9 mentions in 8 dialogues
+  examples:
+    "how many people" (in: "OK, and how many people will be staying in the room?")
+    "11" (in: "Sorry, you are right. We actually have 11 to choose from.")
+[accommodation:21] str
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+[accommodation:15] price
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "cheap" (in: "I'm looking for a place to stay that is cheap located in the north.")
+    "expensive hotel" (in: "...ld you try and book a 4 star, expensive hotel for 3 nights, starting on Sa...")
+[accommodation:16] price range
+  values: text (share 1.00); 10 mentions in 7 dialogues
+  examples:
+    "moderate price range" (in: "Yes that's find are the in the moderate price range?")
+    "city centre north b and b" (in: "Okay! Would you like to stay at City Centre North B and B, or at Worth House?")
+[accommodation:4] date
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "what day" (in: "That shouldn't be a problem. What day would you like to begin your stay?")
+[accommodation:19] reservation number
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples:
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+    "72ycmlxx" (in: "...fectly. Your reference number is 72YCMLXX. Is there anything else I can he...")
+[accommodation:5] day of week
+  values: day (share 0.84); 25 mentions in 15 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+
+Return the JSON object now.

@@ -1,0 +1,85 @@
+Below are two tables of a relational database design, each with its columns. Decide whether train and phone_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "train -> phone_number": one train row has many phone_number rows (each phone_number row refers to one train row)
+- "phone_number -> train": one phone_number row has many train rows (each train row refers to one phone_number row)
+- "many_to_many": a train row can go with many phone_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table train (one row = one train), 10 columns:
+[train_schedule:3] date
+  values: day (share 1.00); 17 mentions in 11 dialogues
+  examples:
+    "sunday" (in: "Cambridge, and it will be on sunday.")
+    "monday" (in: "I'm going to London's Kings Cross on Monday.")
+[train_schedule:7] location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "Thank you for contacting the Cambridge TownInfo centre. Goodbye")
+[train_schedule:6] destination
+  values: text (share 1.00); 32 mentions in 17 dialogues
+  examples:
+    "broxbourne" (in: "I am also look for a train on saturday to broxbourne.")
+    "stevenage" (in: "am also looking for a train for Thursday departing from Stevenage.")
+[train_schedule:4] departure day
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "what day" (in: "Okay what day will you be travelling and what time would you like")
+    "what time" (in: "It might, what time does the train depart?")
+[train_schedule:9] price
+  values: price (share 0.80); 10 mentions in 10 dialogues
+  examples:
+    "12.80 pound" (in: "Sure! The fare is 12.80 pounds and the travel time is 49 minutes. Is there an...")
+    "17.90" (in: "want info or to book the train? The cost is 17.90 per ticket.")
+[train_schedule:8] number of people
+  values: number (share 1.00); 6 mentions in 6 dialogues
+  examples:
+    "2 people" (in: "Could you book that for me for 2 people?")
+    "3 seat" (in: "Yes, can you please book for 3 seats?")
+[train_schedule:12] arrival time
+  values: time (share 1.00); 27 mentions in 16 dialogues
+  examples:
+    "11:30" (in: "I would like to arrive in cambridge by 11:30.")
+    "05:32" (in: "...from Broxbourne to Cambridge on Friday at 5:32 and will arrive there at 6:32.")
+[train_schedule:16] travel time
+  values: duration (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "49 minute" (in: "...0 pounds and the travel time is 49 minutes. Is there anything else I can h...")
+    "163 minute" (in: "The total travel time will be 163 minutes. Is there anything else I can help ...")
+[train_schedule:13] departure day
+  values: time (share 0.46); 39 mentions in 17 dialogues
+  examples:
+    "friday" (in: "Yes, TR2515 departs on friday at 05:21 to stevenage, would you like me to book")
+    "13:06" (in: "...is the TR0545 leaving cambridge at 13:06. Would you like me to book it or ...")
+[train_schedule:10] reference number
+  values: text (share 0.71); 31 mentions in 16 dialogues
+  examples:
+    "cambridge" (in: "Cambridge, and it will be on sunday.")
+    "0w0bqb8w" (in: "I was able to book it, reference is 0W0BQB8W.")
+
+Table phone_number (one row = one phone_number), 3 columns:
+[phone_number:10] contact_number
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "taxi" (in: "I want help booking a taxi")
+    "black ford" (in: "You will be picked up by a black ford and the contact number is 07635928440. ...")
+[phone_number:4] departure location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "leverton house" (in: "I will be leaving from leverton house arriving by 06:45.")
+[phone_number:9] time str
+  values: number (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "07048450899" (in: "you need to contact the taxi company, you can call 07048450899.")
+    "07128258422" (in: "up at hughes hall at 14:45. The contact number is 07128258422.")
+
+Return the JSON object now.

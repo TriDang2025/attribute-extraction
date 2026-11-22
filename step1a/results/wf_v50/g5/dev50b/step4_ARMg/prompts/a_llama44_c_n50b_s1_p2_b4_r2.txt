@@ -1,0 +1,71 @@
+Below are columns found by analysing a corpus of dialogues (a kind of information, with a description, the type of its values, example values and
+counts) and the list of tables of a database design. Put every column into exactly one of the listed tables, or into "unused" when a database
+would not store it. Use only the listed names; do not add tables. Use "unused" only when the column clearly holds nothing a database would
+store.
+Return ONLY one JSON object, nothing before or after it. Shape (the ids and names here are made up): {"x:1": "table_a", "x:2": "table_b", "x:3": "unused"}
+Every column id must appear once.
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Pass 1, the main things (tables): ["customer", "car", "rental"]
+Pass 2, each column to one table:
+{"customer_name": "customer", "customer_phone": "customer", "licence_number": "customer", "car_model": "car", "car_class": "car",
+ "plate_number": "car", "pickup_date": "rental", "return_date": "rental", "daily_rate": "rental"}
+
+Tables: train, accommodation, location, establishment, phone_number
+
+Columns (7):
+== phone_number ==
+[phone_number:1] arrival time
+  values: time (share 0.67); 12 mentions in 9 dialogues
+  examples:
+    "14:45" (in: "from college to the restaurant. I need to arrive by 14:45.")
+    "11:45" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+    "12:45" (in: "I'd like the arrival time to be 12:45, please.")
+    "14:15" (in: "have the car pick me up at the college at 2:15 p.m. instead.")
+    "14:30" (in: "I would like to leave and 2:30 p.m and arrive at 3:23 p.m.")
+[phone_number:9] time str
+  values: number (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "07048450899" (in: "you need to contact the taxi company, you can call 07048450899.")
+    "07128258422" (in: "up at hughes hall at 14:45. The contact number is 07128258422.")
+    "07267142867" (in: "completed! Booked car type : white ford Contact number : 07267142867")
+    "07340953955" (in: "...e that booked for you, contact number 07340953955. Do you need anyhting else?")
+    "07481840729" (in: "...for you. Your contact number is 07481840729. Can I help you with anything ...")
+[phone_number:8] pickup location
+  values: text (share 1.00); 12 mentions in 6 dialogues
+  examples:
+    "restaurant" (in: "...need a taxi to get from college to the restaurant. I need to arrive by 14:45.")
+    "college" (in: "I also need a taxi to get from college to the restaurant. I need to arrive by...")
+    "allenbell" (in: "...But, can you book me a taxi from Allenbell to J Restaurant. I need to be t...")
+    "finch bed and breakfast" (in: "to pick me up Travellers Rest to take me to Finches Bed and Breakfast.")
+    "hotel" (in: "... a taxi from the restaurant to the hotel, please. I need to leave the rest...")
+[phone_number:5] departure time
+  values: time (share 0.88); 8 mentions in 6 dialogues
+  examples:
+    "19:15" (in: "I'd like to book a taxi from Ask, departing after 19:15.")
+    "06:45" (in: "I will be leaving from leverton house arriving by 06:45.")
+    "10:45" (in: "i want to leave by 10:45")
+    "13:15" (in: "Allenbell to J Restaurant. I need to be there by 13:15.")
+    "15:23" (in: "would like to leave and 2:30 p.m and arrive at 3:23 p.m.")
+[phone_number:6] destination
+  values: text (share 1.00); 9 mentions in 5 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "cambridge" (in: "Your welcome, enjoy your time in Cambridge.")
+    "attraction" (in: "I need to leave the attraction by 21:00 please.")
+    "cambridge county fair" (in: "I am going to the Cambridge county fair next to the city tourist museum.")
+    "city tourist museum" (in: "am going to the Cambridge county fair next to the city tourist museum.")
+[phone_number:3] day of week
+  values: day (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "saturday" (in: "sounds good. Please book for 2 people at 11:45 on Saturday.")
+[phone_number:7] party size
+  values: number (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 people" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+
+Note: columns that carry the same entity heading usually belong to the table of that entity. Answer "unused" only for a column that clearly fits no table.
+Second check: in the last answer at least half of the columns of one entity heading went to no table, although that entity has a table. Give each such column the table of its entity heading unless its values clearly belong to another table.
+
+Return the JSON object now.
