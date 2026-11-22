@@ -60,30 +60,36 @@ def block_id(entity, cid):
     return f"{entity}#col{cid}"
 
 
-def column_block(export, docs, entity, col, k=PIN.K_EXAMPLES, seed=0):
-    """(block id, block text) of a column as one names-prompt cluster block (same lines as a frozen A prompt block)."""
+def column_block(export, docs, entity, col, k=PIN.K_EXAMPLES, seed=0, context=None):
+    """(block id, block text) of a column as one names-prompt cluster block (same lines as a frozen A prompt block). context(block id, column)
+    -> snippet lines (wf_v5.1 R4) added after the example lines; None = the v5.0 block."""
     bid = block_id(entity, col["cid"])
     m = export.mentions
     g = m[m["mention_id"].astype(int).isin({int(i) for i in col["mention_ids"]})].assign(cluster_id=bid)
     exs = [(f"{bid}:{j}", int(mid)) for j, mid in enumerate(PIN.select_examples(g, k, seed))]
     ci = PIN.ClusterInput(bid, len(g), g["norm_value"].nunique(), False, exs)
-    return bid, "\n".join([PIN._cluster_head(ci), "Examples:", *PIN._example_lines(export, docs, ci, True)])
+    block = "\n".join([PIN._cluster_head(ci), "Examples:", *PIN._example_lines(export, docs, ci, True)])
+    if context is not None:
+        from s1a import rolenames_v51 as RN
+        block = RN.add_context(block, context(bid, col))
+    return bid, block
 
 
-def g4_jobs(dev, run, out=G4):
-    """Names jobs (one per entity with changed columns) of one set -> <out>/<dev>/{manifest_names.json, prompts/, changed.json}."""
+def g4_jobs(dev, run, out=G4, old=None, new=None, context=None):
+    """Names jobs (one per entity with changed columns) of one set -> <out>/<dev>/{manifest_names.json, prompts/, changed.json}.
+    old / new = final_columns.json files to compare (default: the v4.9 loop-1 columns and the G3 context split); context: see column_block."""
     import pilot_build_v37 as PB
     d = Path(out) / dev
     (d / "prompts").mkdir(parents=True, exist_ok=True)
-    old = B.read_json(LOOP1 / dev / "step3" / "scores" / "final_columns.json")[run]
-    new = B.read_json(G3_FINAL / dev / "final_columns.json")[run]
+    old = B.read_json(old or LOOP1 / dev / "step3" / "scores" / "final_columns.json")[run]
+    new = B.read_json(new or G3_FINAL / dev / "final_columns.json")[run]
     ents = B.read_json(Y3 / dev / "entities.json")
     ri = PB.RunInput(Path("results") / f"graph_v22_{dev}", 0)
     jobs, changed = [], {}
     for ent, cols in changed_columns(old, new).items():
         entity = ents[ent]
         fp = S3.parse_frozen_prompt((Y3 / dev / "a_prompts" / "prompts" / f"{ent}_a_{run}_s0.txt").read_text(encoding="utf-8"))
-        blocks = [column_block(ri.export, ri.docs, entity, c) for c in cols]
+        blocks = [column_block(ri.export, ri.docs, entity, c, context=context) for c in cols]
         name = f"{ent}_rename_{run}"
         prompt = S3.render_names(entity, 1, 1, len(blocks), fp["others"], blocks)
         (d / "prompts" / f"{name}.txt").write_text(prompt, encoding="utf-8", newline="\n")
@@ -111,11 +117,12 @@ def g4(backend, out=G4, log=print):
     return res
 
 
-def apply_names(dev, run, out=G4):
-    """Loop-1 run folder <out>/run/<dev> = wf_v47 z4 run 1 with the G3 columns, renamed by the G4 answers, and its rebuilt a_llama44 input."""
+def apply_names(dev, run, out=G4, new=None):
+    """Loop-1 run folder <out>/run/<dev> = wf_v47 z4 run 1 with the G3 columns (`new`: another final_columns.json), renamed by the G4 answers,
+    and its rebuilt a_llama44 input."""
     d = Path(out) / dev
     changed = B.read_json(d / "changed.json")
-    new = B.read_json(G3_FINAL / dev / "final_columns.json")[run]
+    new = B.read_json(new or G3_FINAL / dev / "final_columns.json")[run]
     rows = []
     for job in B.read_json(d / "manifest_names.json")["jobs"]:
         raw = _raw(d / "responses" / f"{job['job']}.jsonl")
@@ -127,6 +134,13 @@ def apply_names(dev, run, out=G4):
                          "new": nm.replace("_", " ") if ok else c["name"]})
     by = {(r["entity"], r["cid"]): r["new"] for r in rows}
     final = {e: [{**c, "name": by.get((e, c["cid"]), c["name"])} for c in cs] for e, cs in new.items()}
+    build_run_dir(dev, run, final, out)
+    pd.DataFrame(rows).to_csv(d / "renames.csv", index=False, encoding="utf-8", lineterminator="\n")
+    return rows
+
+
+def build_run_dir(dev, run, final, out=G4):
+    """<out>/run/<dev>: the wf_v47 z4 run-1 loop-2 files plus the loop-1 columns `final` ({entity: [column dicts]}) and their a_llama44 input."""
     rd = run_dir(dev, out)
     if rd.exists():
         shutil.rmtree(rd)
@@ -135,8 +149,7 @@ def apply_names(dev, run, out=G4):
     with PL.use_corpus(run, B.read_json(Y3 / dev / "entities.json"), Y3 / dev / "a_prompts"):
         cols = S3.a_columns(final, I.load_mentions(run, ROOT))
     B.write_json(S3_44.a_llama44_file(run, rd / "step3"), cols)
-    pd.DataFrame(rows).to_csv(d / "renames.csv", index=False, encoding="utf-8", lineterminator="\n")
-    return rows
+    return rd
 
 
 def _raw(path):
@@ -152,18 +165,22 @@ def run_dir(dev, out=G4):
 
 # ---------------------------------------------------------------- replay vectors (laptop) so Colab gives the laptop cosines
 class CachedEnc:
-    """.encode(texts) from the vectors computed on the laptop (<out>/<dev>/w2_vectors.npz of every set); a text without a vector raises."""
+    """.encode(texts) from the vectors computed on the laptop (<out>/<dev>/<fname> of every set); a text without a vector goes to `fallback`
+    (an encoder with .encode, counted in .fallback_texts) or, without one, raises."""
 
-    def __init__(self, out=G4):
-        self.vec = {}
+    def __init__(self, out=G4, fname="w2_vectors.npz", fallback=None):
+        self.vec, self.fallback, self.fallback_texts = {}, fallback, 0
         for dev in SETS:
-            z = np.load(Path(out) / dev / "w2_vectors.npz", allow_pickle=False)
+            z = np.load(Path(out) / dev / fname, allow_pickle=False)
             self.vec.update(zip(z["texts"].tolist(), z["x"]))
 
     def encode(self, texts):
-        missing = [t for t in texts if t not in self.vec]
-        if missing:
+        missing = sorted({t for t in texts if t not in self.vec})
+        if missing and self.fallback is None:
             raise KeyError(f"{len(missing)} texts have no laptop vector, e.g. {missing[:3]}")
+        if missing:
+            self.fallback_texts += len(missing)
+            self.vec.update(zip(missing, np.asarray(self.fallback.encode(missing), dtype=np.float32)))
         return np.stack([self.vec[t] for t in texts])
 
 

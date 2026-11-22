@@ -12,8 +12,12 @@ Limit of the replay: reconcile / duplicate check decided on the old parts' examp
 import re
 
 import numpy as np
+import pandas as pd
 from scipy.optimize import linear_sum_assignment
 from sklearn.cluster import KMeans
+
+from . import mentions as MN
+from .paths import ROOT
 
 W = 4
 SEED = 0
@@ -23,6 +27,26 @@ def left_context(text, lo, start, w=W):
     """The last `w` words of text[lo:start] ("[start]" when the value opens the turn)."""
     words = re.findall(r"[\w']+", text[lo:start])
     return " ".join(words[-w:]) or "[start]"
+
+
+def mention_table(set_name, root=ROOT):
+    """results/graph_v22_<set>/spans/mentions.csv as strings, indexed by mention_id (read only)."""
+    mt = pd.read_csv(root / "results" / f"graph_v22_{set_name}" / "spans" / "mentions.csv", dtype=str, keep_default_na=False)
+    mt["mention_id"] = mt["mention_id"].astype(int)
+    return mt.set_index("mention_id")
+
+
+def context_vectors(set_name, mt, enc, root=ROOT):
+    """({mention id: unit bge-m3 vector of its left context}, {mention id: left context text}); `mt` = mention_table(set_name);
+    enc.encode(list of texts) -> vectors (one encode of the distinct texts)."""
+    docs, _, _ = MN.load_shared(root / "results" / f"graph_v22_{set_name}")
+    ctx = {i: left_context(docs[r.dialogue_id].text, MN.turn_bounds(docs[r.dialogue_id], int(r.turn))[0], int(r.char_start))
+           for i, r in zip(mt.index, mt.itertuples())}
+    uniq = sorted(set(ctx.values()))
+    x = np.asarray(enc.encode(uniq), dtype=float)
+    x /= np.linalg.norm(x, axis=1, keepdims=True)
+    by_text = dict(zip(uniq, x))
+    return {i: by_text[t] for i, t in ctx.items()}, ctx
 
 
 def kmeans_parts(x, k, seed=SEED):

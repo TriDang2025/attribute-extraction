@@ -13,7 +13,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT / "scripts")]
 
-import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 import g3_nojoin_v50 as G3  # noqa: E402
@@ -21,21 +20,12 @@ import mainclaim_v46 as M46  # noqa: E402
 import mainclaim_v49 as M49  # noqa: E402
 from run import encoder  # noqa: E402
 from s1a import ctxsplit_v50 as CS  # noqa: E402
-from s1a import mentions as MN  # noqa: E402
 
 OUT = G3.OUT / "ctxsplit"
 VARIANTS = {"all": (2, 99, 0), "two_parts": (2, 2, 0), "big40": (2, 99, 40)}   # (min_parts, max_parts, min_size) of the reassigned clusters
 
 
-def context_vectors(set_name, mt, enc):
-    docs, _, _ = MN.load_shared(ROOT / "results" / f"graph_v22_{set_name}")
-    ctx = {i: CS.left_context(docs[r.dialogue_id].text, MN.turn_bounds(docs[r.dialogue_id], int(r.turn))[0], int(r.char_start))
-           for i, r in zip(mt.index, mt.itertuples())}
-    uniq = sorted(set(ctx.values()))
-    x = np.asarray(enc.encode(uniq), dtype=float)
-    x /= np.linalg.norm(x, axis=1, keepdims=True)
-    by_text = dict(zip(uniq, x))
-    return {i: by_text[t] for i, t in ctx.items()}, ctx
+context_vectors = CS.context_vectors      # moved to s1a/ctxsplit_v50.py (wf_v5.1 R5 reuses it)
 
 
 def run_set(set_name, enc):

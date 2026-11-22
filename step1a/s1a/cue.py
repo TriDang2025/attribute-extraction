@@ -19,14 +19,15 @@ def cue_vectors(spans, docs, enc, k):
 
 
 def cluster_fn(spans, docs, enc, groups, books, beta=0.5, k=1, by_type=False, t=0.4, cannot_link=False,
-               text_fn=None, type_fn=None):
+               text_fn=None, type_fn=None, cue_fn=None):
     """x = unit(beta * cue + (1 - beta) * string), clustered inside each group (and value type).
     text_fn(text) -> the string to encode (e.g. shapes.shape); default the raw span text.
-    type_fn(text) -> the value type of the split (default step2.value_type)."""
+    type_fn(text) -> the value type of the split (default step2.value_type).
+    cue_fn(spans, docs, enc, k) -> cue vectors (default cue_vectors: left k-word window; wf_v5.1 R1 passes a left+right one)."""
     type_fn = type_fn or S2.value_type
     x = enc.encode([text_fn(u.text) if text_fn else u.text for u in spans])
     if beta:
-        x = S2.combine(cue_vectors(spans, docs, enc, k), x, beta)
+        x = S2.combine((cue_fn or cue_vectors)(spans, docs, enc, k), x, beta)
     parts = [(g, type_fn(u.text)) for g, u in zip(groups, spans)] if by_type else list(groups)
     if cannot_link:
         return x, S2.cluster_constrained(x, parts, S2.cannot_links(spans, books), t)

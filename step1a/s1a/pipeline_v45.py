@@ -131,11 +131,13 @@ def final_columns(out, set_name):
     return final
 
 
-def step3(set_name, out, backend, encoder, cfg=None):
-    """build -> run (names, keyed split, rescue, merge, reconcile, dupcheck) -> final columns -> a_llama44/<set>/a.columns.json."""
+def step3(set_name, out, backend, encoder, cfg=None, snips=None):
+    """build -> run (names, keyed split, rescue, merge, reconcile, dupcheck) -> final columns -> a_llama44/<set>/a.columns.json.
+    wf_v5.1: the naming_context / name_clash switches are in cfg["switches"] (S3.load_config(switches=...)); `snips` = {set: {cluster id:
+    [lines]}} for naming_context (default: rolenames_v51.set_snippets of the set). Without them the run is the v5.0 one."""
     cfg = cfg or S3.load_config()
     vecs = {set_name: S3.cluster_vectors(set_name)} if cfg["switches"]["similar_batches"] else None
-    S3.build(out, cfg, None, vecs)
+    S3.build(out, cfg, None, vecs, snips)
     info = S3.run(out, backend, cfg, encoder, Path(out) / "name_vecs.npz", True)
     final_columns(out, set_name)
     return info, S3.write_a_llama44(out)

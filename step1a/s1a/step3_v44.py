@@ -52,6 +52,7 @@ NO_PATTERN = ("v1", "v3", "v4")
 NO_MAXLEN = ("v4",)
 YESNO_MAX_TOKENS = 30
 SWITCHES = ("similar_batches", "rescue", "merge")
+SWITCHES_V51 = ("naming_context", "name_clash")      # wf_v5.1 (rolenames_v51): allowed in cfg["switches"], absent = off
 _ID_RE = re.compile(r"\b[A-Z][A-Za-z0-9]*#\d+")
 _MARK_RE = re.compile(r"\[\[(.+?)\]\]")
 
@@ -61,17 +62,17 @@ def load_config(path=CONFIG, switches=None, **override):
     """The step 3 config (json) with `switches` ({name: bool}) and top-level `override`s applied; unknown switch names raise."""
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
     cfg = {**cfg, **override, "switches": {**cfg["switches"], **(switches or {})}}
-    bad = [k for k in cfg["switches"] if k not in SWITCHES]
+    bad = [k for k in cfg["switches"] if k not in SWITCHES + SWITCHES_V51]
     if bad:
-        raise ValueError(f"unknown switch {bad}; choose from {SWITCHES}")
+        raise ValueError(f"unknown switch {bad}; choose from {SWITCHES + SWITCHES_V51}")
     return cfg
 
 
 def with_switches(cfg, switches):
     """Copy of `cfg` with `switches` ({name: bool}) set; unknown names raise."""
-    bad = [k for k in switches if k not in SWITCHES]
+    bad = [k for k in switches if k not in SWITCHES + SWITCHES_V51]
     if bad:
-        raise ValueError(f"unknown switch {bad}; choose from {SWITCHES}")
+        raise ValueError(f"unknown switch {bad}; choose from {SWITCHES + SWITCHES_V51}")
     c = copy.deepcopy(cfg)
     c["switches"].update(switches)
     return c
@@ -190,14 +191,18 @@ def entity_description(blocks, n=3):
 
 
 # ---------------------------------------------------------------- names jobs (T1 variants, booster 1)
-def names_jobs_for_v44(set_name, ent, order, text, variant="v0", cfg=None, vecs=None, name_fmt="{ent}_names_{run}_s{order}_b{i}"):
+def names_jobs_for_v44(set_name, ent, order, text, variant="v0", cfg=None, vecs=None, name_fmt="{ent}_names_{run}_s{order}_b{i}", snippets=None):
     """(job rows, [(name, prompt text, schema)]) of one entity and order from its frozen A prompt `text`. With the similar_batches switch
     off (and variant v0) this is step3_v43.names_jobs_for; with it on the clusters are first ordered by similar_order over `vecs`
-    ({cluster id: vector}) starting at the first cluster of the frozen order."""
+    ({cluster id: vector}) starting at the first cluster of the frozen order. `snippets` ({cluster id: [lines]}, wf_v5.1 R4 naming_context):
+    the short context lines are added to each cluster block; None = the v5.0 prompts."""
     cfg = cfg or load_config()
     fp = S3.parse_frozen_prompt(text)
     frozen_ids = [c for c, _ in fp["blocks"]]
     blocks = similar_order(fp["blocks"], vecs) if cfg["switches"]["similar_batches"] else fp["blocks"]
+    if snippets is not None:
+        from . import rolenames_v51 as RN
+        blocks = RN.with_context(blocks, snippets)
     cut = S3.batches(blocks, cfg["batch"])
     run = PP.RUN_KEY[set_name]
     rows, files = [], []
@@ -285,21 +290,25 @@ def run_probe(out, backend, cfg=None, variants=PROBE_ORDER):
 
 
 # ---------------------------------------------------------------- build
-def build(out, cfg=None, variant=None, vecs=None):
+def build(out, cfg=None, variant=None, vecs=None, snips=None):
     """Prompts + schemas of the names jobs (orders of cfg only), the keyed split jobs, the assembled A rows (all 18) and blocks.json; returns
-    (names jobs, manifest jobs). `vecs` = {set: {cluster id: vector}} for the similar_batches switch (default: cluster_vectors of the sets)."""
+    (names jobs, manifest jobs). `vecs` = {set: {cluster id: vector}} for the similar_batches switch (default: cluster_vectors of the sets). `snips` = {set: {cluster id: [lines]}} for the naming_context switch (default: set_snippets)."""
     cfg = cfg or load_config()
     variant = variant or names_variant(cfg)
     out = Path(out)
     (out / "prompts").mkdir(parents=True, exist_ok=True)
     if cfg["switches"]["similar_batches"] and vecs is None:
         vecs = {s: cluster_vectors(s) for s in PP.SETS}
+    if cfg["switches"].get("naming_context") and snips is None:
+        from . import rolenames_v51 as RN
+        snips = {s: RN.set_snippets(s) for s in PP.SETS}
     names, a_rows, doc = [], [], {}
     for j in PP.t1b_a_jobs():
         order = int(j["run_tag"][1:])
         text = (PP.T1B / j["prompt"]).read_text(encoding="utf-8")
         if order in cfg["orders"]:
-            rows, files = names_jobs_for_v44(j["set"], j["ent"], order, text, variant, cfg, (vecs or {}).get(j["set"]))
+            rows, files = names_jobs_for_v44(j["set"], j["ent"], order, text, variant, cfg, (vecs or {}).get(j["set"]),
+                                             snippets=(snips or {}).get(j["set"]) if cfg["switches"].get("naming_context") else None)
             write_job_files(out, files)
             names += rows
         fp = S3.parse_frozen_prompt(text)
@@ -648,10 +657,11 @@ def booster_stats(out, base, named, moved):
 
 
 # ---------------------------------------------------------------- run
-def run(out, backend, cfg=None, encoder=None, name_vecs=None, save_vecs=False, variant=None):
+def run(out, backend, cfg=None, encoder=None, name_vecs=None, save_vecs=False, variant=None, blocked=None):
     """The whole T4 chain on `backend` (VllmBackend44 or FakeStep44): names + keyed split -> (rescue questions -> rescue names) ->
     (merge questions) -> assemble A by code -> reconcile -> dupcheck. `encoder` = name encoder for the merge switch (NameVectors);
     `name_vecs` = the npz path of name vectors (read when it exists; written only when `save_vecs`, i.e. the full T4 run).
+    `blocked(pair)` = optional blocker of the wf_v5.1 name_clash switch (rolenames_v51), unused when the switch is off.
     Returns {stage: backend info, "boosters": counts, "assemble": {...}}."""
     cfg = cfg or load_config()
     variant = variant or B.read_json(Path(out) / "config_used.json")["names_variant_used"]
@@ -674,6 +684,9 @@ def run(out, backend, cfg=None, encoder=None, name_vecs=None, save_vecs=False, v
     else:
         for f in ("manifest_merge.json",):
             B.write_json(Path(out) / f, {"stage": 4, "jobs": []})
+    if sw.get("name_clash"):
+        from . import rolenames_v51 as RN
+        info["clash_q"], state = RN.run_clash(out, backend, cfg, state, variant, blocked)
     if not sw["rescue"]:
         B.write_json(Path(out) / "manifest_rescue_q.json", {"stage": 2, "jobs": []})
         B.write_json(Path(out) / "manifest_rescue_n.json", {"stage": 3, "jobs": []})
@@ -693,7 +706,7 @@ def all_jobs(out):
     """Every job of the run folder with its family (the names / split / rescue / merge manifests, reconcile and dupcheck)."""
     out, jobs = Path(out), []
     for name in ("manifest_names.json", "manifest_split44.json", "manifest_rescue_q.json", "manifest_rescue_n.json", "manifest_merge.json",
-                 "manifest_probe.json"):
+                 "manifest_clash.json", "manifest_probe.json"):
         jobs += _stage_jobs(out, name)
     return jobs + [j for j in PP.manifest_all(out) if j["family"] in ("reconcile", "dupcheck_rc")]
 
