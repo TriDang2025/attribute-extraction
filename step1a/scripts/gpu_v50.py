@@ -41,6 +41,9 @@ G4 = RES / "g4"
 G5 = RES / "g5"
 SETS, SEEDS, Y3, LOOP1 = G48.SETS, G48.SEEDS, G48.Y3, G48.LOOP1
 G48.VARIANTS["ARM"] = {**G48.VARIANTS["A"], "p2_reask": True, "p2_reask2": True, "merge_same_entity": True}
+# The first G5 run (2026-11-22, step4_ARM) got finish_reason "error" on every guided Step 4 call and used the unguided fallback, so it is not
+# comparable with v4.9; the rerun writes step4_ARMg (same settings) and must be guided throughout (unguided_rows / guided_smoke).
+G48.VARIANTS["ARMg"] = dict(G48.VARIANTS["ARM"])
 
 
 # ---------------------------------------------------------------- G4 prompts (laptop)
@@ -192,9 +195,26 @@ def build_inputs(encoder, out=G4, g5=G5):
     return {dev: G48.prepare(dev, run, g5, w2=Path(out) / "w2", loop1=Path(out) / "run") for dev, run in SETS.items()}
 
 
-def g5(backend, root=G5, **kw):
-    """Step 4 variant ARM on each set (gpu_v48.w3 into results/wf_v50/g5). Returns {(variant, dev): final/status.json rows}."""
-    return G48.w3(backend, variants=("ARM",), root=root, **kw)
+def g5(backend, root=G5, variant="ARMg", **kw):
+    """Step 4 variant ARM (rerun name ARMg) on each set (gpu_v48.w3 into results/wf_v50/g5). Returns {(variant, dev): final/status.json rows}."""
+    return G48.w3(backend, variants=(variant,), root=root, **kw)
+
+
+def unguided_rows(folder):
+    """Response files of a Step 4 folder whose cached row did not come from guided decoding (must be [] for a valid run)."""
+    bad = []
+    for f in sorted(Path(folder).glob("responses/*.jsonl")):
+        rows = [json.loads(x) for x in f.read_text(encoding="utf-8").splitlines() if x.strip()]
+        if rows and rows[-1].get("guided") is not True:
+            bad.append(f.name)
+    return bad
+
+
+def guided_smoke(engine, sampling, chat):
+    """One tiny guided call; returns (finish_reason, text). A valid session gives "stop" and a JSON object with key "a"."""
+    schema = {"type": "object", "properties": {"a": {"enum": ["x", "y"]}}, "required": ["a"], "additionalProperties": False}
+    o = engine.generate([chat('Return {"a": "x"} as JSON.')], sampling(20, schema))[0].outputs[0]
+    return o.finish_reason, o.text
 
 
 # ---------------------------------------------------------------- laptop checks
