@@ -35,8 +35,10 @@ from . import batch_v4 as B
 from . import nov16_v41 as NV
 from . import step4_gt as G
 from . import step4_inputs as I
+from . import step4_merge_v49 as MG
 from . import step4_neutral_v48 as NT
 from . import step4_p2batch_v46 as P2B
+from . import step4_reask_v49 as RA
 from . import step4_prompts as SP
 from . import step4_score as S
 from . import step4_score_v43 as SC43
@@ -71,11 +73,13 @@ def load_config(path=CONFIG):
     return {"switches": dict(cfg["switches"]), "thresholds": dict(cfg["thresholds"])}
 
 
-def with_switches(cfg, off=(), p2_batch=None, neutral_ids=None, **kw):
+def with_switches(cfg, off=(), p2_batch=None, neutral_ids=None, merge_same_entity=None, p2_reask=None, **kw):
     """Copy of cfg with the switches in `off` set to False and the keyword switches set (e.g. all_off = with_switches(cfg, off=SWITCHES)).
     p2_batch (wf_v4.6, not one of SWITCHES): pass 2 in batches of that many columns (step4_p2batch_v46); None keeps the value of cfg, 0 or none = off.
     neutral_ids (wf_v4.8, not one of SWITCHES): pass 2 with neutral table ids (step4_neutral_v48); None keeps the value of cfg.
-    The keys "p2_batch" / "neutral_ids" are in the result only when on."""
+    merge_same_entity (wf_v4.9, B+M): after the assembly, tables of the same Step 1a entity are joined (step4_merge_v49); p2_reask (wf_v4.9, A+R): a pass-2
+    batch that sends half of an entity's columns to unused is asked once more (step4_reask_v49; needs p2_batch); None keeps the value of cfg.
+    The keys "p2_batch" / "neutral_ids" / "merge_same_entity" / "p2_reask" are in the result only when on."""
     sw = {**cfg["switches"], **kw, **{k: False for k in off}}
     unknown = set(sw) - set(SWITCHES)
     if unknown:
@@ -86,6 +90,11 @@ def with_switches(cfg, off=(), p2_batch=None, neutral_ids=None, **kw):
         out["p2_batch"] = n
     if cfg.get("neutral_ids") if neutral_ids is None else neutral_ids:
         out["neutral_ids"] = True
+    for key, v in (("merge_same_entity", merge_same_entity), ("p2_reask", p2_reask)):
+        if cfg.get(key) if v is None else v:
+            out[key] = True
+    if out.get("p2_reask") and not out.get("p2_batch"):
+        raise ValueError("p2_reask needs p2_batch")
     return out
 
 
@@ -504,10 +513,10 @@ def replay(out, chain, upto, root=ROOT):
                 return st, "p1: no table name", log
         if upto < 2:
             return st, None, log
-        parsed, why = P2B.answer(out, chain, cols)
+        p2_names = p2_choices(chain, st["p1_names"])
+        parsed, why = RA.answer(out, chain, cols, st["p1_names"], p2_names, log, cid) if chain.get("p2_reask") else P2B.answer(out, chain, cols)
         if why:
             return st, f"p2: {why}", log
-        p2_names = NT.neutral(st["p1_names"]) if chain.get("neutral_ids") else st["p1_names"]
         st["assign"], st["rest_host"], st["names"] = p2_assign(parsed, cols, p2_names, sw, log, cid)
         if chain.get("neutral_ids"):
             st["assign"], st["names"], ren = NT.name_tables(st["assign"], st["names"], cols, log, cid)
@@ -554,9 +563,43 @@ def replay(out, chain, upto, root=ROOT):
 
 
 # ---------------------------------------------------------------- stages
+def p2_choices(ch, p1_names):
+    """Table choices of the pass-2 prompt of a chain: the pass-1 names, or table_1 .. table_n (neutral_ids)."""
+    return NT.neutral(p1_names) if ch.get("neutral_ids") else p1_names
+
+
+def p2_builder(st, ch):
+    """build(columns) -> (text, schema, format) of the pass-2 prompt of a chain (st = its state after pass 1)."""
+    if ch.get("neutral_ids"):
+        return lambda c: NT.build_p2(lambda cc, ids: build_p2(cc, ids, ch["switches"]), c, st["p1_names"])
+    return lambda c: build_p2(c, st["p1_names"], ch["switches"])
+
+
 def _emit(jobs, name, fmt, text, schema, chain, step, **extra):
-    jobs.emit(name, "s4_41", text, schema, chain["id"], chain["set"], ent=chain["input"], chain=chain["id"], step=step, **extra)
+    jobs.emit(name, "s4_41", text, schema, extra.pop("run_tag", chain["id"]), chain["set"], ent=chain["input"], chain=chain["id"], step=step, **extra)
     jobs.jobs[-1].update(family=fmt, format=fmt, max_tokens=MAX_TOKENS[fmt])
+
+
+def build_reask_stage(out, chains, root=ROOT):
+    """wf_v4.9 A+R: the re-ask jobs "<chain>_p2_b<k>_r1" of the chains with p2_reask, after the pass-2 batches are answered (run() calls it after
+    stage 2). Writes <out>/manifests/<input>_stage2_reask.json; returns the job dicts."""
+    out = Path(out)
+    jobs = B.Jobs(out, 2)
+    for ch in chains:
+        if not ch.get("p2_reask") or ch["kind"] == "vote":
+            continue
+        st, err, _ = replay(out, ch, 1, root)
+        if err:
+            continue
+        p2 = p2_builder(st, ch)
+        batches = P2B.split(st["cols"], ch["p2_batch"])
+        for b in RA.to_reask(out, ch, st["cols"], st["p1_names"], p2_choices(ch, st["p1_names"])):
+            text, schema, fmt = p2(batches[b])
+            _emit(jobs, RA.job_name(ch["id"], b), fmt, RA.with_note(text), schema, ch, 2, run_tag=RA.run_tag(ch["id"]), n_columns=len(batches[b]))
+            jobs.jobs[-1]["max_tokens"] = P2B.max_tokens(len(batches[b]), MAX_TOKENS[fmt])
+    inp = chains[0]["input"] if chains else "none"
+    B.write_json(out / "manifests" / f"{inp}_stage2_reask.json", {"stage": "2_reask", "jobs": jobs.jobs})
+    return jobs.jobs
 
 
 def build_stage(out, k, chains, root=ROOT):
@@ -578,10 +621,7 @@ def build_stage(out, k, chains, root=ROOT):
             text, schema, fmt = build_p1(st["cols"], sw)
             _emit(jobs, f"{cid}_p1", fmt, text, schema, ch, k, n_columns=len(st["cols"]))
         elif k == 2:
-            def p2(c, st=st, sw=sw, neutral=ch.get("neutral_ids")):
-                if neutral:
-                    return NT.build_p2(lambda cc, ids: build_p2(cc, ids, sw), c, st["p1_names"])
-                return build_p2(c, st["p1_names"], sw)
+            p2 = p2_builder(st, ch)
             if ch.get("p2_batch"):
                 for name, text, schema, fmt, bc in P2B.prompts(p2, st["cols"], cid, ch["p2_batch"]):
                     _emit(jobs, name, fmt, text, schema, ch, k, n_columns=len(bc))
@@ -665,7 +705,7 @@ def make_chains(out, inputs=INPUTS, sets=SETS, seeds=SEEDS, cfg=None, step3_dirs
                     write_score_map(out, inp, s, ids)
             seed_chains = [{"id": B.chain_id(inp, s, d), "kind": "main", "input": inp, "set": s, "seed": d, "exclude": [], "prompt_version": "v44",
                             "columns_file": _rel(p, root), "switches": dict(sw), "thresholds": dict(th), "values_file": vf} for d in seeds]
-            for key in ("p2_batch", "neutral_ids"):
+            for key in ("p2_batch", "neutral_ids", "merge_same_entity", "p2_reask"):
                 if cfg.get(key):
                     for c in seed_chains:
                         c[key] = cfg[key]
@@ -689,6 +729,9 @@ def assemble_all(out, chains, root=ROOT):
                "tables": len(st["ans"]["44"]["tables"]) if err is None else None}
         if err is None:
             c = B.assemble_chain(st["ans"], st["cols"])
+            if ch.get("merge_same_entity"):
+                c, row["merged"] = MG.merge_same_entity(c, st["cols"])
+                row["tables"] = len(c["tables"])
             B.write_json(final / ch["id"] / "canonical.json", c)
             B.write(final / ch["id"] / "schema.sql", SQL.to_sql(c))
             B.write_json(final / ch["id"] / "operations.json", SQL.to_operations(c))
@@ -713,7 +756,7 @@ def run(out, backend, inputs=INPUTS, sets=SETS, seeds=SEEDS, cfg=None, step3_dir
         chains = [c for c in B.read_json(out / "chains.json") if c["input"] not in inputs] + chains
     B.write_json(out / "chains.json", chains)
     info = {"chains": len(chains), "switches": cfg["switches"], "thresholds": cfg["thresholds"], "inputs": {}}
-    for key in ("p2_batch", "neutral_ids"):
+    for key in ("p2_batch", "neutral_ids", "merge_same_entity", "p2_reask"):
         if cfg.get(key):
             info[key] = cfg[key]
     for inp in inputs:
@@ -726,6 +769,10 @@ def run(out, backend, inputs=INPUTS, sets=SETS, seeds=SEEDS, cfg=None, step3_dir
             jobs = build_stage(out, k, cs, root)
             info["inputs"][inp][f"stage{k}"] = backend.run(out, jobs) if jobs else {"jobs": 0, "run": 0, "parse_errors": 0}
             log(f"{inp} stage {k}: {len(jobs)} jobs")
+            if k == 2 and any(c.get("p2_reask") for c in cs):
+                jobs = build_reask_stage(out, cs, root)
+                info["inputs"][inp]["stage2_reask"] = backend.run(out, jobs) if jobs else {"jobs": 0, "run": 0, "parse_errors": 0}
+                log(f"{inp} stage 2 re-ask: {len(jobs)} jobs")
     status = assemble_all(out, chains, root)
     info["finished"] = f"{sum(r['ok'] for r in status)}/{len(status)}"
     B.write_json(out / "run_info.json", info)

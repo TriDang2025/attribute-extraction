@@ -25,7 +25,8 @@ VIEW = "Y1 rule"
 SHARES = ("table_f1", "grouping_f1", "gt_columns_placed", "pk_right_b", "pk_right")
 
 
-def rows(gt, root=OUT):
+def rows(gt, root=OUT, opts=None):
+    """opts: callable(variant, set) -> kwargs of S46.chain_mapping (score map, gt levels, tweak); None = the W3 scoring."""
     out = []
     for v in G.VARIANTS:
         for dev, run in G.SETS.items():
@@ -37,7 +38,7 @@ def rows(gt, root=OUT):
                     out.append({"variant": v, "set": dev, "seed": s, "finished": False, "error": status.get(cid, {}).get("error", "not run")})
                     continue
                 c = json.loads((folder / "final" / cid / "canonical.json").read_text(encoding="utf-8"))
-                for r in S46.score_chain(gt, v, dev, run, folder, s):
+                for r in S46.score_chain(gt, v, dev, run, folder, s, **(opts(v, dev) if opts else {})):
                     out.append({"variant": v, "seed": s, "finished": True, "unused": len(c.get("unused", [])), **r})
     return pd.DataFrame(out)
 

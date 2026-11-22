@@ -1,0 +1,47 @@
+Below are two tables of a relational database design, each with its columns. Decide whether address_2 and train_info_2 are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "address_2 -> train_info_2": one address_2 row has many train_info_2 rows (each train_info_2 row refers to one address_2 row)
+- "train_info_2 -> address_2": one train_info_2 row has many address_2 rows (each address_2 row refers to one train_info_2 row)
+- "many_to_many": a address_2 row can go with many train_info_2 rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table address_2 (one row = one address_2), 4 columns:
+[address:8] location
+  values: text (share 1.00); 46 mentions in 14 dialogues
+  examples:
+    "emmanuel college" (in: "There are 13 choices, how do you feel about Emmanuel College?")
+    "cambridge" (in: "I am looking for information in Cambridge")
+[address:9] location abbrev
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "town" (in: "am looking for a college attraction to go to in town.")
+    "city" (in: "I'm looking for a theatre in any part of the city. Can you recommend one?")
+[address:10] location str
+  values: text (share 1.00); 9 mentions in 4 dialogues
+  examples:
+    "centre area" (in: "Yes. I am looking for places to go in the centre area. I am looking for college.")
+    "cambridge art theatre" (in: "The address of the Cambridge Arts Theatre is 6 Saint Edward's Passage, postco...")
+[address:11] noun
+  values: text (share 1.00); 5 mentions in 3 dialogues
+  examples:
+    "museum" (in: "...s to do and places to go such as, museum's, nightclubs, parks and restaura...")
+    "cinema" (in: "I need a cinema to go to in the south.")
+
+Table train_info_2 (one row = one train_info_2), 1 columns:
+[train_info:19] total fee
+  values: text (share 0.67); 6 mentions in 5 dialogues
+  examples:
+    "17.89" (in: "...ference number is 698RE4W1. The total fee of 17.89 is payable at the station.")
+    "37.79 gpb" (in: "...ber is GJ3062PE. The total fee is 37.79 GPB which you can pay at the station.")
+
+Return the JSON object now.

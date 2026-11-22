@@ -1,0 +1,152 @@
+Below are two tables of a relational database design, each with its columns. Decide whether accommodation_option and phone_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "accommodation_option -> phone_number": one accommodation_option row has many phone_number rows (each phone_number row refers to one accommodation_option row)
+- "phone_number -> accommodation_option": one phone_number row has many accommodation_option rows (each accommodation_option row refers to one phone_number row)
+- "many_to_many": a accommodation_option row can go with many phone_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table accommodation_option (one row = one accommodation_option), 17 columns:
+[accommodation_option:5] checkin date
+  values: day (share 0.80); 10 mentions in 10 dialogues
+  examples:
+    "wednesday" (in: "like it for 6 people for 2 nights starting on Wednesday.")
+    "thursday" (in: "book it for 8 people for 4 nights starting on thursday?")
+[accommodation_option:26] facilities
+  values: text (share 0.91); 11 mentions in 6 dialogues
+  examples:
+    "parking" (in: "...ll of them have free internet and parking. Would you like me to give your ...")
+    "3 star" (in: "name. I really want to stay moderately priced with the 3 stars and parking.")
+[accommodation_option:6] day
+  values: day (share 1.00); 11 mentions in 8 dialogues
+  examples:
+    "friday" (in: "...ok reservation for 2 people at 16:00 on Friday. Send me the reference number.")
+    "sunday" (in: "Yes I'll need it for Sunday for 2 nights and 4 people.")
+[accommodation_option:18] reference number
+  values: id (share 1.00); 16 mentions in 16 dialogues
+  examples:
+    "23ekiufo" (in: "...ations. Your reference number is 23EKIUFO. Is there anything else I can he...")
+    "7sn0baat" (in: "...ghts for 8 people. Your reference number 7SN0BAAT. Do you need anything else?")
+[accommodation_option:7] hotel name
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "the lensfield hotel" (in: "The Lensfield Hotel meets your criteria. Would you like me to book it?")
+    "ashely hotel" (in: "... hotels meeting your criteria. Ashely Hotel located at 74 Chesterton road ...")
+[accommodation_option:25] price_range
+  values: text (share 1.00); 10 mentions in 7 dialogues
+  examples:
+    "moderately priced" (in: "ok. I'll call them. Can you help me find a moderately priced place to stay?")
+    "moderate price range" (in: "you! I'm looking for a place to stay in the moderate price range.")
+[accommodation_option:21] type
+  values: text (share 1.00); 25 mentions in 16 dialogues
+  examples:
+    "guesthouse" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "acorn guest house" (in: "Yes the phone number to the acorn guest house 01223353888 with a price range ...")
+[accommodation_option:17] rating
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "cheap" (in: "Hotel allenbell is what I found that is cheap and has parking.")
+[accommodation_option:22] amenities
+  values: text (share 0.90); 10 mentions in 5 dialogues
+  examples:
+    "parking" (in: "allenbell is what I found that is cheap and has parking.")
+    "free internet" (in: "...esthouses and all of them have free internet and parking. Would you like m...")
+[accommodation_option:23] internet
+  values: text (share 1.00); 17 mentions in 10 dialogues
+  examples:
+    "free wifi" (in: "Does this location include free wifi?")
+    "wifi" (in: "any so long as it is a 2star and has wifi")
+[accommodation_option:19] str
+  values: text (share 1.00); 17 mentions in 12 dialogues
+  examples:
+    "hotel" (in: "...s available. Do you have a preference of guesthouse or hotel and price range?")
+    "4 3 star guest house" (in: "There are four three star guest houses. Is there an area of town that interes...")
+[accommodation_option:8] hotel rating
+  values: number (share 0.50); 8 mentions in 4 dialogues
+  examples:
+    "2 star" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "3 star" (in: "Yes, how about a guesthouse with 3 stars and free wifi instead?")
+[accommodation_option:9] hotel reference
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "hotel allenbell" (in: "Hotel allenbell is what I found that is cheap and has parking.")
+[accommodation_option:15] num people
+  values: number (share 0.82); 49 mentions in 20 dialogues
+  examples:
+    "2 night" (in: "I would like it for 6 people for 2 nights starting on Wednesday.")
+    "4 night" (in: "How about four nights instead of five?")
+[accommodation_option:27] services
+  values: text (share 1.00); 11 mentions in 7 dialogues
+  examples:
+    "free parking" (in: "place to stay in the centre of town that includes free parking.")
+    "free wifi" (in: "for a place to stay in the east that includes free wifi.")
+[accommodation_option:20] time
+  values: time (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "16:00" (in: "...e book reservation for 2 people at 16:00 on Friday. Send me the reference ...")
+[accommodation_option:14] lodging type
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "finch bed and breakfast" (in: "Finches Bed and Breakfast is a cheap 4-star guesthouse on the west side. Its")
+    "carolina bed and breakfast" (in: "I recommend Carolina Bed and Breakfast. It's located close to where you'll be...")
+
+Table phone_number (one row = one phone_number), 10 columns:
+[accommodation_option:24] parking
+  values: text (share 1.00); 16 mentions in 13 dialogues
+  examples:
+    "free parking" (in: "Does this place include free parking?")
+[accommodation_option:12] location part
+  values: text (share 1.00); 19 mentions in 9 dialogues
+  examples:
+    "north" (in: "I would like a hotel in the north, please.")
+    "east" (in: "I am looking for a cheap hotel on the east.")
+[accommodation_option:16] phone number
+  values: number (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "01223247015" (in: "address is 138 Perne Road and their phone number is 01223247015.")
+    "01223334860" (in: "The phone of Downing College is 01223334860. Do you need a place to stay?")
+[location:7] phone number
+  values: number (share 0.70); 10 mentions in 6 dialogues
+  examples:
+    "their phone number" (in: "Something located in the city centre. Also may I have their phone number?")
+    "01223307402" (in: "... Castle Galleries, phone number 01223307402, postal code cb23bj, address u...")
+[establishment:12] phone number
+  values: number (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "01223" (in: "01223 308871 Will that be all?")
+    "07754509492" (in: "...volvo and the contact number is 07754509492. Is there anything else I can ...")
+[phone_number:10] contact_number
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "taxi" (in: "I want help booking a taxi")
+    "black ford" (in: "You will be picked up by a black ford and the contact number is 07635928440. ...")
+[phone_number:4] departure location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "leverton house" (in: "I will be leaving from leverton house arriving by 06:45.")
+[phone_number:1] arrival time
+  values: time (share 0.67); 12 mentions in 9 dialogues
+  examples:
+    "14:45" (in: "from college to the restaurant. I need to arrive by 14:45.")
+    "11:45" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+[phone_number:9] time str
+  values: number (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "07048450899" (in: "you need to contact the taxi company, you can call 07048450899.")
+    "07128258422" (in: "up at hughes hall at 14:45. The contact number is 07128258422.")
+[phone_number:5] departure time
+  values: time (share 0.88); 8 mentions in 6 dialogues
+  examples:
+    "19:15" (in: "I'd like to book a taxi from Ask, departing after 19:15.")
+    "06:45" (in: "I will be leaving from leverton house arriving by 06:45.")
+
+Return the JSON object now.

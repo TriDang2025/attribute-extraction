@@ -31,12 +31,22 @@ CHAINS = [  # (label, dev set, run name, step 4 folder)
 METRICS = ("table_f1", "grouping_f1", "gt_columns_placed", "pk_right", "pk_right_b")
 
 
-def score_chain(gt, label, dev, run, folder, seed=0):
+def chain_mapping(gt, dev, run, folder, seed=0, handover=None, gt_levels=None, tweak=None):
+    """(canonical, {source column: gt mapping}) of one chain. handover = score-map dir (default <folder>/score_map/a_llama44), gt_levels = path or
+    Series (default SCR.GT_LEVELS[dev]), tweak = callable(mapping) -> mapping applied last (wf_v4.9: loop-2 ids, human-check fallback)."""
     chain = f"a_llama44_{run}_s{seed}"
     c = json.loads((folder / "final" / chain / "canonical.json").read_text(encoding="utf-8"))
-    full = G.map_handover(folder / "score_map" / "a_llama44", run, ROOT / SCR.GT_LEVELS[dev], G.gt_names(gt))
+    full = G.map_handover(handover or folder / "score_map" / "a_llama44", run, gt_levels if gt_levels is not None else ROOT / SCR.GT_LEVELS[dev],
+                          G.gt_names(gt))
     srcs = {x["source"] for t in c["tables"] for x in t["columns"] if x.get("source")} | {u["source"] for u in c.get("unused", [])}
     mapping = {s: full.get(s) or {"gt": None, "purity": 0.0, "n": 0, "entity": s.split(":")[0]} for s in srcs}
+    return c, (tweak(mapping) if tweak else mapping)
+
+
+def score_chain(gt, label, dev, run, folder, seed=0, **kw):
+    """Score rows (full GT view, Y1 rule) of one chain; kw as chain_mapping."""
+    chain = f"a_llama44_{run}_s{seed}"
+    c, mapping = chain_mapping(gt, dev, run, folder, seed, **kw)
     calls = [r for r in LOG.call_rows(folder) if str(r["job"]).startswith(chain)]
     base = {"label": label, "set": dev, "tables": len(c["tables"]), "table_names": " ".join(t["name"] for t in c["tables"]),
             "calls": len(calls), "prompt_tokens": sum(int(r["prompt_tokens"]) for r in calls),

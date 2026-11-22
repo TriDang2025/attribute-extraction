@@ -1,0 +1,70 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+This table refers to the other tables listed below. For each of them, choose the id of the column of this table that holds the reference (its value points to a row of that table), or "new" when no column does; a new reference column is then added. Tables referred to: accommodation (one accommodation row has many rows of accommodation_2).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "x:3", "new_id_name": "", "foreign_keys": {"table_b": "new"}}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table accommodation_2 (one row = one accommodation_2), 11 columns:
+[accommodation:4] date
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "what day" (in: "That shouldn't be a problem. What day would you like to begin your stay?")
+[accommodation:5] day of week
+  values: day (share 0.84); 25 mentions in 15 dialogues
+  examples:
+    "monday" (in: "...people for three nights, starting Monday, at Finches Bed and Breakfast. Re...")
+    "wednesday" (in: "book it for 5 people and 5 nights starting from wednesday.")
+[accommodation:10] num days
+  values: number (share 0.91); 22 mentions in 15 dialogues
+  examples:
+    "3 night" (in: "...ou a room for seven people for three nights, starting Monday, at Finches B...")
+    "4 night" (in: "as they have a room available for 3 people staying 4 nights.")
+[accommodation:11] num nights
+  values: number (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "1 person" (in: "Great can you book that for 1 person for 3 nights starting friday?")
+    "3 people" (in: "...ailable starting on Sunday for three people, can I look something else up ...")
+[accommodation:12] num people
+  values: number (share 0.88); 16 mentions in 11 dialogues
+  examples:
+    "5 people" (in: "Yes, for 2 nights for 5 people on the same day")
+    "3 people" (in: "matter as long as they have a room available for 3 people staying 4 nights.")
+[accommodation:13] party size
+  values: text (share 0.56); 9 mentions in 8 dialogues
+  examples:
+    "how many people" (in: "OK, and how many people will be staying in the room?")
+    "11" (in: "Sorry, you are right. We actually have 11 to choose from.")
+[accommodation:19] reservation number
+  values: id (share 1.00); 15 mentions in 13 dialogues
+  examples:
+    "e6uvd9ol" (in: "... booking the Reference number is E6UVD9OL. Is there anything else i can he...")
+    "72ycmlxx" (in: "...fectly. Your reference number is 72YCMLXX. Is there anything else I can he...")
+[accommodation:20] start date
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "avalon" (in: "I have begun a booking for you at Avalon. How many days will you be staying?")
+[food_establishment:14] reservation time
+  values: duration (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+[food_establishment:17] time int
+  values: time (share 1.00); 25 mentions in 16 dialogues
+  examples:
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+    "18:00" (in: "I be able to get a table there Thursday at 18:00 for 7?")
+[food_establishment:18] time str
+  values: number (share 0.83); 18 mentions in 10 dialogues
+  examples:
+    "4" (in: "Please book a table for 4 at 15:15 on wednesday.")
+    "6 people" (in: "Can you make a reservation for 6 people at 12:15 on wednesday?")
+
+Return the JSON object now.

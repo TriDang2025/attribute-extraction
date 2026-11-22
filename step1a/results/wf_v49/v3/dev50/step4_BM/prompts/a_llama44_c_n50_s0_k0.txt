@@ -1,0 +1,35 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table accommodation (one row = one accommodation), 4 columns:
+[accommodation:21] str
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+[accommodation:24] amenities
+  values: text (share 1.00); 11 mentions in 7 dialogues
+  examples:
+    "free parking" (in: "the north part of town. It offers free wifi and free parking.")
+    "free internet" (in: "...lected region. It's moderately priced and includes free internet and parking.")
+[accommodation:25] internet
+  values: text (share 1.00); 29 mentions in 10 dialogues
+  examples:
+    "free wifi" (in: "Yes, can you find a place for me with free wifi in the moderate price range?")
+    "free internet" (in: "...lected region. It's moderately priced and includes free internet and parking.")
+[accommodation:26] parking
+  values: text (share 1.00); 14 mentions in 6 dialogues
+  examples:
+    "free parking" (in: "Yes, please try 5-star hotels with free parking.")
+
+Return the JSON object now.
