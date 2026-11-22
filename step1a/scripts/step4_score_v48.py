@@ -25,12 +25,13 @@ VIEW = "Y1 rule"
 SHARES = ("table_f1", "grouping_f1", "gt_columns_placed", "pk_right_b", "pk_right")
 
 
-def rows(gt, root=OUT, opts=None):
-    """opts: callable(variant, set) -> kwargs of S46.chain_mapping (score map, gt levels, tweak); None = the W3 scoring."""
+def rows(gt, root=OUT, opts=None, variants=None):
+    """opts: callable(variant, set) -> kwargs of S46.chain_mapping (score map, gt levels, tweak); None = the W3 scoring.
+    variants: {variant: root} (folder <root>/<set>/step4_<variant>, a folder without final/ = "not run"); None = every gpu_v48 variant under root."""
     out = []
-    for v in G.VARIANTS:
+    for v, vroot in (variants or {v: root for v in G.VARIANTS}).items():
         for dev, run in G.SETS.items():
-            folder = Path(root) / dev / f"step4_{v}"
+            folder = Path(vroot) / dev / f"step4_{v}"
             status = {r["run"]: r for r in json.loads((folder / "final" / "status.json").read_text(encoding="utf-8"))} if (folder / "final").exists() else {}
             for s in G.SEEDS:
                 cid = f"a_llama44_{run}_s{s}"
@@ -89,19 +90,24 @@ def table_md(df):
     return "\n".join(lines)
 
 
-def figure(gt, dev="dev50", seed=0, root=OUT):
-    """<root>/fig_schema_<dev>_s<seed>.png: variant A, variant B and the GT main design, side by side (fig_schema_v43.draw)."""
+DESC = {"A": "batched", "B": "batched + neutral ids", "BM": "B + merge_same_entity", "AR": "A + p2_reask"}
+
+
+def figure(gt, dev="dev50", seed=0, root=OUT, variants=None, out=None):
+    """out (default <root>/fig_schema_<dev>_s<seed>.png): each variant (default A and B; {variant: root} as in rows) and the GT main design,
+    side by side (fig_schema_v43.draw)."""
     import matplotlib.pyplot as plt
     import fig_schema_v43 as FIG
     from s1a import step4_gt as SG
     run = G.SETS[dev]
-    fig, axes = plt.subplots(1, 3, figsize=(24, 10))
-    for ax, v in zip(axes, G.VARIANTS):
-        c = json.loads((Path(root) / dev / f"step4_{v}" / "final" / f"a_llama44_{run}_s{seed}" / "canonical.json").read_text(encoding="utf-8"))
-        FIG.draw(ax, SC43._schema_view(c), f"Variant {v} ({'batched' if v == 'A' else 'batched + neutral ids'}), {dev}, seed {seed}")
-    FIG.draw(axes[2], SC43._schema_view(SG.to_canonical(gt)), "Ground truth (schema GT v1)")
+    variants = variants or {v: root for v in ("A", "B")}
+    fig, axes = plt.subplots(1, len(variants) + 1, figsize=(8 * (len(variants) + 1), 10))
+    for ax, (v, vroot) in zip(axes, variants.items()):
+        c = json.loads((Path(vroot) / dev / f"step4_{v}" / "final" / f"a_llama44_{run}_s{seed}" / "canonical.json").read_text(encoding="utf-8"))
+        FIG.draw(ax, SC43._schema_view(c), f"Variant {v} ({DESC[v]}), {dev}, seed {seed}")
+    FIG.draw(axes[-1], SC43._schema_view(SG.to_canonical(gt)), "Ground truth (schema GT v1)")
     fig.tight_layout()
-    p = Path(root) / f"fig_schema_{dev}_s{seed}.png"
+    p = Path(out or Path(root) / f"fig_schema_{dev}_s{seed}.png")
     fig.savefig(p, dpi=110)
     return p
 

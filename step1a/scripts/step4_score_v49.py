@@ -26,11 +26,13 @@ from s1a import batch_v4 as B  # noqa: E402
 from s1a import l2ids_v49 as L  # noqa: E402
 from s1a import mainclaim_v41 as M  # noqa: E402
 from s1a import step4_gt as SG  # noqa: E402
+from s1a import step4_pick_v49 as PK  # noqa: E402
 from s1a import step4_score_v43 as SC43  # noqa: E402
 from s1a import tear_cols as TC  # noqa: E402
 
 OUT = ROOT / "results" / "wf_v49" / "v1"
 W1 = ROOT / "results" / "wf_v48" / "w1"
+V1_VARIANTS = {v: G48.OUT for v in ("A", "B")}   # {variant: root}, as step4_score_v48.rows; explicit so a registered AR (gpu_v49) is not scored here
 VIEWS = ("spans", "spans+hc")
 VIEW = S48.VIEW
 CHECK = ("internet", "parking")
@@ -40,8 +42,9 @@ def read_json(p):
     return json.loads(Path(p).read_text(encoding="utf-8"))
 
 
-def prepare(dev, run, names):
-    """{cols, levels (extended gt_L2), override (human-check fallback)} of one set; also writes the score-map copies with L2_ ids."""
+def prepare(dev, run, names, variants=V1_VARIANTS, out=OUT):
+    """{cols, levels (extended gt_L2), override (human-check fallback)} of one set; also writes the score-map copies with L2_ ids of every
+    variant folder <root>/<dev>/step4_<v> that has a score map, to <out>/<dev>/step4_<v>/score_map (a variant not run yet has none)."""
     cols = L.loop2_columns(read_json(G48.W2 / dev / "merged_columns.json"))
     entity_of = {k: v["gt_entity"] for k, v in read_json(W1 / dev / "entity_map.json").items()}
     _, mt, labels, _ = M.load_set(dev)
@@ -52,9 +55,9 @@ def prepare(dev, run, names):
     key = pd.read_csv(W1 / dev / "human_check_key.csv", dtype=str, keep_default_na=False).to_dict("records")
     ids = L.column_ids(cols)
     seen = set()
-    for v in G48.VARIANTS:
-        src = Path(G48.OUT) / dev / f"step4_{v}" / "score_map" / "a_llama44" / run
-        dst = OUT / dev / f"step4_{v}" / "score_map" / "a_llama44" / run
+    for v, root in variants.items():
+        src = Path(root) / dev / f"step4_{v}" / "score_map" / "a_llama44" / run
+        dst = Path(out) / dev / f"step4_{v}" / "score_map" / "a_llama44" / run
         for f in sorted(src.glob("*.json")):
             doc = read_json(f)
             for c in doc["columns"]:
@@ -68,26 +71,29 @@ def prepare(dev, run, names):
     return {"cols": cols, "levels": levels, "override": L.fallback(cols, key, names)}
 
 
-def opts_for(prep, view):
+def opts_for(prep, view, out=OUT):
     def opts(v, dev):
         p = prep[dev]
-        return {"handover": OUT / dev / f"step4_{v}" / "score_map" / "a_llama44", "gt_levels": p["levels"],
+        return {"handover": Path(out) / dev / f"step4_{v}" / "score_map" / "a_llama44", "gt_levels": p["levels"],
                 "tweak": partial(L.apply_fallback, override=p["override"]) if view == "spans+hc" else None}
     return opts
 
 
-def placement(gt, prep, df, opts):
-    """df plus internet_where / internet_gt / parking_where / parking_gt per finished chain (table name or "unused"; GT label of the column)."""
+def placement(gt, prep, df, opts, variants=V1_VARIANTS, hotel=None):
+    """df plus internet_where / internet_gt / parking_where / parking_gt per finished chain (table name or "unused"; GT label of the column).
+    hotel = {set: hotel entities} adds internet_hotel / parking_hotel (placed in a table whose main entity is a hotel entity, PK.in_hotel_table)."""
     rows = []
     for r in df.to_dict("records"):
         if r["finished"] and r["gt_view"] == VIEW:
             dev, run, v = r["set"], G48.SETS[r["set"]], r["variant"]
-            c, mapping = S46.chain_mapping(gt, dev, run, Path(G48.OUT) / dev / f"step4_{v}", r["seed"], **opts(v, dev))
+            c, mapping = S46.chain_mapping(gt, dev, run, Path(variants[v]) / dev / f"step4_{v}", r["seed"], **opts(v, dev))
             for name in CHECK:
                 keys = [k for k, col in prep[dev]["cols"].items() if col["name"] == name]
                 where = [t["name"] for t in c["tables"] for x in t["columns"] if x.get("source") in keys]
                 where += ["unused"] * sum(u["source"] in keys for u in c.get("unused", []))
                 r[f"{name}_where"] = ",".join(where) or "missing"
+                if hotel:
+                    r[f"{name}_hotel"] = PK.in_hotel_table(c, keys, hotel[dev])
                 r[f"{name}_gt"] = ",".join(str(mapping[k]["gt"]) for k in keys if k in mapping and mapping[k]["gt"])
         rows.append(r)
     return pd.DataFrame(rows)
@@ -139,7 +145,7 @@ def main():
     parts = []
     for view in VIEWS:
         opts = opts_for(prep, view)
-        parts.append(placement(gt, prep, S48.rows(gt, opts=opts), opts).assign(l2_view=view))
+        parts.append(placement(gt, prep, S48.rows(gt, opts=opts, variants=V1_VARIANTS), opts).assign(l2_view=view))
     df = pd.concat(parts, ignore_index=True)
     df.to_csv(OUT / "scores.csv", index=False, encoding="utf-8", lineterminator="\n")
     md = ["# wf_v4.9 V1: Step 4 chains of W3 with scorable loop-2 columns", "",
