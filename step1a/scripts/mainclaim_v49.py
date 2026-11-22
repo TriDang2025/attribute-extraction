@@ -44,9 +44,8 @@ def found_marks(set_name):
     return out, gold
 
 
-def recount(set_name, mapping):
-    """Rows (one per source) of found k/n and beyond-gold groups before and after the mapping."""
-    found, gold = found_marks(set_name)
+def mapped_sheet(set_name, mapping, gold):
+    """(merged W1 sheet + key rows, the same with mapped name_match, {row id: gold_L2}) of a set."""
     sheet = pd.read_csv(W1 / set_name / "human_check_sheet.csv", dtype=str, keep_default_na=False)
     key = pd.read_csv(W1 / set_name / "human_check_key.csv", dtype=str, keep_default_na=False)
     merged = sheet.merge(key[["id", "source", "item_id", "name_match"]], on="id")
@@ -55,10 +54,31 @@ def recount(set_name, mapping):
     if unknown:
         raise ValueError(f"{set_name}: mapped names not in the gold L2 list: {sorted(unknown)}")
     mapped = merged.assign(name_match=[gmap.get(i, nm) for i, nm in zip(merged["id"], merged["name_match"])])
+    return merged, mapped, gmap
+
+
+def mapped_adds(mapped, gmap, keep):
+    """Gold attributes added by mapped rows marked real among the sources `keep`."""
+    part = mapped[mapped["source"].isin(keep)]
+    return {gmap[i] for i, r in zip(part["id"], part["real"]) if i in gmap and parse_real(r)}
+
+
+def found_v49(set_name, mapping=None):
+    """({source: set of found gold attributes (span + human check, mapped)}, {gold attribute: entity}) of a set: the v4.9 V2 numbers."""
+    mapping = pd.read_csv(MAPPING, dtype=str, keep_default_na=False) if mapping is None else mapping
+    found, gold = found_marks(set_name)
+    _, mapped, gmap = mapped_sheet(set_name, mapping, gold)
+    return {src: set(found[src]) | mapped_adds(mapped, gmap, keep) for src, keep in M48.SOURCES.items()}, gold
+
+
+def recount(set_name, mapping):
+    """Rows (one per source) of found k/n and beyond-gold groups before and after the mapping."""
+    found, gold = found_marks(set_name)
+    merged, mapped, gmap = mapped_sheet(set_name, mapping, gold)
     rows = []
     for src, keep in M48.SOURCES.items():
         part = mapped[mapped["source"].isin(keep)]
-        add = {gmap[i] for i, r in zip(part["id"], part["real"]) if i in gmap and parse_real(r)}
+        add = mapped_adds(mapped, gmap, keep)
         before = H.summary(merged[merged["source"].isin(keep)].to_dict("records"))
         after = H.summary(part.to_dict("records"))
         rows.append({"set": set_name, "source": src, "gold_n": len(gold),

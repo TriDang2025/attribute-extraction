@@ -52,10 +52,10 @@ def span_inputs(docs, enc, cache):
     return spans, PI.segments(docs, enc, size, tau, snap, kw, cache)
 
 
-def prepare(split, limit, out, with_spans=True):
+def prepare(split, limit, out, with_spans=True, unseal=False):
     """Docs, pipeline Inputs and the encoder of one split; writes the shared files of <out>."""
     t0 = time.time()
-    docs = {d.doc_id: d for d in single_docs(SPL.dialogues(split, limit))}
+    docs = {d.doc_id: d for d in single_docs(SPL.dialogues(split, limit, unseal))}
     tables = U.load_tables(paths.TEAR_DATA, list(docs))
     docs = {d: v for d, v in docs.items() if d in tables}
     classes = gold.merge_classes(gold.load_all_tables())
@@ -91,7 +91,8 @@ def save_split_stats(variant, d):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--split", choices=SPL.RUNNABLE, default="dev")
+    ap.add_argument("--split", choices=SPL.RUNNABLE + ("dev50c",), default="dev")
+    ap.add_argument("--unseal", action="store_true", help="needed for the sealed dev50c (wf_v5.0 G0 gold build, final check)")
     ap.add_argument("--limit", type=int, default=50)
     ap.add_argument("--input", choices=("spans", "gold", "both"), default="both")
     ap.add_argument("--out", required=True)
@@ -105,7 +106,7 @@ def main():
     inputs = ("spans", "gold") if args.input == "both" else (args.input,)
     if args.from_run and not (out / "cache").exists():
         shutil.copytree(paths.ROOT / args.from_run / "cache", out / "cache")
-    docs, inp, enc = prepare(args.split, args.limit, out, "spans" in inputs)
+    docs, inp, enc = prepare(args.split, args.limit, out, "spans" in inputs, args.unseal)
     if args.variant:
         apply_variant(inp, args.variant)
     for name in inputs:

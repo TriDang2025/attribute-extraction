@@ -55,21 +55,31 @@ def to_reask(out, chain, cols, tables, valid):
     return res
 
 
-def answer(out, chain, cols, tables, valid, log=None, where=""):
-    """(joined parsed answer of pass 2, None) or (None, why), like step4_p2batch_v46.answer, with the re-asked batches replaced by their second answer."""
+def batch_answer(out, chain, b, bc, tables, valid, log=None, where=""):
+    """(parsed answer of pass-2 batch b, None) or (None, why): the first answer, or the r1 answer when the first drops an entity and r1 parses."""
+    parsed, why = V._answer(out, P2B.job_name(chain["id"], b))
+    if why:
+        return None, f"batch b{b}: {why}"
+    if not isinstance(parsed, dict):
+        return None, f"batch b{b}: answer is not an object"
+    if drops_entity(bc, parsed, tables, valid):
+        second, why2 = V._answer(out, job_name(chain["id"], b))
+        kind = "p2_reask" if not why2 and isinstance(second, dict) else ("p2_reask_missing" if why2 == "no response" else "p2_reask_failed")
+        if log is not None:
+            log.add(kind, where, f"b{b}")
+        if kind == "p2_reask":
+            parsed = second
+    return parsed, None
+
+
+def answer(out, chain, cols, tables, valid, log=None, where="", batch_fn=None):
+    """(joined parsed answer of pass 2, None) or (None, why), like step4_p2batch_v46.answer, with the re-asked batches replaced by their second answer.
+    batch_fn (default batch_answer) answers one batch (wf_v5.0 adds a second round)."""
+    batch_fn = batch_fn or batch_answer
     joined = {}
     for b, bc in enumerate(P2B.split(cols, chain["p2_batch"])):
-        parsed, why = V._answer(out, P2B.job_name(chain["id"], b))
+        parsed, why = batch_fn(out, chain, b, bc, tables, valid, log, where)
         if why:
-            return None, f"batch b{b}: {why}"
-        if not isinstance(parsed, dict):
-            return None, f"batch b{b}: answer is not an object"
-        if drops_entity(bc, parsed, tables, valid):
-            second, why2 = V._answer(out, job_name(chain["id"], b))
-            kind = "p2_reask" if not why2 and isinstance(second, dict) else ("p2_reask_missing" if why2 == "no response" else "p2_reask_failed")
-            if log is not None:
-                log.add(kind, where, f"b{b}")
-            if kind == "p2_reask":
-                parsed = second
+            return None, why
         joined.update(parsed)
     return joined, None

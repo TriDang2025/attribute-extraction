@@ -34,10 +34,10 @@ def input_dir(dev, root=OUT):
     return Path(root) / dev / "input" / "a_llama44"
 
 
-def prepare(dev, run, root=OUT):
-    """Write the W3 input of one set (see the module doc). Returns its path."""
-    cols = B.read_json(W2 / dev / "a2.columns.json")
-    final = B.read_json(LOOP1 / dev / "step3" / "scores" / "final_columns.json")[run]
+def prepare(dev, run, root=OUT, w2=W2, loop1=LOOP1):
+    """Write the W3 input of one set (see the module doc; w2 / loop1 = other replay and loop-1 run roots, wf_v5.0). Returns its path."""
+    cols = B.read_json(Path(w2) / dev / "a2.columns.json")
+    final = B.read_json(Path(loop1) / dev / "step3" / "scores" / "final_columns.json")[run]
     ids = {f"{e}:{c['cid']}": c["mention_ids"] for e, cs in final.items() for c in cs}
     p = input_dir(dev, root) / run / "a.columns.json"
     B.write_json(p, [{**c, "mention_ids": ids.get(c["id"], [])} for c in cols])
