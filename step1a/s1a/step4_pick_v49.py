@@ -22,6 +22,20 @@ def in_hotel_table(canonical, keys, hotel):
     return any(x.get("source") in keys for t in canonical["tables"] if main_entity(t) in hotel for x in t["columns"])
 
 
+def chain_problems(df, v, dev, s):
+    """Rule-1 problems of one chain (variant v, set dev, seed s): not finished, fewer than MIN_TABLES tables, internet / parking not in a hotel table."""
+    r = df[(df["variant"] == v) & (df["set"] == dev) & (df["seed"] == s) & df["finished"].astype(bool)]
+    if r.empty:
+        return [f"{dev} s{s}: not finished / not run"]
+    r, why = r.iloc[0], []
+    if r["tables"] < MIN_TABLES:
+        why.append(f"{dev} s{s}: collapse ({int(r['tables'])} tables)")
+    for n in ("internet", "parking"):
+        if not r[f"{n}_hotel"]:
+            why.append(f"{dev} s{s}: {n} not in a hotel table")
+    return why
+
+
 def pick(df, seeds=(0, 1, 2), tol=TOL):
     """(chosen variant or None, {variant: {"rule1": (ok, reason), "rule2": (ok, reason), "score": float or None}}).
     df: one row per variant x set x seed with variant, set, seed, finished, tables, internet_hotel, parking_hotel, placed, table_f1, grouping_f1.
@@ -29,20 +43,7 @@ def pick(df, seeds=(0, 1, 2), tol=TOL):
     sets = sorted(df["set"].unique())
     res = {}
     for v in sorted(df["variant"].unique()):
-        why = []
-        for dev in sets:
-            d = df[(df["variant"] == v) & (df["set"] == dev)]
-            for s in seeds:
-                r = d[(d["seed"] == s) & d["finished"].astype(bool)]
-                if r.empty:
-                    why.append(f"{dev} s{s}: not finished / not run")
-                    continue
-                r = r.iloc[0]
-                if r["tables"] < MIN_TABLES:
-                    why.append(f"{dev} s{s}: collapse ({int(r['tables'])} tables)")
-                for n in ("internet", "parking"):
-                    if not r[f"{n}_hotel"]:
-                        why.append(f"{dev} s{s}: {n} not in a hotel table")
+        why = [w for dev in sets for s in seeds for w in chain_problems(df, v, dev, s)]
         res[v] = {"rule1": (not why, "; ".join(why) or "ok")}
     fin = df[df["finished"].astype(bool)]
     mean = fin.groupby(["variant", "set"])[["placed", "table_f1", "grouping_f1"]].mean()
