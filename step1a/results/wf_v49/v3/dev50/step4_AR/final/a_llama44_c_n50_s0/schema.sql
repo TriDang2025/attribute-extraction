@@ -1,0 +1,103 @@
+CREATE TABLE "train_info" (
+  "id" INTEGER,
+  "train id" INTEGER,
+  "booking id" INTEGER,
+  "currency" NUMERIC(10, 2),
+  "day of week" TEXT,
+  "day of week str" TEXT,
+  "departure location" TEXT,
+  "departure station" TEXT,
+  "departure time" INTEGER,
+  "duration str" INTERVAL,
+  "location" TEXT,
+  "location abbr" TEXT,
+  "location str" TEXT,
+  "location type" TEXT,
+  "price" NUMERIC(10, 2),
+  "reference number" INTEGER,
+  "time" TIME,
+  "time int" INTEGER,
+  "time str" TIME,
+  "total fee" TEXT,
+  "train id (train_info:20)" TIME,
+  "seating_capacity" INTEGER,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "food_establishment" (
+  "phone number key" INTEGER,
+  "address" INTEGER,
+  "cuisine" TEXT,
+  "day of week" TEXT,
+  "entry fee" TEXT,
+  "food type" TEXT,
+  "location" TEXT,
+  "location area" TEXT,
+  "location str" TEXT,
+  "num" INTEGER,
+  "phone number" INTEGER,
+  "price" TEXT,
+  "price range" TEXT,
+  "reservation time" INTERVAL,
+  "restaurant name" TEXT,
+  "str" INTEGER,
+  "time int" TIME,
+  "time str" INTEGER,
+  "venue name" TEXT,
+  PRIMARY KEY ("phone number key")
+);
+
+CREATE TABLE "address" (
+  "address key" INTEGER,
+  "address" TEXT,
+  "attraction name" TEXT,
+  "attraction type" TEXT,
+  "bed and breakfast" TEXT,
+  "cinema name" TEXT,
+  "entrance fee" NUMERIC(10, 2),
+  "favorite museum" TEXT,
+  "location" TEXT,
+  "location abbrev" TEXT,
+  "location str" TEXT,
+  "noun" TEXT,
+  "postcode" INTEGER,
+  "street name" TEXT,
+  PRIMARY KEY ("address key")
+);
+
+CREATE TABLE "location" (
+  "reservation number key" INTEGER,
+  "area" TEXT,
+  "attribute" TEXT,
+  "date" TEXT,
+  "day of week" TEXT,
+  "entity" TEXT,
+  "guest house name" TEXT,
+  "hotel name" TEXT,
+  "location" TEXT,
+  "num days" INTEGER,
+  "num nights" INTEGER,
+  "num people" INTEGER,
+  "party size" TEXT,
+  "price" TEXT,
+  "price range" TEXT,
+  "price range noun" TEXT,
+  "reservation number" INTEGER,
+  "start date" TEXT,
+  "str" TEXT,
+  "amenities" TEXT,
+  "internet" TEXT,
+  "parking" TEXT,
+  "attraction name" TEXT,
+  "reference number" INTEGER,
+  PRIMARY KEY ("reservation number key")
+);
+
+CREATE TABLE "food_establishment_location" (
+  "food_establishment_location id" INTEGER,
+  "food_establishment id" INTEGER,
+  "location id" INTEGER,
+  PRIMARY KEY ("food_establishment_location id"),
+  FOREIGN KEY ("food_establishment id") REFERENCES "food_establishment" ("phone number key"),
+  FOREIGN KEY ("location id") REFERENCES "location" ("reservation number key")
+);

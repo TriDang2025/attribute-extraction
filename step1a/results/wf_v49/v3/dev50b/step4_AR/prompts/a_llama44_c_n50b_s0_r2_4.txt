@@ -1,0 +1,151 @@
+Below are two tables of a relational database design, each with its columns. Decide whether location and phone_number are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "location -> phone_number": one location row has many phone_number rows (each phone_number row refers to one location row)
+- "phone_number -> location": one phone_number row has many location rows (each location row refers to one phone_number row)
+- "many_to_many": a location row can go with many phone_number rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table location (one row = one location), 24 columns:
+[train_schedule:7] location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "Thank you for contacting the Cambridge TownInfo centre. Goodbye")
+[accommodation_option:10] location
+  values: text (share 1.00); 35 mentions in 18 dialogues
+  examples:
+    "cambridge" (in: "I am going to cambridge and need a hotel")
+    "alexander bed and breakfast" (in: "Alexander bed and breakfast can acommodate your request.")
+[accommodation_option:11] location name
+  values: text (share 1.00); 4 mentions in 2 dialogues
+  examples:
+    "allenbell" (in: "mentioned all have free wifi and parking. I recommend the Allenbell.")
+[accommodation_option:12] location part
+  values: text (share 1.00); 19 mentions in 9 dialogues
+  examples:
+    "north" (in: "I would like a hotel in the north, please.")
+    "east" (in: "I am looking for a cheap hotel on the east.")
+[accommodation_option:13] location str
+  values: text (share 0.75); 8 mentions in 6 dialogues
+  examples:
+    "centre of town" (in: "actually like a hotel instead of guesthouse and in the centre of town.")
+    "centre" (in: "...you. The Gonville Hotel is in the centre and The Lensfield Hotel is in the...")
+[accommodation_option:14] lodging type
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "finch bed and breakfast" (in: "Finches Bed and Breakfast is a cheap 4-star guesthouse on the west side. Its")
+    "carolina bed and breakfast" (in: "I recommend Carolina Bed and Breakfast. It's located close to where you'll be...")
+[accommodation_option:21] type
+  values: text (share 1.00); 25 mentions in 16 dialogues
+  examples:
+    "guesthouse" (in: "There isn't a guesthouse with 2 stars and free internet available. Is there a...")
+    "acorn guest house" (in: "Yes the phone number to the acorn guest house 01223353888 with a price range ...")
+[accommodation_option:22] amenities
+  values: text (share 0.90); 10 mentions in 5 dialogues
+  examples:
+    "parking" (in: "allenbell is what I found that is cheap and has parking.")
+    "free internet" (in: "...esthouses and all of them have free internet and parking. Would you like m...")
+[accommodation_option:23] internet
+  values: text (share 1.00); 17 mentions in 10 dialogues
+  examples:
+    "free wifi" (in: "Does this location include free wifi?")
+    "wifi" (in: "any so long as it is a 2star and has wifi")
+[accommodation_option:24] parking
+  values: text (share 1.00); 16 mentions in 13 dialogues
+  examples:
+    "free parking" (in: "Does this place include free parking?")
+[location:1] address
+  values: id (share 0.53); 15 mentions in 9 dialogues
+  examples:
+    "cb23bu" (in: "is on Saint Andrew's Street and the post code is cb23bu. It's free admission.")
+    "10 king's parade" (in: "... number is 01223357708. It is at 10 King's Parade and the postcode is cb21sj.")
+[location:2] college
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "magdalene" (in: "honestly recommend visiting a famous college such as Christs or Magdalene.")
+[location:3] entrance fee
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "entrance fee" (in: "Do you have any information on their entrance fees?")
+    "free" (in: "street , post code cb21dq. You can visit them for free! Anything else you need?")
+[location:4] location
+  values: text (share 1.00); 48 mentions in 13 dialogues
+  examples:
+    "centre" (in: "I am looking for a multiple sports attraction in the centre.")
+    "centre of town" (in: "what attractions do you have in the centre of town?")
+[location:5] museum
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "castle gallery" (in: "...he Centre. I would recommend Castle Galleries, phone number 01223307402, p...")
+    "the broughton house gallery" (in: "the broughton house gallery is a museum located in the centre.")
+[location:6] park
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "wandlebury country park" (in: "...are free. May I recommend Wandlebury country park located wandlebury ring,...")
+    "wandlebury ring" (in: "...ndlebury country park located wandlebury ring, gog magog hills, babraham? ...")
+[location:7] phone number
+  values: number (share 0.70); 10 mentions in 6 dialogues
+  examples:
+    "their phone number" (in: "Something located in the city centre. Also may I have their phone number?")
+    "01223307402" (in: "... Castle Galleries, phone number 01223307402, postal code cb23bj, address u...")
+[location:9] theatre
+  values: number (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "1 theatre" (in: "...tre's in the centre of town and one theatre on the south side. Do you have...")
+    "4 theatre" (in: "We have four theatre's in the centre of town and one theatre on")
+[establishment:13] postcode
+  values: id (share 0.50); 4 mentions in 4 dialogues
+  examples:
+    "c.b 2" (in: "The address is Corn Exchange Street and the postcode is C.B 2, 3QF")
+    "cb21rh" (in: "...ess is at king's parade. The post code cb21rh and the entree fee is 2 pounds.")
+[phone_number:4] departure location
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "leverton house" (in: "I will be leaving from leverton house arriving by 06:45.")
+[phone_number:5] departure time
+  values: time (share 0.88); 8 mentions in 6 dialogues
+  examples:
+    "19:15" (in: "I'd like to book a taxi from Ask, departing after 19:15.")
+    "06:45" (in: "I will be leaving from leverton house arriving by 06:45.")
+[phone_number:6] destination
+  values: text (share 1.00); 9 mentions in 5 dialogues
+  examples:
+    "rice house" (in: "I need to go to rice house.")
+    "cambridge" (in: "Your welcome, enjoy your time in Cambridge.")
+[phone_number:8] pickup location
+  values: text (share 1.00); 12 mentions in 6 dialogues
+  examples:
+    "restaurant" (in: "...need a taxi to get from college to the restaurant. I need to arrive by 14:45.")
+    "college" (in: "I also need a taxi to get from college to the restaurant. I need to arrive by...")
+[phone_number:10] contact_number
+  values: text (share 1.00); 8 mentions in 7 dialogues
+  examples:
+    "taxi" (in: "I want help booking a taxi")
+    "black ford" (in: "You will be picked up by a black ford and the contact number is 07635928440. ...")
+
+Table phone_number (one row = one phone_number), 3 columns:
+[establishment:12] phone number
+  values: number (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "01223" (in: "01223 308871 Will that be all?")
+    "07754509492" (in: "...volvo and the contact number is 07754509492. Is there anything else I can ...")
+[phone_number:1] arrival time
+  values: time (share 0.67); 12 mentions in 9 dialogues
+  examples:
+    "14:45" (in: "from college to the restaurant. I need to arrive by 14:45.")
+    "11:45" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+[phone_number:3] day of week
+  values: day (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "saturday" (in: "sounds good. Please book for 2 people at 11:45 on Saturday.")
+
+Return the JSON object now.

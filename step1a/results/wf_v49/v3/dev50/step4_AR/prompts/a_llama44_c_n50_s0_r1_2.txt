@@ -1,0 +1,171 @@
+Below are two tables of a relational database design, each with its columns. Decide whether food_establishment and address are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "food_establishment -> address": one food_establishment row has many address rows (each address row refers to one food_establishment row)
+- "address -> food_establishment": one address row has many food_establishment rows (each food_establishment row refers to one address row)
+- "many_to_many": a food_establishment row can go with many address rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table food_establishment (one row = one food_establishment), 18 columns:
+[food_establishment:1] address
+  values: number (share 0.71); 17 mentions in 14 dialogues
+  examples:
+    "01223367660" (in: "...xpensive. Their phone number is 01223367660. Would you like me to book for...")
+    "01223311911" (in: "...t asian oriental food! Phone is 01223311911 postcode is cb12as and they ar...")
+[food_establishment:2] cuisine
+  values: text (share 1.00); 9 mentions in 6 dialogues
+  examples:
+    "chinese" (in: "I have five places. Do you prefer, Italian, Chinese, Mexican or Indian?")
+    "chinese place" (in: "I would like a suggestion of a moderately priced Chinese place.")
+[food_establishment:3] day of week
+  values: day (share 1.00); 16 mentions in 10 dialogues
+  examples:
+    "thursday" (in: "How about the North? Can I get a table there Thursday at 16:30 for 7?")
+    "wednesday" (in: "...d like to book for 5 at 13:00 on Wednesday as well. I will also need the r...")
+[food_establishment:4] entry fee
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "entry fee" (in: "The address is regent street and there is no entry fee.")
+[food_establishment:5] food type
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "north part of town" (in: "...nd a good restaurant in the north part of town that serves Australasian food?")
+    "east part of town" (in: "I want to find an expensive restaurant in the east part of town.")
+[food_establishment:6] location
+  values: text (share 0.91); 55 mentions in 25 dialogues
+  examples:
+    "city centre" (in: "bedouin 100 Mill Road City Centre")
+    "chesterton" (in: "...alace located at 68 Histon Road Chesterton. Would you like a reservation a...")
+[food_establishment:7] location area
+  values: text (share 1.00); 14 mentions in 10 dialogues
+  examples:
+    "south" (in: "I have 9 different restaurants in the south. Lets try to narrow it down. Do y...")
+    "south side of town" (in: "...ing for a restaurant on the south side of town that serves international f...")
+[food_establishment:8] location str
+  values: text (share 1.00); 12 mentions in 9 dialogues
+  examples:
+    "centre" (in: "restaurant should serve african food and should be in the centre")
+    "centre of town" (in: "I want to find an expensive restaurant in the centre of town.")
+[food_establishment:9] num
+  values: number (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "7" (in: "Can you check if they would have a table for 7 at 17:45 on Sunday?")
+[food_establishment:10] phone number
+  values: id (share 0.75); 16 mentions in 14 dialogues
+  examples:
+    "01223 249955" (in: "is C.B 1, 9 H.X, and their phone number is 01223 249955.")
+    "01223 360966" (in: "...phone number for the Nirala is 01223 360966. Is there anything else I can ...")
+[food_establishment:12] price
+  values: text (share 1.00); 15 mentions in 10 dialogues
+  examples:
+    "moderately priced" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "expensive price range" (in: "is in the centre of town and is in the expensive price range.")
+[food_establishment:13] price range
+  values: text (share 1.00); 11 mentions in 10 dialogues
+  examples:
+    "expensive" (in: "...ter. It is named Bedouin, and is expensive. Their phone number is 01223367...")
+    "north" (in: "... Both are expensive. One is in the north and one is in the centre. Do you ...")
+[food_establishment:14] reservation time
+  values: duration (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "15 minute" (in: "...t Panahar has been reserved for 15 minutes starting at 15:15 on Sunday. Yo...")
+[food_establishment:15] restaurant name
+  values: text (share 1.00); 60 mentions in 26 dialogues
+  examples:
+    "restaurant" (in: "what is the food type of that restaurant ?")
+    "anatolia" (in: "Anatolia is located at 30 Bridge Street City Centre.")
+[food_establishment:16] str
+  values: number (share 0.62); 8 mentions in 7 dialogues
+  examples:
+    "3" (in: "I have pulled up 3. How about anatolia, they are moderately priced.")
+    "hotel" (in: "place to dine in the same price range as the hotel.")
+[food_establishment:17] time int
+  values: time (share 1.00); 25 mentions in 16 dialogues
+  examples:
+    "15:15" (in: "I need reservations for 5 people at 15:15 on Sunday. I'll need the reference ...")
+    "18:00" (in: "I be able to get a table there Thursday at 18:00 for 7?")
+[food_establishment:18] time str
+  values: number (share 0.83); 18 mentions in 10 dialogues
+  examples:
+    "4" (in: "Please book a table for 4 at 15:15 on wednesday.")
+    "6 people" (in: "Can you make a reservation for 6 people at 12:15 on wednesday?")
+[food_establishment:19] venue name
+  values: text (share 1.00); 7 mentions in 4 dialogues
+  examples:
+    "cherry hinton" (in: "...It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode...")
+    "thanh binh" (in: "Thanh binh is located in the west part of town and is")
+
+Table address (one row = one address), 13 columns:
+[address:1] address
+  values: text (share 0.73); 11 mentions in 7 dialogues
+  examples:
+    "clifton way" (in: "Cambridge Leisure Park Clifton Way Cherry Hinton 01223 244277")
+    "01223314960" (in: "...e entrance. Their phone number is 01223314960. May I help find anything else?")
+[address:2] attraction name
+  values: text (share 1.00); 5 mentions in 4 dialogues
+  examples:
+    "ballare" (in: "...t nightclubs in that area. Might I suggest Ballare. Would you like more info?")
+    "broughton house gallery" (in: "I'm looking for information on Broughton house gallery.")
+[address:3] attraction type
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "church" (in: "...centre of town,what type are you looking for a church,or swimming or a park ?")
+    "restaurant" (in: "and places to go such as, museum's, nightclubs, parks and restaurants.")
+[address:4] bed and breakfast
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "alexander bed and breakfast" (in: "alexander bed and breakfast is ideal for you.")
+[address:5] cinema name
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "the whale of a time" (in: "The Whale of a Time entertainment venue is a fun choice. We also have museums")
+    "the cineworld cinema" (in: "The cineworld cinema is the place!")
+[address:6] entrance fee
+  values: price (share 0.57); 7 mentions in 3 dialogues
+  examples:
+    "1 pound fee" (in: "John's has a 2.50 pound fee, and Trinity has a 1 pound fee.")
+    "2 pound fee" (in: "... free, but Corpus Christi has a 2 pound fee, Saint John's has a 2.50 pound...")
+[address:7] favorite museum
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "museum of archaeology and anthropology" (in: "...l favorite is the Museum of Archaeology and Anthropology at University of ...")
+[address:8] location
+  values: text (share 1.00); 46 mentions in 14 dialogues
+  examples:
+    "emmanuel college" (in: "There are 13 choices, how do you feel about Emmanuel College?")
+    "cambridge" (in: "I am looking for information in Cambridge")
+[address:9] location abbrev
+  values: text (share 1.00); 4 mentions in 3 dialogues
+  examples:
+    "town" (in: "am looking for a college attraction to go to in town.")
+    "city" (in: "I'm looking for a theatre in any part of the city. Can you recommend one?")
+[address:10] location str
+  values: text (share 1.00); 9 mentions in 4 dialogues
+  examples:
+    "centre area" (in: "Yes. I am looking for places to go in the centre area. I am looking for college.")
+    "cambridge art theatre" (in: "The address of the Cambridge Arts Theatre is 6 Saint Edward's Passage, postco...")
+[address:11] noun
+  values: text (share 1.00); 5 mentions in 3 dialogues
+  examples:
+    "museum" (in: "...s to do and places to go such as, museum's, nightclubs, parks and restaura...")
+    "cinema" (in: "I need a cinema to go to in the south.")
+[address:12] postcode
+  values: id (share 1.00); 5 mentions in 5 dialogues
+  examples:
+    "cb11ln" (in: "Is the cb11ln the postcode?")
+    "cb11pt" (in: "the postcode is cb11pt")
+[address:13] street name
+  values: text (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "saint andrew" (in: "...ddress for emmanuel college is saint andrew's street. Is there any other i...")
+
+Return the JSON object now.
