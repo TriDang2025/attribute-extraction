@@ -1,0 +1,32 @@
+Below is one table of a relational database design, with its columns.
+Choose its primary key: the id of the one column whose value is different for every row, or "new" when no column can do this; then give the name
+of the new key column in new_id_name (use "" when the primary key is an existing column).
+For the primary key use a natural key when one exists: a column whose value is different for every row, such as a unique name or code of the thing. Use "new" only when no column can do this.
+Return ONLY one JSON object, nothing before or after it. Shape (the names and ids here are made up): {"primary_key": "new", "new_id_name": "name id"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Keys (one table at a time):
+- customer: primary key licence_number
+- car: primary key plate_number
+- rental: new key rental_id; foreign keys licence_number -> customer, plate_number -> car
+
+
+Table accommodation_option (one row = one accommodation_option), 3 columns:
+[accommodation_option:23] internet
+  values: text (share 1.00); 17 mentions in 10 dialogues
+  examples:
+    "free wifi" (in: "Does this location include free wifi?")
+    "wifi" (in: "any so long as it is a 2star and has wifi")
+[accommodation_option:21] hotel type
+  values: text (share 1.00); 24 mentions in 17 dialogues
+  examples:
+    "guesthouse" (in: "Yes, how about a guesthouse with 3 stars and free wifi instead?")
+    "hotel" (in: "I would like a hotel and my only preference, besides being in the south, is")
+[accommodation_option:19] hotel type
+  values: text (share 1.00); 14 mentions in 11 dialogues
+  examples:
+    "guesthouse" (in: "I am looking to stay at a guesthouse that has a 3 star rating.")
+    "hotel" (in: "...s available. Do you have a preference of guesthouse or hotel and price range?")
+
+Return the JSON object now.

@@ -1,0 +1,50 @@
+Below are two tables of a relational database design, each with its columns. Decide whether address and location are linked, and which way. Answer with
+exactly one of:
+- "none": no direct link (they meet at most through a third table)
+- "address -> location": one address row has many location rows (each location row refers to one address row)
+- "location -> address": one location row has many address rows (each address row refers to one location row)
+- "many_to_many": a address row can go with many location rows and the other way round
+Do not invent a link that the columns do not support.
+Return ONLY one JSON object, nothing before or after it. Shape: {"link": "none"}
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Links (one question per pair):
+- customer and car: none (they meet only through a rental)
+- customer and rental: customer -> rental (one customer has many rentals)
+- car and rental: car -> rental (one car has many rentals)
+
+
+Table address (one row = one address), 4 columns:
+[accommodation:4] date
+  values: text (share 1.00); 3 mentions in 3 dialogues
+  examples:
+    "what day" (in: "That shouldn't be a problem. What day would you like to begin your stay?")
+[accommodation:21] str
+  values: text (share 1.00); 8 mentions in 6 dialogues
+  examples:
+    "cambridge" (in: "...oderate price and wifi in all of Cambridge? I find that very hard to believe!")
+[accommodation:1] area
+  values: text (share 1.00); 7 mentions in 6 dialogues
+  examples:
+    "south part of town" (in: "...ou recommend a hotel in the South part of town? I don't need internet or f...")
+    "north part of cambridge" (in: "...'m hoping to find a guesthouse in the north part of Cambridge. Are there any?")
+[accommodation:9] location
+  values: text (share 0.96); 27 mentions in 13 dialogues
+  examples:
+    "north" (in: "I'm looking for something expensive in the north.")
+    "centre" (in: "...versity arms hotel located in the centre. Would you like to make reservati...")
+
+Table location (one row = one location), 2 columns:
+[location:1] attraction name
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "all saint church" (in: "we have a lovely architecture called all saints church it is free admission")
+    "free admission" (in: "have a lovely architecture called all saints church it is free admission")
+[location:2] reference number
+  values: id (share 0.50); 2 mentions in 2 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "It's my pleasure. Thank you for using Cambridge TownInfo centre. Goodbye.")
+    "pu74excq" (in: "That worked and I have a reference number for you: PU74EXCQ.")
+
+Return the JSON object now.

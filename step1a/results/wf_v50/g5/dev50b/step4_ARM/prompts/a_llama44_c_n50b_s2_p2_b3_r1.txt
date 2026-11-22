@@ -1,0 +1,157 @@
+Below are columns found by analysing a corpus of dialogues (a kind of information, with a description, the type of its values, example values and
+counts) and the list of tables of a database design. Put every column into exactly one of the listed tables, or into "unused" when a database
+would not store it. Use only the listed names; do not add tables. Use "unused" only when the column clearly holds nothing a database would
+store.
+Return ONLY one JSON object, nothing before or after it. Shape (the ids and names here are made up): {"x:1": "table_a", "x:2": "table_b", "x:3": "unused"}
+Every column id must appear once.
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Pass 1, the main things (tables): ["customer", "car", "rental"]
+Pass 2, each column to one table:
+{"customer_name": "customer", "customer_phone": "customer", "licence_number": "customer", "car_model": "car", "car_class": "car",
+ "plate_number": "car", "pickup_date": "rental", "return_date": "rental", "daily_rate": "rental"}
+
+Tables: train_schedule, accommodation_option, location, establishment, phone_number
+
+Columns (20):
+== establishment ==
+[establishment:14] price
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "prezzo" (in: "prezzo's postcode is cb30ad.")
+    "what price range" (in: "What price range are you interested in?")
+[establishment:20] str
+  values: text (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "hotel" (in: "... center of town near attractions, hotels and easy access to transportation...")
+    "indian restaurant" (in: "I would like an indian restaurant in the same price range as the hotel please.")
+[establishment:5] entity
+  values: text (share 1.00); 26 mentions in 17 dialogues
+  examples:
+    "restaurant" (in: "...to dine in the centre. I would like a restaurant in the moderate price range.")
+    "danish restaurant" (in: "I would like to find a danish restaurant this is moderately priced.")
+    "stazione restaurant and coffee bar" (in: "... a table for you at stazione restaurant and coffee bar, you ref # is SUY8V...")
+    "chinese restaurant" (in: "...can you help me find a good Chinese restaurant? I seriously need some egg ...")
+    "italian restaurant" (in: "Is that Italian? I would like an Italian restaurant, please.")
+[establishment:8] location str
+  values: text (share 1.00); 21 mentions in 14 dialogues
+  examples:
+    "centre" (in: "I have 13 colleges available in the centre. Did yo have one particular in mind?")
+    "city centre" (in: "... J restaurant, 86 Regent Street City Centre. I currently do not have revie...")
+    "center of town" (in: "... an African restaurant in the center of town as well as some gastropubs. W...")
+    "centre of town" (in: "Something in the moderate price range. Also, in the centre of town.")
+    "centre area" (in: "...North Indian restaurants in the centre area. Would you like to check a dif...")
+[establishment:4] day of week
+  values: time (share 1.00); 4 mentions in 2 dialogues
+  examples:
+    "10:30" (in: "Okay, will you try 10:30 instead?")
+    "11:30" (in: "that sounds good. I need a table for 7 at 11:30 on Thursday.")
+    "18:45" (in: "I would like the reservation for 5 people at 18:45 on Friday.")
+[establishment:9] num people
+  values: number (share 1.00); 9 mentions in 9 dialogues
+  examples:
+    "8 people" (in: "Lets try Hakka,can you book a table for 8 people at 16:30 on tuesday?")
+    "2 people" (in: "that sounds good. I need to make a reservation for 2 people on Tuesday.")
+    "3" (in: "There are four cheap Indian places, three in city centre, and one on the nort...")
+    "3 option" (in: "great, i have three options for you to choose from!")
+    "3 people" (in: "...I need a reservation for Friday, 3 people at 13:45. Please include the ref...")
+[establishment:11] party size
+  values: number (share 0.86); 7 mentions in 6 dialogues
+  examples:
+    "2" (in: "That will be on Friday for 2 please.")
+    "1" (in: "Whatever you suggest. I need to book a table for 1 at 13:15 on Tuesday.")
+    "17" (in: "There are 17 Chinese restaurants. Are you looking for any particular area or")
+    "4" (in: "I have 4 different indian places to eat. Two are moderately priced and")
+    "7" (in: "Okay, that sounds good. I need a table for 7 at 11:30 on Thursday.")
+[establishment:22] table reservation time
+  values: duration (share 0.44); 9 mentions in 5 dialogues
+  examples:
+    "15 minute" (in: "...Your table will be reserved for 15 minutes and your reference number is VW...")
+    "16:15" (in: "Yes. I need a table for 8 people at 16:15 on the same day.")
+    "15" (in: "There are a total of 15 restaurants that are cheap in the centre. Is there an...")
+    "16:30" (in: "try Hakka,can you book a table for 8 people at 16:30 on tuesday?")
+    "19:30" (in: "perfect. Could you book a table for 8 people at 19:30 on Friday?")
+[establishment:13] postcode
+  values: id (share 0.50); 4 mentions in 4 dialogues
+  examples:
+    "c.b 2" (in: "The address is Corn Exchange Street and the postcode is C.B 2, 3QF")
+    "cb21rh" (in: "...ess is at king's parade. The post code cb21rh and the entree fee is 2 pounds.")
+    "cb30ad" (in: "prezzo's postcode is cb30ad.")
+[establishment:6] entrance fee
+  values: price (share 1.00); 1 mentions in 1 dialogues
+  examples:
+    "2 pound" (in: "parade. The post code cb21rh and the entree fee is 2 pounds.")
+[establishment:15] price range
+  values: text (share 1.00); 28 mentions in 17 dialogues
+  examples:
+    "moderately priced" (in: "I would like to find a danish restaurant this is moderately priced.")
+    "moderate price range" (in: "... Danish restaurants in the moderate price range. Would you like me to chec...")
+    "expensive" (in: "I'd like it to be in the north, and expensive would be best.")
+    "expensive price range" (in: "to book a reservation. I want asian oriental in the expensive price range")
+    "expensive restaurant" (in: "Thank you! I would like to go to an expensive restaurant, please.")
+[establishment:21] table booking
+  values: text (share 1.00); 7 mentions in 7 dialogues
+  examples:
+    "table" (in: "Lets try Hakka,can you book a table for 8 people at 16:30 on tuesday?")
+[establishment:23] time
+  values: time (share 0.58); 19 mentions in 12 dialogues
+  examples:
+    "12:45" (in: "I would like a reservation for 2 at 12:45 please.")
+    "13:15" (in: "suggest. I need to book a table for 1 at 13:15 on Tuesday.")
+    "2" (in: "...e 4 different indian places to eat. Two are moderately priced and two are ...")
+    "same day" (in: "need a table for 8 people at 16:15 on the same day.")
+    "05:45" (in: "from the attraction to the restaurant, leaving the attraction at 05:45?")
+[establishment:19] something
+  values: text (share 1.00); 4 mentions in 4 dialogues
+  examples:
+    "cheap" (in: "...a total of 15 restaurants that are cheap in the centre. Is there another t...")
+    "cheap range" (in: "looking for a restaurant that serves asian oriental food in cheap range.")
+[establishment:12] phone number
+  values: number (share 1.00); 3 mentions in 2 dialogues
+  examples:
+    "01223" (in: "01223 308871 Will that be all?")
+    "07754509492" (in: "...volvo and the contact number is 07754509492. Is there anything else I can ...")
+    "308871" (in: "01223 308871 Will that be all?")
+[establishment:17] restaurant info
+  values: text (share 1.00); 2 mentions in 2 dialogues
+  examples:
+    "01223 308871" (in: "...e range. Their phone number is 01223 308871. The address is Corn Exchange ...")
+    "40270 king street city" (in: "... Centre. It is located at 40270 King Street City and is in the expensive p...")
+[establishment:24] cuisine_type
+  values: text (share 1.00); 6 mentions in 4 dialogues
+  examples:
+    "gastropub food" (in: "I am looking for a moderately priced restaurant that serves gastropub food.")
+    "british food" (in: "you help me out with finding a restaurant that serves british food in the east?")
+    "european food" (in: "Yes. How about a restaurant that serves European food?")
+    "indian food" (in: "Please find a place to eat that serves Indian food.")
+    "modern european food" (in: "De Luca Cucina and Bar is moderately priced and serves modern European food.")
+== phone_number ==
+[phone_number:1] arrival time
+  values: time (share 0.67); 12 mentions in 9 dialogues
+  examples:
+    "14:45" (in: "from college to the restaurant. I need to arrive by 14:45.")
+    "11:45" (in: "That sounds good. Please book for 2 people at 11:45 on Saturday.")
+    "12:45" (in: "I'd like the arrival time to be 12:45, please.")
+    "14:15" (in: "have the car pick me up at the college at 2:15 p.m. instead.")
+    "14:30" (in: "I would like to leave and 2:30 p.m and arrive at 3:23 p.m.")
+[phone_number:9] time str
+  values: number (share 1.00); 12 mentions in 11 dialogues
+  examples:
+    "07048450899" (in: "you need to contact the taxi company, you can call 07048450899.")
+    "07128258422" (in: "up at hughes hall at 14:45. The contact number is 07128258422.")
+    "07267142867" (in: "completed! Booked car type : white ford Contact number : 07267142867")
+    "07340953955" (in: "...e that booked for you, contact number 07340953955. Do you need anyhting else?")
+    "07481840729" (in: "...for you. Your contact number is 07481840729. Can I help you with anything ...")
+[phone_number:5] departure time
+  values: time (share 0.88); 8 mentions in 6 dialogues
+  examples:
+    "19:15" (in: "I'd like to book a taxi from Ask, departing after 19:15.")
+    "06:45" (in: "I will be leaving from leverton house arriving by 06:45.")
+    "10:45" (in: "i want to leave by 10:45")
+    "13:15" (in: "Allenbell to J Restaurant. I need to be there by 13:15.")
+    "15:23" (in: "would like to leave and 2:30 p.m and arrive at 3:23 p.m.")
+
+Note: columns that carry the same entity heading usually belong to the table of that entity. Answer "unused" only for a column that clearly fits no table.
+
+Return the JSON object now.

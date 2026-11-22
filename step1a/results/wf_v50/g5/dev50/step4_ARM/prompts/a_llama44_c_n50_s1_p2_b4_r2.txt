@@ -1,0 +1,33 @@
+Below are columns found by analysing a corpus of dialogues (a kind of information, with a description, the type of its values, example values and
+counts) and the list of tables of a database design. Put every column into exactly one of the listed tables, or into "unused" when a database
+would not store it. Use only the listed names; do not add tables. Use "unused" only when the column clearly holds nothing a database would
+store.
+Return ONLY one JSON object, nothing before or after it. Shape (the ids and names here are made up): {"x:1": "table_a", "x:2": "table_b", "x:3": "unused"}
+Every column id must appear once.
+
+Worked example (other domain):
+Columns: customer_name, customer_phone, licence_number, car_model, car_class, plate_number, pickup_date, return_date, daily_rate
+Pass 1, the main things (tables): ["customer", "car", "rental"]
+Pass 2, each column to one table:
+{"customer_name": "customer", "customer_phone": "customer", "licence_number": "customer", "car_model": "car", "car_class": "car",
+ "plate_number": "car", "pickup_date": "rental", "return_date": "rental", "daily_rate": "rental"}
+
+Tables: accommodation, train_info, food_establishment, address, location
+
+Columns (2):
+== location ==
+[location:2] reference number
+  values: id (share 0.50); 2 mentions in 2 dialogues
+  examples:
+    "cambridge towninfo centre" (in: "It's my pleasure. Thank you for using Cambridge TownInfo centre. Goodbye.")
+    "pu74excq" (in: "That worked and I have a reference number for you: PU74EXCQ.")
+[location:1] attraction name
+  values: text (share 1.00); 2 mentions in 1 dialogues
+  examples:
+    "all saint church" (in: "we have a lovely architecture called all saints church it is free admission")
+    "free admission" (in: "have a lovely architecture called all saints church it is free admission")
+
+Note: columns that carry the same entity heading usually belong to the table of that entity. Answer "unused" only for a column that clearly fits no table.
+Second check: in the last answer at least half of the columns of one entity heading went to no table, although that entity has a table. Give each such column the table of its entity heading unless its values clearly belong to another table.
+
+Return the JSON object now.
