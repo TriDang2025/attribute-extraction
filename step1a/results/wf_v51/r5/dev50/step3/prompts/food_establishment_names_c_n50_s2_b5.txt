@@ -1,0 +1,89 @@
+Below are clusters of values taken from the dialogue turns of one entity (a candidate table). Each cluster is a candidate column.
+The examples of a cluster are marked with [[...]] inside the turn they come from.
+Give every cluster ONE name: a short snake_case attribute name (for example graduation_year), or "not_attribute" for noise
+(yes, ok, thanks, booking words, values that a database would not store).
+Use role-specific names: values that play different roles (where something starts and where it ends, the earliest and the latest
+time allowed) get different names. Clusters that hold the same kind of value with the same role get exactly the same name.
+
+Worked examples (other domain):
+
+Clusters (entity R1, a car rental):
+- R1#0 values: [[Main Street branch]], [[airport desk]], [[north depot]]  (in: "I'll pick it up at the [[airport desk]]")
+- R1#1 values: [[airport desk]], [[Main Street branch]]  (in: "I'll drop it off at [[Main Street branch]] on Friday")
+- R1#2 values: [[$39 a day]], [[$52 per day]], [[45 dollars daily]]
+- R1#3 values: [[sure]], [[sounds good]], [[thanks]]
+Answer:
+{"R1#0": "pickup_branch", "R1#1": "return_branch", "R1#2": "daily_rate", "R1#3": "not_attribute"}
+Why: R1#0 and R1#1 share values but play two roles (where the car is taken vs where it is brought back), so each role gets its own
+name. R1#3 is chat, not data.
+
+Clusters (entity C1, a car):
+- C1#0 values: [[compact]], [[SUV]], [[minivan]]
+- C1#1 values: [[Corolla]], [[Model 3]], [[Civic]]
+- C1#2 values: [[automatic]], [[manual]], [[stick shift]]
+Answer:
+{"C1#0": "car_class", "C1#1": "car_model", "C1#2": "transmission"}
+Why: each cluster is one kind of value, so each gets one short snake_case name. "stick shift" is another way to say "manual", so it
+stays in transmission.
+
+Entity E2: batch 5 of 12 (57 clusters in all). Other entities, for context:
+Other entities (id, top values of their 3 biggest clusters):
+- E0: guesthouse, hotel, ashley hotel; 3 night, 4 night, 2 night; monday, wednesday, friday
+- E1: 19:30, 12:00, 13:15; cambridge, cambidge, cambridge towninfo centre; saturday, friday, wednesday
+- E3: centre of town, town, centre area; cambridge, cambridge leisure park, cambridge art theatre; museum, theatre, church
+- E4: cambridge towninfo centre; pu74excq; all saint church
+
+### E2#52  (mentions 1, distinct values 1)
+Examples:
+- E2#52:0 [system] previous turn, user: No, I don't, actually. Surprise me with the type of food and give me the restaurant's address. | turn: The oak bistro is an excellent choice for british food. The address is [[6 Lensfield Road]].
+Short contexts (the value is in [ ]):
+- "... The address is [6 Lensfield Road] ."
+
+### E2#36  (mentions 1, distinct values 1)
+Examples:
+- E2#36:0 [system] previous turn, user: Can I get their address and phone number, please? | turn: Certainly. They're at [[4 - 6 Rose Crescent]]. Their number is 01223464550. I can help you book a table if you'd like. Or is there anything else you need?
+Short contexts (the value is in [ ]):
+- "... They're at [4 - 6 Rose Crescent] . ..."
+
+### E2#17  (mentions 25, distinct values 11, low confidence)
+Examples:
+- E2#17:0 [system] previous turn, user: I am looking for a place to dine. The restaurant should serve african food and should be in the centre | turn: There is one African restuarant in the Center. It is named Bedouin, and is [[expensive]]. Their phone number is 01223367660. Would you like me to book for you?
+- E2#17:1 [user] turn: I'm looking for somewhere to eat, that's [[moderately priced]] and in the city centre.
+- E2#17:2 [system] previous turn, user: I want to find an expensive restaurant in the centre of town. | turn: The cambridge chop house serves british food, it is in the centre of town and is in the [[expensive price range]].
+- E2#17:3 [system] previous turn, user: I want to find a Chinese restaurant in the centre of Cambridge. | turn: There are 10 choices and we have [[cheap]], moderate and expensive options, any preference?
+- E2#17:4 [system] previous turn, user: Is there anything else? | turn: Thanh binh is located in the west part of town and is in the [[cheap price range]]. Would you like their information?
+- E2#17:5 [system] previous turn, user: Yes, that would be great. Can you also give me the entrance fee and postcode for that college? | turn: The address is regent street and there is no [[entry fee]].
+- E2#17:6 [user] previous turn, system: Booking was successful, the total fee is 64.64 GBP payable at the station. Your reference number is: LTQHUT3Y. Can I assist with anything else today? | turn: Yeah, I'm looking for an [[expensive place]] to dine at in the southern area of the city.
+- E2#17:7 [user] previous turn, system: Booking was successful, the total fee is 49.5 GBP payable at the station . Reference number is : Y3MAVYRQ. | turn: Thank you so much, now can you please recommend a restaurant in the north with a [[moderate price range]]? Any type of food will do.
+Short contexts (the value is in [ ]):
+- "I would like to try an [expensive] , italian place ..."
+- "... restaurant in the north with a [moderate price range] ? ..."
+- "... serves eritrean food and in the [expensive price range] ."
+
+### E2#6  (mentions 4, distinct values 4)
+Examples:
+- E2#6:0 [system] previous turn, user: I don't care. I just need to know the address, phone number, and postcode of the venue please. | turn: How about Sitar Tandoori, It's address is 43 High Street Cherry Hinton Cherry Hinton, their postcode is C.B 1, 9 H.X, and their phone number is [[01223 249955]].
+- E2#6:1 [system] previous turn, user: What is the phone number? | turn: The phone number for the Nirala is [[01223 360966]]. Is there anything else I can help you with?
+- E2#6:2 [system] previous turn, user: Yes please, I need to book a taxi to the restaurant from the hotel for the dinner reservation. | turn: Ok, a grey honda will pick you up at the hamilton lodge in time to arrive at restaurant alimentum for your 10:00 reservations. [[Taxi contact number]] is 07242149665. Anything else?
+- E2#6:3 [user] previous turn, system: Okay, how about Peking Restaurant located at 10 Homerton Street City Centre? Would you like a reservation? | turn: I don't need a reservation, but could you give me [[their phone number]]?
+Short contexts (the value is in [ ]):
+- "... H.X, and their phone number is [01223 249955] ."
+- "... reservation, but could you give me [their phone number] ?"
+- "... phone number for the Nirala is [01223 360966] . ..."
+
+### E2#14  (mentions 15, distinct values 14)
+Examples:
+- E2#14:0 [system] previous turn, user: I am looking for a place to dine. The restaurant should serve african food and should be in the centre | turn: There is one African restuarant in the Center. It is named Bedouin, and is expensive. Their phone number is [[01223367660]]. Would you like me to book for you?
+- E2#14:1 [system] previous turn, user: Travellers Rest sounds good. | turn: ok the address is huntingdon road in city centre, the phone # is [[01223276182]], and the postcode is cb30df. will there be anything else ?
+- E2#14:2 [system] previous turn, user: Not really, no. What's the address, postcode, and phone number for your favorite? | turn: Oh well if your letting me decide then kymmoy serves the best asian oriental food! Phone is [[01223311911]] postcode is cb12as and they are at 100 Mill Rd City Centre
+- E2#14:3 [system] previous turn, user: Yes, please give me their address and phone number. | turn: thanh binh is located at 17 magdalene street city centre and its phone number is [[01223315232]]. Is there anything else I can help you with?
+- E2#14:4 [system] previous turn, user: I don't need a reservation, but could you give me their phone number? | turn: Their phone number is [[01223354755]].
+- E2#14:5 [system] previous turn, user: Great, what is the postcode and phone number? | turn: The postcode is cb21sj and the phone number is [[01223359506]].
+- E2#14:6 [system] previous turn, user: Sounds great. Can I get their location and phone number? | turn: Sure thing! It is located at 30 Bridge Street City Centre and the phone number is [[01223362372]]
+- E2#14:7 [system] previous turn, user: No, but can you give me the phone number and postcode? Thanks! | turn: Taj Tandoori's phone number is [[01223412299]] and the postcode is cb17aa.
+Short contexts (the value is in [ ]):
+- "... The contact number is [07032807056] . ..."
+- "Taj Tandoori's phone number is [01223412299] and the postcode ..."
+- "... centre and its phone number is [01223315232] . ..."
+
+Return ONLY one JSON object, nothing before or after it: one key per cluster id (E2#52, E2#36, E2#17, E2#6, E2#14) and its name as the value, like {"E2#52": "<name>"}.
