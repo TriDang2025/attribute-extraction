@@ -75,9 +75,13 @@ def column_block(export, docs, entity, col, k=PIN.K_EXAMPLES, seed=0, context=No
     return bid, block
 
 
-def g4_jobs(dev, run, out=G4, old=None, new=None, context=None):
+def g4_jobs(dev, run, out=G4, old=None, new=None, context=None, variant=None):
     """Names jobs (one per entity with changed columns) of one set -> <out>/<dev>/{manifest_names.json, prompts/, changed.json}.
-    old / new = final_columns.json files to compare (default: the v4.9 loop-1 columns and the G3 context split); context: see column_block."""
+    old / new = final_columns.json files to compare (default: the v4.9 loop-1 columns and the G3 context split); context: see column_block.
+    variant: step3_v44 names schema variant (None = the v4.3 schema with the regex pattern, as v5.0 G4). wf_v5.1 passes the frozen "v1" (no
+    pattern): the R5 run of 2026-11-27 got finish_reason "error" on the guided dev50 rename with the pattern."""
+    if variant not in (None, "v0", "v1"):
+        raise ValueError(f"g4_jobs supports names variants v0/v1 (keys keep '#'), got {variant!r}")
     import pilot_build_v37 as PB
     d = Path(out) / dev
     (d / "prompts").mkdir(parents=True, exist_ok=True)
@@ -93,7 +97,8 @@ def g4_jobs(dev, run, out=G4, old=None, new=None, context=None):
         name = f"{ent}_rename_{run}"
         prompt = S3.render_names(entity, 1, 1, len(blocks), fp["others"], blocks)
         (d / "prompts" / f"{name}.txt").write_text(prompt, encoding="utf-8", newline="\n")
-        B.write_json(d / "prompts" / f"{name}.schema.json", S3.names_schema([b for b, _ in blocks]))
+        ids = [b for b, _ in blocks]
+        B.write_json(d / "prompts" / f"{name}.schema.json", S3_44.names_schema_v44(ids, variant) if variant else S3.names_schema(ids))
         jobs.append({"job": name, "entity": entity, "ent": ent, "set": dev, "run": run, "family": "names", "format": "judge",
                      "format43": "names_v43", "run_tag": "g4", "order": 0, "batch": 1, "cluster_ids": [b for b, _ in blocks],
                      "prompt": f"prompts/{name}.txt", "schema": f"prompts/{name}.schema.json", "max_tokens": S3.NAMES_MAX_TOKENS,

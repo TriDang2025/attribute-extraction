@@ -209,13 +209,13 @@ def rename_stage(backend, enc, root=R5, sets=SETS, max_calls=LIMITS["rename"], l
         new = ctx_split(dev, run, enc, root)
         old = Path(root) / dev / "step3" / "scores" / "final_columns.json"
         bk = Guarded(backend, max_calls, f"rename {dev}")
-        G50.g4_jobs(dev, run, out, old, new, context=snippet_context(dev))
+        variant = B.read_json(Path(root) / dev / "step3" / "config_used.json")["names_variant_used"]
+        G50.g4_jobs(dev, run, out, old, new, context=snippet_context(dev), variant=variant)   # frozen v1 schema: no regex pattern
         jobs = B.read_json(out / dev / "manifest_names.json")["jobs"]
         if jobs:
             bk.run(out / dev, jobs)
         renamed = G50.apply_names(dev, run, out, new)
         final = B.read_json(G50.run_dir(dev, out) / "step3" / "scores" / "final_columns.json")[run]
-        variant = B.read_json(Path(root) / dev / "step3" / "config_used.json")["names_variant_used"]
         final, clash, _info = column_clash(dev, run, final, out / dev, bk, variant, log)
         G50.build_run_dir(dev, run, final, out)
         assert_guided(out / dev)

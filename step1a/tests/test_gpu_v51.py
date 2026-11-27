@@ -129,6 +129,23 @@ def test_default_g4_jobs_are_the_v50_ones(tmp_path, monkeypatch):
 
 
 @needs_data
+def test_g4_jobs_v1_schema_has_no_pattern_and_same_prompt(tmp_path, monkeypatch):
+    """R5 2026-11-27: the v4.3 regex pattern lost guided decoding on the dev50 rename; the v1 schema drops it and keeps keys and prompt."""
+    monkeypatch.chdir(ROOT)
+    G.G50.g4_jobs("dev50", "c_n50", tmp_path / "v0")
+    G.G50.g4_jobs("dev50", "c_n50", tmp_path / "v1", variant="v1")
+    for f in (tmp_path / "v0" / "dev50" / "prompts").glob("*"):
+        g = tmp_path / "v1" / "dev50" / "prompts" / f.name
+        if f.suffix == ".txt":
+            assert g.read_bytes() == f.read_bytes()
+        else:
+            s0, s1 = json.loads(f.read_text(encoding="utf-8")), json.loads(g.read_text(encoding="utf-8"))
+            assert s1["required"] == s0["required"] and "pattern" in json.dumps(s0) and "pattern" not in json.dumps(s1)
+    with pytest.raises(ValueError):
+        G.G50.g4_jobs("dev50", "c_n50", tmp_path / "v2", variant="v2")
+
+
+@needs_data
 def test_step3_default_and_explicit_off_runs_are_identical(tmp_path):
     """pipeline_v45.step3 with no switches (the v5.0 call) and with both v5.1 switches False: same prompts, answers and final columns."""
     run, dev, outs = "c_n50b", "dev50b", []
