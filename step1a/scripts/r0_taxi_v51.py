@@ -75,10 +75,10 @@ def span_marks(set_name, final, on, work=None):
     return {s: set(m) for s, m in marks.items() if s in ("loop1", "loop2")}
 
 
-def found_l2(final_columns, set_name, taxi_rule=False, work=None):
+def found_l2(final_columns, set_name, taxi_rule=False, work=None, detail=False):
     """Set of gold L2 attributes found on `set_name` (found L2 with human check, as wf_v5.0 G3) for `final_columns` ({entity key: columns}, the
     Step 3 final columns of the run). taxi_rule False = the v5.0 number exactly; True = taxi scored as its own entity. The gold count
-    (len of the gold list) is the same either way."""
+    (len of the gold list) is the same either way. detail=True: (found, loop-1 span finds of `final_columns`, column rows of G3.score)."""
     v49, _ = M49.found_v49(set_name)
     mt, labels, emap, cached, _ = G3.load(set_name)
     gold_off, gold_on = gold_lists(set_name, False), gold_lists(set_name, True)
@@ -92,8 +92,9 @@ def found_l2(final_columns, set_name, taxi_rule=False, work=None):
     gold_by_ent = gold_on if taxi_rule else gold_off
     with rule(taxi_rule):
         f_ref = G3.score(cached, emap, mt, labels, gold_by_ent)[0]
-        f_new = G3.score(final_columns, emap, mt, labels, gold_by_ent)[0]
-    return T.adjust(base, f_ref, f_new)
+        f_new, rows_new = G3.score(final_columns, emap, mt, labels, gold_by_ent)
+    found = T.adjust(base, f_ref, f_new)
+    return (found, f_new, rows_new) if detail else found
 
 
 def taxi_mentions(set_name):

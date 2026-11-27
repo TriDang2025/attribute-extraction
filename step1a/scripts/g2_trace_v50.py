@@ -27,8 +27,9 @@ SETS = ("dev50", "dev50b")
 STOPS = ["S1", "S2", "S3", "S4/S5", "S6", "S7", "S8", "S9"]
 
 
-def load(set_name):
-    run = ROOT / "results" / "wf_v46" / "y3" / set_name / "step3"
+def load(set_name, step3=None):
+    """Data of a set; `step3` = another Step 3 folder (default: the v4.6 Y3 run), e.g. the wf_v5.1 R5 Step 3."""
+    run = Path(step3) if step3 else ROOT / "results" / "wf_v46" / "y3" / set_name / "step3"
     key = M46.RUN_OF[set_name]
     mt = pd.read_csv(ROOT / "results" / f"graph_v22_{set_name}" / "spans" / "mentions.csv", dtype=str, keep_default_na=False)
     mt["mention_id"] = mt["mention_id"].astype(int)
@@ -61,9 +62,11 @@ def checkpoints(mt, entity, key, cols, final, labels):
     return {"clusters": clusters, "split": split, "columns": columns, "final": fin}
 
 
-def trace_set(set_name, cfg):
-    mt, labels, emap, cols, final, sugg = load(set_name)
-    found, gold = M49.found_v49(set_name)
+def trace_set(set_name, cfg, data=None, found_gold=None):
+    """Trace table of a set. data = load(...) tuple (default: v4.6 Y3), found_gold = ({"loop2": found attrs}, {gold attr: entity}) (default:
+    wf_v4.9 found_v49): the misses are the gold attributes that are not in found["loop2"]."""
+    mt, labels, emap, cols, final, sugg = data or load(set_name)
+    found, gold = found_gold or M49.found_v49(set_name)
     gold_by_ent = {}
     for a, e in gold.items():
         gold_by_ent.setdefault(e, []).append(a)
@@ -71,7 +74,15 @@ def trace_set(set_name, cfg):
     rows = []
     for attr in sorted(set(gold) - found["loop2"]):
         ent = gold[attr]
-        key = key_of[ent]
+        key = key_of.get(ent)
+        if key is None:      # no predicted entity is matched to the gold entity (taxi rule on, dev50): S1, there is nothing to trace
+            cnt = T.entity_share(mt, labels, attr, "")[1]
+            loop2, detail = T.loop2_status(attr, ent, sugg, gold_by_ent, cfg)
+            rows.append({"set": set_name, "attr": attr, "gold_entity": ent, "scored_entity": "none", "n_pipe": sum(cnt.values()), "share_in_scored": 0.0,
+                         "entities": "; ".join(f"{e}={n}" for e, n in cnt.most_common()), "examples": examples(mt, labels, attr), "stop": "S1",
+                         "stop_last": "S1", "stop_in_entity": "", "if_majority_scored": "no predicted entity matched to " + ent,
+                         "loop2": loop2, "loop2_detail": detail})
+            continue
         stage1 = emap[key][0]
         n_pipe = sum(attr in labels.get(i, []) for i in mt.index)
         share, cnt = T.entity_share(mt, labels, attr, stage1)
@@ -102,6 +113,16 @@ def majority_trace(attr, ent, cnt, stage1, emap, mt, cols, final, labels):
     total = sum(attr in labels.get(i, []) for i in mt.index[(mt["entity"] == major) & (mt["cluster_id"] != "")])
     r = T.trace(attr, ent, checkpoints(mt, major, key, cols, final, labels), labels, total, set())
     return f"{key}: " + ("found" if r["final_ok"] else f"{r['stop']} ({r['final_best']})")
+
+
+def stop_table(tabs):
+    """Stop points (rows) x set first / last (columns) from {set: trace_set DataFrame}; S7 / S8 are the loop-2 statuses."""
+    table = pd.DataFrame({"stop point": STOPS})
+    for s, df in tabs.items():
+        table[f"{s} first"] = [int((df["loop2"] == st).sum()) if st in ("S7", "S8") else int((df["stop"] == st).sum()) for st in STOPS]
+        last = df["stop"].where(df["stop"].isin(["S1", "S2"]), df["stop_last"])
+        table[f"{s} last"] = [int((df["loop2"] == st).sum()) if st in ("S7", "S8") else int((last == st).sum()) for st in STOPS]
+    return table
 
 
 def main():

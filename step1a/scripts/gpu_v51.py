@@ -142,14 +142,15 @@ def step3_stage(backend, enc3, root=R5, sets=SETS, max_calls=LIMITS["step3"], sw
 
 
 # ---------------------------------------------------------------- 2. context split, rename, clash on the columns
-def ctx_split(dev, run, enc, root=R5):
-    """Context split big40 on the Step 3 final columns of one set -> <root>/<dev>/ctxsplit/final_columns.json (returns the path)."""
+def ctx_split(dev, run, enc, root=R5, out=None):
+    """Context split big40 on the Step 3 final columns of one set (read from <root>/<dev>/step3) -> <out or root>/<dev>/ctxsplit/final_columns.json
+    (returns the path)."""
     step3 = Path(root) / dev / "step3"
     final = B.read_json(step3 / "scores" / "final_columns.json")[run]
     parts = B.read_json(step3 / "columns.json")[run]
     vec, _ = CS.context_vectors(dev, CS.mention_table(dev), enc)
     after = {k: CS.apply(final[k], parts[k]["parts"], CS.reassign(parts[k]["parts"], vec, *CTX)) for k in final}
-    p = Path(root) / dev / "ctxsplit" / "final_columns.json"
+    p = Path(out or root) / dev / "ctxsplit" / "final_columns.json"
     B.write_json(p, {run: after})
     return p
 
